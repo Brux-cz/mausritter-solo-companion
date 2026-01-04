@@ -1,0 +1,263 @@
+KAPLE VĚČNÉHO KLIDU
+
+Mausritter Autor: Diogo Nogueira
+ÚVODNÍ TEXT
+
+Příslib prozření, moudrosti a věčného klidu láká k troskám staré kaple myši ze širokého okolí. Usídlila se tu menší sekta nábožných myší, které se řídí záhadnou filozofií.
+
+Sektáři vedení reverendem Zlatosrstem cestují po okolí, obracejí myši na víru a posílají je ke svojí svaté kapli. Slibují, že kdo se k nim přidá, ten konečně spatří Pravdu a bude připraven na věčný klid. Pochopitelně že noví věřící se musejí zříct veškerého svého pozemského jmění a darovat ho Kapli věčného klidu, která ho prý využije výhradně k dalšímu prosazování víry.
+
+Pravda je ovšem mnohem temnější. Zlatosrst je komplic kočičí čarodějnice Sabriny, která ho obdarovala kouzelným amuletem, s jehož pomocí ovlivňuje ostatní. Výměnou za to jí Zlatosrst poskytuje sem tam nějakou tu myš na čarodějné rituály. Dnes je Zlatosrst v okolních myších osadách známou, uznávanou a občas i obávanou osobností. Málokdo ovšem ví o jeho tajném spolčení.
+HÁČKY NA DOBRODRUŽSTVÍ (k6)
+
+    Ztratila se Heloisa, dcera myších rolníků. Její bratr Milaster se ji vypravil hledat, ale teď se rodiče strachují o oba.
+
+    Říká se, že Zlatosrst vlastní spoustu starodávných knih se zakázanými vědomostmi.
+
+    Významný myší měšťan Festus naříká, že jeho syn se dal na víru. Je znepokojen, a pokud někdo syna přesvědčí k návratu, Festus se mu odvděčí.
+
+    Bývalý mnich mluví o bohatství ukrytém v Kapli věčného klidu.
+
+    Věřící pěstují na zahradě u kaple vzácnou léčivou bylinu, ale Zlatosrst ji odmítá prodat bezvěrcům.
+
+    Zlatosrst dluží myšímu čaroději Alkounovi spoustu dobků za kouzelné přísady, ale odmítá mu je splatit. Donuťte ho k tomu.
+
+SETKÁNÍ (k6)
+
+    2k6 konvertitů. Poblouzněně lelkují a pokojně opakují Zlatosrstovy chvalozpěvy.
+
+    1k6+3 strážných. Jsou najatí, aby zvědavce nepouštěli do kaple.
+
+    1k6+3 strážných. Odnášejí bezvědomou myš do křoví venku za kaplí.
+
+    Milaster Buřič. Hledá svoji sestru.
+
+    1k6+2 mnichů v transu. Mají příkaz hledat vetřelce.
+
+    Reverend Zlatosrst. Dělá prohlídku pro 2k6 nově příchozích konvertitů.
+
+POPIS MÍSTNOSTÍ A LOKACÍ
+
+1. Zeleninová zahrádka
+
+    Úzké brázdy okopané hlíny. Zarostlé plevelem.
+
+    Na slunci se suší nakrájené hlízy.
+
+    2k6 konvertitů pokojně obdělává zahrádku.
+
+    Na oploceném záhonku: opečovávaný keřík šanty.
+
+2. Přední vchod
+
+    Těžké dveře zduřelé působením času a vody.
+
+    k6 mnichů vítá poutníky a chválí Zlatosrsta.
+
+    K otevření nebo zavření dveří je zapotřebí několika myší.
+
+3. Modlitební lavice
+
+    Pod dřevěnými lavicemi jsou rozeseté desítky stanů.
+
+    První řada: Táboří tu 2k10 poutníků. Čekají, až budou moct předat dary a vykoupat se v očistném vědru.
+
+    Druhá řada: Žije tu kolem 20 konvertitů, někteří i s rodinami. Vzdali se většiny svého majetku.
+
+    k6 strážných hledá cennosti ke „zkonfiskování“.
+
+    V dutině pod nohou lavice je ukrytý poklad.
+
+4. Oltář obrácení
+
+    Zlatý kalich na omšelé dřevěné desce.
+
+    Nahoru se leze po vachrlatém dřevěném žebříku.
+
+    k6 poutníků. Nesou obětiny a postupují směrem k očistnému vědru.
+
+    k6 strážných. Chtějí ztopit nějakou kořist.
+
+    Všelijaké cennosti v hodnotě 3k6×10 d.
+
+5. Očistné vědro
+
+    Protékající dřevěné vědro. Tmavá, zatuchlá voda.
+
+    V kalné vodě se koupe k6 podezřele poklidných konvertitů a mnichů.
+
+    Každá směna ve vědru dává stav Zklidnění.
+
+    Když myš nabere tři stavy Zklidnění, stává se konvertitou. Všechny své nesené předměty daruje kapli.
+
+6. Socha
+
+    Nesmírně vysoká, porostlá mechem a lišejníkem. Poklidná atmosféra.
+
+    Medituje tu k6+1 mnichů.
+
+    K vylezení na sochu je potřeba vhodné vybavení nebo záchrana na sílu. Při neúspěchu stav Vyčerpání.
+
+    Aura pasivity: Před každou agresivní akcí musejí myši uspět v záchraně na sílu.
+
+7. Ruce Boží
+
+    V kamenných rukou lze nalézt poklid a intriky.
+
+    Reverend Zlatosrst a k6 mnichů tu meditují nebo pořádají schůzky s důležitými konvertity.
+
+    Bohatý myší kupec nabízí své jmění (smaragd za 500 d), aby konečně nalezl klid.
+
+    Mezi prsty jsou ukryté destičky s dvěma kouzly.
+
+8. Střešní doupě
+
+    Zatuchlé trámoví. V přítmí poletuje prach.
+
+    Zlatosrstova skrýš darů od konvertitů. Dobky, šperky a umělecká díla celkem za 2k6×100 d.
+
+    Dva náhodné poklady.
+
+    Poznámky o konstrukci nového kouzla na zotročení kočky. Dopis od Alkouna (O čarodějovi a jeho brnění) vyjmenovává potřebné přísady, včetně šanty napuštěné myší krví.
+
+9. Zadní vchod
+
+    Zřícené kameny, zablácená podlaha.
+
+    V blátě otisky kočičích pacek. Vedou ke keříkovým růžím.
+
+    Milaster tu pátrá po dvou ztracených myších.
+
+10. Keříkové růže
+
+    Husté a spletité. Pach strachu.
+
+    V noci sem Zlatosrst vodí konvertity, aby si je odnesla kočičí čarodějka Sabrina.
+
+    Mosazný zvoneček. 2k6 směn po zazvonění přiběhne Sabrina.
+
+    Krvavá cestička. Útržky myšího oblečení chycené v trní. Na konci cestičky chlemtá z kaluže krve k6 pokřivených růží.
+
+    V hnijícím listí je ukrytý poklad.
+
+STATISTIKY POSTAV
+
+Konvertita
+
+    2 BO, síla 8, mrštnost 10, vůle 8
+
+    Útoky: žádné
+
+    Vždy pod vlivem stavu Zklidnění.
+
+    Chce najít smysl ve vyprázdněném životě.
+
+Strážný
+
+    4 BO, síla 12, mrštnost 10, vůle 8
+
+    Útoky: kopí k8 nebo oštěp k6
+
+    Chce dostat zaplaceno nebo sehnat lepší nabídku.
+
+Mnich
+
+    3 BO, síla 10, mrštnost 11, vůle 12
+
+    Útoky: hůl k6
+
+    Kouzla: Zahojení nebo Síla
+
+    Chce s pomocí Zlatosrsta najít smysl života a klid.
+
+Milaster Buřič
+
+    4 BO, síla 12, mrštnost 8, vůle 11
+
+    Útoky: meč k8, krátký luk k6
+
+    Chce najít svou sestru Heloisu a zjistit pravdu o kapli.
+
+Pokřivená růže
+
+    6 BO, síla 12, mrštnost 12, vůle 12
+
+    Útoky: větve k6 nebo rozprsknutí pylu k4 (obchází BO, zraňuje vůli)
+
+    Chce se zbavit svého prokletí (ale mezitím se spokojí s pitím krve).
+
+Reverend Zlatosrst
+
+    10 BO, síla 11, mrštnost 12, vůle 14
+
+    Útoky: zdobená hůl k8
+
+    Kouzla: Sladká slůvka, Oslepující dotyk, Stínové šlahouny
+
+    Kouzla umí sesílat, jen když má nasazený Sabrinin amulet. S amuletem taky dokáže na jakoukoli myš uvrhnout stav Zklidnění.
+
+    Chce získat moc a vliv, a to libovolnými prostředky.
+
+POKLADY (k6)
+
+    Náhodné kouzlo.
+
+    Léčivé byliny (uzdraví stav Choroba, ale myš je pak velmi ospalá, 150 d.)
+
+    Malý zlatý svatý symbol (drží duchy od těla, 450 d.)
+
+    Hostie (po krátkém odpočinku uzdraví všechny BO, 200 d.)
+
+    Zlatý perořízek (těžký, k10, 800 d.)
+
+    Plášť osvícení (při nošení výhoda na záchrany na vůli, ale myš se chová jako náfuka).
+
+KOUZLA (k4)
+
+1. Oslepující dotyk
+
+    Účinek: Koho se dotkneš, ten dostane stav Slepota. Odezní po [POČET] směnách.
+
+    Dobití: Drž kouzlo na nebezpečném místě celý jeden den se zavřenýma očima.
+
+2. Stínové šlahouny
+
+    Účinek: Šlahouny znehybní [POČET] bytostí. Vysvobození záchranou na sílu.
+
+    Dobití: Ovaž kouzlo provazem a na tři dny ho nech v naprosté tmě.
+
+3. Síla
+
+    Účinek: Výhoda při zách. na sílu, po dobu [POČET] směn způsobuješ o [POČET] zranění víc.
+
+    Dobití: Ponoř do potu tvora, který právě usilovně cvičil.
+
+4. Sladká slůvka
+
+    Účinek: [POČET] osob tě po dobu [SOUČET] směn považuje za důvěryhodného přítele.
+
+    Dobití: Pomaž kouzlo medem. Každé ráno po tři dny med vyměň za čerstvý.
+
+STAVY
+
+Oslepení
+
+    Nevidíš.
+
+    Všechny útoky máš zeslabené.
+
+    Odstranění: ošetřit vílími slzami.
+
+    Způsobeno kouzlem Oslepující dotyk.
+
+Zklidnění
+
+    Nevýhoda při zách. na vůli.
+
+    Před každou agresivní akcí musíš uspět v zách. na vůli.
+
+    Odstranění: po dlouhém odpočinku.
+
+    Způsobeno koupelí v očistném vědru nebo vypitím nápoje z vědra.
+
+Tiráž: Text a ilustrace: Diogo Nogueira | Návrh: Isaac Williams Redakce: Andre Novoa a Isaac Williams | Překlad: Jiří „Markus“ Petrů Redakce překladu: Markéta Forró Copyright 2023 Mytago

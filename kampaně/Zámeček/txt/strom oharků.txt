@@ -1,0 +1,154 @@
+STROM OHARKŮ
+Mausritter
+L. F. OSR
+
+================================================================================
+
+SETKÁNÍ
+
+k6  Setkání
+1   1k4 rozzuřených termitů. Vztekle popocházejí.
+2   2k4 termitů. Jsou pohlcení vášnivou hádkou.
+3   2k6 termitů. Panikáří a snaží se utéct.
+4   Rybenka žhavá. Prudce se mrská.
+5   2k4 myších průzkumníků. Přivábily je uhlíky.
+6   Bleskový elementál. S prskáním ožije.
+
+--------------------------------------------------------------------------------
+
+TERMIT
+Baňatá hlavička, kusadla jako pily.
+
+3 BO, síla 9, mrštnost 8, vůle 8
+Útoky: kousnutí k6
+
+Chce vybudovat mocnou říši, jeden tunel za druhým.
+
+--------------------------------------------------------------------------------
+
+RYBENKA ŽHAVÁ
+Jako korálek roztaveného olova tančící mezi uhlíky.
+
+2 BO, síla 8, mrštnost 10, vůle 6
+Útoky: spalující dotyk k6
+Kritické zranění: k6 předmětů v batohu vzplane
+
+Chce si hrát v plamenech.
+
+--------------------------------------------------------------------------------
+
+BLESKOVÝ ELEMENTÁL
+Přízračná koule energie, která srší vzteky.
+
+8 BO, síla 10, mrštnost 12, vůle 15
+Útoky: výboj k4, potom v příštím kole,
+       rázová vlna k12 (plošný účinek, zraňuje mrš.)
+Zranitelný jen stříbrem, magií nebo vodou.
+
+Chce být vysvobozen z téhle podoby.
+
+================================================================================
+
+LOKACE
+
+1. ZAČAZENÁ BRÁNA
+Kdysi červená brána je celá začerněná sazemi.
+• Po otevření se z ní vyvalí mračno kouře.
+• V sazích na zemi jsou vidět stopy housenek.
+• Skrz kouř je slyšet zmatek z housenčí osady.
+
+2. HOUSENČÍ OSADA
+V dutině jsou zavěšené stany z hedvábných vláken.
+• Chaos. Všude pobíhají panikařící housenky. Pronásledují je stejně rozrušení termiti.
+• Ohořelý stan: Zhroutil se skoro až na zem. Uvnitř uvízlo několik mladých housenek.
+• Prostý stan: Uvnitř truchlí Šusťa za ztraceného prince Štempla, který byl tajně jejím snoubencem.
+• Honosný stan: Do hedvábí jsou vetkané zlaté nitě. Uvnitř k4 termitů hledá poklad. V houpací síti se ukrývá vyděšený housenčí strážný Tripl. Housenčí král odešel pro pomoc. Hodem urči poklad.
+
+3. TERMITÍ TUNELY
+Ozvěny pokřikujících termitů v zakroucených chodbičkách.
+• Nepříjemně horko, vlhko, klaustrofobický dojem.
+• k6 termitů hledá cestu ven.
+• Zakroucené chodbičky: Vedou do stromu, ale bez průvodce je snadné zabloudit (při bloudění urči cíl cesty náhodně). Vedou do čadící díry, k řece žhavé mízy, nebo do hromového tunelu.
+
+4. ČADÍCÍ DÍRA
+Hustý, dusivý závoj kouře brání ve výhledu.
+• V kouři se ztratilo k6 termitů.
+• Po zemi se válejí hromádky jemných sazí.
+• Rozpadající se schody: Dlouhý výstup do řeřavé komory.
+
+5. ŘEKA ŽHAVÉ MÍZY
+Cestu přehrazuje žhnoucí řeka rozteklé mízy.
+• Míza při doteku opaří (k8 zranění). Přechod bez zvláštní výbavy vyžaduje hod na mrštnost.
+• V míze si hraje k6 rybenek žhavých.
+• Po proudu plují kousky zkamenělé mízy.
+• Zrádný výstup do řeřavé komory.
+
+6. HROMOVÝ TUNEL
+Tunelem se valí ohlušující burácení hromu.
+• Po stěnách přejíždějí oblouky zbytkové elektřiny. Zásah způsobuje k6 zranění.
+• Do stěny je zaseknuté hromové kopí. Vytažením se vysvobodí bleskový elementál.
+• Cesta tunelem: Do řeřavé komory.
+
+7. ŘEŘAVÁ KOMORA
+Nesnesitelné vedro. Praskliny ve zčernalém dřevě červeně žhnou.
+• Za každou směnu záchrana na sílu. Neúspěch = k6 zranění. Šance 2 z 6 na vzplanutí dřevěných předmětů.
+• Uprostřed komory trčí řeřavý drahokam. Když ho někdo uhasí, vynese ven ze stromu nebo jinak zneškodní, strom dohoří a kouř se rozplyne.
+• Okolo drahokamu se plácá k6 rybenek žhavých.
+• Dvě klenutá schodiště: Ke spálené koruně.
+
+8. SPÁLENÁ KORUNA
+Padající oharky, listy plápolající ve větru.
+• Pokud řeřavý drahokam není uhašený, z větví v náhodných intervalech šlehají plameny.
+• Na větvích visí 2k4 žhavolistů.
+• Vysoko na větvi je zavěšený traumatizovaný housenčí princ Štempl. Zachráncům nabídne za odměnu zlatý lupen (500 d).
+
+================================================================================
+
+ŘEŘAVÝ DRAHOKAM
+
+Jen kousíček pod korunou uvízl ve vnitřních dutinách stromu křišťálově čirý drahokam, aniž by si toho kdokoli z obyvatel byl vědom. Když byl strom zasažen bleskem, drahokam do sebe vstřebal ohromné množství elektřiny a tepla. Začal červeně žhnout a zanedlouho zaplnil okolní dutiny spalujícím žárem. Dokud řeřavý drahokam nevyzáří všechnu nashromážděnou energii, nepřestane strom hořet. Pokud někdo drahokam uhasí, vynese ho ze stromu ven nebo ho jinak zneškodní, oheň uhasne a hustý kouř se rozptýlí ve větru.
+
+Řeřavý drahokam
+[předmět zabírá 3 sloty]
+
+Jedna směna strávená soustředěním se na drahokam zaškrtne jedno políčko použití a přivolá bleskového elementála, který provede jednu akci a pak se vrátí do kamene.
+
+Po zaškrtnutí všech teček drahokam pukne a elementál je volný.
+
+================================================================================
+
+POKLAD
+
+k6  Poklad
+1   Zkamenělá míza (100 d.)
+2   Žhavolist (následovníci reverenda Zlatosrsta zaplatí 200 d.)
+3   Krunýřový štít (lehký, 1 obr., zranění bleskem je zeslabené)
+4   Jemné saze (po smíchání s olejem okamžitě vzplanou)
+5   Hromové kopí (těžké, k10, zraňuje mrštnost)
+6   Zlatá housenčí koruna (400 d.)
+
+================================================================================
+
+POZADÍ
+
+Za jedné obzvlášť hrůzostrašné bouřky práskl do starého dubu blesk, až strom vzplanul. Liják sice plameny rychle uhasil, ale oheň dál pozvolna doutnal v hlubinách kmene.
+
+Několik dní po bouřce začal zpod ohořelé kůry zčernalého stromu stoupat hustý, palčivý dým. Okolní osady i volně žijící zvířata se začínají bát.
+
+================================================================================
+
+HÁČKY NA DOBRODRUŽSTVÍ
+
+k6  Háček
+1   Dým stoupající ze stromu zakryl slunce. Místní zemědělci nabízejí odměnu 500 d. tomu, kdo ho dokáže odstranit.
+2   Do Cihlína dorazí ohořelý housenčí král a žádá o pomoc.
+3   Kouř vyhnal ze stromu migrující včelstvo. Včely se usadily hned nad Cihlínem a upadly do hlubokého spánku.
+4   Reverend Zlatosrst káže, že očistný oheň stromu brzy sežehne celý Zámeček i jeho okolí.
+5   Luďa Dvoukudlák tvrdí, že ve stromě panuje zmar. Výborná příležitost ukrást poklady housenčího království.
+6   Myší královna poslala zprávu, že její termití dělníci se bouří. Prý si stěžují, že jim hoří domov.
+
+================================================================================
+
+Text a ilustrace: L. F. OSR | Návrh: Isaac Williams
+Redakce: Andre Novoa a Isaac Williams | Překlad: Jiří „Markus" Petrů
+Redakce překladu: Markéta Forró | © Copyright 2022 Mytago

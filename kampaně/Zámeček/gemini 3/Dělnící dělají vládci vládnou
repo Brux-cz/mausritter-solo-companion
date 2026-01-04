@@ -1,0 +1,189 @@
+Mausritter
+
+DĚLNÍCI DĚLAJÍ
+VLÁDCI VLÁDNOU
+
+@SKULLFUNGUS
+
+[Tabulka setkání]
+2k6 | Setkání
+--- | ---
+2   | Zvláštní příval energie. Začínáte se cítit ospale a otupěle.
+3   | k4 stínonožek. Kapou ze stropu.
+4   | k4 stínonožek. Vybublávají z tenké štěrbiny.
+5   | Otupený horník. Je plně probuzený a panikaří!
+6   | k6 otupených horníků. V dokonalém rytmu kutají do stěny.
+7   | k4 otupených horníků. Potácejí se k myším.
+8   | Skořápka přilepená ke stěně. Při přiblížení praskne.
+9   | Skořápka. Tiše jde myším v patách.
+10  | Tiché šeptání: „Podvolte... se... nám...“
+11  | Vítr přináší mračno spór. Na jednu směnu špatný výhled.
+12  | Vítr přináší narkotický prášek. Náhodná myš musí uspět v záchraně na vůli, jinak je na směnu očarovaná můří královnou.
+
+[Statistiky nepřátel]
+
+Otupený horník
+Myš zotročená práškem můří královny
+3 BO, síla 12, mrštnost 8, vůle 6
+Útoky: krumpáč k6 / houbové vlákno (záchrana na sílu, jinak chycení do lepkavé sítě)
+Chce pracovat a pracovat a pracovat a pracovat a pracovat a pracovat a pracovat...
+
+Stínonožka
+Iluzorní stonožka tvořená sny
+1 BO, síla 12, mrštnost 16, vůle 14
+Zranitelná jen ohněm, stříbrem a kouzelnými zbraněmi.
+Po k4+1 kolech se rozplyne v nic.
+Útoky: vysátí energie k6 (zraňuje mrštnost)
+Chce se stát skutečnou
+
+Skořápka
+Hmyzí exoskelet oživený houbami
+6 BO, síla 8, mrštnost 6, vůle 4
+Útoky: pukající podhoubí (exploduje, způsobuje k4 zranění za kolo, dokud není očištěno)
+Chce vyrobit víc hostitelů
+
+Můří královna
+Mrtvá můří vládkyně na houbovém trůně
+16 BO, síla 14, mrštnost 10, vůle 16
+Útoky: „POKLON SE MI“ k8 (zraňuje vůli)
+Kouzla: sprška narkotického prášku (k6 zranění cílům v kuželi, kritické zranění: sloužíš královně)
+Chce VLÁDNOUT
+
+[Lokace]
+
+Vstup do jeskyně
+Vlákna komíhající se ve větru.
+• Vstup je přehrazený dlouhými lepivými vlákny. Dotek způsobuje k4 zranění.
+V hlíně: Několik stop myší velikosti, všechny vedou do jeskyně.
+
+Houbové špice
+Pach vlhké plísně.
+• Z podlahy tyčí ke stropu houbové špice. Když se k nim myši přiblíží, jejich špičky puknou a vypustí neškodné spóry.
+
+Prasklá skořápka
+Sípe a chroptí.
+• O zeď se opírá prasklá umírající skořápka pokrytá houbovými vlákny. Na podlahu z ní vystříkla směs podhoubí a hmyzích vnitřností.
+• Skořápka bzučivým hlasem zaskřehotá: „Musím vykonat práci... Královna si to žádá... Práce... sekera... potřebuju sekeru...“ a potom v záškubech zemře.
+Za skořápkou je poklad.
+
+Mléčné jezírko z podhoubí
+Štiplavý kyselý zápach.
+• Místnost vyplňuje do pasu hluboký sliz tvořený kyselinovým podhoubím. Pád do podhoubí způsobuje k4 zranění za kolo, dokud se myši neočistí. Sliz odbarvuje srst.
+• Části stropu se zřítily do jezírka. Kyselou břečkou vede vachrlatý chodníček ze zubatých kamenů. Překročení vyžaduje záchranu na mrštnost.
+Průchod nalevo: Mdlá záře.
+Průchod vepředu: Dlouhá lepivá vlákna. Při dotyku k4 zranění.
+
+Škubající se svítibrouk
+Zdroj slabého svitu v temnotách.
+• Na konci komory leží obří mrtvý svítibrouk, napůl ponořený v louži kyselinového podhoubí. V zadečku mu pulzuje hřejivé světlo.
+• Po stropě leze sedm stínonožek. Jediné, co je zatím odhání, je hřejivé světlo z brouka.
+• V zadečku brouka je zakleslý svítivý fialový opál (500 d.). Při vyjmutí přestane pulzovat a stínonožky mají volné pole působnosti...
+
+Důlní štoly
+Pravidelné „cink cink cink“.
+• Pět otupených horníků pomalu buší krumpáči do stěny. Těla mají pokrytá tmavými spórami a páchnou plísní.
+• Jeden z horníků má na sobě zlatě vyšívanou tuniku. Po vyléčení se představí jako Ansel, princ z Křáčí (Trpké plody sadu).
+• Na velké hromadě kamení je pohozený poklad. Hromada je nestabilní a při manipulaci se sesune.
+
+Karmínové křišťály
+Pach spáleného prachu.
+• Pět velkých karmínových křišťálů. Vychází z nich pravidelný pulz antisvětla, který komoru zahaluje do nepřirozené tmy.
+• Na zemi před velkým křišťálem leží dvě skořápky, nohy roztažené, jako by se modlily. Obě drží poklad.
+• Při rozbití křišťálu (aspoň 8 bodů poškození) vystřelí do všech směrů k6 ostrých úlomků křišťálu. Každý v ceně 200 d. Hod na setkání.
+
+Můří královna
+Slabá ozvěna ve vašich hlavách.
+• Můří královna: Kolosální můra celá porostlá barevnými houbami. Houbová masa ji ovládá jako loutku.
+• Před královnou: Čtyři otupení horníci uchvácení jejím šeptáním. Dehydratovaní a zesláblí, ale oddaní a budou se za královnu bít na smrt.
+• Po zničení královny se její tělo rozteče v kyselinové podhoubí, které zaplaví místnost. Podhoubí způsobuje k4 zranění za kolo, dokud nebude očištěno.
+
+Temná ruda
+Slabé elektrické bzučení.
+• Zdroj nákazy. Na kamenném oltáři stojí prokletá houba s obsidiánovou krustou. Z trhliny v krustě stoupá tenký pramínek jakéhosi dýmu – ve skutečnosti spóry.
+• Nepoškozená má pro čarodějnice a čaroděje hodnotu 5 000 d. Zato po odstranění krusty čekají doly zlé časy.
+
+Snílek
+Zvuk slabého pochrupování.
+• Na konci místnosti visí v houpací síti z tenkých hedvábných vláken malá můří larva. Jediný potomek můří královny.
+• Když ji někdo zachrání a bude se o ní řádně starat, může vyrůst a stát se mocným spojencem. Dovede vytvářet narkotický prášek a pevná, hedvábná vlákna.
+
+Co se doopravdy stalo?
+Před několika týdny vykopal jeden z horníků houbu s obsidiánovou krustou. Když ji prolomil, do dolů z ní uniklo mračno smrtících spór.
+Spóry nakazily všechno, s čím přišly do styku – myši i hmyz. Oběti ztratily vládu nad svými těly i myslí. Zbyl jim jenom instinkt opakovat staré příkazy a zaběhlé rutiny — dělníci dělají, vládci vládnou.
+V můří královně, výhradní majitelce dolů, probudila choroba nový hlad po moci. Královna teď pomocí svého narkotického můřího prášku zotročuje myši z okolních osad.
+Živou podobu nabírají dokonce i její nejtemnější, nejniternější tužby. V dolech se začaly zhmotňovat podivné stínové stonožky a teď hladově číhají v potemnělých štolách dolů můří královny.
+
+[Tabulka pokladů]
+k8 | Poklad
+--- | ---
+1 | Lidský zub s drahokamy (250 d.)
+2 | Můří bůžek ze zkamenělého dřeva (300 d.)
+3 | Koncentrovaná snovost (500 d.)
+4 | Buclatá houba, snědení dá myši jednu houbovou schopnost.
+5 | Žhnoucí řeřavá koule (660 d.)
+6 | Úlomek obsidiánu obsahující náhodné kouzlo.
+7 | Přilba z lebky s ostny (těžká zbroj).
+8 | Narkotický můří prášek v sametovém váčku.
+
+[Tabulka houbových schopností]
+Když se myši dostanou do delšího styku s houbami, dej jim houbovou schopnost. Hoď k6. Opakované výsledky přehod'. Houbové schopnosti jsou trvalé, dají se odstranit jen magií.
+
+k6
+
+Schopnost
+
+Odstranění
+
+1
+
+Velké uši: Výhoda na záchrany týkající se naslouchání.
+
+trvalé?
+
+2
+
+Jiskřící vousky: Tvory na dosah kousnutí můžeš donutit k záchraně na sílu, jinak je na kolo omráčíš.
+
+trvalé?
+
+3
+
+Houbové vyrůstky: Každý den vyrobí k3 zásob.
+
+trvalé?
+
+4
+
+Spórový dech: Jednou za den zaplní středně velikou místnost tmavými spórami, které brání výhledu.
+
+trvalé?
+
+5
+
+Ochočená stínonožka: Z ucha ti vyleze stínonožka. Poslouchá jednoduché příkazy, zbožňuje drbání na bříšku.
+
+trvalé?
+
+6
+
+Kroutící se obličej: Jednou denně dá jinému tvorovi stav Vystrašení.
+
+trvalé?
+
+V dolech můří královny se dějí prapodivné věci.
+Do okolních osad přestaly přijíždět dodávky rudy a začíná se mluvit o tom, že se ztrácejí myši.
+Odhalí myší hrdinové temnotu, která se skrývá v srdci houbami prorostlého dolu?
+
+[Háčky na dobrodružství]
+k6 | Háček
+--- | ---
+1 | Zločinci pomocí „můřího prášku“ dělají své oběti povolnými. Odkud ho berou, z dolu?
+2 | Jistá myš potřebuje pomoct najít přítele, který se ztratil. Přítel pracuje v dolech.
+3 | Vesničani si stěžují na podivné sny. Někteří se probudili před dolem a nepamatují si, jak se tam dostali.
+4 | Nedaleko jeskyně se objeví brouk nakažený zvláštní chorobou. Je potřeba najít příčinu, než se nemoc rozšíří.
+5 | Byla nalezena mrtvá myš pokrytá podivnou plísní. Stopy vedou do dolů.
+6 | Čarodějnice Uršula nabízí každé hráčské myši 200 d., když jí skupina přinese trochu narkotického můřího prášku.
+
+Text a ilustrace @skullfungus | Návrh Isaac Williams
+Redakce: Andre Novoa a Isaac Williams | Překlad: „Jiří Markus“ Petrů
+Redakce překladu: Markéta Forró | Copyright 2023 Mytago

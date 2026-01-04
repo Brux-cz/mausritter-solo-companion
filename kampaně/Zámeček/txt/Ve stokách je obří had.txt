@@ -1,0 +1,262 @@
+VE STOKÁCH JE OBŘÍ HAD
+@gnarledmonster
+Mausritter
+
+================================================================================
+
+PŘÍBĚH
+
+Když krysy z tlupy Kosťáků ukradly pořádnou hromadu cenností a ukryly lup ve stokách, netušily, že tam číhá obří had.
+
+Had se domáhal obětí a začal krysy posílat na přepady okolních osad. Krysy mu jako oběť nabídly čarodějnici, ta však hada proklela věčným hladem.
+
+UTÍKEJTE! UTEČTE!
+
+Několika krysám se podařilo prchnout. Spoustu jich had sežral. Jiné se zamknuly ve skladu. O několik měsíců později se krysy vrátily s kouzlem Nesmrt, které ukradly Nekrokřečkovi, a oživily mrtvé v marném pokusu o zabití predátora.
+
+Nepovedlo se. Krysí kostlivci se obrátili proti svým stvořitelům a teď bezcílně bloumají stokami. A jelikož hadovi nikdo nenosí oběti, aby utěšil jeho hlad, plaz teď po nocích terorizuje okolní myší osady.
+
+================================================================================
+
+SETKÁNÍ
+
+k6  Setkání
+1   Osamělý šváb. Utíká pryč.
+2   Dva švábi. Perou se o jídlo.
+3   k6 švábů. Nesou neobvyklý poklad.
+4   Krysí kostlivec. Hladově bloumá kolem.
+5   k4 krysích kostlivců. Táhnou truhlu s lupem.
+6   Botticelli, nindža ze stok. Hledá potravu.
+
+================================================================================
+
+BESTIÁŘ
+
+Šváb
+Příšerné stvoření. Cupitá ve stínech.
+
+1 BO, síla 8, mrštnost 6, vůle 6
+Útoky: kousnutí k6
+Kritické zranění: dá stav Choroba
+
+Chce žrát a množit se.
+
+--------------------------------------------------------------------------------
+
+Krysí kostlivec
+Chodící kostra. Rachtá jako xylofon.
+
+5 BO, síla 10, mrštnost 6, vůle 15
+Útoky: kousnutí nebo kostěné pařáty k8
+Řezné a bodné útoky jsou proti němu zeslabené.
+Drtivé útoky jsou proti němu zesílené.
+
+Chce být vysvobozen z téhle sféry existence.
+
+--------------------------------------------------------------------------------
+
+Obří had
+Enormní. Tichý. Obří oči těsně nad hladinou.
+
+Měřítko tlupy
+14 BO, síla 12, mrštnost 15, vůle 10, zbroj 1
+Útoky: kousnutí k10
+Kritické zranění: spolknutí v celku
+
+Chce utěšit svůj věčný hlad.
+
+--------------------------------------------------------------------------------
+
+Botticelli, nindža ze stok
+Když vy jste běhali po dobrodružstvích, on trénoval boj.
+
+7 BO, síla 12, mrštnost 12, vůle 9
+Útoky: sai k8 (dva útoky za kolo)
+
+Chce pomstít své padlé spojence (a najít něco k snědku).
+
+--------------------------------------------------------------------------------
+
+Uršula, čarodějnice
+Ztracená v žaludku predátora.
+
+6 BO, síla 8, mrštnost 8, vůle 14
+Útoky: naběračka k6
+Když má svoji hůl, dovede komunikovat s tvory v měřítku tlupy a ovládat je.
+
+Chce být vysvobozena z živoucího vězení.
+
+================================================================================
+
+LOKACE
+
+1. Vchod
+Do stěn tunelu jsou vyryté varovné značky. Silný puch výkalů a chemikálií.
+
+- V bahně uvízl člun. Má dost místa pro čtyři myši a na zádi lucernu.
+- Přeskočení kanálu vyžaduje zách. na mrštnost.
+- Kdo vstoupí do splašků v kterékoli části stok, dostane stav Choroba.
+
+--------------------------------------------------------------------------------
+
+2. Přístaviště
+Zlomená vesla a umazaná podlaha.
+
+- Hodem urči dva běžné poklady.
+
+--------------------------------------------------------------------------------
+
+3. Sklad
+Zamlžené chodby. Pach hnijícího jídla a ledku.
+
+- Chodba je prázdná, dveře vyražené zevnitř. Pohozené prázdné koše.
+- V rohu stojí tři sudy střelného prachu, jeden z nich otevřený. Skrývá se v něm krysí kostlivec a zaútočí na toho, kdo ho vyruší.
+- V postranní místnosti: Želví krunýř. Leží pod ním mrtvá krysa s nunčaky.
+
+--------------------------------------------------------------------------------
+
+4. Ubikace
+Pach krve a krysí moči.
+
+- Neustlané postele (2k10 ukrytých dobků).
+- Tajný průchod ve skříni: Vede do doupěte Botticelliho. Je nepřátelský, dokud se nenají. Ví, kde je kouzlo Nesmrt (v žaláři).
+
+--------------------------------------------------------------------------------
+
+5. Plovoucí sudy
+Vesele se pohupují ve splaších.
+
+- První sud: Hodem urči běžný poklad.
+- Druhý sud: Hodem urči neobvyklý poklad.
+- Třetí sud: Hodem urči cenný poklad. Had zaútočí!
+
+--------------------------------------------------------------------------------
+
+6. Hnízdo švábů
+Silný zápach olejnaté plísně.
+
+- V rohu je pohozený žebřík. Dost veliký na překlenutí kanálu.
+- Hnízdo brání hejno 3k4 švábů. Když jich polovina padne, zbylí se v hrůze rozutečou.
+
+--------------------------------------------------------------------------------
+
+7. Švábí vajíčka
+Podlaha pokrytá vajíčky. Některá jsou prázdná, jiná nevylíhnutá.
+
+- Na zemi vzpřímeně stojí Uršulina hůl.
+- Při vyrušení se z vajíček vylíhne 2k6 švábů.
+
+--------------------------------------------------------------------------------
+
+8. Žaláře
+Rozbitý nábytek z krabiček od sirek. Chrastění chodících kostí.
+
+- Potuluje se tu k6+1 krysích kostlivců. Jeden má dvě katany.
+- V žaláři: Mrtvá krysa v červeném rouchu s černým opaskem. Drží kouzlo Nesmrt.
+- Hodem urči dva běžné poklady.
+
+--------------------------------------------------------------------------------
+
+9. Falešné stěny
+Cihly bez malty, dají se snadno rozebrat.
+
+- Truhla s pokladem: k6 x 100 d., dva cenné poklady a jeden neobvyklý poklad.
+
+--------------------------------------------------------------------------------
+
+10. Pelech hada
+Těsně pod hladinou číhá cosi obrovského.
+
+- Sežrané myši: Pokračují do tlamy.
+
+--------------------------------------------------------------------------------
+
+11. Tlama
+Jazyk se mrská jako bič. Ze zubů odkapává jed.
+
+- Záchrana na mrštnost, aby se myš vyhnula jazyku a zubům, jinak k8 zranění (zraňuje mrštnost místo síly).
+- Temná díra: Do chřtánu
+
+--------------------------------------------------------------------------------
+
+12. Chřtán
+Dlouhý masitý tunel. Ve stěnách cosi pravidelně tepe.
+
+- Úder do srdce hada okamžitě zabije, ale spustí explozivní spršku krve a kyseliny, která způsobí k20 zranění, při záchraně na sílu polovinu.
+- Svěrač: Do žaludku.
+
+--------------------------------------------------------------------------------
+
+13. Žaludek
+Kyselý zápach. Krysí kosti. Menší stan.
+
+- Je tady Uršula, vaří si na ohýnku.
+- Když má svoji hůl, dovede Uršula komunikovat s tvory v měřítku tlupy a ovládat je.
+- Na konci: Nepříjemný východ.
+
+================================================================================
+
+POKLAD
+
+k6  Běžné poklady
+1   Váček dobků (2k6 d.)
+2   Ohlodaný kus pizzy (zásoby na k6 použití)
+3   Rezavý sekáček (střední, k6/k8)
+4   Nindžovské roucho (výhoda na nenápadnost)
+5   Lucerna (zbývá k3 použití)
+6   Lano s kotvičkou (z kancelářské sponky)
+
+--------------------------------------------------------------------------------
+
+k6  Neobvyklé poklady
+1   Hadí zub (kouzelný meč, prokletý)
+2   Rezavý klíč (k bráně do Cihlína)
+3   Dílek skládačky (může ho chtít Zipora)
+4   Zbroj z víček (lehká, k6 použití)
+5   Vílí srdce v láku
+6   Mapa stok (Věda a žal)
+
+--------------------------------------------------------------------------------
+
+k6  Cenné poklady
+1   Vyzrálý sýr s modrou plísní (200 d.)
+2   Stříbrná lžička (300 d., 2 políčka)
+3   Šachová figurka ze slonoviny (300 d.)
+4   Filigránový stříbrný prsten (400 d.)
+5   Zlatá brož (500 d.)
+6   Smaragdové náušnice (800 d., 2 políčka)
+
+================================================================================
+
+KOUZLO NESMRT
+
+Účinek: Vzkřísí [SOUČET] tvorů z mrtvých, pak hoď záchranu na vůli. Při neúspěchu jsou to nemyslící a neovladatelné trosky.
+Dobití: Polij kouzlo kočičí krví.
+
+================================================================================
+
+STAV
+
+Choroba
+BO ti nemůžou stoupnout nad 1.
+Odstranění: zách. na sílu po dlouhém odpočinku
+
+Způsobeno útoky švábů nebo vkročením do splašků ve stokách.
+
+================================================================================
+
+HÁČKY NA DOBRODRUŽSTVÍ
+
+k6  Háček
+1   Pašeráci z tlupy Kosťáků najímají myši na zabití hada.
+2   Starostka nabízí odměnu 500 d. tomu, kdo zastaví hadovy útoky.
+3   Nekrokřeček chce zpátky svoje kouzlo Nesmrt.
+4   Luda Dvoukudlák neopatrně mluví o ztraceném lupu ve stokách.
+5   Sofie, dcera čarodějnice, hledá svoji matku.
+6   Čaroděj Alkoun dobře zaplatí za kouzlo Nesmrt.
+
+================================================================================
+
+Text a ilustrace: @gnarledmonster | Návrh: Isaac Williams
+Redakce: Andre Novoa a Isaac Williams | Překlad: Jiří „Markus" Petrů
+Redakce překladu: Markéta Forró | © Copyright 2022 Mytago

@@ -1,0 +1,272 @@
+﻿Zde je kompletní přepis obsahu souboru Med v trámoví, uspořádaný podle sekcí tak, jak se objevují v dokumentu.
+Titulní strana
+
+
+Med v trámoví 1Dobrodružné místo pro Mausritter 2Napsal Isaac Williams 3
+
+
+________________
+Bestiář a Setkání
+
+
+Tabulka: k6 Setkání 4
+| Hod (k6) | Setkání |
+| :--- | :--- |
+| 1 | k6 prokletých včel, vracejí se obtěžkané černým pylem |
+| 2 | 2k6 prokletých včel, hlídkují v okolí úlu |
+| 3 | 2k6 prokletých včel, nesou zprávu do jiného úlu |
+| 4 | k6 cukrových kultistů, nesou vědra plná medu |
+| 5 | $k6+2$ cukrových kultistů, vlečou zajatou včelu |
+| 6 | Skunčice Šidla, shání něco k snědku |
+
+
+Cukrový kultista 5
+
+
+* 6 BO, síla 12, mrštnost 12, vůle 10 6
+
+* Útoky: cukrový mlat k8 7
+
+* Cíl: Chce přinést bratrovi Glazé víc prokletého medu. 8
+
+
+
+Prokletá včela 9
+
+
+   * 3 BO, síla 8, mrštnost 15, vůle 8, zbroj 1 10
+
+   * Útoky: žihadlo k12 (jednou) nebo udušení k10 (když útočí v hejně) 11
+
+   * Kritické zranění: kletba (viz níže) 12
+
+   * Cíl: Chce chránit úl 13
+
+
+
+Královna Esurit, prokletá vladařka 14
+
+
+      * 15 BO, síla 15, mrštnost 15, vůle 15, zbroj 1 15
+
+      * Útoky: žihadlo k12 16
+
+      * Kouzla: Cukrová zbroj, Pylový mrak 17
+
+      * Cíl: Chce získat větší moc a zvětšovat svůj úl 18
+
+
+
+Skunčice Šidla 19
+
+
+         * Měřítko tlupy 20
+
+         * 10 BO, síla 12, mrštnost 10, vůle 8, zbroj 1 21
+
+         * Útoky: kousnutí k8 nebo výstřik pižma (k4 tvorům dá stav Vystrašení) 22
+
+         * Cíl: Chce si v klidu na něčem pochutnat. 23
+
+
+
+Bratr Glazé, vypasený cukrář 24
+
+
+            * 9 BO, síla 14, mrštnost 10, vůle 15 25
+
+            * Útok: teploměr k8 26
+
+            * Kouzla: Žužu, Oslepující dotyk 27
+
+            * Cíl: Chce zdokonalit speciální bonbóny, než dorazí bůh Sladkomil. 28
+
+________________
+Lokace
+
+
+Květ černé slunečnice 29
+
+
+               * Černá semínka se blýskají jako drahokamy. Nad nimi se třpytí pyl, který při rozrušení utváří přízračné kouřové obláčky. 30
+
+               * Za každou směnu tu jde nasbírat jedno políčko semínek. 31
+
+               * Nad květem poletuje 2k6 prokletých včel. 32
+
+
+
+Trůnní sál 33
+
+
+                  * Komora s vysokou klenbou, hluboko uvnitř úlu. Pochodně tu hasí horký, dusivý vzduch. 34
+
+                  * Královna Esurit na trůně, 3k10 včel služebnic na ni pěje ódy. 35
+
+                  * Před trůnem leží k3 blouznících myší. 36
+
+
+
+Šidlina kláda 37
+
+
+                     * Puch pižma, ze kterého se podlamují kolena. Kdo neuspěje v záchraně na sílu, dostává stav Vystrašení. 38
+
+                     * V suchém listí a ožraných kostech se skrývá poklad. 39
+
+                     * Když Šidla nehledá potravu, spí tady. 40
+
+
+
+Stonek slunečnice 41
+
+
+                        * Myši šplhající bez vhodného vybavení si musejí vzít dva stavy Vyčerpání nebo uspět v záchraně na sílu. 42
+
+                        * Zranění z pádu je k6 za každých 30 cm. 43
+
+
+
+Slunečnicový záhon 44
+
+
+                           * Tyčící se stonky s velkými rozestupy. Chladno a ticho. 45
+
+                           * Uprostřed jeden obří stonek, černý a lesklý - patří k prokleté slunečnici. 46
+
+
+
+Včelí úl (Začněte tady) 47
+
+
+                              * Chorobně sladký, ulepený, klaustrofobní. Odevšad vychází ohlušující bzučení. Plástev provrtaná tunely vedoucími do trůnního sálu. 48
+
+                              * Po vnější straně leze 3k10 včel, uvnitř v tunelech jich je nespočet. 49
+
+
+
+Trámoví 50
+
+
+                                 * V komínu jsou nahrubo vytesané dveře. Vzadu u úlu je pracovní prostor. Ulepené kbelíky a smotané provázky. 51
+
+                                 * Dovnitř vede myší díra. 52
+
+                                 * k6 pološílených cukrových kultistů tu vynáší med z úlu. 53
+
+
+
+Cukrový chrám 54
+
+
+                                    * Uvnitř v kamnech. Světlo luceren se odráží od zubatých střepů cukru. Na stěnách visí prapory z obalů od bonbónů. 55
+
+                                    * Další dveře vedou do:
+                                       * Cukrářská kuchyně: Bratr Glazé pracuje u kotlíku roztopeného medu. k4 speciálních bonbónů. 56
+
+                                       * Skládek: Prázdné ulepené sklenice. Dva poklady. 57
+
+                                       * Otvor do komína: kde je žebřík vedoucí nahoru do trámoví. 58
+
+                                          * Chrám obývá 2k6 cukrových kultistů. 59
+
+
+
+Zarostlá zahrada 60
+
+
+                                             * Všude za provaleným plotem roste hustá tráva. Shora je slyšet hluboké bzučení. 61
+
+                                             * Na východní straně stojí opuštěná chýše, vysoká a zlověstná. V trouchnivějících dveřích je skulina tak akorát na myš. 62
+
+                                             * Na západě roste slunečnicový záhon. Mezi květinami se tyčí jedna obří černá slunečnice. 63
+
+
+
+Opuštěná chýše 64
+
+
+                                                * Slabě osvětlená paprsky světla pronikajícími střechou. Nepřetržité bzučení. 65
+
+                                                * Pach sladkého medu a tlejícího dřeva. Nad myšmi se tyčí rozbitý stůl a povalená židle. 66
+
+                                                * V protějším rohu stojí znepokojivá černá kamna. 67
+
+                                                * V místnosti hlídkuje k6 cukrových kultistů. 68
+
+________________
+Pravidla, Poklady a Kouzla
+
+
+Kletby 69Kdykoli myš stráví směnu v přítomnosti prokletého pylu, sní slunečnicové semínko nebo dostane kritické zranění od prokleté včely, dej jí náhodnou kletbu. 70
+
+
+                                                   1. 33 Vypasenost: Sníš třikrát víc zásob. Výhoda při záchraně na sílu, když je váha předností. 71
+
+                                                      * Odstranění: týden drž půst. 72
+
+                                                         2. 48 Strupy: Nemůžeš si hojit zranění síly. Snižuj si utržená fyzická zranění o 1. 73
+
+                                                            * Odstranění: odstraň si stav Poranění. 74
+
+                                                               3. 1 Bezesnost: Nezdají se ti sny. Dostáváš o 10 % míň zk. 75
+
+                                                                  * Odstranění: odstraň si stav Pomaten. 76
+
+                                                                     4. 5 Kůže papíru: Zranění ohněm je proti tobě zesílené. Déšť nebo plavání ti způsobí k6 zranění. 77
+
+                                                                        * Odstranění: týden jez vosí vajíčka. 78
+
+                                                                           5. 2 Zákal: Oči ti mdle svítí. Útoky na dálku máš zeslabené. 79
+
+                                                                              * Odstranění: hodinu koukej na slunce, pak uspěj v záchraně na vůli, jinak dostaneš stav Slepota. 80
+
+                                                                                 6. 6 Šeptavé hlasy: Získáš kouzlo. Můžeš ho z inventáře seslat, ale ne odebrat, dokud kletbu neodstraníš. 81
+
+                                                                                    * Odstranění: kouzlo dobij. 82
+
+
+
+Tabulka: k6 Poklad 83
+| Hod (k6) | Poklad |
+| :--- | :--- |
+| 1 | Náhodné kouzlo |
+| 2 | Černá hrouda semínek (snědení: 50:50 jestli lék, nebo kletba, 200 d) |
+| 3 | Uschlý a složený okvětní lístek (kdo ho drží, padá pomalu, 300 d) |
+| 4 | Soška Sladkomila, krystalizovaný cukr vykládaný stříbrem (2 políčka, 600 d) |
+| 5 | Dýka tvarovaná jako žihadlo (zranění k6, kritické zranění: kletba, 400 d) |
+| 6 | Speciální bonbón ve fólii (snědení +1k4 síla, stav Vypasenost, 300 d) |
+
+
+Tabulka: k4 Kouzla 84
+| Hod (k4) | Kouzlo | Účinek | Dobití |
+| :--- | :--- | :--- | :--- |
+| 1 | Oslepující dotyk | Koho se dotkneš, dostává stav Slepota. Odezní po [POČET] směnách. | Drž kouzlo na nebezpečném místě celý jeden den se zavřenýma očima. |
+| 2 | Žužu | Koho se dotkneš, může na 1 směnu protáhnout končetiny na [SOUČET] x 2,5 cm. | Na tři dny polož kouzlo pod závaží, k jehož zvednutí jsou potřeba čtyři myši. |
+| 3 | Pylový mrak | Mračno plynu široké [POČET] x 15 cm. Zasažení dostanou stav Záchvat kašle. | Peč na ohni z květin přinejmenším tří různých druhů. |
+| 4 | Cukrová zbroj | Zabrání [SOUČET] bodům zranění z příštího útoku, pak pukne. | Vař v roztaveném cukru a nech zatvrdnout. |
+________________
+Pozadí a Háčky
+Příběh
+Stojí na zahradě za opuštěnou lidskou chýší. Je zčernalá magií a vyzařuje prapodivnou energii. 85Prokletá slunečnice vábí každého, kdo se přiblíží. 86Nejdřív neodolatelný pyl ucítila královna Esurit a její včelí dvůr. 87Včely si postavily úl z černého, lepkavého nektaru a teď jsou navždy prokleté. 88
+Pak slunečnicová semínka přivábila nerudnou skunčici Šidlu. Ta žárlivě střeží zahrádku před myšmi i včelami. 89Její jizvy dokazují, že to myslí vážně. 90
+Nakonec přišly myši - bratři z cukrového kultu. Věří, že medem prokletých včel můžou uchlácholit svého boha Sladkomila. 91
+
+
+Tabulka: k6 Háčky na dobrodružství 92929292
+Proč statečné myši přicházejí překonat nebezpečí prokleté slunečnice? Zjisti to hodem. 93
+Hod (k6)
+	Háček
+	1
+	Z nedaleké osady se ztratil tamní pěstitel slunečnicových semínek
+	2
+	Příbuzný jedné z hráčských myší se přidal k cukrovému kultu
+	3
+	Prokletý med je jediný známý lék na jistou příšernou chorobu
+	4
+	Královna jiného úlu požádala hráčské myši, aby odčarovaly prokletí její sestry
+	5
+	Čaroděj nabídne myším 1000 d za 6 políček prokletých semínek
+	6
+	Jistý včelař chce víc. Víc medu. Medu ve vodě. Medu!
+	Je tu ještě něco dalšího z tohoto dobrodružství, co bys chtěl probrat, nebo ti mám pomoci s přípravou hry?

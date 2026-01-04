@@ -1,0 +1,313 @@
+MAUSRITTER ZÁMEČEK
+Průvodce kampaní
+
+================================================================================
+MAPA OKOLÍ ZÁMEČKU
+================================================================================
+
+Setkání (k6)
+1 - Dvě myši s pomotaným časem, ztracené a zmatené
+2 - k6 myších poutníků, cestují do Kaple věčného klidu
+3 - k6 brouků, válejí kuličku břečky (je v ní předmět)
+4 - k8 stonožek, utíkají od Stromu oharků
+5 - k8 krys z tlupy Kosťáků, nesou lup
+6 - Kočičí čarodějnice Sabrina na lovu
+
+Zvěsti (k6)
+1 - Kočičí čarodějnice Sabrina má tajného myšího spojence
+2 - Krysy z tlupy Kosťáků se setkávají v Bodlinách
+3 - Modré straky si ukryly lup do fontány
+4 - V potoce číhají na kořist hladoví úhoři
+5 - Pavoučí královna Zipora umí cestovat časem
+6 - Žaborákulum dovede splnit jakékoli přání
+
+================================================================================
+LOKACE NA MAPĚ
+================================================================================
+
+1: Podzemí
+Pod Zámečkem se mačká Cihlín, rušná osada bezmála čtyř stovek myší.
+
+2: Knihovna (TIKAJÍCÍ VĚŽ)
+Téměř nepoužívaná místnost na západní straně Zámečku. Pavoučí královna Zipora tu provádí čáry s časem.
+
+3: Ložnice (VĚŽ PLNÁ SAZÍ)
+Během noční hlídky šance 2 z 6, že tu bude podřimovat Sabrina.
+
+4: Soukromé muzeum (O ČARODĚJOVI A JEHO BRNĚNÍ)
+Zpod dřevěné podlahy je dodnes cítit sláma a konina. V ocelové věži tu sídlí čaroděj Alkoun.
+
+5: Příjezdová cesta
+Během ranní a odpolední hlídky se tady plíží obrovská ocelová zvířata. V noci je tu pusto.
+
+6: Fontána
+Často tu bývají k vidění modré straky, jak pokoutně přilétají a zase odlétají.
+
+7: Zahradní bouda (VĚDA A ŽAL)
+Lidské mládě ji kdysi používalo jako laboratoř k chemickým pokusům. Teď tu žijí podivně pozměněné krysy.
+
+8: Rozeklaný pařez (DĚLNÍCI DĚLAJÍ, VLÁDCI VLÁDNOU)
+Prastarý pařez. Pod ním dělníci kopou cín pro můří královnu. Našli ale něco mnohem zlověstnějšího.
+
+9: Rodinný hřbitov
+V noci se tu ozývají zvláštní zvuky. Nekrokřeček si tu vybudoval doupě z kamenných desek, do kterých jsou tesané zvláštní symboly.
+
+10: Stará kaple (KAPLE VĚČNÉHO KLIDU)
+Na mýtině stojí kamenná budova porostlá lišejníkem. Na svaté půdě si zřídili menší osadu následovníci reverenda Zlatosrsta.
+
+11: Lem lesa
+Kdo zná tajný tanec, který otevírá bránu, může z kruhu čarovných kamenů projít do vílích zemí. Pohybují se tu víly přestrojené za myší poutníky.
+
+12: Hořící strom (STROM OHARKŮ)
+Obří zčernalý strom, který pořád ještě doutná po nedávném zásahu bleskem. V jeho torzu vedou termiti válku s královstvím housenek.
+
+13: Stará studna
+Zarostlá břečťanem. Na dně se třpytí starodávná, vodou ohlazená kouzla. Když je někdo vynese, Sabrina se mu odvděčí.
+
+14: Kanál (VE STOKÁCH JE OBŘÍ HAD)
+Nepříjemný zápach splašků a síry. V noci tu bývá k vidění obrovitánský had.
+
+15: Jezírko (PÍSEŇ ŽABORÁKULA)
+Domov nebezpečných zlatých rybek a jejich potomstva. Každoročně se tu koná závod na počest Žaborákula.
+
+16: Lov v křovinách
+Ozdobný keř vyřezaný do podoby myši. Číhá v něm kočka. V kořenech keře se nachází myší osada Bodliny.
+
+17: Most přes potok
+Střeží ho krysy z tlupy Kosťáků. Za bezpečný průchod žádají k6 x 100 d.
+
+18: Jablečný sad (TRPKÉ PLODY SADU)
+Osada Větvohrad, vládne jí královna Madriga z Trní. Na jabloni hnízdo Ruperta, jedné z modrých strak. Přes den šance 1 z 6, že přijde člověk zalévat stromy.
+
+19: Houbový kruh (LUP Z HUB)
+Tady rostou nejlahodnější houby. Oblast ovládají brouci kutálníci.
+
+================================================================================
+CIHLÍN
+================================================================================
+
+Pod Zámečkem se mačká rušná myší osada Cihlín.
+Má skoro čtyři sta myších obyvatel, a je tak zdaleka největším městem v okolí Zámečku.
+
+Události (k8)
+1 - Zastaví se tu 2k6 poutníků cestujících ke kapli (viz Kaple věčného klidu).
+2 - Kolosální bouřka zaplaví Cihlín a podpálí strom (viz Strom oharků).
+3 - Všichni se připravují na roční závod na počest Žaborákula (viz Píseň Žaborákula).
+4 - Ztratila se důležitá myš! (viz Dělníci dělají nebo Věž plná sazí).
+5 - Z Větvohradu dorazí vyslanec s neveselou novinou (viz Trpké plody sadu nebo Lup z hub).
+6 - Vrátí se sběrač, ale zmatený, dezorientovaný nebo změněný (viz Tikající věž, O čarodějovi a jeho brnění nebo Věda a žal).
+7 - Na Cihlín útočí krysy z tlupy Kosťáků a unášejí myši (viz Ve stokách je obří had)
+8 - Kolem čenichá kočičí čarodějnice Sabrina. Dá se nějak uchlácholit?
+
+Místa v Cihlíně:
+
+1. Cihlové chýše
+Změť domků postavených v mezerách mezi cihlami nebo z barevných kartonů.
+- Den: Myší hospodyňky vaří ve společné kuchyni. Děti si hlučně hrají.
+- Noc: Luďa Dvoukudlák se plíží z domu s pytlem plným lupu.
+
+2. Přístaviště ve strouze
+Řada dřevěných bárek přivázaných kotvicími provázky.
+- Franta Bond, postarší strážný. Dává si šlofíka u štosu sušených hub, u nohou mu poskakuje mrzutý starý šváb jménem Jimmy.
+
+3. Hostinec Plechovka
+Vesele pomalované stěny. Na kulatých dveřích je vyobrazený chlapecký obličej.
+- V jídelně se myší hlásky odrážejí od okrouhlých plechových stěn.
+- Noclehárna s houpacími sítěmi z novin. Elektrické topení ohřívá vodu na koupel.
+
+4. Chrám klidu
+Čerstvě přemalovaný. Kolemjdoucí myši ho míjejí rychle, nesouhlasně kroutí hlavou.
+- Uvnitř je kamenná socha Matky, poničená a odhozená do kouta.
+- Bazalka Augustínová, misionářka z Kaple věčného klidu, pokojně káže o velkoleposti a dobráctví reverenda Zlatosrsta.
+
+5. Záře
+Zářivá a hřejivá skleněná baňka.
+- Leží na červené cihle uprostřed. Jedná se o hlavní městské shromaždiště.
+- Baňku obklopuje chaotická změť kupeckých stánků.
+
+6. Radnice
+Věž z červené keramiky. Ve výšce shlíží na Cihlín řada oken.
+- Ve velké sněmovní síni stojí dlouhý stůl s místem až pro dvacet myší.
+- Nahoře se Andula Ďobková setkává s myšmi a rozsuzuje jejich spory.
+
+7. Expediční tábor
+Nahoru do tmy stoupají provázkové žebříky, elektrické kabely a hřebíky.
+- Výstup usnadňuje pár kladkových výtahů, ale je potřeba mít pomocníka.
+- Sběrač Burák Marmelád zrovna ze Zámečku snáší náklad zásob.
+
+8. Zelená brána
+Mechem porostlá skulina mezi cihlami, široká tak akorát na kupeckou kárku.
+- Samotná brána je věkem zašlá kamenná deska na ocelových ložiscích. Pohnou jí dvě myši. Na noc se zavírá.
+- Veselí prostomyslní hlídači Ranec a Hrča Šprýmová ztratili klíč od visacího zámku a bojí se to říct starostce.
+
+Práce mezi cihlami
+Některé nejsou tak docela legální, ale dobky se přece hodí.
+Odměna k6 x 100 d.
+
+k4 Práce
+1 - Ukrást sušené houby
+2 - Zjistit, co je ve staré studni
+3 - Najít klíč k zámku brány
+4 - Ukrást paroloď Lyry McZkázové
+
+Nabídka v Plechovce (k6 Pokrm)
+1 - Houbová polévka z broučích zemí
+2 - Jablečný koláč ze sadu
+3 - Jatýrka zlatých rybek z jezírka
+4 - Žaludy nadívané semínky
+5 - Cizokrajný sýr s modrou plísní
+6 - Zbytky lidského jídla
+
+Andula Ďobková, starostka
+Výmluvná a vždy upravená. Vyhnankyně z hrabství Ek.
+
+S čím potřebuje pomoc:
+1. Obnova chrámu
+2. Vyjednání míru se strakami
+3. Doručení dopisu do Bodlin
+4. Přistižení zloděje v přístavišti
+5. Zanesení daru královně Madrize
+6. Obrana před tlupou Kosťáků
+
+================================================================================
+DALŠÍ OSADY
+================================================================================
+
+Větvohrad
+Vesnice 160 myší. Bytelné domy ve větvích.
+- Vládne mu královna Madriga z Trní.
+- Momentálně zarostlý a pod útokem padavkáčů a dýňových netvorů.
+- Svalnatá myší děva Kapradinka tu provozuje hostinec U Zlatého jablka, ale ten je teď zavřený.
+
+Komuna při kapli
+Osada 50 myší. Stanové městečko.
+- Několik myších rodin, všichni zarytí vyznavači reverenda Zlatosrsta.
+- Znepokojivě zírající mnich Kalvín Šplouch prodává nově příchozím lehce plesnivé suchary a polámané stany.
+
+Bodliny
+Osada 80 myší. Tunely v kořenech ozdobného keře.
+- Bujaré útočiště pro myši horších mravů.
+- Skrýš tu má tlupa Kosťáků.
+- Filias Gril je známý tím, že odkoupí cokoli cenného bez ohledu na to, odkud to pochází.
+
+Bálzinec
+Jediná myší rodina. Spousta opuštěných děr ve zdech.
+- Kdysi vzkvétající osada pod Alkounovou věží.
+- Teď převážně opuštěná, protože čaroděj obrátil svoji magii k temnějším účelům.
+- Plamenka Hlohová tu vede noclehárnu, poslední stále fungující podnik.
+
+================================================================================
+FRAKCE
+================================================================================
+
+Sabrina, kočičí čarodějnice
+Zdroje:
+- Ovládá prostory Zámečku
+- Kult reverenda Zlatosrsta
+- Mocná magie
+
+Cíle:
+○○○ Vybírat úplatky od modrých strak
+○○○ Získat kouzlo Nesmrt
+○○○○○ Podmanit si celé okolí Zámečku
+
+---
+
+Zipora, pavoučí královna
+Zdroje:
+- Magie ohýbající čas
+- Všudypřítomní špehové a donašeči
+- Snůška pavoučích přisluhovačů
+
+Cíle:
+○○○ Ovládnout hodinové roboty z tikající věže
+○○○ Zmocnit se věže čaroděje Alkouna
+○○○○○ Ovládat všechno uvnitř Zámečku
+
+---
+
+Modré straky, bohatí sběratelé
+Zdroje:
+- Nastřádaný lup
+- Chráněná hnízda
+
+Cíle:
+○○○ Postavit si v sadu hnízda z blyštivého stříbra
+○○○ Zmocnit se Zlatosrstova amuletu
+○○○○○ Ovládnout země severně od potoka
+
+---
+
+Tlupa Kosťáků, krysí lupiči
+Zdroje:
+- Tajná skrýš
+- Donašeč v Cihlíně (Luďa Dvoukudlák)
+
+Cíle:
+○○○ Najít kouzlo Nesmrt a prodat ho Sabrině
+○○○ Uzavřít spojenectví s Dvoulebkounem a jeho kultisty
+○○○○○ Zmocnit se vlády nad vším pod zemí
+
+================================================================================
+VAZBY MEZI DOBRODRUŽNÝMI MÍSTY
+================================================================================
+
+Každé dobrodružné místo má vazby na minimálně dvě jiná. Používej je jako háčky, kterými můžeš myši navádět při průzkumu okolí.
+
+Dobrodružství | Místo | Háček č. 6
+-------------|-------|------------
+Dělníci dělají, vládci vládnou | Lokace 6: Jedním z otupených horníků je Ansel, princ z Křáčí (Trpké plody sadu). | Čarodějnice Uršula (Ve stokách je obří had) chce z dolů přinést narkotický prášek.
+Kaple věčného klidu | Lokace 8: Dopis, který vyjmenovává magické přísady od Alkouna (O čarodějovi a jeho brnění). | Alkoun (O čarodějovi a jeho brnění) nedostal zaplaceno a chce si vybrat dluh.
+Lup z hub | Lokace 3 a 5: Královna Zipora sem vyslala pavouky (Tikající věž). | Ztracená koruna může být ta, kterou hledá královna Madriga (Trpké plody sadu).
+O čarodějovi a jeho brnění | Lokace 3: Alkoun vytvořil naddimenzované kouzlo pro Osla Potočníka (Píseň Žaborákula). | Modré straky, včetně Ruperta (Trpké plody sadu), chtějí z věže přinést zlatý prsten.
+Píseň Žaborákula | Lokace 8: Na chvíli se tu ukáže tlupa Kosťáků (Ve stokách je obří had). | Alkoun (O čarodějovi a jeho brnění) ještě nedostal zaplaceno za svůj runový člun.
+Strom oharků | Lokace 8: Obsahuje žhavolisty, kterých si cení následovníci Zlatosrsta (Kaple věčného klidu). | Můří královna (Dělníci dělají, vládci vládnou) chce získat nadvládu nad termitími dělníky.
+Tikající věž | Královna Zipora si znepřátelila Žaborákulum (Píseň Žaborákula) a je pod vlivem jeho kletby. | Královna Zipora dotírá na kutálníky z Lupu z hub.
+Trpké plody sadu | Lokace 8: Straka Rupert touží po královské koruně. Koruna se nachází v Lupu z hub. | Královna Zipora (Tikající věž) shání kapesní hodinky krále Ježivouska.
+Ve stokách je obří had | Neobvyklé poklady, položka 6: Mapa znázorňující stoky pod Vědou a žalem. | Alkoun (O čarodějovi a jeho brnění) by rád získal kouzlo Nesmrt.
+Věda a žal | Lokace 11: Nachází se tu kukla se sestrou můří královny (Dělníci dělají, vládci vládnou). | Zlatosrst (Kaple věčného klidu) může své tišící sérum kupovat od Dvoulebkouna.
+Věž plná sazí | Doupě čiperníků: Brouci čiperníci uprchli z dolu můří královny (Dělníci dělají, vládci vládnou). | Zajatcem je Ansel z Křáčí (Trpké plody sadu) nebo Nekrokřeček (Ve stokách je obří had).
+
+================================================================================
+ZAHÁJENÍ KAMPANĚ
+================================================================================
+
+Představ myším Cihlín a nech je chvíli prozkoumávat město. Hodem urči událost a uvidíš, kam je to zavede.
+
+Jak budou myši prozkoumávat okolí Zámečku, představuj jim dobrodružná místa. Myši můžou hexy s dobrodružnými místy projít bez podrobnějšího průzkumu - v tom případě jen popis okolí. Začnou ho zkoumat, až se jim bude chtít.
+
+Dovol hráčům, at si dobrodružství najdou sami. Pomáhej jim s tím pomocí zvěstí z Průvodce, háčků jednotlivých dobrodružných míst a vazeb mezi dobrodružnými místy.
+
+================================================================================
+UKONČENÍ KAMPANĚ
+================================================================================
+
+Jakmile jedna z frakcí splní svůj třetí cíl, kampaň skončí nebo se výrazně promění. Společně popište, co to pro Cihlín i hráčské myši znamená.
+
+Pokud budou všechny frakce zlikvidovány, kampaň končí. Od té doby se myši z Cihlína musejí bát už jen lidí, kteří žijí nad nimi.
+
+Až si zahrajete všechna dobrodružná místa, kampaň končí. Ohlédněte se za tím, co jste dokázali, a vzpomeňte na padlé myší hrdiny.
+
+Hlavně ale pamatujte, že odteď je to vaše hra! Tahle kniha slouží jako průvodce, ale jinak hrajte po svém.
+
+================================================================================
+KREDITY
+================================================================================
+
+Léta tam stál, stát bude dál. Obří a prastarý, z kamene vybudovaný. Zámeček vévodil krajině na míle daleko už v dobách, kdy i myší kmeti byli pouhými písklaty.
+
+Pod jeho podlahami zažívá myší osada Cihlín ohrožení ze všech stran.
+
+Nad zemí se prohánějí obrovští tvorové. Krutá kočičí čarodějnice Sabrina si žárlivě střeží svoje panství. Venku v zahradách, u jezírka a v ovocném sadu se dějí ještě podivnější věci. Dokážete přispět k záchraně Cihlína, než bude pozdě, nebo osadu pohltí chaos, který už zachvátil celé okolí?
+
+Průvodce
+napsali Isaac Williams a Andre Novoa
+Překlad: Jiří "Markus" Petrů
+
+Sbírka dobrodružství
+Překlad: Jiří "Markus" Petrů
+Playtesteři: Adelaide Orange, Andre Tavares, Andrea Phan, Craig Hogan David Neves, Diogo Novoa, Jota, Kyle Bomar, Luke Van Ryn, ManaRampMatt, Manel Pinheiro, Margarida Neves, Maria Abranches, Matt West, Nathaniel Scott, Nathan Cocks, Patrick Hayes, Pipo Kimkiduk, Ross Burton, Sacruna
+
+Vydalo nakladatelství Mytago jako svou 122. publikaci.
+ISBN: 978-80-88501-07-7
+© Copyright 2023 Mytago

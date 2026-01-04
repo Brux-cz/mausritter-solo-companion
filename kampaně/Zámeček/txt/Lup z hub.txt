@@ -1,0 +1,196 @@
+LUP Z HUB
+Mausritter
+Autor: Bodie H.
+
+================================================================================
+ÚVOD
+================================================================================
+
+Při nehodě natolik ostudné, že o podrobnostech je lépe pomlčet, vypadla královská koruna z hradního okna do kaluže břečky. Než se královna ze svého studu vzpamatovala natolik, aby pro ni poslala skupinku stráží, stihli se tu mihnout kutálníci. Tihle potulní brouci uváleli z břečky velkou kuličku, která se snadněji přepravuje, a nezamyšleně v ní odkouleli i královninu korunu.
+
+Domov kutálníků je vyhloubený v kolosální houbě. Jde o změť chodbiček i rozlehlých místností, z nichž každá plní jinou roli ve zpracovávání drahocenné suroviny, kuliček břečky. Skupina odvážných myší se teď musí vypravit do nitra houby a korunu zachránit!
+
+================================================================================
+SETKÁNÍ
+================================================================================
+
+k6  Setkání
+1   k6 tunelářů. Hledají vetřelce.
+2   k6 tunelářů. Doprovázejí kuličkáře s vajíčky.
+3   k4 pavoučích zabijáků. Belhají se pryč z boje.
+4   Mnich pokrytý břečkou. Hledá ztracenou hůl.
+5   k4 žabích zlodějů. Nesou pytle plné lupu.
+6   Žížalák Reginald. Ohromný a hladový.
+
+Kutálníci při svých obchůzkách za břečkou zaslechnou leccos, a tak jakžtakž rozumí jednoduché myštině.
+
+================================================================================
+BESTIE
+================================================================================
+
+Kuličkář
+Dělají všechno, co nechce dělat nikdo jiný.
+
+2 BO, síla 5, mrštnost 7, vůle 8
+Útoky: drápy k6
+
+Chce navěky věků kutálet kuličky.
+
+---
+
+Tunelář
+Přehnaně sebejistí a agresivní vojáci.
+
+8 BO, síla 14, mrštnost 7, vůle 8, zbroj 1
+Útoky: rýč k8
+Kritické zranění: odnese myš v klepetech
+
+Chce bránit pevnost.
+
+---
+
+Reginald, obří žížalák
+Je větší, než si je vědom.
+
+12 BO, síla 12, mrštnost 9, vůle 12, zbroj 1
+Útoky: kousnutí k8, omračující výskot
+(Všichni v doslechu házejí záchranu na vůli. Při neúspěchu ztrácejí další akci a dostanou stav Vystrašení.)
+
+Chce zbaštit něco dobrého.
+
+---
+
+Pavoučí zabiják
+6 BO, síla 8, mrštnost 15, vůle 10
+Útoky: jedovatý kousanec k8 (zraňuje mrštnost místo síly)
+
+Chce najít ztracenou součástku hodin.
+
+================================================================================
+LOKACE
+================================================================================
+
+1. Vchod
+Dlouhá síň. Ke stropu se tyčí vysoké sloupy.
+
+- Pobíhající a panikařící kuličkáři.
+- Stráže: Čtyři tuneláři pokřikují navzájem si odporující rozkazy. Kdo jejich řeči rozumí, rozezná pokyny jako "obří pavouci", "invaze" nebo "do jídelny!"
+
+---
+
+2. Parní komora
+Silně zahalená párou. Nepříjemné vedro.
+
+- Oheň živený kuličkami břečky tu nahřívá kameny ve velké míse. Jeden kuličkář stříbrnou naběračkou (200 d.) polévá kameny vodou.
+- Různí kutálníci relaxují v husté páře, klábosí a společně si popěvují.
+
+---
+
+3. Jídelna
+Pohroma. Po stolech cupitají pavoučí vetřelci.
+
+- k6 pavoučích zabijáků. Derou se kolem kuličkářů a ničí jim kuličky břečky - něco v nich hledají.
+- Kuličkáři tiše cvrkají a pískají, rozpačitě se při jídle snaží nevšímat si okolních pavouků.
+- Za 1k4 kol dorazí k8 tunelářů vyzbrojených rýči a pokusí se pavouky vyhnat.
+
+---
+
+4. Královská komnata
+Zdobně hloubená. Na jílové plošině stojí zdobený trůn.
+
+- Královna: Na trůně sedí neskutečně znuděná broučice mnohem větší než všichni ostatní. Kuličkář asistent ji krmí sousty, která odlamuje z kuliček břečky.
+- Baliči vajíček: Tři kuličkáři vybírají vajíčka z koše za královnou. Z velké mísy berou břečku a plácají z ní kolem vajec ochranné skořápky.
+- Sběrači: Co chvíli se tu ukážou dva kuličkáři, kteří nosí nově zabalená vajíčka do líhně.
+
+---
+
+5. Sklad
+Římsy a plošiny. Dutiny obsahují kuličky břečky.
+
+- U vchodu stojí na stráži jeden tunelář. k8 dalších hlídkuje uvnitř na římsách.
+- Po stropě se plíží k6 pavoučích zabijáků připravených skočit na stráže. Hledají součástku hodin.
+- Kuličky břečky: Za každou směnu hledání šance 2 z 6 na poklad.
+
+---
+
+6. Líheň
+Komorou se rozléhá pískot a slabé cvrkání.
+
+- Ve stěnách jsou napůl zanořené kuličky břečky. Každá obsahuje larvu kutálníka.
+- Dvě kuličkářky chůvy zrovna spí opřené zády k sobě.
+- Jedna z kuliček pukla, v drti se válí kukla kutálníka. Když jí myši pomůžou, chůvy se jim odvděčí pokladem.
+- Obalená myš: Z jedné kuličky čouhá čenich ztracené myší dívky Perničky Brusinkové.
+
+---
+
+7. Sklad nářadí
+Pečlivě vyrovnané stojany s nářadím. Všechno na svém místě.
+
+- Nářadí: 2 rýče (střední, k6/k8), chitinový plát (těžká zbroj), elektrická lampa.
+- Hlídají tu dva nervózní tuneláři.
+- Tajná klubovna: 2k4 tunelářů probírá plány na svržení královny a převzetí moci. Pokusí se myši přesvědčit, aby jim pomohly výměnou za poklad.
+
+---
+
+8. Zpracovací linka
+Organizovaná práce. Kuličkáři pracují jako hodinky.
+
+- Sedí tu 12 kuličkářů. Rozebírají velké kuličky a dělají z nich menší. Dávají pozor, aby nic neztratili.
+- Každou směnu dorazí kutálníci s novou ohromnou koulí břečky. Pokusí se do ní myši nabalit.
+- Odpadní skluz: Vede na skládku. Vyhazuje se jím všechno, co není břečka (včetně myší!).
+
+---
+
+9. Skládka
+Tma. Vlhko a štiplavý pach. Tiché dunění z hlubin.
+
+- Podlahu tvoří rozmanitý odpad. Dřevo, sklo, kosti, úlomky plastu. Po směně hledání najdou myši poklad, ale rozzlobí Reginalda.
+- Padající odpadky: Každá myš má šanci 3 z 6 za kolo (během boje) nebo za směnu (při hledání), že ji zasáhnou padající odpadky za k6 zranění.
+- Bydlí tu žížalák Reginald. Živí se odpadky. Pokud myši ještě nenašly královskou korunu, je tady. Reginald ji vymění za něco dobrého a velkého k snědku.
+
+================================================================================
+POKLAD
+================================================================================
+
+k6  Poklad
+1   Obřadní dýka (lehká, k6, Kosťáci za ni zaplatí 300 d.)
+2   Vyřezávaná hůl (lehká, k6, reverend Zlatosrst zaplatí 500 d.)
+3   Očarovaná chitinová zbroj (těžká, 1 obr., šance 3 z 6 na odražení magického zranění)
+4   Červí píšťalka (bez ohledu na místo přivolá Reginalda)
+5   Součástka z hodin, kterou hledají pavouci (600 d., 2 políčka)
+6   Královská koruna vykládaná zlatem a stříbrem (1 000 d.)
+
+================================================================================
+ORIENTACE V CHODBIČKÁCH KUTÁLNÍKŮ
+================================================================================
+
+Kdykoli hráčské myši vyrazí chodbičkami do nové místnosti, prohledají kuličku břečky nebo kuličku začnou nést, hod k6.
+
+Když padne 1-2, dostávají stav Nános břečky.
+
+Nános břečky
+Po získání zaznač použití u všech předmětů na těle a v packách.
+Odstranění: příjemná teplá koupel
+
+================================================================================
+HÁČKY NA DOBRODRUŽSTVÍ
+================================================================================
+
+k6  Háček
+1   Myší dívka Pernička Brusinková byla naposledy spatřena, jak si hraje poblíž houbové pevnosti.
+2   Jisté zemědělské družstvo chce s kutálníky zahájit obchodní jednání, ale jeho zástupcům se nedaří doručit vzkaz až ke královně.
+3   Houbovou pevností se šíří zvěsti o vojenském puči. Královna kutálníků potřebuje pučisty odhalit a žádá o pomoc zvenčí.
+4   Královna Zipora ztratila důležitou součástku z hodin. Za její návrat nabízí odměnu 500 d.
+5   Překupníkům na černém trhu bylo zabaveno šest vajec kutálníků. Jelikož vztahy s kutálníky jsou i bez toho dost napjaté, je zapotřebí vrátit vejce do houbové pevnosti, aniž by si krádeže kdokoli všiml.
+6   Kutálničtí sběrači omylem odnesli korunu patřící královně Madrize z Trní.
+
+================================================================================
+KREDITY
+================================================================================
+
+Text a ilustrace: Bodie H.
+Návrh: Isaac Williams
+Redakce: Andre Novoa a Isaac Williams
+Překlad: Jiří "Markus" Petrů
+Redakce překladu: Markéta Forró
+© Copyright 2023 Mytago

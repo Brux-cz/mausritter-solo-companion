@@ -1,0 +1,275 @@
+VĚŽ PLNÁ SAZÍ
+Mausritter
+Lazy Litch
+
+================================================================================
+
+ČASOVÁ OSA UDÁLOSTÍ
+
+Tohle dobrodružství nemá tabulku setkání.
+Místo toho každou směnu nastane další událost z téhle časové osy.
+
+[ ] Komínem projede poryv větru. V popelu se rozežhnou uhlíky. Překročení/prohledání vyžaduje záchranu na mrštnost, jinak myš dostává stav Popálení.
+
+[ ] Zvuky trumpet a veselí. Sazové království jmenuje nového krále.
+
+[ ] Hlasité prasknutí dveřmi. Do místnosti právě vešel člověk. Část sazových schodišť se zřítí, ze stěn odpadávají sutiny.
+
+[ ] Někdo chystá dřevo do krbu. Zničí tím sazová schodiště.
+
+[ ] Oheň se rozhořívá. Komín se plní dýmem, začíná se zahřívat.
+
+[ ] Sílící oheň probudí rodinu brouků čiperníků. Všechny myši pod úrovní bašty dostávají v každé směně jeden stav Popálení.
+
+[ ] Oheň hoří a plameny šlehají vysoko do komína. Balón pod doupětem brouků čiperníků se zaplní teplým vzduchem a pomalu stoupá.
+
+[ ] Oheň šlehá výš a výš a spalující vítr zabije všechny myši pod úrovní Sazehradu.
+
+================================================================================
+
+POSTAVY
+
+Sazový voják
+Horliví služebníci Sazového království
+
+4 BO, síla 12, mrštnost 10, vůle 11
+Útoky: doutnající kopí k8
+Kritické zranění: dá stav Popálení
+
+Chce korunovat nového krále.
+
+---
+
+Sazový duch
+Nenávistné oharky, které tak docela nevyhasly.
+
+3 BO, síla 6, mrštnost 10, vůle 14
+Útoky: spalující dotek k6
+Kritické zranění: dá stav Popálení
+Zranitelný jen stříbrem nebo kouzelnými zbraněmi.
+
+Chce napáchat paseku.
+
+---
+
+Brouk čiperník
+
+2 BO, síla 12, mrštnost 16, vůle 10
+Útoky: kousnutí k6 nebo
+       udice k6 (záchrana na mrš., nebo tě přitáhne)
+Kritické zranění: přitáhne myš udicí (bez záchrany)
+
+Chce zbaštit něco dobrého.
+
+---
+
+Atticus, prastarý pavouk
+
+10 BO, síla 12, mrštnost 16, vůle 14
+Útoky: kousnutí k8
+Kritické zranění: zamotá do pavučiny, dá stav Poranění
+
+Chce žrát a doplnit tekutiny.
+
+---
+
+Julus, nafoukaná stonožka
+
+14 BO, síla 18, mrštnost 15, vůle 12, zbroj 1
+Útoky: kousnutí k8
+
+Chce najít bezpečnou cestu komínem.
+
+================================================================================
+
+LOKACE - KOMÍN
+
+VRCHOLEK KOMÍNA
+Studený vítr. Impozantní výhled.
+
+• Cesta ven: Buď po hřebících, nebo po komuli, která tu vyklíčila. Myši musejí uspět v záchraně na mrštnost, jinak spadnou do pavučiny.
+
+---
+
+PAVUČINA
+Dlouhá začazená vlákna chrastí v průvanu.
+
+• V rohu číhá prastarý pavouk Atticus. Už měsíce nic nežral. Seschlý a scvrklý.
+
+---
+
+DOUPĚ BROUKŮ ČIPERNÍKŮ
+Cihly provrtané dírami jako ementál.
+
+• Rodina 2k6 brouků čiperníků. Hladoví uprchlíci z dolu mufí královny (Dělníci dělají, vládci vládnou). Zrovna spí. Po probuzení se pokusí chytit myši na udice s velkými háčky.
+• Na hřebíku visí oškubaný balón.
+• V doupěti: dva poklady.
+
+---
+
+HORNÍ DOLY
+Černočerný tunel. Zubatá skála.
+
+• Tunely vedou z jednoho vchodu do druhého.
+• Nepoužívané a zavalené hromadou sutin. Odhrabání trvá dvě směny.
+
+---
+
+BAŠTA SAZOVÉHO KRÁLOVSTVÍ
+Hlasité žvanění a pokřikování v hublavém jazyce.
+
+• Uvnitř bašty: Tísní se tu příliš mnoho sazových človíčků.
+• Mezi nimi nabručený Budoucí sazový král.
+• Sazoví človíčkové uprchli ze Sazehradu kvůli duchům a teď se nemůžou dočkat, až korunují nového krále, který hrad dokáže znovu dobýt.
+
+---
+
+SAZEHRAD
+Černý a ztichlý. Zevnitř sálá zelená záře.
+Podrobnosti uvádí část Uvnitř Sazehradu.
+
+---
+
+ŘETĚZOVÝ MOST
+Zašlý kov se ve tmě matně leskne.
+
+• Na stráži tu stojí k6 sazových vojáků. Nechají myši projít, pokud mají královskou korunu nebo slíbí, že přemůžou duchy v Sazehradu.
+
+================================================================================
+
+LOKACE - KRB
+
+STRAŠIDELNÝ SAZOVÝ DŮL
+Kvílení mrazivého větru a ozvěny sotva znatelných hlasů.
+
+• Tunely vedou z jednoho vchodu do druhého.
+• k6 sazových duchů. Chvějí se zimou.
+• Hřebíky mezi cihlami: Stoupají do Sazehradu. Myši musejí uspět v záchraně na mrštnost, jinak spadnou do hromádky popela a dostanou stav Popálení.
+
+---
+
+POPEL A SAZOVÉ SCHODY
+Z šedých dun stoupají schody vytesané do sazí.
+
+• Při výstupu po schodech záchrana na mrštnost, jinak pád do horkého popela (dává stav Popálení).
+• Ukryto v popelu: Poklad, hřebíky, velký stříbrný klíček (otevírá klec).
+
+---
+
+HROMÁDKA DŘÍVÍ
+Šustění a cvrkání.
+
+• Pelech stonožky jménem Julus. Je pyšný, nepochopený a zaútočí na každého, kdo ho urazí.
+• V dříví: Koruna Sazového krále. Julus vrátí korunu sazovému království, když mu dovolí bezpečně vylézt nahoru komínem.
+• Po pohrabáči: Na krbovou římsu a pak ke kleci. Záchrana na mrštnost, jinak myši po vylezení dostanou stav Vyčerpání.
+
+---
+
+KLEC
+Obří pozlacený žalář.
+
+• Je v ní zamčený zajatec.
+• Odemknutí obřího zámku šperhákem vyžaduje dvě myši.
+• Přeřezání mříží vyžaduje vhodné nářadí a posune časovou osu o dvě události.
+
+================================================================================
+
+UVNITŘ SAZEHRADU
+
+KRÁLOVSKÉ KOMNATY
+Pod sazemi se ukrývá poklad.
+
+---
+
+VYBRAKOVANÁ KNIHOVNA
+Vzduchem poletují černé saze. Těžko se tu dýchá.
+
+---
+
+VATRA Z PORTRÉTŮ
+2k6 sazových duchů okolo ohně. Snaží se nasát teplo.
+
+---
+
+KUCHYNĚ
+Zapomenutý sazový kuchař. Schovává se pod stolem.
+
+---
+
+VELKÁ SÍŇ
+k6 sazových duchů. Odlupují ze stěn portréty králů.
+
+---
+
+POPELAVÁ KRYPTA
+Stříbrná socha prastarého krále (1 000 d, 2 políčka).
+
+================================================================================
+
+JAK SE MYŠI DOSTALY DO LOŽNICE
+
+Na začátku dobrodružství hoď k4.
+• Přidej +1, pokud jsou myši dobře připravené.
+• Přidej +1, pokud mají kamarády, kteří můžou pomoct.
+
+k4  Vstup
+1   Než se myši do ložnice dostaly, musely se chvíli schovávat. Posuň časovou osu o jednu událost.
+2   Pomalý šplh po okapu. Každá myš dostává stav Vyčerpání.
+3   Přehnaně sebevědomý vynálezce katapultoval myši na okenní římsu. Všechny začínají s -1 BO.
+4   Myši vynesla straka. Za odměnu chce poklad, bude na něj čekat nahoře na komíně.
+5   Myši se spustily po laně nataženém z větví stromů.
+6   Myši seskočily padákem, prolétly oknem a hladce přistály.
+
+================================================================================
+
+POKLAD
+
+k6  Poklad
+1   Náhodné kouzlo (str. 13 v pravidlech)
+2   Stříbrná dýka (lehká, k6, 200 d.)
+3   Lahvička peprmintového oleje (odpuzuje hmyz)
+4   Zkamenělé ptačí vejce (300 d.)
+5   Zlatý háček na ryby (těžký, k10, 300 d.)
+6   Nekrokřečkova krabice lebek (vraťte ji a bude vám dlužit protislužbu)
+
+================================================================================
+
+POPÁLENÍ
+
+Výpravy do komína jsou nebezpečné. Stav Popálení se dá získat mnoha způsoby.
+
+Popálení
+Při získání dostaneš 1 zranění za každý stav Popálení, včetně tohoto.
+
+Odstranění: studená koupel
+
+================================================================================
+
+ÚVOD DO DOBRODRUŽSTVÍ
+
+Veledůležitá myš byla unesena lidským mládětem a údajně zavřena do klece jako nějaký křeček. Jako křeček!
+
+Hledají se statečné myši, které zajatce vysvobodí. Musejí jednat rychle, protože lidé se balí na dovolenou a nebohého vězně se chystají vzít s sebou.
+
+Myši se musejí vypravit do velké ložnice a uprchnout z ní jediným východem: komínem. Cestu jim bude komplikovat čadící oheň a šlehající plameny.
+
+================================================================================
+
+CO JE ZAJATEC ZAČ?
+
+k4  Zajatec
+1   Jedna z hráčských myší nebo blízký přítel / příbuzný (zajata mezi sezeními nebo na jiném dobrodružném místě).
+2   Nekrokřeček. Vdova po bohatém obchodníkovi z Cihlína se potřebuje zeptat na něco důležitého o svém zesnulém manželovi. Odpovědět může jen legendární Nekrokřeček. (2 000 d., pokud se otázku podaří položit.)
+3   Luďa Dvoukudlák, hledaný zloděj. Krysí pašerák Kuch Dlouhý dráp chce Luďu přivézt a vytlouct z něj dluhy. Luďa se po vysvobození z klece pokusí utéct. (2 500 d. za jeho přivlečení do Kuchova doupěte ve stokách.)
+4   Ansel, princ z Křáčí. Jeho sestra, královna Madriga z Trní, nabízí tučnou odměnu za jeho bezpečný návrat. Princ bude tvrdit, že je na dobrodružství a žádnou pomoc nepotřebuje. (3 000 d. za bezpečný návrat do Křáčí.)
+
+================================================================================
+
+KREDITY
+
+Veledůležitá text a ilustrace: Lazy Litch
+Návrh: Isaac Williams
+Redakce: Andre Novoa a Isaac Williams
+Překlad: Jiří „Markus" Petrů
+Redakce překladu: Markéta Forró
+© Copyright 2023 Mytago

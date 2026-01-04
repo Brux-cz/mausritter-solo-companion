@@ -1,0 +1,158 @@
+﻿Zde je kompletní přepis obsahu PDF souboru Věda Žal. Text je strukturován tak, aby odpovídal logice dokumentu (dobrodružství pro hru Mausritter).
+________________
+VĚDA ŽAL
+Mausritter
+Nate Treme
+________________
+Úvodní příběh a Háčky (Zadní strana / Strana 6)
+Lidské mládě si ze zahradní kůlny kdysi udělalo laboratoř. Provádělo v ní experimenty s mýdlem, bělidlem, tabletami do myčky nádobí, zeleným slizem a dalšími věcmi, o nichž je lepší pomlčet.
+Nikdo neví, o co mu šlo. Ale ze slizu se zrodil Dvoulebkoun, krysák pokřivený působením chemikálií.
+Dnes je laboratoř opuštěná a Dvoulebkoun – spolu se svým kultem chemicky pozměněných služebníků – žije v bludišti zapomenutých odtokových tunelů pod kůlnou a snaží se navázat na bádání svého pána.
+Odvážíte se prozkoumat vlhké odpadní tunely, kde vzduch čpí záhadnými výpary a na všem ulpívají neznámé látky?
+Háčky na dobrodružství (k6)
+k6
+	Háček
+	1
+	Kdosi spatřil skupinku krys se svítícíma očima, které slídily okolo zahradní kůlny.
+	2
+	Šušká se o dvouhlavém prorokovi, který střeží fontánu věčného života.
+	3
+	Starý August Moudrý chce přinést svatý papír s ezoterickými symboly.
+	4
+	Tlupa Kosťáků prý sídlí v nějaké kanalizaci. Je to tahle, nebo jiná?
+	5
+	Přítel jedné z hráčských myší se nedávno vrátil úplně vypelíchaný. Potřebuje pomoc.
+	6
+	Reverend Zlatosrst shání další alchymistickou zkumavku. Obstaráte mu ji?
+	________________
+Setkání a Bestiář (Strana 2)
+Náhodná setkání (k6)
+1. 2k4 kultistů. Hledají „dobrovolníky“ na experimenty.
+2. 2k4 plivajících svinek. Hledají potravu.
+3. Po místnosti se rychle rozlezou plazivé řasy. Kdo se jich dotkne, toho udusí.
+4. Náhlý příval vody z nejbližšího tunelu.
+5. Na vodě se dělají velké bubliny. Při prasknutí vypustí páchnoucí dusivý plyn.
+6. Kyklopská kajmanka. Shání večeři.
+Bestiář
+Krysí hnusosliz
+Hrouda čvachtavého slizu. V ní žvatlající tvář krysy.
+* 12 BO, síla 5, mrštnost 4, vůle 14
+* Útoky: kousnutí k6
+* Kritické zranění: vcucne oběť do sebe. Zranitelný jen ohněm nebo magií.
+* Chce vstřebat víc masa.
+Plivající svinka
+Po nasvícení zelenkavě svítí. Možná proto nesnáší světlo?
+* 12 BO, síla 5, mrštnost 4, vůle 8
+* Útoky: hořící žlučový plivanec k6
+* Kritické zranění: dá stav Rozleptání
+* Chce utéct před světlem a skrýt se ve tmě.
+Masožravá ropucha
+Těžko říct, kde končí bradavice a začínají oči.
+* 10 BO, síla 10, mrštnost 12, vůle 8, zbroj 1
+* Útoky: lepivý jazyk k8
+* Chce zbaštit něco masitého.
+Kyklopská kajmanka
+Obří nerudná želva. Její jedno oko svítí ve tmě. (Měřítko tlupy)
+* 10 BO, síla 14, mrštnost 6, vůle 10, zbroj 2
+* Útoky: kousnutí k8
+* Chce uprchnout z tunelu a vrátit se do jezírka.
+Dvoulebkoun, šéf laboratoře
+Dvě hlavy, co se neustále dohadují.
+* 15 BO, síla 12, mrštnost 10, vůle 14
+* Útoky: kousnutí oběma hlavami 2k6 nebo modrá zkumavka (dává stav Rozleptání) nebo zelená zkumavka (dává stav Zklidnění)
+* Levá hlava chce poznání, pravá chce moc.
+Laboratorní kultista
+Neosrstěná krysa pokrytá podivnými světélkujícími výrůstky.
+* 4 BO, síla 8, mrštnost 12, vůle 12
+* Útoky: skleněná kudla k6
+* Chce sloužit Dvoulebkounovi.
+________________
+Lokace (Strana 3 a 4)
+1. Vchod
+Řasy na vlhkých stěnách. Sladké chemické zápachy. Nad vodou se míhají vážky, které zelenkavě svítí. Podlaha je pokrytá kluzkými řasami.
+* Vypití vody (ať už záměrně, nebo omylem): Myš dostává stav Rozleptání.
+2. Nástěnná malba
+Na stěnách cosi svítí. Neumětelská nástěnná malba s dvouhlavým hlodavcem, který drží kalich. Lehce svítí.
+* Na zemi leží váček s několika kousky svítivé křídy.
+3. Krysí hnusosliz
+Na podlaze loužičky hnilobně páchnoucí žluté tekutiny.
+* Zaražený do loužičky: Poklad. Vytažení vyžaduje záchranu na sílu.
+* Ze stropu kape rosol na velkou hroudu. Když se myši přiblíží, z hroudy se vynoří tvář neosrstěné krysy.
+* Další nevydařený experiment (Krysí hnusosliz). Hrouda se pokusí vstřebat myši do sebe. Nevejde se do dveří. V hroudě je další poklad.
+4. Zářící perla
+Na dně hluboké nádržky plné splašků září modré světlo. Připomíná perlu, ale ve skutečnosti je to svítící oko kyklopské kajmanky.
+* Při doteku zaútočí!
+* V nádržce leží mrtví dobrodruzi. 3k20 d. a dva poklady.
+5. Houbová rajčata
+Dva květináče s keříky a světélkujícími houbami.
+* Na podivných houbových hybridech roste k4 rajčátek. Po snědení zvýší maximum BO o 1.
+6. Doupě brouků
+Mechem porostlé odpadky. Ozývá se z nich cvakání.
+* Doupě 2k6 plivajících svinek. Bojí se světla a jsou extrémně zvědavé. Vyčenichají zásoby a pokusí se je sežrat.
+* Přes strouhu leží brýle lidské velikosti, které slouží jako improvizovaný most.
+7. Káď
+Velká skleněná káď plná fialového slizu.
+* Při doteku sliz okamžitě odstraňuje srst.
+* Při snědení způsobuje trvalou ztrátu srsti po celém těle.
+8. Světélkující květy
+Z vody se vynoří dva světélkující květy.
+* Na vodě jsou květy znepokojivě nehybné. Ve skutečnosti jde o výrůstky dvou masožravých ropuch, které se snaží přivábit kořist.
+9. Hlavní odtok
+Všechna voda stéká sem. Bublá a vypařuje se. V bublající vodě odpočívá dvouhlavý prorok Dvoulebkoun.
+* 2k4 kultistů. Klečí tu a pobrukují si v kolektivní halucinaci způsobené dlouhým čicháním výparů.
+* Vetřelcům nabídnou doušek z kalichu plného chemikálií. Když myši odmítnou, zaútočí na ně a budou je chtít uvěznit na experimenty.
+* Ve vodách Dvoulebkounovy lázně jsou dva poklady.
+Tabulka: Účinek kalichu (k6)
+| k6 | Účinek |
+| :--- | :--- |
+| 1 | Zvracení rychle následované smrtí |
+| 2 | Stav Rozleptání |
+| 3 | Telepatické dorozumívání (na k4 dní) |
+| 4 | Vidění aury živých věcí (na k4 dní) |
+| 5 | Srst svítí neonově zeleně |
+| 6 | Opilost |
+10. Zkumavková laboratoř
+Svítící zkumavky s různobarevnými tekutinami. Střeží je k4 kultistů.
+* Zelená: Dává stav Zklidnění.
+* Růžová: 40% obilná pálenka. Odstraní všechny stavy Rozleptání.
+* Žlutá: Oči svítí. Následujících k6 dní vidí myš ve tmě.
+11. Rezavá klec na můry
+Klec se zeleno-žlutou kuklou housenky. Střeží ji k4 kultistů.
+* Za 1k4 dní se z ní vylíhne zeleno-šedá můra, mladší sestra můří královny (Dělníci dělají, vládci vládnou).
+* Dvoulebkoun ji chce využít k bádání. Cílem je nechat přisluhovačům narůst křídla. 50% šance, že to bude fungovat.
+12. Obří kniha
+Na podlaze leží otevřená obrovská plesnivá kniha. Většina stránek je nečitelná. Na některých jsou ezoterické symboly a nákresy.
+* 2k6 nepoškozených stránek (myší akademici zaplatí 50 d. za každou).
+* Vytržená stránka přilepená na stěně: Diagram se zkumavkami vylévanými do vany, ve které sedí lidská postava.
+________________
+Poklady a Stavy (Strana 5)
+Tabulka: k6 Poklad
+k6
+	Poklad
+	1
+	Třpytivá zeleno-fialová kulička (200 d.)
+	2
+	Mátová žvýkačka (velice lepivá)
+	3
+	Šumivka (vydává dráždivý zápach)
+	4
+	Dávkovač PEZů (500 d., 2 políčka)
+	5
+	Rapír z rybí kosti (lehký, k6, zesílený proti rybám)
+	6
+	Lahvička chemikálií (účinky podle lokace 10)
+	Stavy
+Rozleptání
+* Nevýhoda na záchrany na sílu. Můžeš se protahovat štěrbinami.
+* Odstranění: získej tři stavy Vyčerpání.
+* Způsobeno kontaktem s odpadní vodou, útoky plivajících svinek a různými strašlivými chemikáliemi, na které je možné narazit porůznu ve stokách.
+Zklidnění
+* Nevýhoda při záchraně na vůli. Před každou agresivní akcí musíš uspět v záchraně na vůli.
+* Odstranění: po dlouhém odpočinku.
+* Způsobeno chemikáliemi, na které je možné narazit porůznu ve stokách. Jde o stejný stav, jaký způsobuje Zlatosrstovo očistné vědro v Kapli věčného klidu. Souvisí to nějak?
+________________
+Tiráž:
+Text a ilustrace: Nate Treme | Návrh: Isaac Williams
+Redakce: Andre Novoa a Isaac Williams
+Překlad: Jiří "Markus" Petrů | Redakce překladu: Markéta Forró
+Copyright 2023 Mytago

@@ -8572,111 +8572,90 @@ function MausritterSoloCompanion() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              {/* Cloud Sync Status */}
-              {fileHandle ? (
-                <div className="flex items-center gap-1">
-                  <span 
-                    className={`text-xs px-2 py-1 rounded ${
-                      syncStatus === 'saving' ? 'bg-yellow-600 text-yellow-100' :
-                      syncStatus === 'error' ? 'bg-red-600 text-red-100' :
-                      'bg-green-700 text-green-100'
-                    }`}
-                    title={lastSyncTime ? `Poslední sync: ${lastSyncTime.toLocaleTimeString('cs-CZ')}` : ''}
-                  >
-                    {syncStatus === 'saving' ? '⏳ Ukládám...' :
-                     syncStatus === 'error' ? '❌ Chyba' :
-                     '☁️ Sync'}
-                  </span>
+              {/* Local File Sync */}
+              <div className="flex items-center gap-1 border-r border-amber-600/30 pr-3 mr-1">
+                {fileHandle ? (
+                  <>
+                    <span
+                      className={`text-xs px-2 py-1 rounded ${
+                        syncStatus === 'saving' ? 'bg-yellow-600 text-yellow-100' :
+                        syncStatus === 'error' ? 'bg-red-600 text-red-100' :
+                        'bg-green-700 text-green-100'
+                      }`}
+                      title={lastSyncTime ? `Lokální soubor\nPoslední sync: ${lastSyncTime.toLocaleTimeString('cs-CZ')}` : 'Lokální soubor'}
+                    >
+                      {syncStatus === 'saving' ? '⏳' :
+                       syncStatus === 'error' ? '❌' :
+                       '📄'} Lokální
+                    </span>
+                    <button
+                      onClick={disconnectFile}
+                      className="px-1.5 py-1 bg-green-700/50 hover:bg-red-600 rounded text-xs transition-colors"
+                      title="Odpojit lokální soubor"
+                    >
+                      ✕
+                    </button>
+                  </>
+                ) : (
                   <button
-                    onClick={handleManualSync}
-                    className="px-2 py-1 bg-amber-700 hover:bg-amber-600 rounded text-xs transition-colors"
-                    title="Uložit teď"
+                    type="button"
+                    onClick={() => {
+                      if (!isFileSystemSupported) {
+                        alert('⚠️ Lokální sync vyžaduje Chrome nebo Edge.\n\nPro cloud sync použij Google Drive.');
+                        return;
+                      }
+                      connectToFile();
+                    }}
+                    className="px-2 py-1.5 bg-green-700/70 hover:bg-green-600 rounded text-xs font-medium transition-colors cursor-pointer"
+                    title="Sync do lokálního souboru (pouze Chrome/Edge)"
                   >
-                    💾
+                    📄 Lokální
                   </button>
-                  <button
-                    onClick={disconnectFile}
-                    className="px-2 py-1 bg-amber-700 hover:bg-amber-600 rounded text-xs transition-colors"
-                    title="Odpojit soubor"
-                  >
-                    ✕
-                  </button>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!isFileSystemSupported) {
-                      alert('⚠️ Sync vyžaduje:\n\n1. Stáhnout HTML soubor\n2. Otevřít ho v Chrome nebo Edge\n\nV tomto prostředí File System API není dostupné.');
-                      return;
-                    }
-                    connectToFile();
-                  }}
-                  className="px-3 py-1.5 bg-green-700 hover:bg-green-600 rounded text-sm font-medium transition-colors cursor-pointer"
-                  title="Připojit soubor pro automatický sync (Google Drive, Dropbox...)"
-                >
-                  ☁️ Sync
-                </button>
-              )}
+                )}
+              </div>
 
               {/* Google Drive Sync */}
-              {googleAccessToken ? (
-                <div className="flex items-center gap-1">
-                  <span
-                    className={`text-xs px-2 py-1 rounded ${
-                      googleSyncStatus === 'saving' ? 'bg-yellow-600 text-yellow-100' :
-                      googleSyncStatus === 'error' ? 'bg-red-600 text-red-100' :
-                      'bg-blue-700 text-blue-100'
-                    }`}
-                    title={googleLastSync ? `Složka: ${googleDriveFolderName || 'Můj disk'}\nPoslední sync: ${googleLastSync.toLocaleTimeString('cs-CZ')}` : `Složka: ${googleDriveFolderName || 'Můj disk'}`}
-                  >
-                    {googleSyncStatus === 'saving' ? '⏳ Ukládám...' :
-                     googleSyncStatus === 'error' ? '❌ Chyba' :
-                     `📁 ${googleDriveFolderName || 'Drive'}`}
-                  </span>
+              <div className="flex items-center gap-1">
+                {googleAccessToken ? (
+                  <>
+                    <span
+                      className={`text-xs px-2 py-1 rounded flex items-center gap-1 ${
+                        googleSyncStatus === 'saving' ? 'bg-yellow-600 text-yellow-100' :
+                        googleSyncStatus === 'error' ? 'bg-red-600 text-red-100' :
+                        'bg-blue-600 text-blue-100'
+                      }`}
+                      title={googleLastSync ? `Google Drive: ${googleDriveFolderName || 'Můj disk'}\nPoslední sync: ${googleLastSync.toLocaleTimeString('cs-CZ')}` : `Google Drive: ${googleDriveFolderName || 'Můj disk'}`}
+                    >
+                      {googleSyncStatus === 'saving' ? '⏳' :
+                       googleSyncStatus === 'error' ? '❌' :
+                       '☁️'} {googleDriveFolderName || 'Drive'}
+                    </span>
+                    <button
+                      onClick={changeGoogleDriveFolder}
+                      className="px-1.5 py-1 bg-blue-600/50 hover:bg-blue-500 rounded text-xs transition-colors"
+                      title="Změnit složku na Google Drive"
+                    >
+                      📂
+                    </button>
+                    <button
+                      onClick={disconnectGoogleDrive}
+                      className="px-1.5 py-1 bg-blue-600/50 hover:bg-red-600 rounded text-xs transition-colors"
+                      title="Odpojit Google Drive"
+                    >
+                      ✕
+                    </button>
+                  </>
+                ) : (
                   <button
-                    onClick={handleGoogleDriveSync}
-                    className="px-2 py-1 bg-blue-700 hover:bg-blue-600 rounded text-xs transition-colors"
-                    title="Uložit do Google Drive"
+                    type="button"
+                    onClick={connectGoogleDrive}
+                    className="px-2 py-1.5 bg-blue-600 hover:bg-blue-500 rounded text-xs font-medium transition-colors cursor-pointer"
+                    title="Připojit Google Drive pro cloud sync"
                   >
-                    💾
+                    ☁️ Drive
                   </button>
-                  <button
-                    onClick={changeGoogleDriveFolder}
-                    className="px-2 py-1 bg-blue-700 hover:bg-blue-600 rounded text-xs transition-colors"
-                    title="Změnit složku"
-                  >
-                    📂
-                  </button>
-                  <button
-                    onClick={createGoogleDriveFolder}
-                    className="px-2 py-1 bg-blue-700 hover:bg-blue-600 rounded text-xs transition-colors"
-                    title="Vytvořit novou složku"
-                  >
-                    ➕
-                  </button>
-                  <button
-                    onClick={disconnectGoogleDrive}
-                    className="px-2 py-1 bg-blue-700 hover:bg-blue-600 rounded text-xs transition-colors"
-                    title="Odpojit Google Drive"
-                  >
-                    ✕
-                  </button>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={connectGoogleDrive}
-                  className="px-3 py-1.5 bg-blue-700 hover:bg-blue-600 rounded text-sm font-medium transition-colors cursor-pointer"
-                  title="Připojit Google Drive"
-                >
-                  📁 Drive
-                </button>
-              )}
-
-              <span className="text-amber-300/60 text-xs hidden md:block" title={`Save formát v${SAVE_VERSION}`}>
-                v{SAVE_VERSION}
-              </span>
+                )}
+              </div>
               <button
                 onClick={handleExport}
                 className="px-3 py-1.5 bg-amber-700 hover:bg-amber-600 rounded text-sm font-medium transition-colors"

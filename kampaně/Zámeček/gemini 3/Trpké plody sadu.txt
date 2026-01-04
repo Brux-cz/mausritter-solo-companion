@@ -1,0 +1,224 @@
+﻿Zde je kompletní přepis textu ze souboru Trpké plody sadu, uspořádaný podle jednotlivých sekcí a tabulek tak, jak jdou v dokumentu za sebou.
+Trpké plody sadu
+
+
+Mausritter 1Autor: Madeleine Ember 2
+
+
+________________
+Tabulka setkání (k6)
+3
+
+
+Hod (k6)
+	Setkání
+	1
+	Roj bzučivek rudohlavých. Nesou zkvašenou ostružinu.
+	2
+	Osamělý hnijící padavkáč. Odhání roj bzučivek rudohlavých.
+	3
+	k6 padavkáčů. Chytají králíka.
+	4
+	Dýňový netvor. Zvědavý a zmatený.
+	5
+	Myší kupec. Shání cider.
+	6
+	Luda Dvoukudlák. Plánuje loupež pokladů z Rupertova hnízda.
+	________________
+Bestiář
+Roj bzučivek rudohlavých
+* Statistiky: 5 BO, síla 5, mrštnost 15, vůle 5 4
+
+* Útoky: bzučivý štípanec k4 5
+
+* Kritické zranění: dává stav Vyčerpání 6
+
+* Zvláštnost: Zranitelné jen ohněm nebo magií. 7
+
+* Cíl: Chtějí hodovat na něčem, co hnije. 8
+
+Dýňový netvor
+   * Statistiky: 8 BO, síla 12, mrštnost 11, vůle 8, zbroj 1 9
+
+   * Útoky: drcení k8, kousnutí k10, šlehnutí k4 10
+
+   * Cíl: Chce zbaštit něco pořádného. 11
+
+Straka Rupert
+      * Statistiky: 15 BO, síla 15, mrštnost 12, vůle 12 12
+
+      * Útoky: klovnutí k10 nebo oslnivý tanec (ovlivňuje všechny v dosahu) 13
+
+      * Oslnivý tanec: Příští útoky cílů jsou zeslabené. 14
+
+      * Cíl: Chce hromadit všechno, co se leskne a blyští. 15
+
+Padavkáč
+         * Statistiky: 4 BO, síla 6, mrštnost 10, vůle 6 16
+
+         * Útoky: kousnutí k6 nebo skučení (k4 tvarům v doslechu dá stav Vystrašení) 17
+
+         * Cíl: Chce způsobit co největší paseku. 18
+
+________________
+Lokace
+1. Cesta do Větvohradu
+Zlověstné houští z pokroucených větviček a šlahounů. Vysoké až běda. Zpod lesklých lístků vyčuhují zákeřné trny. 19
+
+
+            * Vyježděnou cestu přehrazuje neprůchozí houští. 20
+
+            * Rodina myších uprchlíků. Utíkají z Větvohradu, ale nemůžou přes houští. 21
+
+            * Útokům se houští brání šlehnutím za k6 zranění. Kdo ale slušně poprosí, před tím se rozestoupí. 22
+
+2. Větvohrad
+Tak tak je možné rozeznat obrysy toho, co kdysi bývalo malebnou osadou. Teď je zarostlá trním. 23
+
+
+               * V trnitém houští jsou zavěšení čtyři myšťani. 24
+
+               * Za vysvobození dají odměnu (3k10 d) a nasměrují myši k hradu. 25
+
+Zvěsti o královně (k4):
+                  1. Trestá nás za to, že jsme dovolili Lucejino utrpení. 26
+
+                  2. Zešílela touhou po moci. 27
+
+                  3. Vždycky byla taková milá, měla blízko k Luceji. 28
+
+                  4. Je poslední svého rodu, nemůže umřít stářím. 29
+
+3. Věž v houštinách
+Trnité křoví podepírá věž z šedého kamene. 30
+
+
+                     * V nejvyšší věžičce svítí mdlé světlo. 31
+
+                     * Uvnitř: Ve věži je ticho. Na všem leží prach. Okny lezou dovnitř trnité šlahouny. 32323232
+
+                     * Schodiště: Dvě myši v naleštěném brnění. Nenechají hráče projít, dokud od nich nedostanou výhodnou nabídku. 33
+
+                     * Úplně nahoře: Královna Madriga klečí nad Luceou. Mezi oběma visí třpytivá zlatá nit, která propojuje jejich srdce. 34
+
+Královnino soužení
+Lucejino srdce ukradla straka Rupert. Královna ji udržuje naživu tím, že se kouzlem dělí o sílu svého srdce. Tím ale její kouzla zdivočela a začala řádit po okolí. Pokud někdo Lucejino srdce nepřinese do tří dnů, obě zemřou. 35
+Znovushledání s královnou
+Po zdárném návratu Lucejina srdce napraví královna Madriga zmatek, který její zdivočelá kouzla způsobila. Na počest chrabrých myších zachránců uspořádá hostinu. Myší družina dostane jako poděkování 1000 d a každý myší dobrodruh dostane navíc odměnu od královny. 36
+4. Pěstitelský tábor
+Mezi jabloněmi stojí na pilířích skromné chýše s doškovými střechami. 37
+
+
+                        * 12 myší. Různě prchají nebo se ukrývají, o sad už nikdo nepečuje... „Královně na nás nezáleží!" 38
+
+                        * k4 padavkáčů. Dohadují se mezi sebou a ohlodávají opuštěnou chýši. Jeden má váček dýňových semínek. 39
+
+                        * Dýňový netvor cupuje strašáka. Myší pěstitelé považují strašáka za posvátného. Když ho dobrodruzi opraví, Rupert se sem neodváží. 40
+
+5. Dýňový záhon a králičí nora
+Změť tmavozelených šlahounů a listů velikých jako plachty. Uprostřed je králičí nora. 41
+
+
+                           * Do nory se snaží nacpat k4 padavkáčů. Jeden má jako klobouk setrvačník z moštového lisu. 42
+
+                           * Za nimi přichází dýňový netvor. Hledá svoje ukradená semínka. 43
+
+                           * V noře: Králík Ježivousek vyhlíží příležitost k útěku. Když mu myši pomůžou, odmění je stříbrnými kapesními hodinkami (500 d.). 44
+
+6. Moštový lis Jabloňářské unie
+Pach kvašení. Na sluníčku hnijí popadaná jablka, každé několikanásobně větší než myš. 45
+
+
+                              * Na Unii útočí roj bzučivek rudohlavých! 46
+
+                              * Moštovému lisu chybí setrvačník. Když ho myši přinesou, členové Unie odmění každou z nich pokladem a lahví dobrého cideru. 47
+
+7. Velká jabloň
+Prastará a majestátní. Ošlehaná bezpočtem zim. 48
+
+
+                                 * Od koruny ke kořenům je spuštěný gigantický žebřík. Výstup je nebezpečný a vyčerpávající. 49
+
+8. Stračí hnízdo
+V hřejivém světle pableskují poházené cennosti. 50
+
+
+                                    * Rupert sedí na trůně z větviček, do kterých jsou vetkané cáry stříbrných a modrých hadrů. 51
+
+                                    * Na stříbrném řetízku visí Rupertovi na krku Lucejino srdce, třpytivě modré a zlaté. Vymění ho za kapesní hodinky nebo královskou korunu (Lup z hub). 52
+
+                                    * Poházeno kolem: k4 prstenů (100 d), stříbrný řetízek (2 políčka, 500 d), perlový náhrdelník (2 políčka, 1500 d.), dva běžné poklady. 53
+
+________________
+Příběhové pozadí
+Co se tu děje?
+Myši z Větvohradu vždy chovaly královnu Madrigu z Trní v ohromné úctě. To se ovšem změnilo, když její služebná Lucea onemocněla. 54Samec straky zlodějky Rupert ukradl Luceji srdce a nebohá služebná teď spí bezesným spánkem, ze kterého se nedokáže probudit. 55
+Královna kvůli zlomenému srdci ztratila kontrolu nad svojí královskou magií a ta teď pokřivuje jablečný sad. Věci se nezlepší, dokud někdo Lucejino srdce nepřinese zpět. 56
+________________
+Poklady
+57
+
+
+k6
+	Běžné poklady
+	k6
+	Odměny od královny
+	1
+	Dýňová semínka
+	1
+	Hodovní roh (když zaduješ před jídlem, uzdraví k4 síly)
+	2
+	Sklenice ostružinového džemu (100 d.)
+	2
+	Kolo hermelínu (lahodný, 300 d.)
+	3
+	Vosková svíčka (jako pochodně)
+	3
+	Zlatá maska (zapadneš v luxusní společnosti)
+	4
+	Stříbrný srp (lehký, k6, 200 d.)
+	4
+	Láhev dobrého cideru (dodává kuráž, 200 d.)
+	5
+	Bronzový náprstek (těžká zbroj)
+	5
+	Stříbrná plácačka na mouchy (lehká, k6, zesílená proti breberkám)
+	6
+	Cívka provázku
+	6
+	Zlatá motýlí brož (nádherná, 600 d.)
+	________________
+Úvod a Háčky na dobrodružství
+Ze sadu přicházejí znepokojivé zprávy. Mírumilovné myši a veverky, které tam obhospodařují stromy, mluví o působení podivné magie – o hustých a zákeřných ostružinících, o potulných dýňových nestvůrách, o hrůzných padavkových netvorech, o lstivé strace, která si vysoko na stromě postavila nádherný palác. 58
+
+
+Cesta je trnitá, noci dlouhé. Dokážete vysvobodit Větvohrad a vyléčit královninu milovanou služebnou? Jaké poklady a příběhy si ze sadu odnesete? 59
+
+
+
+
+Háčky na dobrodružství (k6) 60
+
+
+Hod
+	Háček
+	1
+	Syn paní Cupinožkové vešel příliš hluboko do křoví a ztratil se. Zachraňte ho!
+	2
+	Ansel, zhýralý princ z Křáčí, dává dohromady družinu, která ho bude doprovázet na návštěvu jeho sestry a udělá na ni velký dojem.
+	3
+	Nikdo už nějakou dobu neviděl králičího zemědělce Ježivouska. Jeho farma leží kousek za Větvohradem.
+	4
+	Někdo ukradí důležitou součástku z moštového lisu Jabloňářské unie! Najděte ji!
+	5
+	Po loukách běhá oživlá dýně a zakládá požáry. Kde vzala tu lupu?
+	6
+	Královna Zipora z tíkající věže shání kapesní hodinky. Ježivousek prý má špičkové.
+	________________
+Tiráž:
+Text a ilustrace: Madeleine Ember | Návrh: Isaac Williams
+Redakce: Andre Novoa a Isaac Williams
+Překlad: Jiří „Markus" Petrů
+Redakce překladu: Markéta Forró | © Copyright 2023 Mytago 61
+________________
+Je tento přepis dostatečně přehledný pro tvé potřeby, nebo bys chtěl vytáhnout specificky jen statistiky monster nebo tabulky pokladů?

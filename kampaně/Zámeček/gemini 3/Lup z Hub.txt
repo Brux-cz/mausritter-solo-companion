@@ -1,0 +1,116 @@
+﻿Zde je kompletní přepis obsahu souboru Lup z hub do textové podoby. Text jsem uspořádal logicky podle sekcí (úvod, bestiář, lokace, tabulky), aby byl dokument čitelný a použitelný, přičemž jsem zachoval veškeré informace.
+________________
+LUP Z HUB (Dobrodružství pro Mausritter)
+Úvodní příběh
+Při nehodě natolik ostudné, že o podrobnostech je lépe pomlčet, vypadla královská koruna z hradního okna do kaluže břečky. Než se královna ze svého studu vzpamatovala natolik, aby pro ni poslala skupinku stráží, stihli se tu mihnout kutálníci. Tihle potulní brouci uváleli z břečky velkou kuličku, která se snadněji přepravuje, a nezamýšleně v ní odkouleli i královninu korunu.
+Domov kutálníků je vyhloubený v kolosální houbě. Jde o změť chodbiček i rozlehlých místností, z nichž každá plní jinou roli ve zpracovávání drahocenné suroviny, kuliček břečky. Skupina odvážných myší se teď musí vypravit do nitra houby a korunu zachránit!
+________________
+HÁČKY NA DOBRODRUŽSTVÍ (k6)
+1. Myší dívka Pernička Brusinková byla naposledy spatřena, jak si hraje poblíž houbové pevnosti.
+2. Jisté zemědělské družstvo chce s kutálníky zahájit obchodní jednání, ale jeho zástupcům se nedaří doručit vzkaz až ke královně.
+3. Houbovou pevností se šíří zvěsti o vojenském puči. Královna kutálníků potřebuje pučisty odhalit a žádá o pomoc zvenčí.
+4. Královna Zipora ztratila důležitou součástku z hodin. Za její návrat nabízí odměnu 500 d.
+5. Překupníkům na černém trhu bylo zabaveno šest vajec kutálníků. Jelikož vztahy s kutálníky jsou i bez toho dost napjaté, je zapotřebí vrátit vejce do houbové pevnosti, aniž by si krádeže kdokoli všiml.
+6. Kutálničtí sběrači omylem odnesli korunu patřící královně Madrize z Trní.
+________________
+BESTIÁŘ & POSTAVY
+Kuličkář
+Dělají všechno, co nechce dělat nikdo jiný.
+* 2 BO, síla 5, mrštnost 7, vůle 8
+* Útoky: drápy k6
+* Cíl: Chce navěky věků kutálet kuličky.
+Tunelář
+Přehnaně sebejistí a agresivní vojáci.
+* 8 BO, síla 14, mrštnost 7, vůle 8, zbroj 1
+* Útoky: rýč k8
+* Kritické zranění: Odnese myš v klepetech.
+* Cíl: Chce bránit pevnost.
+Pavoučí zabiják
+* 6 BO, síla 8, mrštnost 15, vůle 10
+* Útoky: jedovatý kousanec k8 (zraňuje mrštnost místo síly)
+* Cíl: Chce najít ztracenou součástku hodin.
+Reginald, obří žížalák
+Je větší, než si je vědom.
+* 12 BO, síla 12, mrštnost 9, vůle 12, zbroj 1
+* Útoky: kousnutí k8, omračující vřískot (Všichni v doslechu házejí záchranu na Vůli. Při neúspěchu ztrácejí další akci a dostanou stav Vystrašený.)
+* Cíl: Chce zbaštit něco dobrého.
+________________
+NÁHODNÁ SETKÁNÍ (k6)
+Kutálníci při svých obchůzkách za břečkou zaslechnou leccos, a tak jakžtakž rozumí jednoduché myštině.
+1. k6 tunelářů. Hledají vetřelce.
+2. k6 tunelářů. Doprovázejí kuličkáře s vajíčky.
+3. Mních pokrytý břečkou. Hledá ztracenou hůl.
+4. k4 pavoučích zabijáků. Belhají se pryč z boje.
+5. k4 žabích zlodějů. Nesou pytle plné lupu.
+6. Žížalák Reginald. Ohromný a hladový.
+________________
+LOKACE (Mapa)
+1. Vchod
+Dlouhá síň. Ke stropu se tyčí vysoké sloupy.
+* Pobíhající a panikařící kuličkáři.
+* Stráže: Čtyři tuneláři pokřikují navzájem si odporující rozkazy. Kdo jejich řeči rozumí, rozezná pokyny jako „obří pavouci“, „invaze“ nebo „do jídelny!“.
+2. Parní komora
+Silně zahalená párou. Nepříjemné vedro.
+* Oheň živený kuličkami břečky tu nahřívá kameny ve velké míse.
+* Jeden kuličkář stříbrnou naběračkou (200 d.) polévá kameny vodou.
+* Různí kutálníci relaxují v husté páře, klábosí a společně si pozpěvují.
+3. Jídelna
+Pohroma. Po stolech cupitají pavoučí vetřelci.
+* k6 pavoučích zabijáků. Derou se kolem kuličkářů a ničí jim kuličky břečky – něco v nich hledají.
+* Kuličkáři tiše cvrkají a pískají, rozpačitě se při jídle snaží nevšímat si okolních pavouků.
+* Za 1k4 kol dorazí k8 tunelářů vyzbrojených rýči a pokusí se pavouky vyhnat.
+4. Královská komnata
+Zdobně hloubená. Na jílové plošině stojí zdobený trůn.
+* Královna: Na trůně sedí neskutečně znuděná broučice mnohem větší než všichni ostatní.
+* Kuličkář asistent ji krmí sousty, která odlamuje z kuliček břečky.
+* Baliči vajíček: Tři kuličkáři vybírají vajíčka z koše za královnou. Z velké mísy berou břečku a plácají z ní kolem vajec ochranné skořápky.
+* Sběrači: Co chvíli se tu ukážou dva kuličkáři, kteří nosí nově zabalená vajíčka do líhně.
+5. Sklad
+Římsy a plošiny. Dutiny obsahují kuličky břečky.
+* U vchodu stojí na stráži jeden tunelář. k8 dalších hlídkuje uvnitř na římsách.
+* Po stropě se plíží k6 pavoučích zabijáků připravených skočit na stráže. Hledají součástku hodin.
+* Kuličky břečky: Za každou směnu hledání šance 3 z 6 na poklad.
+6. Líheň
+Komorou se rozléhá pískot a slabé cvrkání.
+* Ve stěnách jsou napůl zanořené kuličky břečky. Každá obsahuje larvu kutálníka.
+* Dvě kuličkářky chůvy zrovna spí opřené zády k sobě.
+* Jedna z kuliček pukla, v drti se válí kukla kutálníka. Když jí myši pomůžou, chůvy se jim odvděčí pokladem.
+* Obalená myš: Z jedné kuličky čouhá čenich ztracené myší dívky Perničky Brusinkové.
+7. Sklad nářadí
+Pečlivě vyrovnané stojany s nářadím. Všechno na svém místě.
+* Nářadí: 2 rýče (střední, k6/k8), chitinový plát (těžká zbroj), elektrická lampa.
+* Hlídají tu dva nervózní tuneláři.
+* Tajná klubovna: 2k4 tunelářů probírá plány na svržení královny a převzetí moci. Pokusí se myši přesvědčit, aby jim pomohly výměnou za poklad.
+8. Zpracovací linka
+Organizovaná práce. Kuličkáři pracují jako hodinky.
+* Sedí tu 12 kuličkářů. Rozebírají velké kuličky a dělají z nich menší. Dávají pozor, aby nic neztratili.
+* Každou směnu dorazí kutálníci s novou ohromnou koulí břečky. Pokusí se do ní myši nabalit.
+* Odpadní skluz: Vede na skládku. Vyhazuje se jím všechno, co není břečka (včetně myší!).
+9. Skládka
+Tma. Vlhko a štiplavý pach. Tiché dunění z hlubin. Podlahu tvoří rozmanitý odpad. Dřevo, sklo, kosti, úlomky plastu.
+* Po směně hledání najdou myši poklad, ale rozzlobí Reginalda.
+* Padající odpadky: Každá myš má šanci 3 z 6 za kolo (během boje) nebo za směnu (při hledání), že ji zasáhnou padající odpadky za k6 zranění.
+* Bydlí tu žížalák Reginald. Živí se odpadky. Pokud myši ještě nenašly královskou korunu, je tady.
+* Reginald ji vymění za něco dobrého a velkého k snědku.
+________________
+POKLAD (k6)
+1. Obřadní dýka (lehká, k6, Kostáci za ni zaplatí 300 d.)
+2. Vyřezávaná hůl (lehká, k6, reverend Zlatosrst zaplatí 500 d.)
+3. Očarovaná chitinová zbroj (těžká, 1 obr., šance 3 z 6 na odražení magického zranění)
+4. Červí píšťalka (bez ohledu na místo přivolá Reginalda)
+5. Součástka z hodin, kterou hledají pavouci (600 d., 2 políčka)
+6. Královská koruna vykládaná zlatem a stříbrem (1 000 d.)
+________________
+PRAVIDLA
+Orientace v chodbičkách kutálníků
+Kdykoli hráčské myši vyrazí chodbičkami do nové místnosti, prohledají kuličku břečky nebo kuličku začnou nést, hoď k6.
+Když padne 1–2, dostávají stav Nános břečky.
+Stav: Nános břečky
+* Popis: Poprskaný a páchnoucí sliz na těle a na packách.
+* Efekt: Postih -1 k Vůli a Charismatu u všech přejímaly (pravděpodobně testů/hodů - pozn. transkripce) na těle a packách.
+* Odstranění: Příjemná teplá koupel.
+________________
+Tiráž:
+Text a ilustrace: Bodie H. | Návrh: Isaac Williams
+Redakce: Andre Novoa a Isaac Williams | Překlad: Jiří „Markus“ Petrů
+Redakce překladu: Markéta Forró | Copyright 2023 Mytago

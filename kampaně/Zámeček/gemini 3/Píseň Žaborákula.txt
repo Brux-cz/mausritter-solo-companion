@@ -1,0 +1,295 @@
+﻿Zde je kompletní přepis obsahu tvého souboru „Píseň Žaborákula“, uspořádaný do logických sekcí tak, jak by pravděpodobně vypadaly v původním formátu (např. pravidla, lokace, tabulky).
+________________
+Píseň Žaborákula
+
+
+Dobrodružství pro hru Mausritter 1Autor: Ema Acosta 2
+
+
+________________
+Úvod a Háčky na dobrodružství
+V ojíněné zahradě leží jezírko, které se právě připravuje na každoroční jarní festival. Statečné myši, udatní sportovci ze širokého okolí Zámečku, přicházejí závodit v plavbě na vodách jezírka i potůčku. Nejzdatnější a nejrychlejší závodníci si jako první vyslechnou jarní píseň Žaborákula. To svou písní žehná okolním osadám a předává myším moudré rady z dob předků. 3
+
+
+Nebo aspoň takový byl záměr, ale poslední dobou se kdysi čestný závod zvrhl v nelítostné klání plné úskoků, neférových triků i krvavých zrad. Zabodujete mezi říčními myšmi a vyhrajete požehnání Žaborákula? Přišli jste jen kvůli tomu, abyste čmajzli něco cenného? Nebo selžete a ve vodních hlubinách najdete smrt? 4
+
+
+
+
+Tabulka háčků (k6): 5
+
+
+1. Prohráli jste sázku s favority a musíte nastoupit místo nich, protože oni se báli.
+2. Vítězům závodu předá Žaborákulum skutečné poznání.
+3. Dřívější závodníci vyprávějí, že na dně jezírka i potoka se válejí bobky a jiné cennosti.
+4. Přítel nebo příbuzný hráčské myši je hodně nemocný. Neumělo by ho Žaborákulum vyléčit?
+5. Kočičí čarodějnice Sabrina zaplatí hotové jmění tomu, kdo Žaborákulum unese.
+6. Oslo Potočník nezaplatil čaroději Alkounovi za runový člun. Ukradněte ho zpátky a čaroděj se vám bohatě odvděčí.
+________________
+Pravidla závodu
+Průběh závodu:
+Schopnosti účastníků jsou vyrovnané. Po herní desce se všichni pohybují ve skupině. 6
+Konkurenční závodníci:
+Všechny lodě mají kostku rychlosti. Tou házejí při pronásledování nebo prchání. Kdo hodí víc, tomu se splní jeho cíl. Když se skupina přesune na nové políčko, aktualizuj pořadí v závodě podle typu políčka, do kterého vplouvá. 7
+
+
+Rozdvojení – Uvažujte rychle, vyhrává spolupráce! 8
+Všichni hráči najednou musejí bez domlouvání s ostatními ukázat, jestli chtějí plout vlevo, nebo vpravo. Když se všichni shodnou, házejí při příštím hodu na rychlost k12. Pak hodí na rychlost proti lodi, která je o jedno místo napřed (pokud jsou hráči první, tak proti lodi na druhém místě). Když jim padne víc, posouvají se o jedno místo dopředu. 9
+
+
+Úžina – Vejde se sem jen jedna loď! 10
+Hráčské myši mají setkání s lodí, která jim je v pořadí nejblíž. Můžou třeba zaútočit, zahákovat soupeře, uplout pryč atd. Pomoz jim to vyhodnotit. 11
+________________
+Tabulka náhodných setkání (k6)
+
+
+Při setkání hráči můžou jednat, ale při zbytečném otálení se můžou propadnout o jedno místo. 12
+
+
+1. k6 zlatých rybčat. Vesele si hrají. Padají z nich třpytivé šupiny, každá za 100 d. 13131313
+
+2. Potopená loď. Leží v ní truhla s pokladem (1 000 d.). Když se hráči zdrží vytahováním, propadnou se na poslední místo. 14141414
+
+3. k6 přízračných žab loví v potoce. Hodem k4 urči, na kterou loď zaútočí. 15151515
+
+4. Vír! Všechny lodě házejí záchranu na mrštnost. Kdo neuspěje, propadá se o jedno místo. 16161616
+
+5. Zvláštní proudy. Všechny lodě házejí záchranu na sílu. Kdo neuspěje, propadá se o jedno místo. 17171717
+
+6. Zlatá rybka na lovu. Zaútočí na loď na posledním místě. 18181818
+
+________________
+Mapa závodu a lokace
+
+
+Startovní páska 19
+Ve vzduchu visí očekávání. Pořadatel pronese meandrující proslov. Konkurenční závodníci podezřívavě zírají. 20
+1. Tribuny 21Fandění ze všech stran. 22
+
+
+   * Vlevo: Fandící myši. Výhoda k příští záchraně na vůli. 23
+
+   * Vpravo: Hučící žáby. Výhoda k příští záchraně na mrštnost. 24
+
+2. Rákosový porost 25
+Ve změti rákosí není vidět moc dopředu. Všechny hody na rychlost používají k4. 26
+3. Peřeje 27
+Rychlý proud strhává loď dopředu. Hoď na setkání. 28
+4. Riskantní úsek 29
+Ze stran se tísní bahnité a skalnaté břehy. Hoď na setkání. 30
+5. Závodní praporky (v textu uvedeno jako 25., pravděpodobně překlep) 31
+Pestrobarevné vlaječky nad vodou.
+      * Vlevo: Zlatá rybčata rozhoupávají lodě. Příští hod na rychlost používá k4. 32
+
+      * Vpravo: Prudké vlny. Loď dostává k4 zranění. 33
+
+6. Korálová jeskyně 34
+Mrazivá mlha a poletující světýlka. Na 1. loď v pořadí zaútočí k4 přízračných žab. 35
+7. Zapovězené vody 36
+Náznaky toho, že v hlubinách cosi číhá. Hoď na setkání. 37
+8. Skalnatý mostek 38
+Nestojí na něm náhodou tlupa Kosťáků? Místo vlevo/vpravo volí hráči horem/spodem. 39
+         * Horem: Nic se nestane, jste v bezpečí. 40
+
+         * Spodem: Vroucí med! Každý člen posádky dostává k8 zranění. 41
+
+9. Ostrůvek leknínů 42
+Pomalý tok. Proplést se skrz je těžké. Hoď na setkání. 43
+10. Bouřný útes / Cílová páska 44
+Cílová páska je na dohled! Davy vám fandí. Kdo se stane vítězem? 45
+
+
+Cíl: Leknínový chrám 46
+Obří plovoucí květ, ve světle skoro nepostřehnutelně září. Uvnitř poklidně čeká Žaborákulum. Požádáte ho o píseň? 47
+________________
+Hráčská loď: Papírová loďka
+K účasti na závodě potřebujete loď! Naštěstí pořadatelka Loterie Pichlavá zrovna jednu prodává. A jen za 800 d! 48484848
+
+
+Statistiky (Měřítko tlupy):
+            * BO: 8, Síla: 8, Mrštnost: 8, Vůle: 8 49
+
+            * Útoky: kopí k6 50
+
+            * Rychlost: k4 51
+
+Úpravy lodě (Naše papírová loďka má...):
+
+
+
+
+Vyberte dvě možnosti: 52
+
+
+               1. Papírové plachty (rychlost k6) 53
+
+               2. Štíhlou konstrukci (rychlost k6 / k8 s plachtami) 54545454
+
+               3. Zkušeného lodivoda (+4 BO) 55
+
+               4. Těžkou výzbroj (harpuna k8) 56
+
+               5. Lana s háky 57
+
+               6. Levné materiály (levnější o 300 d.) 58
+
+
+
+Ale taky... Vyberte jednu možnost (nevýhodu): 59
+
+
+                  1. Je mistrně složená (dražší o 500 d.) 60
+
+                  2. Vzpurnou posádku (neposlouchá rozkazy) 61616161
+
+                  3. Je poškozená po jiném závodu (-4 BO) 62
+
+                  4. Nemá ani jednu závadu (lež) 63
+
+________________
+Rivalové (Protivníci)
+1. Lyra McZkázová a její parolod' 64Plavidlo v měřítku tlupy 65
+
+
+                     * Statistiky: 10 BO, síla 8, mrštnost 10, vůle 10 66
+
+                     * Útoky: šíp k6, dělová koule k8 (má jen 2) 67
+
+                     * Rychlost: k8 68
+
+                     * Cíl: Chce se zmocnit každého pokladu, který uvidí. 69
+
+                     * Posádka:
+                        1. Lyra, bezohledná kapitánka. 70
+
+                        2. Šimon, mladík, co si musí něco dokazovat. 71
+
+                        3. Jonáš, starý mořský kmet. 72
+
+                        4. Vilemína, zaříkávačka vln. 73
+
+2. Oslo Potočník a jeho runový člun 74Plavidlo v měřítku tlupy 75
+
+
+                           * Statistiky: 8 BO, síla 8, mrštnost 8, vůle 12 76
+
+                           * Útoky: kletba, zastrašení k6 (zraňuje vůli) 77
+
+                           * Rychlost: k4 78
+
+                           * Cíl: Chce unést Žaborákulum za pochybnými účely. 79
+
+                           * Runové kletby: 80
+
+                              1. Náhodná myš na příští tah v závodě oslepne. 81
+
+                              2. Náhodná myš na příští tah v závodě ohluchne. 82
+
+                              3. Cílová loď použije k příštímu hodu na rychlost k4. 83
+
+                              4. Ztráta kontroly nad lodí. Propadne se o jedno místo v pořadí. 84
+
+3. Grak Šlehal a jeho krysraketa 85Plavidlo v měřítku tlupy 86
+
+
+                                 * Statistiky: 6 BO, síla 6, mrštnost 12, vůle 6 87
+
+                                 * Útoky: petardy k6 88
+
+                                 * Rychlost: k6 89
+
+                                 * Cíl: Chce zaimponovat vůdci tlupy Kosťáků. 90
+
+                                 * Tajné vynálezy na krysraketě: 91
+
+                                    1. Mosazný dalekohled (vyhne se příštímu setkání) 92
+
+                                    2. Raketové trysky (okamžitě se dostane do vedení) 93
+
+                                    3. Petardomet (lodi na prvním místě dá k10 zranění) 94
+
+                                    4. Kouřová bomba (cíl má příští hod na rychlost k4) 95
+
+________________
+Bestiář
+
+
+Zlatá rybka 96
+
+
+                                       * 8 BO, síla 10, mrštnost 12, vůle 7 97
+
+                                       * Útoky: plácnutí ocasem k8, kousnutí k6 98
+
+                                       * Chce sežrat všechno, co spadne do vody. 99
+
+
+
+Zlaté rybče 100
+
+
+                                          * 4 BO, síla 6, mrštnost 10, vůle 4 101
+
+                                          * Útoky: kousnutí k6 102
+
+                                          * Chce si hrát, možná vás zblajznout. 103
+
+
+
+Přízračná žába 104
+
+
+                                             * 5 BO, síla 8, mrštnost 9, vůle 10 105
+
+                                             * Útoky: výron ektoplasmy k6 (dává stav Vyčerpání) 106106106106
+
+                                             * Zranitelná jen stříbrem nebo magií. 107107107107
+
+                                             * Chce vás stáhnout do bahnitého hrobu. 108
+
+________________
+Žaborákulum a Odměny
+Žaborákulum:
+Jednou ročně se Žaborákulum vynoří z Leknínového chrámu, aby přečetlo znamení na obloze a vyslovilo věštby. Někdo získá jeho přízeň, jiný prokletí. Záleží na tom, kdo vyhraje závod. 109109109109
+
+
+Tabulka odměn: 110
+
+
+Umístění
+	Odměna od Žaborákula
+	Odměna od myší z města
+	1. místo
+
+
+Píseň Žaborákula
+	Hráči smí položit tři otázky. Průvodce musí pravdivě odpovědět.
+	1000 d. každému účastníkovi. Myši jsou ve městě přivítány jako hrdinové a nadlouho mají pití zdarma.
+	2. místo
+
+
+Požehnání Žaborákula
+	Žaborákulum myším požehná. Získají 1 bod v libovolné vlastnosti.
+	500 d. každému účastníkovi. Myši jsou ve městě vřele přivítány a starostka je pozve na večírek spolu s vítězi.
+	3. místo
+
+
+Bramborová medaile Žaborákula
+	Diplom za účast.
+	Každý na myši kouká skrz prsty.
+	4. místo
+
+
+Kletba Žaborákula
+	Myši dostanou stav Kletba Žaborákula.
+	Ve městě jimi pohrdají a přehlížejí je.
+	Stav: Kletba Žaborákula
+
+
+
+
+Ve vodě dostáváš zranění k6 každé kolo. (text neúplný v PDF, rekonstruováno z kontextu: "Ve vode dostav..." a "Odstranění při závodě v příštím roce"). 111
+
+
+________________
+Konec přepisu.

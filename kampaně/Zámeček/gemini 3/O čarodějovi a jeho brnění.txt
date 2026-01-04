@@ -1,0 +1,164 @@
+﻿Zde je kompletní přepis textu ze souboru O čarodějovi na jeho brnění.pdf. Text jsem uspořádal podle jednotlivých sekcí a stránek tak, jak jdou za sebou, včetně tabulek a statistik postav.
+________________
+O čarodějovi a jeho brnění
+Mausritter | Amanda Lee Franck
+________________
+Tabulka: Setkání (k6)
+Hod
+	Setkání
+	1
+	k4 věrných učedníků. Hledají nespolehlivého učedníka.
+	2
+	k4 nespolehlivých učedníků. Lelkují.
+	3
+	Němý netopýr. Nese sladké pečivo.
+	4
+	Jeden šváb válečník. Na hlídce.
+	5
+	Mladá myš z osady. Nechala se vyhecovat, aby čarodějovi nakoukla do dílny.
+	6
+	k6 učedníků. Táhnou obsidiánový střep.
+	________________
+Postavy (NPC)
+Alkoun, čaroděj z brnění
+Nadaný a bezohledný. Jednoduchá kouzla ho nudí. Vybádal, jak dušemi živých myší dodávat větší moc kouzelným destičkám. Snaží se vyrobit kouzlo schopné oživit zbroj, kterou obývá, ale k dosažení tohoto cíle bude možná potřebovat duše všech svých učedníků.
+* Statistiky: 10 BO (Bodů ochrany), Síla 12, Mrštnost 10, Vůle 15
+* Útoky: dláto (k6)
+* Kouzla: Ohnivá koule, Čarovný spánek, Tma, Oživlá zbroj
+* Cíl: Chce se stát nejslavnějším čarodějem myšstva.
+Němý netopýr
+Čaroděj slíbil, že mu vrátí hlas výměnou za deset let služby. Stýská se mu po domově, je zasmušilý a úzkostlivý.
+* Statistiky: 12 BO, Síla 12, Mrštnost 15, Vůle 8, Zbroj 1
+* Útoky: kousnutí (k8), drápy (k6)
+* Poznámka: Nevidí ve tmě.
+* Cíl: Chce opět moct lovit a vrátit se do svojí kolonie.
+Šváb válečník
+Střeží čaroděje výměnou za sladké pečivo a jed.
+* Statistiky: 3 BO, Síla 12, Mrštnost 8, Vůle 10, Zbroj 1
+* Útoky: otrávená halapartna (k8)
+* Kritické zranění: dá stav Znecitlivění.
+* Cíl: Chce předvést svoji zdatnost v boji.
+Čtyři věrní učedníci
+Čaroděj jim každým dnem určitě prozradí svá tajemství.
+* Statistiky: 3 BO, Síla 9, Mrštnost 9, Vůle 11
+* Útoky: obsidiánový střep (k6)
+* Cíl: Chtějí získat čarodějovu přízeň.
+Čtyři nespolehliví učedníci
+Pokaždé dostávají ty nejhorší práce a plní je špatně.
+* Statistiky: 3 BO, Síla 8, Mrštnost 9, Vůle 5
+* Útoky: kuchyňské nože (k6)
+* Cíl: Chtějí se konečně zmocnit nějakých těch kouzel.
+________________
+Lokace
+1. Pravá noha
+Vchod. Shora se ozývá soustavné cinkání.
+* 2 švábí válečníci na stráži.
+* Dlouhé točité schodiště stoupá do kyrysu.
+2. Kyrys
+Lana, cinkání kladiv a vyvýšené plošiny. Na provázku zavěšený obří obsidiánový hrot kopí. k4 věrných učedníků z hrotu opatrně štípá střepy.
+* Pytel obsidiánových střepů.
+* Vachrlaté schodiště: nahoru do přilby.
+* Masivní zamčené dveře: do pravé ruky.
+* Tmavý výklenek: dolů do levé nohy.
+3. Pravá ruka
+Skladiště. Chaotická změť žebříků a polic.
+* Jedna sklenice obsahuje hlas němého netopýra.
+* V jiné sklenici je jed na švábí halapartny.
+* Těžká dřevěná truhla (500 d., 2 políčka).
+* V rukavici se zasekl zlatý prsten (300 d.).
+* Velká deska s rytinami. Vedle lísteček: „Objednávka pro Osla Potočníka“ (Píseň Žaborákula).
+4. Přilba
+Čarodějova dílna. Čaroděj tesá runy do obsidiánové destičky. Poházené přísady a změť svitků v regálech. Prázdné obsidiánové destičky na kouzla, rytecké náčiní.
+* Tělo jedné myši spící čarovným spánkem.
+* Dveře v zadní části přilby: vedou za zbroj.
+5. Za zbrojí
+Chladno a tma. Tlustá pokrývka prachu. Nahoře je zbroj uvolněnou svorkou připevněná ke zdi. Někdo nahradil jeden chybějící šroub kouzelným mečem. Po jeho vytažení hrozí, že se brnění zhroutí.
+* Drolivý otvor ve zdi pod svorkou: V něm spousta puklých destiček s kouzly. Čtyři jsou ještě v celku, zbývá vždy jedno použití (kouzla urči náhodně).
+6. Netopýří bidýlko
+Netopýr spává zavěšený na čepeli halapartny. Němý netopýr tu vyčkává na čarodějovy příkazy.
+7. Levá ruka
+Páchne po nepraných ponožkách. Žebříky mezi řadami paland.
+* Po žebřících nahoru: Kuchyně. Znuděný nespolehlivý učedník tu žvýká kávová zrna. k6 pytlíků cukru. Podřimuje tu nespolehlivý učedník.
+* Za palandou: Tajný východ v palci.
+8. Levá noha
+Podezřelé ticho, až na tlumené chrápání.
+* Za těžkými zamčenými dveřmi: Těla 12 myší spících čarovným spánkem. Jejich duše teď dodávají moc čarodějovým kouzlům. Vzbudí se nezraněné až po odstranění stavu Čarovný spánek.
+9. Muzejní osada Bálzinec
+Skromné příbytky ve zdech.
+* Několik opuštěných děr zbavených veškerého vybavení. Zdejší myši odešly hledat štěstí jinde.
+* Plamenka Hlohová, osamělá provozovatelka noclehárny pro cestovatele, kteří přišli požádat čaroděje o pomoc.
+________________
+Poklad a Vybavení
+Tabulka: Poklad (k6)
+Hod
+	Poklad
+	1
+	Zdobená truhla (obsahuje 500 d., zabírá 2 políčka)
+	2
+	2k6 prázdných destiček na kouzla (čarodějové dají 50 d. za každou)
+	3
+	Sada ryteckého náčiní (čarodějové za něj dají 200 d.)
+	4
+	Pytlík cukru (zásoby, ale bolí z něj hlava)
+	5
+	Kávová zrna (odstraní stav Vyčerpání)
+	6
+	Sklenice jedu (dává stav Znecitlivění)
+	Tabulka: Kouzla (k4)
+Hod
+	Kouzlo
+	Účinek
+	Dobití
+	1
+	Oživlá zbroj
+	Jedna zbroj se bude po dobu [POČET] směn pohybovat, jak jí přikážeš.
+	Uvězni v kouzle duši jiné spící myši.
+	2
+	Mrak neviditelnosti
+	[SOUČET] tvorů je na [POČET] směn neviditelnými. Pohyb zkrátí trvání o 1 směnu.
+	Ukolébavka zazpívaná babičkou.
+	3
+	Čarovný spánek
+	[POČTU] tvorů dá stav Čarovný spánek.
+	Přesvědč kouzlo, že je skvělým učedníkem a jednou z něj bude mocný čaroděj.
+	4
+	Ohnivá koule
+	Dostřel až 60 cm. Všichni v okruhu 15 cm utrpí [POČET] + [SOUČET] zranění.
+	Po tři dny a tři noci peč kouzlo v plamenech divokého ohně.
+	Stavy
+* Znecitlivění: Nemotornost. Uspěj v záchraně na Sílu, jinak děláš akce 1/2 rychlostí.
+   * Odstranění: po dlouhém odpočinku.
+   * Původ: Způsobeno otrávenými halapartnami švábů válečníků.
+* Čarovný spánek: Mocná hibernace, ze které se skoro nedá probudit.
+   * Odstranění: zlom destičku, která kouzlo seslala.
+   * Původ: Způsobeno kouzlem Čarovný spánek.
+________________
+Příběhové pozadí (Lore)
+Vždy pozdě večer září na konci tmavé chodby dvě obří zelené oči. Myši žijící v muzeu vyprávějí svým dětem říkanku:
+„V přilbě žije čaroděj, pozor na něj, myško, dej,
+jak se oči rozsvítí, do pelíšku utíkej.“
+Čaroděj bydlí ve starodávném brnění. Pomáhá mu osm učňů a jako stráže mu slouží němý netopýr a švábi válečníci.
+Jeho kouzla jsou mocná a nevyzpytatelná. Nejednou se stalo, že se mu kouzlo vymklo z pacek a podpálilo štos knih nebo rozbilo skleněné vitríny.
+Přestože je čaroděj krutý a tajnůstkářský, chodí k němu myši z daleka, aby si od něj koupily kouzla nebo mu zaplatily za učení. Poslední dobou se z jeho dílny v přilbě dlouho do noci line světlo. Je zelené, rubínové a zlaté a muzejní myši se začínají bát.
+________________
+Tabulka: Háčky na dobrodružství (k6)
+Hod
+	Háček
+	1
+	Čaroděj se nechal slyšet, že shání nové učedníky.
+	2
+	Muzejní myši si koupily kouzlo Mrak neviditelnosti, aby mohly bezpečně sbírat potravu. Nabíjely ho tak, že mu stará myš každý večer zpívala ukolébavku. Nedávno ale zemřela a nikdo písničku neumí zazpívat správně.
+	3
+	„Slyšela jsem, že napůl využitá kouzla vyhazuje čaroděj do díry za zbrojí. Když se tam prohrabete, možná najdete nějaká, ve kterých ještě zbývá trocha magie.“
+	4
+	Když z čarodějovy přilby sálalo takhle pronikavé světlo naposledy, celé muzeum se naplnilo kouřem a deštěm a zdejší osadu to málem utopilo.
+	5
+	„Jeden myšák dostal znepokojivý dopis od svojí snoubenky, která odešla studovat magii. Zrušila naše zásnuby! Ale podepsala se s chybou a přeje mi hodně štěstí při hledání potravy, i když moc dobře ví, že jsem umělec! Koukněte, namaloval jsem její portrét, poznáte přece, že taková není.“
+	6
+	Straky se chtějí zmocnit krásného zlatého prstenu, který čaroděj ukrývá někde ve věži.
+	________________
+Tiráž:
+Text a ilustrace: Amanda Lee Franck | Návrh: Isaac Williams
+Redakce: Andre Novoa a Isaac Williams
+Překlad: Jiří „Markus“ Petrů | Redakce překladu: Markéta Forró
+© Copyright 2023 Mytago

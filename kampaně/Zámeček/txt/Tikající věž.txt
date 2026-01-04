@@ -1,0 +1,213 @@
+TIKAJÍCÍ VĚŽ
+Josiah S. Moore
+Mausritter
+
+================================================================================
+
+SETKÁNÍ
+
+k8  Setkání
+1   k6 hodinových robotů. Provádějí opravy.
+2   2k6 hodinových robotů. Pochodují v řadě.
+3   k3 rozrušených hodinových robotů. Uvízli v pavučině.
+4   Hodinový golem. Hledá svého stvořitele.
+5   Prokletá myší průzkumnice. Uvízlá v časové smyčce.
+6   k4 hladových pavouků. Hledají kořist.
+7   k6 pavouků. Tkají pavučinu.
+8   Pavoučí matka. Na zádech nese desítky vajíček.
+
+--------------------------------------------------------------------------------
+
+NATAHOVACÍ ROBOT
+3 BO, síla 8, mrštnost 4, vůle 12, zbroj 1
+Útoky: švihnutí rukou k6
+Znají kouzla: Tuk
+
+Chce udržet hodiny v pravidelném chodu.
+
+--------------------------------------------------------------------------------
+
+HODINOVÝ GOLEM
+9 BO, síla 14, obratnost 8, vůle 12, zbroj 2
+Útoky: tyč k12 nebo hypnóza (Cíl musí uspět v záchraně na vůli, jinak má nutkání sloužit věži, dokud slyší její tikání)
+
+Chce chránit věž, zbavit se bolehlavu.
+
+--------------------------------------------------------------------------------
+
+PAVOUK
+6 BO, síla 8, mrštnost 15, vůle 10
+Útoky: jedovatý kousanec k6 (zraňuje mrš. místo síly), vystřelovací pavučina (stav Lepkavá pavučina)
+
+Chce krmit své mladé a sloužit Zipoře.
+
+--------------------------------------------------------------------------------
+
+KRÁLOVNA ZIPORA
+15 BO, síla 13, mrštnost 15, vůle 15, zbroj 1
+Útoky: jedovatý kousanec k6 (zraňuje mrš. místo síly), vystřelovací pavučina (stav Lepkavá pavučina)
+Zná kouzla: Tma
+Prokletá Žaborákulem: ve vodě k6 zranění za kolo.
+
+Chce získat zapovězenou znalost nesmrtelnosti.
+
+================================================================================
+
+MAPA VĚŽE (10 místností)
+
+================================================================================
+
+1. NÁDVOŘÍ
+Ozvěny pomalého tikání. Pach prachu a mědi.
+
+- Úhledně vyskládané haraburdí, cestičky v prachu.
+- k6 robotů. Hlídkují a sbírají šrot.
+- Těžkopádné dveře: Do strojovny.
+
+--------------------------------------------------------------------------------
+
+2. STROJOVNA
+Vysoký strop. Symfonie tikání a bzučení.
+
+- Změť rotujících ozubených kol a svištících kyvadel.
+- Jeden robot sesílá na ozubená kola kouzlo Tuk.
+- V hromadě šrotu poklad. Nalezení trvá jednu směnu.
+- Dřevěné lešení s žebříkem: Do dílny.
+
+--------------------------------------------------------------------------------
+
+3. DÍLNA
+Zanedbaná. Pavučiny, rezavé nářadí, rozbité sklo.
+
+- Ve velké svíčce stříbrný natahovací klíček (100 d.).
+- Pod nánosem pavučin stojí dubový stůl, na něm inkoust a brk (50 d.) a plánky robota (75 d.).
+- Dřevěné dveře: Do alkovny.
+- Šroubový výtah: Do zkušební komory. Potřebuje napájení.
+
+--------------------------------------------------------------------------------
+
+4. ALKOVNA
+Tma. Pod klenutým stropem se lesknou pavučiny.
+
+- Uprostřed stojí na kulatém, 20 cm vysokém podstavci hrací skříňka s klíčovou dírkou.
+- Použití natahovacího klíčku: Hraje smutná ukolébavka. Ze skříňky vyjede porcelánová víla držící poklad. Po dohrání podstavec vystřelí a vymrští vílu do pavučin. Vyleze k4 agresivních pavouků.
+
+--------------------------------------------------------------------------------
+
+5. ZKUŠEBNÍ KOMORA
+Opálené stěny. Podlaha rozsekaná na třísky.
+
+- V rohu stojí nečinný hodinový golem. Při jakémkoli zvuku mu poblikává žárovková hlava. Při velkém randálu se probudí a bude nevrlý.
+- Za golemem je zastrčený poklad.
+- Poklop ve stropě: Do zvonice. Šňůrka se bimbá 15 cm nad zemí. K otevření je třeba ohromné závaží.
+- Poškozená stěna: Ústí na skleněný mostek.
+
+--------------------------------------------------------------------------------
+
+6. SKLENĚNÝ MOSTEK
+Lehký vánek. Mostek vibruje vzdáleným tikáním.
+
+- Rovná skleněná deska, 8 cm široká, 30 cm dlouhá.
+- Přes most: Do pavoučí líhně.
+- Pod myšmi, které nesou předměty na 5 a víc políčkách, most praská a nakonec se zřítí.
+
+--------------------------------------------------------------------------------
+
+7. PAVOUČÍ LÍHEŇ
+Válcová místnost vyplněná tapisérii pavučin.
+
+- k8 pavouků se krčí poblíž kokonů s vajíčky.
+- Kdo se pavučin dotkne, dostává stav Lepkavá pavučina.
+- Za pavučinami stojí mechanická loutka (800 d., 2 políčka).
+- Vedle jednoho kokonu s vejci leží zesnulá myš obalená pavučinami. Drží poklad.
+- Otevřený strop: Vede ven na balkon.
+
+--------------------------------------------------------------------------------
+
+8. ZVONICE
+Pach formaldehydu a starých mincí.
+
+- Ze stropu visí zdobené zvony a zvonkohry.
+- Desítky sklenic plných svítivé tekutiny. Plavou v nich myší končetiny.
+- V jednom z válců plavou měděné nůžky (75 d.) a 8 velkých pavoučích očí (čarodějnice zaplatí 50 d. za každé).
+- Točité schodiště: Stoupá na špici. Poklop přehrazují Zipořiny pavučiny. Do sítí jsou vetkané krysí kosti.
+
+--------------------------------------------------------------------------------
+
+9. BALKON
+Hlasité, zastrašující tikání. Pokřivený tok času.
+
+- Ciferník. Přes broušené sklo je možné zahlédnout Ziporu, jak spřádá sítě. Dá se po něm vylézt do kukaččích dvířek.
+- Kukačí dvířka: Nad ciferníkem. Vedou na špici. Když se obě ručičky překrývají, zazvoní zvon, dvířka se otevřou a vynoří se vyřezávaný dřevěný ptáček se zlatým žaludem (600 d.) v zobáčku.
+- Kdo tu bude při bití zvonu, dostává stav Časobol.
+
+--------------------------------------------------------------------------------
+
+10. CIFERNÍK
+Broušené barevné sklo láme paprsky světla. Čas se divně kroutí.
+
+- Královna Zipora spolu s k6 věrnými pavouky spřádá složité pavučiny plné run a symbolů. Kdo je naruší, musí uspět v záchraně na vůli, jinak dostane stav Časobol.
+- Pozlacený strop s rytinami souhvězdí.
+- Uprostřed místnosti stojí na otáčejícím se ozubeném kole velké přesýpací hodiny (800 d., 2 políčka). Písek padá nahoru. Přetočení hodin obrátí gravitaci.
+
+================================================================================
+
+POKLAD
+
+k6  Poklad
+1   Pružinový žebřík (Rozloží se do výšky 30 cm, 150 d.)
+2   Paměťová svíčka (Po zapálení odkryje tvoje stopy, 200 d.)
+3   Hodinářské nářadí (600 d.)
+4   Hodinový robot pomocník (Poslouchá jednoduché příkazy. Má 4 políčka batohu. Musí se dvakrát denně natahovat.)
+5   Ručičkový budík (Po natažení a uplynutí k3 směn udělá HLASITÝ randál. 50 % šance, že ho myš nezamáčkne, ale jenom odloží.)
+6   Skleněná ladička (Odhaluje magické nebo prokleté předměty. Po zaškrtnutí všech políček pukne. 300 d.)
+
+================================================================================
+
+STAVY
+
+LEPKAVÁ PAVUČINA
+Pokud můžeš, musíš ji dát přes předmět. Ten se pak nedá používat.
+Odstranění: jedna směna čištění
+
+ČASOBOL (RYCHLÝ)
+Pohybuješ se rychle, ale zásoby a světlo spotřebováváš 2x rychleji.
+Odstranění: příští nov (v reálu, ne ve hře)
+
+ČASOBOL (POMALÝ)
+Jsi jako šnek, ale zásoby a světlo spotřebováváš 1/2 rychlostí.
+Odstranění: příští úplněk (v reálu, ne ve hře)
+
+Pavouci sídlící v hodinách mají mimořádně lepkavé pavučiny. Tenhle stav je možné dostat při souboji s nimi nebo při interakci s pavučinami.
+
+Když myš dostane stav Časobol, hoď k6:
+- 1-3: Dostává Časobol (rychlý).
+- 4-6: Dostává Časobol (pomalý).
+
+================================================================================
+
+PŘÍBĚH
+
+Knihovna, která kdysi zněla cvrkotem desítek tikajících hodin, nedávno utichla. Dnes se tu ozývá se jen pravidelný rytmus Tikající věže. Hodinoví roboti udržují věž v chodu dávno potom, co její stavitel zmizel.
+
+Naneštěstí se v Tikající věži usídlili hladoví pavouci. Obtěžují hodinové roboty a hodují na bláhových tvorech, které sem přivábí magická atmosféra věže nebo vidina pokladů. Pavoučí královna Zipora se opíjí zdejší magií a je posedlá hledáním nesmrtelnosti.
+
+Do napjaté situace mezi pavouky a roboty co nevidět vstoupí nic netušící myši.
+
+================================================================================
+
+HÁČKY NA DOBRODRUŽSTVÍ
+
+k6  Háček
+1   Jistý myší vynálezce potřebuje z věže přinést součástky na dokončení svého létacího stroje. Nabízí za ně 800 d.
+2   Rozčarovaný pavouk hledá někoho, kdo mu pomůže uniknout ze Zipořina kultu.
+3   Sběrači z Cihlína tvrdí, že čas strávený v okolí věže může uplynout vcukuletu, nebo se naopak nekonečně táhnout.
+4   Jeden hodinový robot utekl s důležitým rodinným dědictvím, které zoufale hledá strýc jedné z hráčských myší.
+5   Myší dobrodružka se zacyklila v časové smyčce a prožívá pořád dokola stejný den. Je přesvědčená, že je to vinou věže, a potřebuje vaši pomoc.
+6   Brouci kutálníci z houbového hradu musejí neustále odrážet výpady Zipořiných pavouků. Zaplatí 1 000 d. tomu, kdo útoky zarazí.
+
+================================================================================
+
+Text a ilustrace: Josiah S. Moore | Návrh: Isaac Williams
+Redakce: Andre Novoa a Isaac Williams | Překlad: Jiří "Markus" Petrů
+Redakce překladu: Markéta Forró | © Copyright 2023 Mytago
