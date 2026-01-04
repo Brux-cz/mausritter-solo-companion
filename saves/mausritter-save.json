@@ -1,0 +1,312 @@
+{
+  "version": 3,
+  "parties": [
+    {
+      "id": "13qqzkbvy",
+      "name": "Moje družina",
+      "members": [
+        {
+          "id": "rpofl55cj",
+          "type": "pc",
+          "name": "Slunečka Mechová",
+          "gender": "female",
+          "level": 1,
+          "STR": {
+            "current": 11,
+            "max": 11
+          },
+          "DEX": {
+            "current": 5,
+            "max": 5
+          },
+          "WIL": {
+            "current": 11,
+            "max": 11
+          },
+          "hp": {
+            "current": 6,
+            "max": 6
+          },
+          "pips": 5,
+          "xp": 0,
+          "origin": {
+            "name": "Knihovník",
+            "itemA": "Útržek ze starodávné knihy",
+            "itemB": "Brk a inkoust"
+          },
+          "birthsign": {
+            "sign": "Bouřka",
+            "trait": "Štědrá/popudlivá"
+          },
+          "fur": {
+            "color": "Černá",
+            "pattern": "Mourovatá"
+          },
+          "distinctiveFeature": "Módní oblečení",
+          "conditions": [],
+          "inventory": [],
+          "spells": [],
+          "inventorySlots": {
+            "mainPaw": {
+              "id": "gw977v6il",
+              "name": "Hůl (k6)",
+              "slots": 1,
+              "usageDots": 0,
+              "maxUsage": 3,
+              "isWeapon": true
+            },
+            "offPaw": null,
+            "body1": null,
+            "body2": null,
+            "pack1": {
+              "id": "dwdmlnchc",
+              "name": "Zásoby",
+              "slots": 1,
+              "usageDots": 0,
+              "maxUsage": 3
+            },
+            "pack2": {
+              "id": "mkyqh9dur",
+              "name": "Pochodně",
+              "slots": 1,
+              "usageDots": 0,
+              "maxUsage": 3
+            },
+            "pack3": {
+              "id": "qiifxq2dl",
+              "name": "Útržek ze starodávné knihy",
+              "slots": 1,
+              "usageDots": 0,
+              "maxUsage": 3
+            },
+            "pack4": {
+              "id": "tyb6cqq37",
+              "name": "Brk a inkoust",
+              "slots": 1,
+              "usageDots": 0,
+              "maxUsage": 3
+            },
+            "pack5": null,
+            "pack6": null
+          }
+        },
+        {
+          "id": "j2auu5znm",
+          "type": "pc",
+          "name": "Poupě Katzenreiser",
+          "gender": "male",
+          "level": 1,
+          "STR": {
+            "current": 12,
+            "max": 12
+          },
+          "DEX": {
+            "current": 12,
+            "max": 12
+          },
+          "WIL": {
+            "current": 6,
+            "max": 6
+          },
+          "hp": {
+            "current": 4,
+            "max": 4
+          },
+          "pips": 6,
+          "xp": 0,
+          "origin": {
+            "name": "Pěstitel hub",
+            "itemA": "Sušené houby (zásoby)",
+            "itemB": "Maska proti spórám"
+          },
+          "birthsign": {
+            "sign": "Měsíc",
+            "trait": "Moudrá/záhadná"
+          },
+          "fur": {
+            "color": "Světle hnědá",
+            "pattern": "Jednolitá"
+          },
+          "distinctiveFeature": "Módní oblečení",
+          "conditions": [],
+          "inventory": [],
+          "spells": [],
+          "inventorySlots": {
+            "mainPaw": {
+              "id": "fde8rb0hh",
+              "name": "Dýka (k6)",
+              "slots": 1,
+              "usageDots": 0,
+              "maxUsage": 3,
+              "isWeapon": true
+            },
+            "offPaw": null,
+            "body1": null,
+            "body2": null,
+            "pack1": {
+              "id": "h84pq0sl6",
+              "name": "Zásoby",
+              "slots": 1,
+              "usageDots": 0,
+              "maxUsage": 3
+            },
+            "pack2": {
+              "id": "ocghw0hha",
+              "name": "Pochodně",
+              "slots": 1,
+              "usageDots": 0,
+              "maxUsage": 3
+            },
+            "pack3": {
+              "id": "bviqf5u25",
+              "name": "Sušené houby (zásoby)",
+              "slots": 1,
+              "usageDots": 0,
+              "maxUsage": 3
+            },
+            "pack4": {
+              "id": "3k7s6x65q",
+              "name": "Maska proti spórám",
+              "slots": 1,
+              "usageDots": 0,
+              "maxUsage": 3
+            },
+            "pack5": null,
+            "pack6": null
+          }
+        }
+      ],
+      "gameTime": {
+        "watch": 1,
+        "day": 1,
+        "week": 1,
+        "season": "winter",
+        "totalWatches": 0,
+        "lastRest": null
+      },
+      "createdAt": "2025-12-31T06:11:21.044Z"
+    }
+  ],
+  "activePartyId": "13qqzkbvy",
+  "activeCharacterId": "rpofl55cj",
+  "journal": [
+    {
+      "type": "oracle",
+      "subtype": "action_theme",
+      "timestamp": "3. 1. 2026 17:52:13",
+      "result": "Střetnout se + Obchod",
+      "action": "Střetnout se",
+      "theme": "Obchod",
+      "id": "3b4c5dasu",
+      "partyId": "13qqzkbvy",
+      "note": "Naši dobrodruzi přijíždí do osady Cihlín z důvodů obchodu, mají se tam s někým sejít. S kým? A s čím obchodují?",
+      "edited": true
+    },
+    {
+      "type": "oracle",
+      "subtype": "yes_no",
+      "timestamp": "3. 1. 2026 17:45:04",
+      "question": "Jsme v okolí Zámečku?",
+      "probability": "likely",
+      "dice": [
+        2,
+        4
+      ],
+      "total": 6,
+      "result": "Yes",
+      "id": "f726kpbvv",
+      "partyId": "13qqzkbvy"
+    },
+    {
+      "type": "oracle",
+      "subtype": "custom_dice",
+      "timestamp": "3. 1. 2026 17:43:03",
+      "dice": [
+        2
+      ],
+      "sides": 4,
+      "count": 1,
+      "total": 2,
+      "reason": "Jaký je cca čas?",
+      "id": "63ma12k66",
+      "partyId": "13qqzkbvy",
+      "note": "Odpoledne",
+      "edited": true
+    },
+    {
+      "type": "world_event",
+      "subtype": "weather",
+      "timestamp": "31. 12. 2025 18:28:22",
+      "data": {
+        "type": "weather",
+        "season": "winter",
+        "dice": [
+          5,
+          4
+        ],
+        "total": 9,
+        "weather": "Mráz"
+      },
+      "id": "2itftqdj6",
+      "partyId": "13qqzkbvy"
+    },
+    {
+      "type": "oracle",
+      "subtype": "custom_dice",
+      "timestamp": "31. 12. 2025 18:27:36",
+      "dice": [
+        4
+      ],
+      "sides": 4,
+      "count": 1,
+      "total": 4,
+      "id": "3fnhgv3v8",
+      "partyId": "13qqzkbvy",
+      "note": "Zima",
+      "edited": true
+    },
+    {
+      "type": "character_created",
+      "timestamp": "31. 12. 2025 18:27:23",
+      "character": "Poupě Katzenreiser",
+      "id": "qx6toiv2e",
+      "partyId": "13qqzkbvy"
+    },
+    {
+      "type": "character_created",
+      "timestamp": "31. 12. 2025 18:26:01",
+      "character": "Slunečka Mechová",
+      "id": "d7umltx79",
+      "partyId": "13qqzkbvy"
+    }
+  ],
+  "factions": [],
+  "settlements": [
+    {
+      "id": "6tejxdti1",
+      "name": "Cihlín",
+      "size": "Město",
+      "population": "400",
+      "landmark": "",
+      "feature": "",
+      "event": "",
+      "ruler": null,
+      "notes": "",
+      "npcs": []
+    }
+  ],
+  "worldNPCs": [
+    {
+      "id": "4ejbwhb47",
+      "name": "Nová postava",
+      "birthsign": "",
+      "physicalDetail": "",
+      "quirk": "",
+      "goal": "",
+      "role": "",
+      "settlementId": "6tejxdti1",
+      "notes": ""
+    }
+  ],
+  "lastModified": "2026-01-04T01:28:48.094Z"
+}
