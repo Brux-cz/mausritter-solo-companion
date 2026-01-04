@@ -726,9 +726,9 @@ const migrations = {
       gameTime: {
         day: party.gameTime?.day || 1,
         season: party.gameTime?.season || 'spring',
-        watch: party.gameTime?.watch || 1,
-        turn: party.gameTime?.turn || 0,
-        restedToday: party.gameTime?.restedToday || false
+        watch: party.gameTime?.watch ?? 0,  // 0-3 index, ?? protože 0 je validní hodnota
+        turn: party.gameTime?.turn ?? 0,
+        restedToday: party.gameTime?.restedToday ?? false
       }
     }));
     return {
@@ -7698,18 +7698,18 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
 // TIME BAR - Sledování času
 // ============================================
 
-const SEASONS = [
+const TIMEBAR_SEASONS = [
   { id: 'spring', name: 'Jaro', icon: '🌱' },
   { id: 'summer', name: 'Léto', icon: '☀️' },
   { id: 'autumn', name: 'Podzim', icon: '🍂' },
   { id: 'winter', name: 'Zima', icon: '❄️' }
 ];
 
-const WATCHES = [
-  { id: 1, name: 'Ráno', icon: '🌅' },
-  { id: 2, name: 'Den', icon: '☀️' },
-  { id: 3, name: 'Večer', icon: '🌆' },
-  { id: 4, name: 'Noc', icon: '🌙' }
+const TIMEBAR_WATCHES = [
+  { id: 0, name: 'Ráno', icon: '🌅' },
+  { id: 1, name: 'Den', icon: '☀️' },
+  { id: 2, name: 'Večer', icon: '🌆' },
+  { id: 3, name: 'Noc', icon: '🌙' }
 ];
 
 const TimeBar = ({ gameTime, updateGameTime, partyName }) => {
@@ -7719,10 +7719,10 @@ const TimeBar = ({ gameTime, updateGameTime, partyName }) => {
 
   if (!gameTime) return null;
 
-  const { day = 1, season = 'spring', watch = 1, turn = 0, restedToday = false } = gameTime;
+  const { day = 1, season = 'spring', watch = 0, turn = 0, restedToday = false } = gameTime;
 
-  const currentSeason = SEASONS.find(s => s.id === season) || SEASONS[0];
-  const currentWatch = WATCHES.find(w => w.id === watch) || WATCHES[0];
+  const currentSeason = TIMEBAR_SEASONS.find(s => s.id === season) || TIMEBAR_SEASONS[0];
+  const currentWatch = TIMEBAR_WATCHES.find(w => w.id === watch) || TIMEBAR_WATCHES[0];
 
   // Přidat směnu
   const addTurn = () => {
@@ -7744,8 +7744,8 @@ const TimeBar = ({ gameTime, updateGameTime, partyName }) => {
 
   // Další hlídka
   const nextWatch = () => {
-    if (watch >= 4) {
-      // Konec dne
+    if (watch >= 3) {
+      // Konec dne (watch 3 = noc, poslední hlídka)
       if (!restedToday) {
         setShowExhaustionWarning(true);
         setTimeout(() => setShowExhaustionWarning(false), 5000);
@@ -7753,7 +7753,7 @@ const TimeBar = ({ gameTime, updateGameTime, partyName }) => {
       updateGameTime({
         ...gameTime,
         day: day + 1,
-        watch: 1,
+        watch: 0,
         turn: 0,
         restedToday: false
       });
@@ -7774,9 +7774,9 @@ const TimeBar = ({ gameTime, updateGameTime, partyName }) => {
 
   // Změna sezóny
   const cycleSeason = () => {
-    const currentIndex = SEASONS.findIndex(s => s.id === season);
-    const nextIndex = (currentIndex + 1) % SEASONS.length;
-    updateGameTime({ ...gameTime, season: SEASONS[nextIndex].id });
+    const currentIndex = TIMEBAR_SEASONS.findIndex(s => s.id === season);
+    const nextIndex = (currentIndex + 1) % TIMEBAR_SEASONS.length;
+    updateGameTime({ ...gameTime, season: TIMEBAR_SEASONS[nextIndex].id });
   };
 
   // Ruční úprava dne
@@ -7822,7 +7822,7 @@ const TimeBar = ({ gameTime, updateGameTime, partyName }) => {
 
             {/* Hlídky */}
             <div className="flex gap-1">
-              {WATCHES.map((w) => (
+              {TIMEBAR_WATCHES.map((w) => (
                 <div
                   key={w.id}
                   className={`w-7 h-7 flex items-center justify-center rounded text-base ${
