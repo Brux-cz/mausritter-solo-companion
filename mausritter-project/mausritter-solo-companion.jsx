@@ -7726,38 +7726,47 @@ const FloatingDice = () => {
     setActiveGenerator(null);
   };
 
+  // Pozice radiálního menu - pixely relativně k hlavnímu tlačítku
+  // Hlavní tlačítko je 56px (w-14), menu tlačítka 48px (w-12)
+  // Radiální rozložení v půlkruhu vlevo a nahoru
+  const getMenuPosition = (index) => {
+    const radius = 70; // vzdálenost od středu hlavního tlačítka
+    const startAngle = 180; // začínáme vlevo
+    const angleStep = 30; // 30 stupňů mezi tlačítky
+    const angle = startAngle - (index * angleStep); // proti směru hodin
+
+    const rad = (angle * Math.PI) / 180;
+    const x = Math.cos(rad) * radius;
+    const y = Math.sin(rad) * radius;
+
+    // Offset pro vycentrování (hlavní tlačítko 56px, menu 48px)
+    return {
+      left: `${28 + x - 24}px`,
+      bottom: `${28 - y - 24}px`
+    };
+  };
+
   return (
     <div className="fixed bottom-4 right-4 z-50">
       {/* Radiální menu */}
-      {isOpen && (
-        <div className="absolute bottom-0 right-0">
-          {generators.map((gen, index) => {
-            const angle = -90 - (index * 45); // Rozmístění po kruhu směrem nahoru a doleva
-            const radius = 70;
-            const x = Math.cos((angle * Math.PI) / 180) * radius;
-            const y = Math.sin((angle * Math.PI) / 180) * radius;
-
-            return (
-              <button
-                key={gen.id}
-                onClick={() => handleGeneratorClick(gen.id)}
-                className={`absolute w-12 h-12 rounded-full shadow-lg flex items-center justify-center text-xl transition-all duration-300 ${
-                  activeGenerator === gen.id
-                    ? `${gen.color} text-white scale-110 ring-2 ring-white`
-                    : 'bg-white hover:scale-110 border-2 border-stone-200'
-                }`}
-                style={{
-                  transform: `translate(${x - 24}px, ${y - 24}px)`,
-                  animation: `popIn 0.3s ease-out ${index * 0.05}s both`
-                }}
-                title={gen.label}
-              >
-                {gen.icon}
-              </button>
-            );
-          })}
-        </div>
-      )}
+      {isOpen && generators.map((gen, index) => {
+        const pos = getMenuPosition(index);
+        return (
+          <button
+            key={gen.id}
+            onClick={() => handleGeneratorClick(gen.id)}
+            className={`absolute w-12 h-12 rounded-full shadow-lg flex items-center justify-center text-xl transition-all duration-200 z-40 ${
+              activeGenerator === gen.id
+                ? `${gen.color} text-white scale-110 ring-2 ring-white`
+                : 'bg-white hover:scale-105 border-2 border-stone-200 hover:border-amber-400'
+            }`}
+            style={{ left: pos.left, bottom: pos.bottom }}
+            title={gen.label}
+          >
+            {gen.icon}
+          </button>
+        );
+      })}
 
       {/* Panel pro vybraný generátor */}
       {isOpen && activeGenerator && (
