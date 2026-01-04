@@ -1302,6 +1302,14 @@ const OraclePanel = ({ onLogEntry }) => {
   const [customDice, setCustomDice] = useState({ count: 1, sides: 6 });
   const [customDiceResult, setCustomDiceResult] = useState(null);
   const [diceReason, setDiceReason] = useState('');
+  const [silentMode, setSilentMode] = useState(false); // Tichý režim - nezapisuje do deníku
+
+  // Helper pro logování (respektuje silentMode)
+  const logEntry = (entry) => {
+    if (!silentMode && onLogEntry) {
+      onLogEntry(entry);
+    }
+  };
 
   // Custom dice roller
   const rollCustomDice = () => {
@@ -1319,7 +1327,7 @@ const OraclePanel = ({ onLogEntry }) => {
     };
     setCustomDiceResult(entry);
     setLastResult(entry);
-    onLogEntry(entry);
+    logEntry(entry);
     setDiceReason(''); // Clear after roll
   };
 
@@ -1337,7 +1345,7 @@ const OraclePanel = ({ onLogEntry }) => {
       result
     };
     setLastResult(entry);
-    onLogEntry(entry);
+    logEntry(entry);
     setQuestion('');
   };
 
@@ -1352,7 +1360,7 @@ const OraclePanel = ({ onLogEntry }) => {
       result
     };
     setLastResult(entry);
-    onLogEntry(entry);
+    logEntry(entry);
   };
 
   const rollConsequence = () => {
@@ -1366,7 +1374,7 @@ const OraclePanel = ({ onLogEntry }) => {
       result
     };
     setLastResult(entry);
-    onLogEntry(entry);
+    logEntry(entry);
   };
 
   const rollAlteredScene = () => {
@@ -1380,7 +1388,7 @@ const OraclePanel = ({ onLogEntry }) => {
       result: altered ? 'Scéna je POZMĚNĚNA!' : 'Scéna probíhá podle očekávání'
     };
     setLastResult(entry);
-    onLogEntry(entry);
+    logEntry(entry);
   };
 
   const rollActionTheme = () => {
@@ -1395,7 +1403,7 @@ const OraclePanel = ({ onLogEntry }) => {
       theme
     };
     setLastResult(entry);
-    onLogEntry(entry);
+    logEntry(entry);
   };
 
   const drawCard = () => {
@@ -1411,7 +1419,7 @@ const OraclePanel = ({ onLogEntry }) => {
       result: `${value}${suit.symbol} - ${suit.domain}`
     };
     setLastResult(entry);
-    onLogEntry(entry);
+    logEntry(entry);
   };
 
   const oracleTabs = [
@@ -1431,6 +1439,21 @@ const OraclePanel = ({ onLogEntry }) => {
       />
       
       <TabNav tabs={oracleTabs} activeTab={activeOracle} onTabChange={setActiveOracle} />
+
+      {/* Tichý režim toggle */}
+      <div className="flex items-center justify-end gap-2 -mt-2 mb-2">
+        <label className="flex items-center gap-2 cursor-pointer text-sm text-stone-600 hover:text-stone-800 transition-colors">
+          <input
+            type="checkbox"
+            checked={silentMode}
+            onChange={(e) => setSilentMode(e.target.checked)}
+            className="w-4 h-4 rounded border-stone-300 text-amber-600 focus:ring-amber-500"
+          />
+          <span className={silentMode ? 'text-amber-700 font-medium' : ''}>
+            🤫 Tichý hod {silentMode && '(nezapisuje do deníku)'}
+          </span>
+        </label>
+      </div>
 
       {activeOracle === 'yesno' && (
         <ResultCard>
@@ -7653,6 +7676,88 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
 };
 
 // ============================================
+// FLOATING DICE - Plovoucí kostky
+// ============================================
+
+const FloatingDice = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [lastRoll, setLastRoll] = useState(null);
+
+  const quickRoll = (count, sides) => {
+    const results = rollDice(count, sides);
+    const total = results.reduce((a, b) => a + b, 0);
+    setLastRoll({ dice: results, total, sides, count });
+  };
+
+  const quickYesNo = (probability = 'even') => {
+    const { dice, total } = roll2D6();
+    const result = ORACLE_TABLE[probability][total];
+    setLastRoll({ type: 'yesno', dice, total, result, probability });
+  };
+
+  return (
+    <div className="fixed bottom-4 right-4 z-50">
+      {/* Rozbalený panel */}
+      {isOpen && (
+        <div className="absolute bottom-14 right-0 bg-white rounded-xl shadow-2xl border border-amber-200 p-4 w-72 mb-2">
+          <div className="flex justify-between items-center mb-3">
+            <h4 className="font-bold text-amber-900">🎲 Rychlý hod</h4>
+            <span className="text-xs text-stone-400">bez zápisu do deníku</span>
+          </div>
+
+          {/* Rychlé kostky */}
+          <div className="grid grid-cols-4 gap-2 mb-3">
+            <button onClick={() => quickRoll(1, 6)} className="px-2 py-2 bg-amber-100 hover:bg-amber-200 rounded text-sm font-medium transition-colors">1d6</button>
+            <button onClick={() => quickRoll(2, 6)} className="px-2 py-2 bg-amber-100 hover:bg-amber-200 rounded text-sm font-medium transition-colors">2d6</button>
+            <button onClick={() => quickRoll(1, 20)} className="px-2 py-2 bg-amber-100 hover:bg-amber-200 rounded text-sm font-medium transition-colors">1d20</button>
+            <button onClick={() => quickRoll(1, 100)} className="px-2 py-2 bg-amber-100 hover:bg-amber-200 rounded text-sm font-medium transition-colors">d100</button>
+          </div>
+
+          {/* Oracle */}
+          <div className="grid grid-cols-3 gap-2 mb-3">
+            <button onClick={() => quickYesNo('unlikely')} className="px-2 py-2 bg-red-100 hover:bg-red-200 rounded text-xs font-medium transition-colors">❓ Sotva</button>
+            <button onClick={() => quickYesNo('even')} className="px-2 py-2 bg-yellow-100 hover:bg-yellow-200 rounded text-xs font-medium transition-colors">❓ 50/50</button>
+            <button onClick={() => quickYesNo('likely')} className="px-2 py-2 bg-green-100 hover:bg-green-200 rounded text-xs font-medium transition-colors">❓ Asi ano</button>
+          </div>
+
+          {/* Výsledek */}
+          {lastRoll && (
+            <div className="bg-amber-50 rounded-lg p-3 text-center border border-amber-200">
+              {lastRoll.type === 'yesno' ? (
+                <>
+                  <div className="text-2xl font-bold text-amber-900">{lastRoll.result}</div>
+                  <div className="text-xs text-stone-500">[{lastRoll.dice.join(', ')}] = {lastRoll.total}</div>
+                </>
+              ) : (
+                <>
+                  <div className="text-3xl font-bold text-amber-900">{lastRoll.total}</div>
+                  <div className="text-xs text-stone-500">
+                    {lastRoll.count}d{lastRoll.sides}: [{lastRoll.dice.join(', ')}]
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Plovoucí tlačítko */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl transition-all duration-200 ${
+          isOpen
+            ? 'bg-amber-600 text-white rotate-45'
+            : 'bg-amber-500 hover:bg-amber-600 text-white hover:scale-110'
+        }`}
+        title="Rychlé kostky"
+      >
+        {isOpen ? '✕' : '🎲'}
+      </button>
+    </div>
+  );
+};
+
+// ============================================
 // MAIN APP
 // ============================================
 
@@ -8875,6 +8980,9 @@ function MausritterSoloCompanion() {
           />
         )}
       </main>
+
+      {/* Plovoucí kostky - vždy viditelné */}
+      <FloatingDice />
 
       {/* Footer */}
       <footer className="bg-amber-900 text-amber-200 text-center py-4 mt-8">
