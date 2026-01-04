@@ -394,6 +394,388 @@ const ENCOUNTER_COMPLICATIONS = [
 ];
 
 // ============================================
+// CREATURE GENERATOR TABLES
+// Pro generování NPC a tvorů s narativem
+// ============================================
+
+// Typy tvorů (50 možností)
+const CREATURE_TYPES = [
+  // Myší archetypry
+  { name: 'myší poustevník', category: 'mouse', icon: '🐭' },
+  { name: 'myší poutník', category: 'mouse', icon: '🐭' },
+  { name: 'myší lovec', category: 'mouse', icon: '🐭' },
+  { name: 'myší bylinkář', category: 'mouse', icon: '🐭' },
+  { name: 'myší kovář', category: 'mouse', icon: '🐭' },
+  { name: 'myší bard', category: 'mouse', icon: '🐭' },
+  { name: 'myší stráž', category: 'mouse', icon: '🐭' },
+  { name: 'myší zloděj', category: 'mouse', icon: '🐭' },
+  { name: 'myší kupec', category: 'mouse', icon: '🐭' },
+  { name: 'myší čaroděj', category: 'mouse', icon: '🐭' },
+  { name: 'myší kněz', category: 'mouse', icon: '🐭' },
+  { name: 'myší voják', category: 'mouse', icon: '🐭' },
+  { name: 'myší šlechtic', category: 'mouse', icon: '🐭' },
+  { name: 'myší sirotek', category: 'mouse', icon: '🐭' },
+  { name: 'myší vynálezce', category: 'mouse', icon: '🐭' },
+  { name: 'myší kartograf', category: 'mouse', icon: '🐭' },
+  { name: 'myší léčitel', category: 'mouse', icon: '🐭' },
+  { name: 'myší šaman', category: 'mouse', icon: '🐭' },
+
+  // Krysy
+  { name: 'krysí lupič', category: 'rat', icon: '🐀' },
+  { name: 'krysí válečník', category: 'rat', icon: '🐀' },
+  { name: 'krysí šmejd', category: 'rat', icon: '🐀' },
+  { name: 'krysí vědma', category: 'rat', icon: '🐀' },
+  { name: 'krysí žoldnéř', category: 'rat', icon: '🐀' },
+
+  // Hmyz a malí tvorové
+  { name: 'moudrý brouk', category: 'insect', icon: '🪲' },
+  { name: 'včelí posel', category: 'insect', icon: '🐝' },
+  { name: 'mravenčí voják', category: 'insect', icon: '🐜' },
+  { name: 'cvrček básník', category: 'insect', icon: '🦗' },
+  { name: 'světluška průvodce', category: 'insect', icon: '✨' },
+  { name: 'motýl věštec', category: 'insect', icon: '🦋' },
+  { name: 'šnek poustevník', category: 'creature', icon: '🐌' },
+  { name: 'žabí rytíř', category: 'creature', icon: '🐸' },
+  { name: 'žabí šašek', category: 'creature', icon: '🐸' },
+  { name: 'rejsek stopař', category: 'creature', icon: '🐁' },
+
+  // Nadpřirozené
+  { name: 'lesní duch', category: 'spirit', icon: '👻' },
+  { name: 'bludička', category: 'spirit', icon: '🔥' },
+  { name: 'duch mrtvé myši', category: 'spirit', icon: '👻' },
+  { name: 'skřítek', category: 'fae', icon: '🧚' },
+  { name: 'víla', category: 'fae', icon: '🧚' },
+  { name: 'domácí duch', category: 'spirit', icon: '✨' },
+  { name: 'stínový tvor', category: 'spirit', icon: '🌑' },
+  { name: 'duch stromu', category: 'spirit', icon: '🌳' },
+  { name: 'vodní duch', category: 'spirit', icon: '💧' },
+
+  // Konstrukty a zvláštní
+  { name: 'oživlá loutka', category: 'construct', icon: '🎭' },
+  { name: 'magický konstrukt', category: 'construct', icon: '⚙️' },
+  { name: 'oživlý stín', category: 'spirit', icon: '🌑' },
+  { name: 'služebník čaroděje', category: 'construct', icon: '🔮' },
+
+  // Predátoři (mluvící)
+  { name: 'mladá sova', category: 'predator', icon: '🦉' },
+  { name: 'stará vrána', category: 'predator', icon: '🐦‍⬛' },
+  { name: 'mluvící had', category: 'predator', icon: '🐍' }
+];
+
+// Osobnostní rysy (40 možností)
+const CREATURE_PERSONALITIES = [
+  'mrzutý a nedůvěřivý',
+  'přátelský a zvědavý',
+  'paranoidní a ostražitý',
+  'melanholický a tichý',
+  'veselý a upovídaný',
+  'vážný a důstojný',
+  'nervózní a ustrašený',
+  'arogantní a povýšený',
+  'skromný a pokorný',
+  'charismatický a okouzlující',
+  'tajemný a uzavřený',
+  'impulzivní a vznětlivý',
+  'trpělivý a rozvážný',
+  'podezřívavý a opatrný',
+  'optimistický a nadějeplný',
+  'pesimistický a cynický',
+  'laskavý a starostlivý',
+  'chamtivý a vypočítavý',
+  'čestný a přímý',
+  'lstivý a zákeřný',
+  'naivní a důvěřivý',
+  'moudrý a zkušený',
+  'bláznivý a nepředvídatelný',
+  'klidný a vyrovnaný',
+  'zoufalý a beznadějný',
+  'hrdý a neústupný',
+  'zbabělý a vyhýbavý',
+  'statečný a odvážný',
+  'nostalgický a zasněný',
+  'praktický a pragmatický',
+  'snílkovský a romantický',
+  'zahořklý a zatrpklý',
+  'vděčný a pokorný',
+  'neklidný a roztěkaný',
+  'soustředěný a odhodlaný',
+  'unavený životem',
+  'plný energie a elánu',
+  'osamělý a toužící po společnosti',
+  'samotářský a nezávislý',
+  'loajální a věrný'
+];
+
+// Vzhled a fyzické rysy (45 možností)
+const CREATURE_APPEARANCES = [
+  'má zjizvený obličej',
+  'chybí mu kus ucha',
+  'má neobvykle lesklou srst',
+  'je pokrytý tetováními',
+  'nosí obnošený plášť',
+  'má pronikavé zelené oči',
+  'kulhá na jednu nohu',
+  'je neobvykle velký',
+  'je drobný a vychrtlý',
+  'má stříbrnou srst',
+  'je slepý na jedno oko',
+  'má zlomený vous',
+  'nosí podivný klobouk',
+  'je pokrytý jizvami',
+  'má elegantní oblečení',
+  'je zahalený v hadrech',
+  'nosí amulety a talismany',
+  'má spálený kus srsti',
+  'je pokrytý prachem z cest',
+  'má neobvykle dlouhý ocas',
+  'je bezzubý',
+  'má kouzelnou záři v očích',
+  'nosí zbraň z lidské jehly',
+  'je pokrytý pylem',
+  'má tetování na tlapce',
+  'nosí zděděný medailon',
+  'má nervózní tik',
+  'je neobvykle čistý',
+  'páchne bylinkami',
+  'voní po kouři',
+  'má hlas jako zvon',
+  'šeptá neustále',
+  'mluví s přízvukem',
+  'koktá při stresu',
+  'má nepřítomný pohled',
+  'neustále si hraje s něčím v tlapkách',
+  'má modřiny a odřeniny',
+  'nosí vzácný kámen na krku',
+  'má výrazné bílé chloupky',
+  'je pokrytý blátem',
+  'má mechanickou protézu',
+  'nosí brýle z kapky rosy',
+  'má viditelnou magickou auru',
+  'je albín',
+  'má neobvykle krátké vousy'
+];
+
+// Motivace a cíle (50 možností)
+const CREATURE_GOALS = [
+  'hledá ztraceného příbuzného',
+  'utíká před pronásledovateli',
+  'sbírá ingredience pro rituál',
+  'nese tajnou zprávu',
+  'hledá bezpečné místo',
+  'chce splatit starý dluh',
+  'pátrá po ukrytém pokladu',
+  'hledá pomstu za křivdu',
+  'sbírá informace pro svého pána',
+  'utíká před minulostí',
+  'hledá léčivou bylinu',
+  'chce varovat osadu před nebezpečím',
+  'sbírá příběhy pro kroniku',
+  'hledá učedníka',
+  'chce založit nový domov',
+  'pátrá po starověkém artefaktu',
+  'plní slib mrtvému příteli',
+  'hledá odpuštění za hřích',
+  'sbírá součástky pro vynález',
+  'utíká před zákonem',
+  'hledá ztracené kouzlo',
+  'chce překonat prokletí',
+  'pátrá po pravdě o své minulosti',
+  'hledá partnera na cestu',
+  'chce dokázat svou hodnotu',
+  'sbírá vzácné materiály',
+  'hledá vstup do skrytého místa',
+  'chce se pomstít nepříteli',
+  'pátrá po zmizelé osadě',
+  'nese oběť pro ducha',
+  'hledá ztracený recept',
+  'chce osvobodit zajatce',
+  'sbírá důkazy zločinu',
+  'hledá způsob jak odčinit minulost',
+  'chce získat vzácnou znalost',
+  'pátrá po legendárním místu',
+  'hledá cestu domů',
+  'chce varovat před blížící se hrozbou',
+  'sbírá spojence pro boj',
+  'hledá ztracené dědictví',
+  'chce předat prokletý předmět',
+  'pátrá po svém původu',
+  'hledá místo z proroctví',
+  'chce splnit poslední přání umírajícího',
+  'sbírá staré dluhy',
+  'hledá odpověď na záhadu',
+  'chce dokončit nedokončenou práci',
+  'pátrá po zmizele karavanně',
+  'hledá ochranu před něčím',
+  'chce získat magický předmět'
+];
+
+// Aktuální činnost (40 možností)
+const CREATURE_DOING = [
+  'odpočívá ve stínu',
+  'jí skromné jídlo',
+  'opravuje své vybavení',
+  'studuje starou mapu',
+  'mluví sám se sebou',
+  'zpívá tichou píseň',
+  'ošetřuje si zranění',
+  'hledá něco v pytli',
+  'pozoruje okolí',
+  'číhá ve stínu',
+  'přemýšlí nad rozhodnutím',
+  'počítá mince',
+  'čte zvětralý svitek',
+  'brousí zbraň',
+  'připravuje lektvar',
+  'kreslí do prachu',
+  'šeptá zaklínadlo',
+  'schovává něco',
+  'následuje stopu',
+  'staví malý přístřešek',
+  'sbírá byliny',
+  'naslouchá větru',
+  'medituje',
+  'pláče potichu',
+  'směje se něčemu',
+  'cvičí s zbraní',
+  'vaří nad malým ohníčkem',
+  'balí své věci',
+  'čeká na někoho',
+  'píše do deníku',
+  'zkoumá podivný předmět',
+  'léčí nemocného druha',
+  'vyjednává s někým',
+  'ukrývá se',
+  'hádá se s neviditelným',
+  'tančí podivný tanec',
+  'sbírá rosu do lahvičky',
+  'staví past',
+  'ruší staré kouzlo',
+  'volá do tmy'
+];
+
+// Nálada a emocionální stav (35 možností)
+const CREATURE_MOODS = [
+  'je zjevně vyčerpaný',
+  'působí podezřívavě',
+  'je v dobré náladě',
+  'vypadá nervózně',
+  'je hluboce zamyšlený',
+  'působí ztraceně',
+  'je zjevně v šoku',
+  'vypadá rozhodnutě',
+  'je plný obav',
+  'působí nostalgicky',
+  'je evidentně zraněný',
+  'vypadá hladově',
+  'je v panice',
+  'působí klidně a vyrovnaně',
+  'je zjevně opilý',
+  'vypadá jako by něco skrýval',
+  'je plný naděje',
+  'působí paranoidně',
+  'je zjevně nemocný',
+  'vypadá zoufalě',
+  'je v transu',
+  'působí jako by snil',
+  'je evidentně vyděšený',
+  'vypadá odhodlaně',
+  'je zmatený a dezorientovaný',
+  'působí tajemně',
+  'je zjevně unavený životem',
+  'vypadá jako by čekal na smrt',
+  'je plný energie',
+  'působí jako by něco věděl',
+  'je zjevně pod vlivem magie',
+  'vypadá jako by utíkal celou noc',
+  'je zahloubán do vzpomínek',
+  'působí jako by právě prožil trauma',
+  'je překvapený že tě vidí'
+];
+
+// Tajemství (35 možností)
+const CREATURE_SECRETS = [
+  'je ve skutečnosti špeh jiné frakce',
+  'nese prokletý předmět, o kterém neví',
+  'je poslední ze své rodiny',
+  'byl kdysi někým důležitým',
+  'zná cestu k ukrytému pokladu',
+  'má dluhy u nebezpečných bytostí',
+  'viděl něco, co neměl',
+  'je pod vlivem kletby',
+  'zná zapomenuté kouzlo',
+  'skrývá svou pravou identitu',
+  'je na útěku před spravedlností',
+  'nese důležitou zprávu pro někoho mrtvého',
+  'má spojení s nebezpečnou frakcí',
+  'zná slabinu mocného nepřítele',
+  'je vázán přísahou, kterou nemůže porušit',
+  'byl svědkem zločinu',
+  'zná tajnou cestu',
+  'má v sobě ducha předka',
+  'ví kde je ukrytý artefakt',
+  'je pronásledován duchem',
+  'zná pravdu o historické události',
+  'má tajnou nemoc',
+  'je agentem královny',
+  'zná polohu ztracené osady',
+  'nese semínko vzácné rostliny',
+  'ví kdy přijde nebezpečí',
+  'je potomkem legendární postavy',
+  'zná recept na mocný lektvar',
+  'má dluh vůči nadpřirozené bytosti',
+  'skrývá magický dar',
+  'je vázán smlouvou s vílou',
+  'zná slabé místo v obraně osady',
+  'viděl budoucnost',
+  'nese vzpomínky mrtvého',
+  'ví o zradě ve vysokých kruzích'
+];
+
+// Zvláštnosti a kvíry (40 možností)
+const CREATURE_QUIRKS = [
+  'mluví ve třetí osobě',
+  'neustále si něco mumlá',
+  'sbírá bezvýznamné předměty',
+  'má strach z vody',
+  'nikdy neotočí záda ke dveřím',
+  'jí pouze syrové jídlo',
+  'nespí v noci',
+  'má obsesi s čistotou',
+  'věří v podivné pověry',
+  'počítá neustále kroky',
+  'mluví s neviditelnými přáteli',
+  'odmítá vstoupit do stínu',
+  'nikdy nelže (ani když by měl)',
+  'má strach z ptáků',
+  'sbírá kosti',
+  'dělá poznámky o všem co vidí',
+  'nikdy nejí maso',
+  'mluví pouze v hádankách',
+  'má rituál před každým jídlem',
+  'odmítá nosit zbraně',
+  'věří že je někdo jiný',
+  'sbírá příběhy o smrti',
+  'nikdy neprozradí své pravé jméno',
+  'má strach z uzavřených prostor',
+  'neustále kontroluje své věci',
+  'mluví o sobě v množném čísle',
+  'má obsesi s určitou barvou',
+  'nikdy nespí na stejném místě dvakrát',
+  'věří že ho někdo sleduje',
+  'sbírá pyl z květin',
+  'odmítá jít proti větru',
+  'má rituál zdravení',
+  'nikdy nepije z tekoucí vody',
+  'sbírá kamínky specifického tvaru',
+  'věří v osudová znamení',
+  'má strach z hadů',
+  'neustále si brousí zuby',
+  'odmítá mluvit za tmy',
+  'má posedlost se směry',
+  'vždy má plán úniku'
+];
+
+// ============================================
 // BESTIARY - CREATURE DATA
 // ============================================
 
@@ -1714,6 +2096,14 @@ const OraclePanel = ({ onLogEntry }) => {
     dangerLevel: 'any' // 'any', 'safe', 'dangerous'
   });
 
+  // State pro generátor tvorů/NPC
+  const [creatureResult, setCreatureResult] = useState(null);
+  const [creatureOptions, setCreatureOptions] = useState({
+    includeSecret: true,
+    includeQuirk: true,
+    categoryFilter: 'any' // 'any', 'mouse', 'rat', 'insect', 'spirit', 'fae', 'creature', 'construct', 'predator'
+  });
+
   // Generátor setkání - kombinuje tabulky pro narativní výstup
   const generateEncounter = () => {
     // Filtruj tvory podle nebezpečí pokud je nastaveno
@@ -1771,9 +2161,77 @@ const OraclePanel = ({ onLogEntry }) => {
     logEntry(entry);
   };
 
+  // Generátor tvorů/NPC - bohatý narativní popis
+  const generateCreature = () => {
+    // Filtruj typy podle kategorie
+    let types = CREATURE_TYPES;
+    if (creatureOptions.categoryFilter !== 'any') {
+      types = CREATURE_TYPES.filter(t => t.category === creatureOptions.categoryFilter);
+    }
+    if (types.length === 0) types = CREATURE_TYPES; // fallback
+
+    const type = randomFrom(types);
+    const personality = randomFrom(CREATURE_PERSONALITIES);
+    const appearance = randomFrom(CREATURE_APPEARANCES);
+    const goal = randomFrom(CREATURE_GOALS);
+    const doing = randomFrom(CREATURE_DOING);
+    const mood = randomFrom(CREATURE_MOODS);
+    const secret = creatureOptions.includeSecret ? randomFrom(CREATURE_SECRETS) : null;
+    const quirk = creatureOptions.includeQuirk ? randomFrom(CREATURE_QUIRKS) : null;
+
+    // Generuj jméno (české myší jméno)
+    const firstNames = ['Křemílek', 'Lístek', 'Proutek', 'Bělouš', 'Stínek', 'Chlupáč', 'Tichošlap', 'Bystrozrak',
+      'Šedivka', 'Ořech', 'Zrnko', 'Kapka', 'Mech', 'Korál', 'Jiskra', 'Pírko', 'Hvězdička', 'Kvítek',
+      'Bobek', 'Kamínek', 'Vánek', 'Stéblo', 'Rosa', 'Luna', 'Šero', 'Úsvit', 'Mraka', 'Blesk',
+      'Rámus', 'Tichoun', 'Hbitec', 'Kulička', 'Pecka', 'Šiška', 'Vločka', 'Prach', 'Drobek'];
+    const name = randomFrom(firstNames);
+
+    // Sestav narativní popis
+    let narrative = `**${name}** - ${type.name} ${type.icon}\n\n`;
+    narrative += `${name} ${doing}. `;
+    narrative += `Je ${personality}. `;
+    narrative += `${mood.charAt(0).toUpperCase() + mood.slice(1)}.\n\n`;
+    narrative += `**Vzhled:** ${appearance.charAt(0).toUpperCase() + appearance.slice(1)}.\n`;
+    narrative += `**Cíl:** ${goal.charAt(0).toUpperCase() + goal.slice(1)}.`;
+
+    if (quirk) {
+      narrative += `\n**Zvláštnost:** ${quirk.charAt(0).toUpperCase() + quirk.slice(1)}.`;
+    }
+
+    if (secret) {
+      narrative += `\n\n🔒 *Tajemství (pouze GM): ${secret}.*`;
+    }
+
+    const result = {
+      name,
+      type,
+      personality,
+      appearance,
+      goal,
+      doing,
+      mood,
+      secret,
+      quirk,
+      narrative
+    };
+
+    setCreatureResult(result);
+
+    const entry = {
+      type: 'oracle',
+      subtype: 'creature',
+      timestamp: formatTimestamp(),
+      result: narrative,
+      data: result
+    };
+    setLastResult(entry);
+    logEntry(entry);
+  };
+
   const oracleTabs = [
     { id: 'yesno', label: 'Ano/Ne', icon: '🎲' },
     { id: 'encounter', label: 'Setkání', icon: '👁️' },
+    { id: 'creature', label: 'Tvor', icon: '🐭' },
     { id: 'dice', label: 'Kostky', icon: '🎯' },
     { id: 'scene', label: 'Scéna', icon: '🎭' },
     { id: 'prompt', label: 'Prompt', icon: '💡' },
@@ -1989,6 +2447,151 @@ const OraclePanel = ({ onLogEntry }) => {
           {/* Statistiky */}
           <p className="text-center text-xs text-stone-400 mt-4">
             41 × 35 × 30 × 25 × 40 × 30 × 25 = ~5,400,000,000 kombinací
+          </p>
+        </ResultCard>
+      )}
+
+      {/* ========== CREATURE GENERATOR ========== */}
+      {activeOracle === 'creature' && (
+        <ResultCard>
+          <HelpHeader
+            title="Generátor tvorů & NPC"
+            icon="🐭"
+            tooltip={
+              <div>
+                <p className="font-bold mb-2">🐭 Co je tohle?</p>
+                <p className="text-xs mb-2">
+                  Narativní generátor postav a tvorů pro Mausritter.
+                  Kombinuje 50 typů, 40 osobností, 45 vzhledů, 50 cílů,
+                  40 aktivit, 35 nálad, 35 tajemství a 40 zvláštností.
+                </p>
+
+                <p className="font-bold mb-1">🎭 Výstup:</p>
+                <p className="text-xs text-stone-300 mb-2">
+                  Kompletní NPC s jménem, osobností, vzhledem, cílem a tajemstvím.
+                </p>
+
+                <p className="font-bold mb-1">⚙️ Možnosti:</p>
+                <ul className="text-xs space-y-1">
+                  <li>• <b>Tajemství</b> - skryté informace pro GM</li>
+                  <li>• <b>Zvláštnost</b> - unikátní vlastnost nebo obsese</li>
+                  <li>• <b>Kategorie</b> - filtruj typ tvora</li>
+                </ul>
+              </div>
+            }
+          />
+
+          {/* Možnosti generátoru */}
+          <div className="mb-4 p-3 bg-stone-100 rounded-lg space-y-3">
+            <div className="flex flex-wrap gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={creatureOptions.includeSecret}
+                  onChange={(e) => setCreatureOptions(prev => ({ ...prev, includeSecret: e.target.checked }))}
+                  className="w-4 h-4 rounded border-stone-300"
+                />
+                <span className="text-sm text-stone-700">Zahrnout tajemství</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={creatureOptions.includeQuirk}
+                  onChange={(e) => setCreatureOptions(prev => ({ ...prev, includeQuirk: e.target.checked }))}
+                  className="w-4 h-4 rounded border-stone-300"
+                />
+                <span className="text-sm text-stone-700">Přidat zvláštnost</span>
+              </label>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-stone-600">Kategorie:</span>
+              <select
+                value={creatureOptions.categoryFilter}
+                onChange={(e) => setCreatureOptions(prev => ({ ...prev, categoryFilter: e.target.value }))}
+                className="text-sm border border-stone-300 rounded px-2 py-1"
+              >
+                <option value="any">Jakákoliv</option>
+                <option value="mouse">🐭 Myš</option>
+                <option value="rat">🐀 Krysa</option>
+                <option value="insect">🐛 Hmyz</option>
+                <option value="creature">🐸 Tvor</option>
+                <option value="spirit">👻 Duch</option>
+                <option value="fae">🧚 Víla/Skřítek</option>
+                <option value="construct">⚙️ Konstrukt</option>
+                <option value="predator">🦉 Predátor</option>
+              </select>
+            </div>
+          </div>
+
+          <Button onClick={generateCreature} variant="primary" size="large" className="w-full mb-4">
+            🐭 Generovat tvora
+          </Button>
+
+          {/* Výsledek */}
+          {creatureResult && (
+            <div className="p-4 rounded-lg border-2 bg-amber-50 border-amber-300">
+              {/* Hlavička s jménem a typem */}
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-2xl">{creatureResult.type.icon}</span>
+                <div>
+                  <h3 className="font-bold text-lg text-amber-900">{creatureResult.name}</h3>
+                  <p className="text-sm text-stone-600">{creatureResult.type.name}</p>
+                </div>
+              </div>
+
+              {/* Aktivita a nálada */}
+              <p className="text-stone-700 mb-3">
+                {creatureResult.name} {creatureResult.doing}.
+                <span className="text-stone-600"> Je {creatureResult.personality}. </span>
+                <span className="italic text-stone-500">{creatureResult.mood.charAt(0).toUpperCase() + creatureResult.mood.slice(1)}.</span>
+              </p>
+
+              {/* Vzhled */}
+              <div className="mb-2 p-2 bg-white/50 rounded border-l-4 border-amber-400">
+                <span className="text-xs text-amber-700 font-medium block mb-1">👁️ VZHLED</span>
+                <p className="text-stone-700">{creatureResult.appearance.charAt(0).toUpperCase() + creatureResult.appearance.slice(1)}.</p>
+              </div>
+
+              {/* Cíl */}
+              <div className="mb-2 p-2 bg-white/50 rounded border-l-4 border-blue-400">
+                <span className="text-xs text-blue-600 font-medium block mb-1">🎯 CÍL</span>
+                <p className="text-stone-700">{creatureResult.goal.charAt(0).toUpperCase() + creatureResult.goal.slice(1)}.</p>
+              </div>
+
+              {/* Zvláštnost */}
+              {creatureResult.quirk && (
+                <div className="mb-2 p-2 bg-white/50 rounded border-l-4 border-purple-400">
+                  <span className="text-xs text-purple-600 font-medium block mb-1">✨ ZVLÁŠTNOST</span>
+                  <p className="text-stone-700">{creatureResult.quirk.charAt(0).toUpperCase() + creatureResult.quirk.slice(1)}.</p>
+                </div>
+              )}
+
+              {/* Tajemství - pouze pro GM */}
+              {creatureResult.secret && (
+                <div className="mt-3 p-2 bg-stone-800 rounded border-l-4 border-stone-600">
+                  <span className="text-xs text-stone-400 font-medium block mb-1">🔒 TAJEMSTVÍ (pouze GM)</span>
+                  <p className="text-stone-300 italic">{creatureResult.secret.charAt(0).toUpperCase() + creatureResult.secret.slice(1)}.</p>
+                </div>
+              )}
+
+              {/* Meta info */}
+              <div className="mt-4 pt-3 border-t border-stone-200 flex flex-wrap gap-2 text-xs text-stone-500">
+                <span className="px-2 py-1 bg-stone-100 rounded">
+                  {creatureResult.type.category === 'mouse' ? '🐭 Myš' :
+                   creatureResult.type.category === 'rat' ? '🐀 Krysa' :
+                   creatureResult.type.category === 'insect' ? '🐛 Hmyz' :
+                   creatureResult.type.category === 'spirit' ? '👻 Duch' :
+                   creatureResult.type.category === 'fae' ? '🧚 Víla' :
+                   creatureResult.type.category === 'construct' ? '⚙️ Konstrukt' :
+                   creatureResult.type.category === 'predator' ? '🦉 Predátor' : '🐸 Tvor'}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Statistiky */}
+          <p className="text-center text-xs text-stone-400 mt-4">
+            50 × 40 × 45 × 50 × 40 × 35 × 35 × 40 = ~25,200,000,000,000 kombinací
           </p>
         </ResultCard>
       )}
