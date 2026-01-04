@@ -683,7 +683,7 @@ const SPELLS = [
 // SAVE VERSION & MIGRATION SYSTEM
 // ============================================
 // Increment this when save format changes!
-const SAVE_VERSION = 3;
+const SAVE_VERSION = 4;
 
 // Migration functions - each upgrades from version N to N+1
 const migrations = {
@@ -717,10 +717,29 @@ const migrations = {
       settlements: data.settlements || [],
       worldNPCs: data.worldNPCs || []
     };
+  },
+
+  // v3 -> v4: Ensure all parties have new gameTime format
+  3: (data) => {
+    const migratedParties = (data.parties || []).map(party => ({
+      ...party,
+      gameTime: {
+        day: party.gameTime?.day || 1,
+        season: party.gameTime?.season || 'spring',
+        watch: party.gameTime?.watch || 1,
+        turn: party.gameTime?.turn || 0,
+        restedToday: party.gameTime?.restedToday || false
+      }
+    }));
+    return {
+      ...data,
+      version: 4,
+      parties: migratedParties
+    };
   }
-  
+
   // Future migrations go here:
-  // 3: (data) => { ... return { ...data, version: 4, newField: [] }; }
+  // 4: (data) => { ... return { ...data, version: 5, newField: [] }; }
 };
 
 // Main migration function - applies all needed migrations
