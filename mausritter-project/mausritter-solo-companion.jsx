@@ -6451,24 +6451,35 @@ const SEASONS = [
   { id: 'winter', name: 'Zima', icon: '❄️', months: 'Prosinec-Únor' }
 ];
 
-const TimePanel = ({ party, updateParty, updateCharacterInParty, factions, setFactions, onLogEntry }) => {
-  const [notifications, setNotifications] = useState([]);
-  const [showWeatherRoll, setShowWeatherRoll] = useState(false);
-  const [currentWeather, setCurrentWeather] = useState(null);
-  const [dungeonMode, setDungeonMode] = useState(false);
-  const [dungeonTurns, setDungeonTurns] = useState(0);
-  const [torchTurns, setTorchTurns] = useState(0); // Turns since torch lit
+// Simplified time constants for TimePanel and TimeBar
+const TIMEBAR_SEASONS = [
+  { id: 'spring', name: 'Jaro', icon: '🌱' },
+  { id: 'summer', name: 'Léto', icon: '☀️' },
+  { id: 'autumn', name: 'Podzim', icon: '🍂' },
+  { id: 'winter', name: 'Zima', icon: '❄️' }
+];
 
+const TIMEBAR_WATCHES = [
+  { id: 0, name: 'Ráno', icon: '🌅' },
+  { id: 1, name: 'Den', icon: '☀️' },
+  { id: 2, name: 'Večer', icon: '🌆' },
+  { id: 3, name: 'Noc', icon: '🌙' }
+];
+
+const TimePanel = ({ party, updateParty, onLogEntry }) => {
   // Extract gameTime from party
-  const gameTime = party?.gameTime || { watch: 0, day: 1, week: 1, season: 'spring', totalWatches: 0, lastRest: null };
+  const gameTime = party?.gameTime || { watch: 0, day: 1, season: 'spring', turn: 0, restedToday: false };
+
   const setGameTime = (newTime) => {
     if (party) {
       updateParty({ gameTime: typeof newTime === 'function' ? newTime(gameTime) : newTime });
     }
   };
 
-  const currentWatch = WATCHES[gameTime.watch];
-  const currentSeason = SEASONS.find(s => s.id === gameTime.season) || SEASONS[0];
+  const { day = 1, season = 'spring', watch = 0, turn = 0, restedToday = false } = gameTime;
+
+  const currentSeason = TIMEBAR_SEASONS.find(s => s.id === season) || TIMEBAR_SEASONS[0];
+  const currentWatch = TIMEBAR_WATCHES.find(w => w.id === watch) || TIMEBAR_WATCHES[0];
 
   // Check if party exists
   if (!party) {
@@ -6479,370 +6490,96 @@ const TimePanel = ({ party, updateParty, updateCharacterInParty, factions, setFa
           <div className="text-center py-8 text-stone-500">
             <p className="text-4xl mb-3">🏕️</p>
             <p>Žádná aktivní družina.</p>
-            <p className="text-sm mt-2">Přejdi do panelu "Družiny" a vytvoř nebo aktivuj družinu.</p>
+            <p className="text-sm mt-2">Přejdi do panelu "Postavy" a vytvoř nebo aktivuj družinu.</p>
           </div>
         </ResultCard>
       </div>
     );
   }
 
-  // Add notification
-  const addNotification = (message, type = 'info') => {
-    const id = generateId();
-    setNotifications(prev => [...prev, { id, message, type }]);
-    setTimeout(() => {
-      setNotifications(prev => prev.filter(n => n.id !== id));
-    }, 5000);
-  };
+  // Přidat směnu
+  const addTurn = () => {
+    const newTurn = turn + 1;
+    if (newTurn >= 36) {
+      nextWatch();
+    } else {
+      setGameTime({ ...gameTime, turn: newTurn });
+    }
 
-  // Advance dungeon turn
-  const advanceDungeonTurn = (count = 1) => {
-    const newTurns = dungeonTurns + count;
-    const newTorchTurns = torchTurns + count;
-    setDungeonTurns(newTurns);
-    setTorchTurns(newTorchTurns);
-
-    onLogEntry({
-      type: 'dungeon_turn',
-      timestamp: formatTimestamp(),
-      turn: newTurns,
-      torchTurns: newTorchTurns
-    });
-
-    // Wandering monster check every 2 turns
-    if (newTurns % 2 === 0) {
-      const roll = rollD6();
-      const encounter = roll === 1;
-      
+    // Připomínka setkání každé 3 směny
+    if (newTurn % 3 === 0 && newTurn > 0) {
       onLogEntry({
-        type: 'wandering_monster_check',
+        type: 'encounter_reminder',
         timestamp: formatTimestamp(),
-        roll,
-        encounter
+        turn: newTurn
       });
-
-      if (encounter) {
-        addNotification(`👹 NÁHODNÉ SETKÁNÍ! (Hod: ${roll})`, 'warning');
-      } else {
-        addNotification(`🎲 Wandering monster check: ${roll} - bezpečno`, 'info');
-      }
-    }
-
-    // Torch warning at 6 turns (1 hour)
-    if (newTorchTurns === 5) {
-      addNotification('🔥 Pochodeň brzy dohoří! (zbývá ~10 min)', 'warning');
-    }
-    if (newTorchTurns >= 6) {
-      addNotification('🔥 POCHODEŇ DOHOŘELA! Rozsviť novou nebo jsi ve tmě!', 'warning');
-      rollUsage('Torch');
     }
   };
 
-  // Light new torch
-  const lightNewTorch = () => {
-    setTorchTurns(0);
-    addNotification('🔥 Nová pochodeň zapálena! (vydrží 6 turns)', 'success');
-    onLogEntry({
-      type: 'torch_lit',
-      timestamp: formatTimestamp()
-    });
-  };
-
-  // Enter/Exit dungeon
-  const toggleDungeonMode = () => {
-    if (dungeonMode) {
-      // Exiting dungeon - convert turns to watches if significant
-      const watchesSpent = Math.floor(dungeonTurns / 6);
-      if (watchesSpent > 0) {
-        for (let i = 0; i < watchesSpent; i++) {
-          advanceWatch();
-        }
-        addNotification(`⛏️ Opouštíš dungeon po ${dungeonTurns} turnech (${watchesSpent} směn)`, 'info');
-      }
-      setDungeonTurns(0);
-      setTorchTurns(0);
+  // Další hlídka
+  const nextWatch = () => {
+    if (watch >= 3) {
+      setGameTime({
+        ...gameTime,
+        day: day + 1,
+        watch: 0,
+        turn: 0,
+        restedToday: false
+      });
+      onLogEntry({
+        type: 'time_advance',
+        timestamp: formatTimestamp(),
+        message: `Nový den ${day + 1}`
+      });
     } else {
-      addNotification('⛏️ Vstupuješ do dungeonu! Počítám turny.', 'info');
-    }
-    setDungeonMode(!dungeonMode);
-  };
-
-  // Advance watch
-  const advanceWatch = () => {
-    let newWatch = gameTime.watch + 1;
-    let newDay = gameTime.day;
-    let newWeek = gameTime.week;
-    let newSeason = gameTime.season;
-    let triggeredEvents = [];
-
-    // New day at morning (after midnight)
-    if (newWatch >= WATCHES.length) {
-      newWatch = 0;
-      newDay += 1;
-      triggeredEvents.push('new_day');
-
-      // Check for new week (every 7 days)
-      if (newDay > 7) {
-        newDay = 1;
-        newWeek += 1;
-        triggeredEvents.push('new_week');
-
-        // Check for new season (every 12 weeks / 3 months)
-        if (newWeek > 12) {
-          newWeek = 1;
-          const seasonIndex = SEASONS.findIndex(s => s.id === newSeason);
-          newSeason = SEASONS[(seasonIndex + 1) % SEASONS.length].id;
-          triggeredEvents.push('new_season');
-        }
-      }
-    }
-
-    // Update game time
-    setGameTime({
-      ...gameTime,
-      watch: newWatch,
-      day: newDay,
-      week: newWeek,
-      season: newSeason,
-      totalWatches: gameTime.totalWatches + 1
-    });
-
-    // Log the time advance
-    onLogEntry({
-      type: 'time_advance',
-      timestamp: formatTimestamp(),
-      from: { watch: gameTime.watch, day: gameTime.day },
-      to: { watch: newWatch, day: newDay },
-      events: triggeredEvents
-    });
-
-    // Trigger notifications and events
-    if (triggeredEvents.includes('new_day')) {
-      addNotification('🌅 Nový den začíná! Hoď na počasí.', 'warning');
-      setShowWeatherRoll(true);
-    }
-
-    if (triggeredEvents.includes('new_week')) {
-      addNotification('📅 Nový týden! Hoď na faction progress.', 'warning');
-    }
-
-    if (triggeredEvents.includes('new_season')) {
-      addNotification(`🌿 Nové roční období: ${SEASONS.find(s => s.id === newSeason)?.name}!`, 'success');
-    }
-
-    // Check for light sources (every watch)
-    checkLightSources();
-
-    // Check for rest needs (every 3 watches without rest = exhaustion warning)
-    if ((gameTime.totalWatches + 1) % 3 === 0 && !gameTime.lastRest) {
-      addNotification('😴 Postavy by měly odpočívat!', 'warning');
+      setGameTime({
+        ...gameTime,
+        watch: watch + 1,
+        turn: 0
+      });
+      onLogEntry({
+        type: 'time_advance',
+        timestamp: formatTimestamp(),
+        message: `${TIMEBAR_WATCHES[watch + 1]?.name || 'Další hlídka'}`
+      });
     }
   };
 
-  // Check and consume light sources
-  const checkLightSources = () => {
-    if (!party?.members) return;
-
-    const hasLightSources = party.members.some(member => 
-      member.inventory?.some(item => 
-        item.name.toLowerCase().includes('torch') || 
-        item.name.toLowerCase().includes('pochodeň') ||
-        item.name.toLowerCase().includes('svíčka') ||
-        item.name.toLowerCase().includes('lucerna') ||
-        item.name.toLowerCase().includes('světlo')
-      )
-    );
-
-    if (hasLightSources) {
-      addNotification('🔥 Zkontroluj světelné zdroje (1 směna spotřebována)', 'info');
-    }
-  };
-
-  // Roll for rations/torch usage
-  const rollUsage = (itemName) => {
-    const die = rollD6();
-    const consumed = die <= 2; // In Mausritter, 1-2 means mark usage
-    
-    onLogEntry({
-      type: 'usage_roll',
-      timestamp: formatTimestamp(),
-      item: itemName,
-      roll: die,
-      consumed
-    });
-
-    if (consumed) {
-      addNotification(`📦 ${itemName}: Hod ${die} - Označ použití!`, 'warning');
-      
-      // Auto-mark usage if item found in any party member's inventory
-      if (party?.members) {
-        for (const member of party.members) {
-          if (member.inventory) {
-            const itemIndex = member.inventory.findIndex(i => 
-              i.name.toLowerCase().includes(itemName.toLowerCase())
-            );
-            if (itemIndex >= 0) {
-              const item = member.inventory[itemIndex];
-              if (item.usageDots < (item.maxUsage || 3)) {
-                const newInventory = [...member.inventory];
-                newInventory[itemIndex] = { ...item, usageDots: item.usageDots + 1 };
-                updateCharacterInParty(member.id, { inventory: newInventory });
-                addNotification(`📦 Označeno u ${member.name}`, 'info');
-                break; // Only mark one
-              }
-            }
-          }
-        }
-      }
-    } else {
-      addNotification(`📦 ${itemName}: Hod ${die} - Bez spotřeby!`, 'success');
-    }
-
-    return { die, consumed };
-  };
-
-  // Take a rest
-  const takeRest = (restType) => {
+  // Označit odpočinek
+  const markRest = () => {
+    setGameTime({ ...gameTime, restedToday: true });
     onLogEntry({
       type: 'rest',
-      subtype: restType,
       timestamp: formatTimestamp(),
-      watches: restType === 'long' ? 1 : 0
+      message: 'Odpočinek'
     });
-
-    if (restType === 'short') {
-      // Short rest - 1 turn in dungeon, quick breather outside
-      addNotification('☕ Krátký odpočinek (1 turn / pár minut)', 'info');
-    } else {
-      // Long rest - 1 watch, heal and consume rations
-      addNotification('🏕️ Dlouhý odpočinek (1 směna) - Hoď na rations!', 'warning');
-      rollUsage('Zásoby');
-      
-      // Heal HP to max for all party members
-      if (party?.members) {
-        party.members.forEach(member => {
-          if (member.hp && member.hp.current < member.hp.max) {
-            updateCharacterInParty(member.id, {
-              hp: { ...member.hp, current: member.hp.max }
-            });
-          }
-          
-          // Clear exhausted condition for PCs
-          if (member.type === 'pc' && member.conditions?.includes('exhausted')) {
-            updateCharacterInParty(member.id, {
-              conditions: member.conditions.filter(c => c !== 'exhausted')
-            });
-          }
-        });
-        addNotification('❤️ HP všech členů obnoveno!', 'success');
-      }
-
-      // Advance 1 watch for long rest
-      advanceWatch();
-    }
-
-    setGameTime(prev => ({ ...prev, lastRest: prev.totalWatches }));
+    nextWatch();
   };
 
-  // Roll weather for new day
-  const rollWeather = () => {
-    const { dice, total } = roll2D6();
-    const weather = WEATHER_TABLE[gameTime.season][total];
-    
-    setCurrentWeather({ dice, total, weather });
-    setShowWeatherRoll(false);
-
-    onLogEntry({
-      type: 'weather',
-      timestamp: formatTimestamp(),
-      season: gameTime.season,
-      dice,
-      total,
-      weather
-    });
-
-    // Check for dangerous weather
-    if (total <= 3) {
-      addNotification(`⚠️ Nebezpečné počasí: ${weather}! Cestování je riskantní.`, 'warning');
-    }
+  // Změna sezóny
+  const cycleSeason = () => {
+    const currentIndex = TIMEBAR_SEASONS.findIndex(s => s.id === season);
+    const nextIndex = (currentIndex + 1) % TIMEBAR_SEASONS.length;
+    setGameTime({ ...gameTime, season: TIMEBAR_SEASONS[nextIndex].id });
   };
 
-  // Roll faction progress for all factions
-  const rollAllFactionProgress = () => {
-    if (factions.length === 0) {
-      addNotification('Žádné frakce k aktualizaci', 'info');
-      return;
+  // Progress bar pro směny
+  const renderTurnProgress = () => {
+    const segments = [];
+    for (let i = 0; i < 12; i++) {
+      const segmentStart = i * 3;
+      const filled = turn > segmentStart;
+      const isThird = (i + 1) % 4 === 0;
+      segments.push(
+        <div
+          key={i}
+          className={`h-4 flex-1 rounded ${
+            filled ? 'bg-amber-500' : 'bg-stone-200'
+          } ${isThird ? 'mr-2' : 'mr-1'}`}
+        />
+      );
     }
-
-    const results = [];
-    const updatedFactions = factions.map(faction => {
-      const die = rollD6();
-      const resourceBonus = faction.resources?.length || 0;
-      const total = die + resourceBonus;
-      const success = total >= 6;
-
-      results.push({
-        name: faction.name,
-        die,
-        resourceBonus,
-        total,
-        success
-      });
-
-      if (success && faction.goals?.length > 0) {
-        const currentGoal = faction.goals.find(g => g.progress < g.maxProgress);
-        if (currentGoal) {
-          return {
-            ...faction,
-            goals: faction.goals.map(g =>
-              g.id === currentGoal.id
-                ? { ...g, progress: Math.min(g.maxProgress, g.progress + 2) }
-                : g
-            )
-          };
-        }
-      }
-      return faction;
-    });
-
-    setFactions(updatedFactions);
-
-    results.forEach(r => {
-      onLogEntry({
-        type: 'faction_progress',
-        timestamp: formatTimestamp(),
-        faction: r.name,
-        roll: r.die,
-        bonus: r.resourceBonus,
-        total: r.total,
-        success: r.success
-      });
-
-      if (r.success) {
-        addNotification(`⚔️ ${r.name}: Pokrok! (${r.total})`, 'success');
-      }
-    });
-  };
-
-  // Travel (advances time and may trigger encounters)
-  const travel = (watches = 1) => {
-    for (let i = 0; i < watches; i++) {
-      advanceWatch();
-      
-      // Random encounter check (1-2 on d6)
-      const encounterRoll = rollD6();
-      if (encounterRoll <= 2) {
-        addNotification(`⚠️ Náhodné setkání! (Hod ${encounterRoll})`, 'warning');
-        onLogEntry({
-          type: 'random_encounter',
-          timestamp: formatTimestamp(),
-          roll: encounterRoll
-        });
-      }
-    }
-    
-    // Roll torch usage after travel
-    rollUsage('Torch');
+    return segments;
   };
 
   return (
@@ -6850,326 +6587,110 @@ const TimePanel = ({ party, updateParty, updateCharacterInParty, factions, setFa
       <SectionHeader
         icon="⏰"
         title="Sledování času"
-        subtitle={`${currentSeason.icon} ${currentSeason.name}, Týden ${gameTime.week}, Den ${gameTime.day}`}
+        subtitle={`${party.name} • ${currentSeason.icon} ${currentSeason.name}`}
       />
 
-      {/* Notifications */}
-      {notifications.length > 0 && (
-        <div className="space-y-2">
-          {notifications.map(n => (
-            <div
-              key={n.id}
-              className={`p-3 rounded-lg font-medium animate-pulse ${
-                n.type === 'warning' ? 'bg-orange-100 text-orange-800 border border-orange-300' :
-                n.type === 'success' ? 'bg-green-100 text-green-800 border border-green-300' :
-                'bg-blue-100 text-blue-800 border border-blue-300'
-              }`}
-            >
-              {n.message}
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Current Time Display */}
-      <ResultCard title="📅 Aktuální čas">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-          <div className="p-4 bg-amber-100 rounded-lg">
-            <div className="text-3xl mb-1">{currentWatch.icon}</div>
-            <div className="font-bold text-amber-900">{currentWatch.name}</div>
-            <div className="text-sm text-stone-500">{currentWatch.hours}</div>
-          </div>
-          <div className="p-4 bg-amber-100 rounded-lg">
-            <div className="text-3xl mb-1">📆</div>
-            <div className="font-bold text-amber-900">Den {gameTime.day}</div>
-            <div className="text-sm text-stone-500">Týden {gameTime.week}</div>
-          </div>
-          <div className="p-4 bg-amber-100 rounded-lg">
-            <div className="text-3xl mb-1">{currentSeason.icon}</div>
-            <div className="font-bold text-amber-900">{currentSeason.name}</div>
-            <div className="text-sm text-stone-500">{currentSeason.months}</div>
-          </div>
-          <div className="p-4 bg-amber-100 rounded-lg">
-            <div className="text-3xl mb-1">⏱️</div>
-            <div className="font-bold text-amber-900">{gameTime.totalWatches}</div>
-            <div className="text-sm text-stone-500">Celkem směn</div>
-          </div>
-        </div>
-      </ResultCard>
-
-      {/* Dungeon Mode Toggle */}
+      {/* Hlavní přehled */}
       <ResultCard>
-        <HelpHeader 
-          title="Režim průzkumu" 
-          icon="⛏️"
-          tooltip={
+        <div className="space-y-6">
+          {/* Den a sezóna */}
+          <div className="flex items-center justify-center gap-8 text-center">
             <div>
-              <p className="font-bold mb-1">Dva režimy času:</p>
-              <ul className="text-xs space-y-1">
-                <li><strong>Povrch</strong> - počítáš směny (6 hodin)</li>
-                <li><strong>Dungeon</strong> - počítáš turny (10 minut)</li>
-              </ul>
-              <p className="mt-2 text-xs text-stone-300">
-                V dungeonu: wandering monster check každé 2 turny, pochodeň vydrží 6 turnů
-              </p>
+              <div className="text-5xl mb-2">{currentSeason.icon}</div>
+              <div className="text-lg font-bold text-amber-900">{currentSeason.name}</div>
             </div>
-          }
-        />
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <p className="font-bold text-amber-900">{dungeonMode ? '🏰 V dungeonu' : '🌲 Na povrchu'}</p>
-            <p className="text-sm text-stone-600">
-              {dungeonMode 
-                ? 'Počítám turny (~10 min), wandering monsters každé 2 turny' 
-                : 'Počítám směny (~6 hodin)'}
-            </p>
-          </div>
-          <Button 
-            onClick={toggleDungeonMode} 
-            variant={dungeonMode ? 'danger' : 'secondary'}
-          >
-            {dungeonMode ? '🚪 Opustit dungeon' : '⛏️ Vstoupit do dungeonu'}
-          </Button>
-        </div>
-      </ResultCard>
-
-      {/* Dungeon Turn Tracker */}
-      {dungeonMode && (
-        <ResultCard title="🕯️ Dungeon Tracker" className="border-2 border-amber-600">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center mb-4">
-            <div className="p-4 bg-stone-800 text-stone-100 rounded-lg">
-              <div className="text-3xl font-bold">{dungeonTurns}</div>
-              <div className="text-sm text-stone-400">Turnů celkem</div>
-            </div>
-            <div className="p-4 bg-stone-800 text-stone-100 rounded-lg">
-              <div className="text-3xl font-bold">~{dungeonTurns * 10} min</div>
-              <div className="text-sm text-stone-400">Čas v dungeonu</div>
-            </div>
-            <div className={`p-4 rounded-lg ${torchTurns >= 5 ? 'bg-red-700 text-white' : 'bg-orange-600 text-white'}`}>
-              <div className="text-3xl font-bold">{6 - torchTurns}</div>
-              <div className="text-sm">Zbývá turnů pochodeň</div>
-            </div>
-            <div className="p-4 bg-purple-800 text-purple-100 rounded-lg">
-              <div className="text-3xl font-bold">{2 - (dungeonTurns % 2)}</div>
-              <div className="text-sm">Do wandering check</div>
+            <div>
+              <div className="text-5xl font-bold text-amber-600">{day}</div>
+              <div className="text-stone-600">Den</div>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-            <Button onClick={() => advanceDungeonTurn(1)} className="flex-col h-16">
-              <span className="text-xl">⏱️</span>
-              <span className="text-sm">+1 Turn</span>
-            </Button>
-            <Button onClick={() => advanceDungeonTurn(2)} variant="secondary" className="flex-col h-16">
-              <span className="text-xl">⏱️⏱️</span>
-              <span className="text-sm">+2 Turny</span>
-            </Button>
-            <Button onClick={lightNewTorch} variant="ghost" className="flex-col h-16">
-              <span className="text-xl">🔥</span>
-              <span className="text-sm">Nová pochodeň</span>
-            </Button>
-            <Button onClick={() => { setDungeonTurns(0); setTorchTurns(0); }} variant="ghost" className="flex-col h-16">
-              <span className="text-xl">🔄</span>
-              <span className="text-sm">Reset</span>
-            </Button>
-          </div>
-
-          <div className="p-3 bg-stone-100 rounded-lg text-sm">
-            <h4 className="font-bold text-stone-700 mb-2">📋 Co zabere 1 turn (~10 min):</h4>
-            <ul className="grid grid-cols-2 gap-1 text-stone-600">
-              <li>• Průzkum místnosti</li>
-              <li>• Hledání pastí/tajných dveří</li>
-              <li>• Krátký odpočinek</li>
-              <li>• Boj (celý)</li>
-              <li>• Manipulace s mechanismem</li>
-              <li>• Sesílání rituálu</li>
-            </ul>
-          </div>
-        </ResultCard>
-      )}
-
-      {/* Watch Tracker - only show when not in dungeon */}
-      {!dungeonMode && (
-        <ResultCard title="🕐 Směny dne">
-          <div className="flex flex-wrap gap-2 mb-4">
-            {WATCHES.map((watch, index) => (
+          {/* Hlídky */}
+          <div className="flex justify-center gap-3">
+            {TIMEBAR_WATCHES.map((w) => (
               <div
-                key={watch.id}
-                className={`flex-1 min-w-[80px] p-3 rounded-lg text-center transition-all ${
-                  index === gameTime.watch
-                    ? 'bg-amber-600 text-white shadow-lg scale-105'
-                    : index < gameTime.watch
-                    ? 'bg-stone-300 text-stone-600'
-                    : 'bg-amber-100 text-amber-900'
-                }`}
+                key={w.id}
+                className={`w-16 h-16 flex flex-col items-center justify-center rounded-lg text-2xl transition-all ${
+                  w.id === watch
+                    ? 'bg-amber-500 text-white shadow-lg scale-110'
+                    : w.id < watch
+                    ? 'bg-stone-300 text-stone-500'
+                    : 'bg-stone-100 text-stone-400'
+                } ${restedToday && w.id < watch ? 'ring-2 ring-green-400' : ''}`}
               >
-                <div className="text-2xl">{watch.icon}</div>
-                <div className="text-sm font-medium">{watch.name}</div>
+                <span>{w.icon}</span>
+                <span className="text-xs mt-1">{w.name}</span>
               </div>
             ))}
           </div>
-          <Button onClick={advanceWatch} size="large" className="w-full">
-            ⏭️ Další směna
-          </Button>
-        </ResultCard>
-      )}
 
-      {/* Weather */}
-      <ResultCard title="🌤️ Počasí">
-        {showWeatherRoll ? (
-          <div className="text-center space-y-4">
-            <p className="text-amber-800 font-medium">Nový den! Hoď na počasí:</p>
-            <Button onClick={rollWeather} size="large">
-              🎲 Hodit 2d6 na počasí
-            </Button>
-          </div>
-        ) : currentWeather ? (
-          <div className="text-center space-y-2">
-            <DiceDisplay dice={currentWeather.dice} />
-            <div className="text-4xl my-3">
-              {currentWeather.weather.includes('Bouře') || currentWeather.weather.includes('Vánice') ? '⛈️' :
-               currentWeather.weather.includes('Déšť') || currentWeather.weather.includes('Sněžení') ? '🌧️' :
-               currentWeather.weather.includes('Zataženo') || currentWeather.weather.includes('Mlha') ? '☁️' :
-               currentWeather.weather.includes('Slunečno') || currentWeather.weather.includes('Jasno') ? '☀️' :
-               currentWeather.weather.includes('Perfektní') || currentWeather.weather.includes('Nádherné') ? '🌈' : '🌤️'}
+          {/* Směny */}
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm text-stone-600">
+              <span>Směny v hlídce</span>
+              <span className="font-bold">{turn}/36</span>
             </div>
-            <p className="text-2xl font-bold text-amber-900">{currentWeather.weather}</p>
-            <Button onClick={() => setShowWeatherRoll(true)} variant="ghost" size="small">
-              🔄 Nový hod
+            <div className="flex items-center">
+              {renderTurnProgress()}
+            </div>
+            <p className="text-xs text-stone-500 text-center">
+              Připomínka setkání každé 3 směny • 36 směn = 1 hlídka
+            </p>
+          </div>
+
+          {/* Tlačítka */}
+          <div className="flex flex-wrap justify-center gap-3">
+            <Button onClick={addTurn} variant="primary" size="large">
+              +1 Směna
+            </Button>
+            <Button onClick={markRest} variant="secondary" size="large">
+              💤 Odpočinek
+            </Button>
+            <Button onClick={nextWatch} variant="ghost" size="large">
+              → Další hlídka
             </Button>
           </div>
-        ) : (
-          <div className="text-center">
-            <Button onClick={() => setShowWeatherRoll(true)}>
-              🎲 Hodit na počasí
-            </Button>
-          </div>
-        )}
-      </ResultCard>
 
-      {/* Actions */}
-      <ResultCard title="🎬 Akce">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <Button onClick={() => travel(1)} variant="secondary" className="flex-col h-20">
-            <span className="text-2xl">🚶</span>
-            <span className="text-sm">Cestovat (1 směna)</span>
-          </Button>
-          <Button onClick={() => travel(2)} variant="secondary" className="flex-col h-20">
-            <span className="text-2xl">🏃</span>
-            <span className="text-sm">Dlouhá cesta (2)</span>
-          </Button>
-          <Button onClick={() => takeRest('short')} variant="ghost" className="flex-col h-20">
-            <span className="text-2xl">☕</span>
-            <span className="text-sm">Krátký odpočinek</span>
-          </Button>
-          <Button onClick={() => takeRest('long')} variant="success" className="flex-col h-20">
-            <span className="text-2xl">🏕️</span>
-            <span className="text-sm">Dlouhý odpočinek</span>
-          </Button>
+          {/* Varování */}
+          {!restedToday && watch >= 3 && (
+            <div className="bg-red-100 border border-red-300 rounded-lg p-3 text-center text-red-800">
+              ⚠️ Žádný odpočinek dnes! Hrozí vyčerpání.
+            </div>
+          )}
         </div>
       </ResultCard>
 
-      {/* Usage Rolls */}
-      <ResultCard title="📦 Hody na spotřebu">
-        <p className="text-sm text-stone-600 mb-3">Hoď d6 - na 4+ označ jedno použití</p>
-        <div className="flex flex-wrap gap-2">
-          <Button onClick={() => rollUsage('Torch')} variant="ghost">🔥 Pochodeň</Button>
-          <Button onClick={() => rollUsage('Rations')} variant="ghost">🍖 Zásoby</Button>
-          <Button onClick={() => rollUsage('Lantern')} variant="ghost">🏮 Lucerna</Button>
-          <Button onClick={() => rollUsage('Rope')} variant="ghost">🪢 Lano</Button>
-          <Button onClick={() => rollUsage('Weapon')} variant="ghost">⚔️ Zbraň</Button>
-          <Button onClick={() => rollUsage('Armor')} variant="ghost">🛡️ Zbroj</Button>
-        </div>
-      </ResultCard>
-
-      {/* Faction Progress */}
-      <ResultCard title="⚔️ Frakční pokrok">
-        <p className="text-sm text-stone-600 mb-3">
-          Hoď na pokrok všech frakcí (doporučeno jednou týdně)
-        </p>
-        <Button onClick={rollAllFactionProgress} className="w-full" disabled={factions.length === 0}>
-          🎲 Hodit pokrok všech frakcí ({factions.length})
-        </Button>
-        {factions.length === 0 && (
-          <p className="text-sm text-stone-400 mt-2 text-center">Nejprve přidej frakce v záložce Frakce</p>
-        )}
-      </ResultCard>
-
-      {/* Quick Reference */}
-      <ResultCard title="📋 Rychlá reference">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-          <div className="p-3 bg-amber-100/50 rounded">
-            <h4 className="font-bold text-amber-900 mb-2">⏰ Čas</h4>
-            <ul className="space-y-1 text-stone-700">
-              <li>• <strong>Turn</strong> = ~10 minut (dungeon)</li>
-              <li>• <strong>Watch/Směna</strong> = ~6 hodin</li>
-              <li>• 4 směny = 1 den</li>
-              <li>• 6 turns = 1 hodina</li>
-            </ul>
-          </div>
-          <div className="p-3 bg-amber-100/50 rounded">
-            <h4 className="font-bold text-amber-900 mb-2">🏕️ Odpočinek</h4>
-            <ul className="space-y-1 text-stone-700">
-              <li>• Krátký: 1 turn, bez léčení</li>
-              <li>• Dlouhý: 1 směna, full HP</li>
-              <li>• Dlouhý spotřebuje zásoby</li>
-              <li>• Spánek v noci nutný</li>
-            </ul>
-          </div>
-          <div className="p-3 bg-amber-100/50 rounded">
-            <h4 className="font-bold text-amber-900 mb-2">⛏️ Dungeon</h4>
-            <ul className="space-y-1 text-stone-700">
-              <li>• Wandering monster: každé 2 turny</li>
-              <li>• Hod d6, na 1 = setkání</li>
-              <li>• Pochodeň vydrží 6 turns</li>
-              <li>• Lucerna vydrží 24 turns</li>
-            </ul>
-          </div>
-          <div className="p-3 bg-amber-100/50 rounded">
-            <h4 className="font-bold text-amber-900 mb-2">🚶 Cestování</h4>
-            <ul className="space-y-1 text-stone-700">
-              <li>• 1 hex = 1 směna pěšky</li>
-              <li>• Náhodné setkání: 1 na d6</li>
-              <li>• Špatné počasí = 2 směny/hex</li>
-              <li>• Ztracen: WIL save nebo +1 směna</li>
-            </ul>
-          </div>
-        </div>
-      </ResultCard>
-
-      {/* Season Selector (for manual adjustment) */}
-      <ResultCard title="⚙️ Nastavení času">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div>
-            <label className="text-sm text-stone-600 block mb-1">Roční období</label>
-            <Select
-              value={gameTime.season}
-              onChange={(v) => setGameTime({ ...gameTime, season: v })}
-              options={SEASONS.map(s => ({ value: s.id, label: `${s.icon} ${s.name}` }))}
-            />
-          </div>
-          <div>
-            <label className="text-sm text-stone-600 block mb-1">Týden</label>
-            <Input
-              type="number"
-              value={gameTime.week}
-              onChange={(v) => setGameTime({ ...gameTime, week: Math.max(1, parseInt(v) || 1) })}
-            />
-          </div>
+      {/* Nastavení */}
+      <ResultCard title="⚙️ Ruční nastavení">
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="text-sm text-stone-600 block mb-1">Den</label>
-            <Input
-              type="number"
-              value={gameTime.day}
-              onChange={(v) => setGameTime({ ...gameTime, day: Math.max(1, Math.min(7, parseInt(v) || 1)) })}
+            <div className="flex items-center gap-2">
+              <Button size="small" onClick={() => setGameTime({ ...gameTime, day: Math.max(1, day - 1) })}>-</Button>
+              <span className="font-bold text-xl w-12 text-center">{day}</span>
+              <Button size="small" onClick={() => setGameTime({ ...gameTime, day: day + 1 })}>+</Button>
+            </div>
+          </div>
+          <div>
+            <label className="text-sm text-stone-600 block mb-1">Sezóna</label>
+            <Button onClick={cycleSeason} variant="secondary" className="w-full">
+              {currentSeason.icon} {currentSeason.name}
+            </Button>
+          </div>
+          <div>
+            <label className="text-sm text-stone-600 block mb-1">Hlídka</label>
+            <Select
+              value={watch}
+              onChange={(v) => setGameTime({ ...gameTime, watch: parseInt(v), turn: 0 })}
+              options={TIMEBAR_WATCHES.map(w => ({ value: w.id, label: `${w.icon} ${w.name}` }))}
             />
           </div>
           <div>
             <label className="text-sm text-stone-600 block mb-1">Směna</label>
-            <Select
-              value={gameTime.watch}
-              onChange={(v) => setGameTime({ ...gameTime, watch: parseInt(v) })}
-              options={WATCHES.map((w, i) => ({ value: i, label: `${w.icon} ${w.name}` }))}
+            <Input
+              type="number"
+              value={turn}
+              onChange={(v) => setGameTime({ ...gameTime, turn: Math.max(0, Math.min(36, parseInt(v) || 0)) })}
             />
           </div>
         </div>
@@ -7672,20 +7193,6 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
 // ============================================
 // TIME BAR - Sledování času
 // ============================================
-
-const TIMEBAR_SEASONS = [
-  { id: 'spring', name: 'Jaro', icon: '🌱' },
-  { id: 'summer', name: 'Léto', icon: '☀️' },
-  { id: 'autumn', name: 'Podzim', icon: '🍂' },
-  { id: 'winter', name: 'Zima', icon: '❄️' }
-];
-
-const TIMEBAR_WATCHES = [
-  { id: 0, name: 'Ráno', icon: '🌅' },
-  { id: 1, name: 'Den', icon: '☀️' },
-  { id: 2, name: 'Večer', icon: '🌆' },
-  { id: 3, name: 'Noc', icon: '🌙' }
-];
 
 const TimeBar = ({ gameTime, updateGameTime, partyName }) => {
   const [showEncounterReminder, setShowEncounterReminder] = useState(false);
@@ -9311,11 +8818,6 @@ function MausritterSoloCompanion() {
           <TimePanel
             party={activeParty}
             updateParty={(updates) => activePartyId && updateParty(activePartyId, updates)}
-            updateCharacterInParty={(charId, updates) =>
-              activePartyId && updateCharacterInParty(activePartyId, charId, updates)
-            }
-            factions={factions}
-            setFactions={setFactions}
             onLogEntry={handleLogEntry}
           />
         )}
