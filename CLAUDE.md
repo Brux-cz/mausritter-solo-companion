@@ -14,8 +14,8 @@ node mausritter-project/build-html.js
 # 3. Spusť dev server
 python3 -m http.server 8081
 
-# 4. Otevři v prohlížeči
-firefox http://localhost:8081/mausritter-solo-companion.html
+# 4. Otevři v Chrome (pro Claude in Chrome extension)
+google-chrome http://localhost:8081/mausritter-solo-companion.html
 ```
 
 Používej Serena MCP nástroje (find_symbol, find_referencing_symbols) místo grepu.
