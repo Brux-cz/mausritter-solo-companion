@@ -129,6 +129,271 @@ const WEATHER_TABLE = {
 };
 
 // ============================================
+// ENCOUNTER GENERATOR TABLES
+// Pro ~5,000,000+ unikátních kombinací
+// ============================================
+
+// Kdo/Co potkáš (40 možností)
+const ENCOUNTER_CREATURES = [
+  // Myši a přátelé
+  { name: 'stará myš poustevnice', type: 'npc', danger: false },
+  { name: 'mladý myší kupec', type: 'npc', danger: false },
+  { name: 'unavený myší poutník', type: 'npc', danger: false },
+  { name: 'myší lovec s lukem', type: 'npc', danger: false },
+  { name: 'myší stráž z blízké osady', type: 'npc', danger: false },
+  { name: 'myší bylinkářka', type: 'npc', danger: false },
+  { name: 'myší kovář hledající materiál', type: 'npc', danger: false },
+  { name: 'myší bard s malou loutnou', type: 'npc', danger: false },
+  { name: 'myší zloděj ve stínech', type: 'npc', danger: true },
+  { name: 'skupinka myších dětí', type: 'npc', danger: false },
+  { name: 'myší kurýr s naléhavou zprávou', type: 'npc', danger: false },
+  { name: 'starý myší veterán', type: 'npc', danger: false },
+  { name: 'myší alchymista', type: 'npc', danger: false },
+  { name: 'myší šlechtic na cestách', type: 'npc', danger: false },
+  { name: 'band myších lupičů', type: 'npc', danger: true },
+
+  // Malí tvorové
+  { name: 'rejsek pozorovatel', type: 'creature', danger: false },
+  { name: 'přátelská žába', type: 'creature', danger: false },
+  { name: 'čmelák sbírající pyl', type: 'creature', danger: false },
+  { name: 'hlemýžď nesoucí svůj dům', type: 'creature', danger: false },
+  { name: 'cvrček muzikant', type: 'creature', danger: false },
+  { name: 'moucha špehující', type: 'creature', danger: false },
+  { name: 'mravenčí hlídka', type: 'creature', danger: true },
+  { name: 'vosa hledající potravu', type: 'creature', danger: true },
+  { name: 'kudlanka číhající', type: 'creature', danger: true },
+  { name: 'motýl s potrhanými křídly', type: 'creature', danger: false },
+  { name: 'chroust bzučící', type: 'creature', danger: false },
+  { name: 'stonožka plazící se', type: 'creature', danger: true },
+  { name: 'pavouk ve své síti', type: 'creature', danger: true },
+  { name: 'světluška blikající', type: 'creature', danger: false },
+
+  // Nebezpeční predátoři
+  { name: 'lasička lovící', type: 'predator', danger: true },
+  { name: 'had sunící se', type: 'predator', danger: true },
+  { name: 'sova tiše letící', type: 'predator', danger: true },
+  { name: 'jestřáb kroužící', type: 'predator', danger: true },
+  { name: 'liška čenichající', type: 'predator', danger: true },
+  { name: 'toulavá kočka', type: 'predator', danger: true },
+  { name: 'tchoř ve stínech', type: 'predator', danger: true },
+  { name: 'vrána krákorající', type: 'predator', danger: true },
+
+  // Nadpřirozené
+  { name: 'bludička tančící', type: 'supernatural', danger: true },
+  { name: 'duch mrtvé myši', type: 'supernatural', danger: false },
+  { name: 'lesní skřítek', type: 'supernatural', danger: false }
+];
+
+// Co dělá / v jakém je stavu (35 možností)
+const ENCOUNTER_ACTIVITIES = [
+  'hledá něco v listí',
+  'odpočívá ve stínu',
+  'jí nalezené jídlo',
+  'pozorně naslouchá',
+  'utíká před něčím',
+  'číhá v úkrytu',
+  'nese těžký náklad',
+  'zpívá si pro sebe',
+  'hádá se s někým',
+  'pláče tiše',
+  'sbírá zásoby na zimu',
+  'hledí do dálky',
+  'čistí si srst',
+  'staví si úkryt',
+  'označuje teritorium',
+  'volá na své druhy',
+  'kope díru do země',
+  'šplhá po stonku',
+  'pije z kapky rosy',
+  'třese se zimou',
+  'schovává něco cenného',
+  'čeká na někoho',
+  'bloudí ztracený/á',
+  'sleduje tvé kroky',
+  'předstírá smrt',
+  'tančí podivný tanec',
+  'šeptá zaklínadlo',
+  'váhá na rozcestí',
+  'ošetřuje si zranění',
+  'brousí si zuby',
+  'staví past',
+  'zdobí se květinami',
+  'počítá své poklady',
+  'kreslí do hlíny',
+  'medituje v tichu'
+];
+
+// Kde přesně (30 možností)
+const ENCOUNTER_LOCATIONS = [
+  'pod obřím listem lopuchu',
+  'u kořenů starého dubu',
+  'na okraji lidské pěšiny',
+  'v trhlině rozbitého hrnce',
+  'mezi kameny potoka',
+  'na větvi spadlého stromu',
+  'u vchodu do opuštěné nory',
+  'pod záhybem staré látky',
+  'v dutině pařezu',
+  'na okraji muchomůrkového kruhu',
+  'vedle rezavého hřebíku',
+  'pod stříškou houby',
+  'v trávě vysoké jako les',
+  'na břehu malé kaluže',
+  'u zbytků lidského pikniku',
+  'v prasklině kamenné zdi',
+  'mezi kořeny ostružiní',
+  'pod spadaným listím',
+  'na slunném místě u skály',
+  'v opuštěném ptačím hnízdě',
+  'u kapající vody z listu',
+  'mezi plevelem zahrady',
+  'pod kůrou mrtvého stromu',
+  've stínu lebky drobného zvířete',
+  'u starého myšího ukazatele',
+  'v houští černého bezu',
+  'na prahu staré liščí nory',
+  'u ztracené lidské mince',
+  'mezi hromadou žaludů',
+  'pod obloukem bramborové natě'
+];
+
+// Nálada / atmosféra (25 možností)
+const ENCOUNTER_MOODS = [
+  'Vzduch voní po dešti.',
+  'Padá jemná mlha.',
+  'Slunce právě zapadá.',
+  'V dálce hřmí bouřka.',
+  'Listí šustí ve větru.',
+  'Je nepříjemné ticho.',
+  'Slyšíš vzdálené zpěvavé ptáky.',
+  'Světlo prosvítá mezi listy.',
+  'Cítíš pach kouře.',
+  'Země je mokrá po dešti.',
+  'Fouká ledový vítr.',
+  'Bzučí roj much poblíž.',
+  'V trávě cvrlikají cvrčci.',
+  'Vidíš blesk na obzoru.',
+  'Je zvláštní klid před bouří.',
+  'Voní tu silně květiny.',
+  'Cítíš pach predátora.',
+  'Slyšíš kroky něčeho velkého.',
+  'Měsíc vychází nad obzor.',
+  'První hvězdy se objevují.',
+  'Rosa se třpytí všude kolem.',
+  'Pavučiny se lesknou v ranním světle.',
+  'Někde v dálce štěká pes.',
+  'Cítíš blížící se změnu počasí.',
+  'Je tu divná nadpřirozená aura.'
+];
+
+// Zajímavý detail / twist (40 možností)
+const ENCOUNTER_DETAILS = [
+  'U sebe má podivný amulet.',
+  'Je zjevně zraněný/á.',
+  'Za sebou zanechává krvavou stopu.',
+  'Mluví sám/sama se sebou.',
+  'Má jedovatě zelené oči.',
+  'Nese zprávu v malé tašce.',
+  'Schovává pod pláštěm zbraň.',
+  'Je pokrytý/á podivným pylem.',
+  'Má starou jizvu přes oko.',
+  'Třese se strachem.',
+  'Je zjevně nemocný/á.',
+  'Má u sebe mapu.',
+  'Je svázaný/á provazem.',
+  'Nese klíč od neznámého zámku.',
+  'Zanechává za sebou magickou záři.',
+  'Je němý/á - jen ukazuje.',
+  'Má tetování podivných symbolů.',
+  'Je slepý/á, ale všechno slyší.',
+  'Za ním/ní letí světluška.',
+  'Má u sebe vzácný krystal.',
+  'Voní po lektvarech.',
+  'Je očividně v přestrojení.',
+  'Neustále se ohlíží za sebe.',
+  'Má čerstvou krev na tlapkách.',
+  'Nese mrtvého hmyz.',
+  'Je starší, než vypadá.',
+  'Jeho/její stín se hýbe divně.',
+  'U sebe má lidskou tretku.',
+  'Kulhá na zadní nohu.',
+  'Má zlomený vous.',
+  'Šeptá jméno někoho mrtvého.',
+  'Je pokrytý/á blátem z bažiny.',
+  'U sebe má jedovatou rostlinu.',
+  'Nese varování pro osadu.',
+  'Je pod vlivem kouzla.',
+  'Schovává vejce vzácného tvora.',
+  'Má spálený kus srsti.',
+  'Zjevně něco hledá.',
+  'Nese dar pro někoho důležitého.',
+  'Je poslední ze své skupiny.'
+];
+
+// Motivace / co chtějí (30 možností)
+const ENCOUNTER_MOTIVATIONS = [
+  'Hledá pomoc pro zraněného přítele.',
+  'Utíká před nebezpečím z východu.',
+  'Chce vyměnit informace za jídlo.',
+  'Pátrá po ztraceném příbuzném.',
+  'Nese důležitou zprávu.',
+  'Hledá konkrétní rostlinu.',
+  'Chce varovat před blížícím se nebezpečím.',
+  'Sbírá dluh od někoho v osadě.',
+  'Je na tajné misi.',
+  'Hledá bezpečné místo k přenocování.',
+  'Chce prodat vzácné zboží.',
+  'Pátrá po starém příteli.',
+  'Hledá cestu domů.',
+  'Chce se pomstít za křivdu.',
+  'Je na útěku před zákonem.',
+  'Hledá místo z proroctví.',
+  'Chce získat spojenec pro boj.',
+  'Sbírá součástky pro vynález.',
+  'Hledá léčivou bylinu.',
+  'Chce předat prokletý předmět.',
+  'Pátrá po starověkém pokladu.',
+  'Je pověřen ochranou něčeho.',
+  'Hledá svědka zločinu.',
+  'Chce založit novou osadu.',
+  'Sbírá příběhy pro kroniku.',
+  'Hledá odpovědi na záhadu.',
+  'Je na pouti ke svatému místu.',
+  'Chce uniknout své minulosti.',
+  'Hledá učedníka pro své řemeslo.',
+  'Nese oběť pro lesního ducha.'
+];
+
+// Komplikace (25 možností)
+const ENCOUNTER_COMPLICATIONS = [
+  'Ale něco se blíží - slyšíš to.',
+  'Je to past - nejsi tu sám.',
+  'Začíná pršet.',
+  'Objevuje se třetí strana.',
+  'Tvor je pod vlivem magie.',
+  'Situace je jiná, než vypadá.',
+  'Čas běží - něco se blíží.',
+  'Je tu skrytý pozorovatel.',
+  'Země se zachvěla.',
+  'Ve vzduchu je pach nebezpečí.',
+  'Právě ses dostal do teritoria.',
+  'Někdo vás sledoval.',
+  'Objevil ses v nevhodný čas.',
+  'Cesta zpět je zablokovaná.',
+  'Je tu více nepřátel, než jsi čekal.',
+  'Padá tma rychleji než obvykle.',
+  'Slyšíš volání o pomoc odjinud.',
+  'Tvůj úkryt je prozrazen.',
+  'Máš jen chvíli na rozhodnutí.',
+  'Vzpomínáš si - tohle místo znáš.',
+  'Cítíš, že jsi pozorován.',
+  'Něco se tu změnilo od tvé poslední návštěvy.',
+  'Je tu stopy boje.',
+  'Vzduch houstne podivnou magií.',
+  'Slyšíš známý hlas...'
+];
+
+// ============================================
 // BESTIARY - CREATURE DATA
 // ============================================
 
@@ -1441,8 +1706,74 @@ const OraclePanel = ({ onLogEntry }) => {
     logEntry(entry);
   };
 
+  // State pro generátor setkání
+  const [encounterResult, setEncounterResult] = useState(null);
+  const [encounterOptions, setEncounterOptions] = useState({
+    includeMotivation: true,
+    includeComplication: false,
+    dangerLevel: 'any' // 'any', 'safe', 'dangerous'
+  });
+
+  // Generátor setkání - kombinuje tabulky pro narativní výstup
+  const generateEncounter = () => {
+    // Filtruj tvory podle nebezpečí pokud je nastaveno
+    let creatures = ENCOUNTER_CREATURES;
+    if (encounterOptions.dangerLevel === 'safe') {
+      creatures = ENCOUNTER_CREATURES.filter(c => !c.danger);
+    } else if (encounterOptions.dangerLevel === 'dangerous') {
+      creatures = ENCOUNTER_CREATURES.filter(c => c.danger);
+    }
+
+    const creature = randomFrom(creatures);
+    const activity = randomFrom(ENCOUNTER_ACTIVITIES);
+    const location = randomFrom(ENCOUNTER_LOCATIONS);
+    const mood = randomFrom(ENCOUNTER_MOODS);
+    const detail = randomFrom(ENCOUNTER_DETAILS);
+    const motivation = encounterOptions.includeMotivation ? randomFrom(ENCOUNTER_MOTIVATIONS) : null;
+    const complication = encounterOptions.includeComplication ? randomFrom(ENCOUNTER_COMPLICATIONS) : null;
+
+    // Sestav narativní text
+    let narrative = `${mood}\n\n`;
+    narrative += `${location.charAt(0).toUpperCase() + location.slice(1)} spatříš **${creature.name}**. `;
+    narrative += `${creature.name.charAt(0).toUpperCase() + creature.name.slice(1)} ${activity}. `;
+    narrative += `${detail}`;
+
+    if (motivation) {
+      narrative += `\n\n*${motivation}*`;
+    }
+
+    if (complication) {
+      narrative += `\n\n⚠️ **${complication}**`;
+    }
+
+    const result = {
+      creature,
+      activity,
+      location,
+      mood,
+      detail,
+      motivation,
+      complication,
+      narrative,
+      danger: creature.danger
+    };
+
+    setEncounterResult(result);
+
+    const entry = {
+      type: 'oracle',
+      subtype: 'encounter',
+      timestamp: formatTimestamp(),
+      result: narrative,
+      data: result
+    };
+    setLastResult(entry);
+    logEntry(entry);
+  };
+
   const oracleTabs = [
     { id: 'yesno', label: 'Ano/Ne', icon: '🎲' },
+    { id: 'encounter', label: 'Setkání', icon: '👁️' },
     { id: 'dice', label: 'Kostky', icon: '🎯' },
     { id: 'scene', label: 'Scéna', icon: '🎭' },
     { id: 'prompt', label: 'Prompt', icon: '💡' },
@@ -1532,6 +1863,133 @@ const OraclePanel = ({ onLogEntry }) => {
               🎲 Hodit 2d6
             </Button>
           </div>
+        </ResultCard>
+      )}
+
+      {/* ========== ENCOUNTER GENERATOR ========== */}
+      {activeOracle === 'encounter' && (
+        <ResultCard>
+          <HelpHeader
+            title="Generátor setkání"
+            icon="👁️"
+            tooltip={
+              <div>
+                <p className="font-bold mb-2">👁️ Co je tohle?</p>
+                <p className="text-xs mb-2">
+                  Narativní generátor náhodných setkání v duchu Mausritter.
+                  Kombinuje 40+ tvorů, 35 aktivit, 30 lokací, 25 nálad, 40 detailů,
+                  30 motivací a 25 komplikací = více než 5 milionů unikátních kombinací!
+                </p>
+
+                <p className="font-bold mb-1">🎭 Výstup:</p>
+                <p className="text-xs text-stone-300 mb-2">
+                  Plně narativní popis setkání, který můžeš rovnou použít ve hře.
+                </p>
+
+                <p className="font-bold mb-1">⚙️ Možnosti:</p>
+                <ul className="text-xs space-y-1">
+                  <li>• <b>Motivace</b> - přidá důvod proč tvor jedná</li>
+                  <li>• <b>Komplikace</b> - přidá twist nebo nebezpečí</li>
+                  <li>• <b>Nebezpečí</b> - filtruj bezpečné/nebezpečné tvory</li>
+                </ul>
+              </div>
+            }
+          />
+
+          {/* Možnosti generátoru */}
+          <div className="mb-4 p-3 bg-stone-100 rounded-lg space-y-3">
+            <div className="flex flex-wrap gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={encounterOptions.includeMotivation}
+                  onChange={(e) => setEncounterOptions(prev => ({ ...prev, includeMotivation: e.target.checked }))}
+                  className="w-4 h-4 rounded border-stone-300"
+                />
+                <span className="text-sm text-stone-700">Zahrnout motivaci</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={encounterOptions.includeComplication}
+                  onChange={(e) => setEncounterOptions(prev => ({ ...prev, includeComplication: e.target.checked }))}
+                  className="w-4 h-4 rounded border-stone-300"
+                />
+                <span className="text-sm text-stone-700">Přidat komplikaci</span>
+              </label>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-stone-600">Nebezpečí:</span>
+              <select
+                value={encounterOptions.dangerLevel}
+                onChange={(e) => setEncounterOptions(prev => ({ ...prev, dangerLevel: e.target.value }))}
+                className="text-sm border border-stone-300 rounded px-2 py-1"
+              >
+                <option value="any">Jakékoliv</option>
+                <option value="safe">Bezpečné</option>
+                <option value="dangerous">Nebezpečné</option>
+              </select>
+            </div>
+          </div>
+
+          <Button onClick={generateEncounter} variant="primary" size="large" className="w-full mb-4">
+            👁️ Generovat setkání
+          </Button>
+
+          {/* Výsledek */}
+          {encounterResult && (
+            <div className={`p-4 rounded-lg border-2 ${encounterResult.danger ? 'bg-red-50 border-red-300' : 'bg-amber-50 border-amber-300'}`}>
+              {encounterResult.danger && (
+                <div className="flex items-center gap-2 mb-3 text-red-700 font-bold">
+                  <span>⚠️</span>
+                  <span>NEBEZPEČNÉ SETKÁNÍ</span>
+                </div>
+              )}
+
+              {/* Nálada */}
+              <p className="text-stone-500 italic mb-3">{encounterResult.mood}</p>
+
+              {/* Hlavní popis */}
+              <div className="text-stone-800 leading-relaxed mb-3">
+                <span className="text-stone-500">{encounterResult.location.charAt(0).toUpperCase() + encounterResult.location.slice(1)} spatříš </span>
+                <span className="font-bold text-amber-800">{encounterResult.creature.name}</span>
+                <span className="text-stone-500">. </span>
+                <span>{encounterResult.creature.name.charAt(0).toUpperCase() + encounterResult.creature.name.slice(1)} {encounterResult.activity}. </span>
+                <span className="text-stone-700">{encounterResult.detail}</span>
+              </div>
+
+              {/* Motivace */}
+              {encounterResult.motivation && (
+                <div className="mb-3 p-2 bg-white/50 rounded border-l-4 border-blue-400">
+                  <span className="text-xs text-blue-600 font-medium block mb-1">💭 MOTIVACE</span>
+                  <p className="text-stone-700 italic">{encounterResult.motivation}</p>
+                </div>
+              )}
+
+              {/* Komplikace */}
+              {encounterResult.complication && (
+                <div className="p-2 bg-red-100 rounded border-l-4 border-red-500">
+                  <span className="text-xs text-red-600 font-medium block mb-1">⚠️ KOMPLIKACE</span>
+                  <p className="text-red-800 font-medium">{encounterResult.complication}</p>
+                </div>
+              )}
+
+              {/* Meta info */}
+              <div className="mt-4 pt-3 border-t border-stone-200 flex flex-wrap gap-2 text-xs text-stone-500">
+                <span className="px-2 py-1 bg-stone-100 rounded">
+                  {encounterResult.creature.type === 'npc' ? '🐭 NPC' :
+                   encounterResult.creature.type === 'predator' ? '🦅 Predátor' :
+                   encounterResult.creature.type === 'supernatural' ? '✨ Nadpřirozené' : '🐛 Tvor'}
+                </span>
+                {encounterResult.danger && <span className="px-2 py-1 bg-red-100 text-red-700 rounded">Nebezpečné</span>}
+              </div>
+            </div>
+          )}
+
+          {/* Statistiky */}
+          <p className="text-center text-xs text-stone-400 mt-4">
+            41 × 35 × 30 × 25 × 40 × 30 × 25 = ~5,400,000,000 kombinací
+          </p>
         </ResultCard>
       )}
 
