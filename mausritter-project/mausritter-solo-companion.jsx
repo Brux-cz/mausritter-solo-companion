@@ -7726,23 +7726,21 @@ const FloatingDice = () => {
     setActiveGenerator(null);
   };
 
-  // Pozice radiálního menu - pixely relativně k hlavnímu tlačítku
-  // Hlavní tlačítko je 56px (w-14), menu tlačítka 48px (w-12)
-  // Radiální rozložení v půlkruhu vlevo a nahoru
+  // Pozice radiálního menu - čtvrtkruh nahoru a doleva (pravý dolní roh obrazovky)
   const getMenuPosition = (index) => {
-    const radius = 70; // vzdálenost od středu hlavního tlačítka
-    const startAngle = 180; // začínáme vlevo
-    const angleStep = 30; // 30 stupňů mezi tlačítky
-    const angle = startAngle - (index * angleStep); // proti směru hodin
+    const radius = 70;
+    // Úhly: 90° (nahoru) až 165° (doleva-nahoru) - čtvrtkruh vlevo-nahoře
+    const angles = [165, 150, 135, 120, 105, 90];
+    const angle = angles[index];
 
     const rad = (angle * Math.PI) / 180;
     const x = Math.cos(rad) * radius;
     const y = Math.sin(rad) * radius;
 
-    // Offset pro vycentrování (hlavní tlačítko 56px, menu 48px)
+    // Hlavní tlačítko 56px, menu tlačítko 48px
     return {
       left: `${28 + x - 24}px`,
-      bottom: `${28 - y - 24}px`
+      bottom: `${28 + y - 24}px`
     };
   };
 
