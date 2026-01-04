@@ -7631,7 +7631,8 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
 
 function MausritterSoloCompanion() {
   const [activePanel, setActivePanel] = useState('journal');
-  
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   // Cloud sync state (File System API)
   const [fileHandle, setFileHandle] = useState(null);
   const [syncStatus, setSyncStatus] = useState('disconnected'); // 'disconnected' | 'connected' | 'saving' | 'error'
@@ -8547,50 +8548,47 @@ function MausritterSoloCompanion() {
 
       {/* Header */}
       <header className="bg-gradient-to-r from-amber-900 via-amber-800 to-amber-900 text-amber-50 shadow-xl sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-2 sm:px-4 py-2 sm:py-3">
+        <div className="max-w-6xl mx-auto px-3 md:px-4 py-2 md:py-3">
           <div className="flex items-center justify-between gap-2">
+            {/* Logo and title */}
             <div className="flex items-center gap-2 min-w-0">
-              <span className="text-2xl sm:text-4xl flex-shrink-0">🐭</span>
+              <span className="text-2xl md:text-4xl flex-shrink-0">🐭</span>
               <div className="min-w-0">
-                <h1 className="text-base sm:text-2xl font-bold tracking-wide truncate" style={{ fontFamily: 'Georgia, serif' }}>
+                <h1 className="text-lg md:text-2xl font-bold tracking-wide" style={{ fontFamily: 'Georgia, serif' }}>
                   Mausritter
                 </h1>
                 {activeParty && (
-                  <p className="text-amber-200 text-xs sm:text-sm truncate">
+                  <p className="text-amber-200 text-xs md:text-sm truncate">
                     {activeParty.name}
-                    {activeCharacter && (
-                      <span> • {activeCharacter.name}</span>
-                    )}
+                    {activeCharacter && <span> • {activeCharacter.name}</span>}
                     {activeCharacter?.hp && (
-                      <span className="hidden sm:inline"> • HP {activeCharacter.hp.current}/{activeCharacter.hp.max}</span>
+                      <span className="hidden md:inline"> • HP {activeCharacter.hp.current}/{activeCharacter.hp.max}</span>
                     )}
-                    {activeParty.gameTime && (
-                      <span> • D{activeParty.gameTime.day}</span>
-                    )}
+                    {activeParty.gameTime && <span> • D{activeParty.gameTime.day}</span>}
                   </p>
                 )}
               </div>
             </div>
-            <div className="flex items-center gap-1 flex-shrink-0">
+
+            {/* Desktop: Full toolbar */}
+            <div className="hidden md:flex items-center gap-2">
               {/* Local File Sync */}
-              <div className="flex items-center gap-0.5">
+              <div className="flex items-center gap-1">
                 {fileHandle ? (
                   <>
                     <span
-                      className={`text-xs px-1.5 py-1 rounded ${
+                      className={`text-xs px-2 py-1 rounded ${
                         syncStatus === 'saving' ? 'bg-yellow-600 text-yellow-100' :
                         syncStatus === 'error' ? 'bg-red-600 text-red-100' :
                         'bg-green-700 text-green-100'
                       }`}
                       title={lastSyncTime ? `Lokální soubor\nPoslední sync: ${lastSyncTime.toLocaleTimeString('cs-CZ')}` : 'Lokální soubor'}
                     >
-                      {syncStatus === 'saving' ? '⏳' :
-                       syncStatus === 'error' ? '❌' :
-                       '📄'}<span className="hidden sm:inline"> Lokální</span>
+                      {syncStatus === 'saving' ? '⏳' : syncStatus === 'error' ? '❌' : '📄'} Lokální
                     </span>
                     <button
                       onClick={disconnectFile}
-                      className="px-1 py-1 bg-green-700/50 hover:bg-red-600 rounded text-xs transition-colors"
+                      className="px-1.5 py-1 bg-green-700/50 hover:bg-red-600 rounded text-xs transition-colors"
                       title="Odpojit lokální soubor"
                     >
                       ✕
@@ -8606,74 +8604,126 @@ function MausritterSoloCompanion() {
                       }
                       connectToFile();
                     }}
-                    className="px-1.5 py-1 bg-green-700/70 hover:bg-green-600 rounded text-xs font-medium transition-colors cursor-pointer"
+                    className="px-2 py-1.5 bg-green-700/70 hover:bg-green-600 rounded text-xs font-medium transition-colors cursor-pointer"
                     title="Sync do lokálního souboru (pouze Chrome/Edge)"
                   >
-                    📄<span className="hidden sm:inline"> Lokální</span>
+                    📄 Lokální
                   </button>
                 )}
               </div>
 
               {/* Google Drive Sync */}
-              <div className="flex items-center gap-0.5">
+              <div className="flex items-center gap-1">
                 {googleAccessToken ? (
                   <>
                     <span
-                      className={`text-xs px-1.5 py-1 rounded flex items-center gap-0.5 ${
+                      className={`text-xs px-2 py-1 rounded flex items-center gap-1 ${
                         googleSyncStatus === 'saving' ? 'bg-yellow-600 text-yellow-100' :
                         googleSyncStatus === 'error' ? 'bg-red-600 text-red-100' :
                         'bg-blue-600 text-blue-100'
                       }`}
                       title={googleLastSync ? `Google Drive: ${googleDriveFolderName || 'Můj disk'}\nPoslední sync: ${googleLastSync.toLocaleTimeString('cs-CZ')}` : `Google Drive: ${googleDriveFolderName || 'Můj disk'}`}
                     >
-                      {googleSyncStatus === 'saving' ? '⏳' :
-                       googleSyncStatus === 'error' ? '❌' :
-                       '☁️'}<span className="hidden sm:inline"> {googleDriveFolderName || 'Drive'}</span>
+                      {googleSyncStatus === 'saving' ? '⏳' : googleSyncStatus === 'error' ? '❌' : '☁️'} {googleDriveFolderName || 'Drive'}
                     </span>
-                    <button
-                      onClick={changeGoogleDriveFolder}
-                      className="hidden sm:block px-1 py-1 bg-blue-600/50 hover:bg-blue-500 rounded text-xs transition-colors"
-                      title="Změnit složku na Google Drive"
-                    >
-                      📂
-                    </button>
-                    <button
-                      onClick={disconnectGoogleDrive}
-                      className="px-1 py-1 bg-blue-600/50 hover:bg-red-600 rounded text-xs transition-colors"
-                      title="Odpojit Google Drive"
-                    >
-                      ✕
-                    </button>
+                    <button onClick={changeGoogleDriveFolder} className="px-1.5 py-1 bg-blue-600/50 hover:bg-blue-500 rounded text-xs transition-colors" title="Změnit složku">📂</button>
+                    <button onClick={disconnectGoogleDrive} className="px-1.5 py-1 bg-blue-600/50 hover:bg-red-600 rounded text-xs transition-colors" title="Odpojit">✕</button>
                   </>
                 ) : (
                   <button
                     type="button"
                     onClick={connectGoogleDrive}
-                    className="px-1.5 py-1 bg-blue-600 hover:bg-blue-500 rounded text-xs font-medium transition-colors cursor-pointer"
+                    className="px-2 py-1.5 bg-blue-600 hover:bg-blue-500 rounded text-xs font-medium transition-colors cursor-pointer"
                     title="Připojit Google Drive pro cloud sync"
                   >
-                    ☁️<span className="hidden sm:inline"> Drive</span>
+                    ☁️ Drive
                   </button>
                 )}
               </div>
-              <button
-                onClick={handleExport}
-                className="px-2 py-1 bg-amber-700 hover:bg-amber-600 rounded text-sm font-medium transition-colors"
-                title="Exportovat save (stáhne JSON soubor)"
-              >
-                📤
-              </button>
-              <label className="px-2 py-1 bg-amber-700 hover:bg-amber-600 rounded text-sm font-medium cursor-pointer transition-colors" title="Importovat save (nahrát JSON soubor)">
+
+              <button onClick={handleExport} className="px-3 py-1.5 bg-amber-700 hover:bg-amber-600 rounded text-sm font-medium transition-colors" title="Exportovat save">📤</button>
+              <label className="px-3 py-1.5 bg-amber-700 hover:bg-amber-600 rounded text-sm font-medium cursor-pointer transition-colors" title="Importovat save">
                 📥
-                <input
-                  type="file"
-                  accept=".json"
-                  onChange={handleImport}
-                  className="hidden"
-                />
+                <input type="file" accept=".json" onChange={handleImport} className="hidden" />
               </label>
             </div>
+
+            {/* Mobile: Hamburger button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 rounded hover:bg-amber-700 transition-colors"
+              title="Menu"
+            >
+              <span className="text-xl">{mobileMenuOpen ? '✕' : '☰'}</span>
+            </button>
           </div>
+
+          {/* Mobile dropdown menu */}
+          {mobileMenuOpen && (
+            <div className="md:hidden mt-3 pt-3 border-t border-amber-700 space-y-2">
+              {/* Local sync */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm">📄 Lokální soubor</span>
+                {fileHandle ? (
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs px-2 py-1 rounded ${
+                      syncStatus === 'saving' ? 'bg-yellow-600' : syncStatus === 'error' ? 'bg-red-600' : 'bg-green-700'
+                    }`}>
+                      {syncStatus === 'saving' ? '⏳ Ukládám' : syncStatus === 'error' ? '❌ Chyba' : '✓ Připojeno'}
+                    </span>
+                    <button onClick={() => { disconnectFile(); setMobileMenuOpen(false); }} className="px-2 py-1 bg-red-600 hover:bg-red-500 rounded text-xs">Odpojit</button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => {
+                      if (!isFileSystemSupported) {
+                        alert('⚠️ Lokální sync vyžaduje Chrome nebo Edge.');
+                        return;
+                      }
+                      connectToFile();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="px-3 py-1.5 bg-green-700 hover:bg-green-600 rounded text-xs font-medium"
+                  >
+                    Připojit
+                  </button>
+                )}
+              </div>
+
+              {/* Google Drive sync */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm">☁️ Google Drive</span>
+                {googleAccessToken ? (
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs px-2 py-1 rounded ${
+                      googleSyncStatus === 'saving' ? 'bg-yellow-600' : googleSyncStatus === 'error' ? 'bg-red-600' : 'bg-blue-600'
+                    }`}>
+                      {googleSyncStatus === 'saving' ? '⏳ Ukládám' : googleSyncStatus === 'error' ? '❌ Chyba' : `✓ ${googleDriveFolderName || 'Drive'}`}
+                    </span>
+                    <button onClick={() => { disconnectGoogleDrive(); setMobileMenuOpen(false); }} className="px-2 py-1 bg-red-600 hover:bg-red-500 rounded text-xs">Odpojit</button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => { connectGoogleDrive(); setMobileMenuOpen(false); }}
+                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 rounded text-xs font-medium"
+                  >
+                    Připojit
+                  </button>
+                )}
+              </div>
+
+              {/* Export/Import */}
+              <div className="flex gap-2 pt-2 border-t border-amber-700">
+                <button onClick={() => { handleExport(); setMobileMenuOpen(false); }} className="flex-1 px-3 py-2 bg-amber-700 hover:bg-amber-600 rounded text-sm font-medium">
+                  📤 Export
+                </button>
+                <label className="flex-1 px-3 py-2 bg-amber-700 hover:bg-amber-600 rounded text-sm font-medium cursor-pointer text-center">
+                  📥 Import
+                  <input type="file" accept=".json" onChange={(e) => { handleImport(e); setMobileMenuOpen(false); }} className="hidden" />
+                </label>
+              </div>
+            </div>
+          )}
         </div>
       </header>
 
