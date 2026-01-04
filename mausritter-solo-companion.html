@@ -7981,11 +7981,12 @@ const FloatingDice = ({ onLogEntry }) => {
         title = `Hod kostkou: ${lastRoll.count}d${lastRoll.sides}`;
         content = `Výsledek: **${lastRoll.total}** [${lastRoll.dice.join(', ')}]`;
         break;
-      case 'yesno':
+      case 'yesno': {
         const probLabel = { unlikely: 'Sotva', even: '50/50', likely: 'Asi ano' }[lastRoll.probability];
         title = `Orákulum (${probLabel})`;
         content = `**${lastRoll.result}** [${lastRoll.dice.join(', ')}] = ${lastRoll.total}`;
         break;
+      }
       case 'action':
         title = 'Akce + Téma';
         content = `**${lastRoll.action}** + **${lastRoll.theme}**`;
