@@ -7654,16 +7654,16 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
 // FLOATING DICE - Plovoucí kostky s radiálním menu
 // ============================================
 
-const FloatingDice = () => {
+const FloatingDice = ({ onLogEntry }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeGenerator, setActiveGenerator] = useState(null);
   const [lastRoll, setLastRoll] = useState(null);
 
-  // Generátory v radiálním menu
+  // Generátory - vertikální seznam
   const generators = [
     { id: 'dice', icon: '🎲', label: 'Kostky', color: 'bg-amber-500' },
     { id: 'yesno', icon: '❓', label: 'Ano/Ne', color: 'bg-blue-500' },
-    { id: 'action', icon: '💡', label: 'Akce+Téma', color: 'bg-purple-500' },
+    { id: 'action', icon: '💡', label: 'Akce', color: 'bg-purple-500' },
     { id: 'complication', icon: '⚡', label: 'Komplikace', color: 'bg-orange-500' },
     { id: 'consequence', icon: '💀', label: 'Důsledek', color: 'bg-red-500' },
     { id: 'card', icon: '🃏', label: 'Karta', color: 'bg-green-500' },
@@ -7724,61 +7724,93 @@ const FloatingDice = () => {
   const closeAll = () => {
     setIsOpen(false);
     setActiveGenerator(null);
+    setLastRoll(null);
   };
 
-  // Pozice radiálního menu - čtvrtkruh nahoru a doleva (pravý dolní roh obrazovky)
-  const getMenuPosition = (index) => {
-    const radius = 70;
-    // Úhly: 90° (nahoru) až 165° (doleva-nahoru) - čtvrtkruh vlevo-nahoře
-    const angles = [165, 150, 135, 120, 105, 90];
-    const angle = angles[index];
+  // Zapsat hod do deníku
+  const logRollToJournal = () => {
+    if (!lastRoll || !onLogEntry) return;
 
-    const rad = (angle * Math.PI) / 180;
-    const x = Math.cos(rad) * radius;
-    const y = Math.sin(rad) * radius;
+    let title = '';
+    let content = '';
 
-    // Hlavní tlačítko 56px, menu tlačítko 48px
-    return {
-      left: `${28 + x - 24}px`,
-      bottom: `${28 + y - 24}px`
-    };
+    switch (lastRoll.type) {
+      case 'dice':
+        title = `Hod kostkou: ${lastRoll.count}d${lastRoll.sides}`;
+        content = `Výsledek: **${lastRoll.total}** [${lastRoll.dice.join(', ')}]`;
+        break;
+      case 'yesno':
+        const probLabel = { unlikely: 'Sotva', even: '50/50', likely: 'Asi ano' }[lastRoll.probability];
+        title = `Orákulum (${probLabel})`;
+        content = `**${lastRoll.result}** [${lastRoll.dice.join(', ')}] = ${lastRoll.total}`;
+        break;
+      case 'action':
+        title = 'Akce + Téma';
+        content = `**${lastRoll.action}** + **${lastRoll.theme}**`;
+        break;
+      case 'complication':
+        title = 'Komplikace';
+        content = `**${lastRoll.result}**`;
+        break;
+      case 'consequence':
+        title = 'Důsledek neúspěchu';
+        content = `**${lastRoll.result}**`;
+        break;
+      case 'card':
+        title = `Karta: ${lastRoll.value}${lastRoll.suit.symbol}`;
+        content = `${lastRoll.suit.domain} - ${lastRoll.meaning}`;
+        break;
+    }
+
+    onLogEntry({ title, content });
+    setLastRoll(null); // Vymazat po zapsání
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
-      {/* Radiální menu */}
-      {isOpen && generators.map((gen, index) => {
-        const pos = getMenuPosition(index);
-        return (
-          <button
-            key={gen.id}
-            onClick={() => handleGeneratorClick(gen.id)}
-            className={`absolute w-12 h-12 rounded-full shadow-lg flex items-center justify-center text-xl transition-all duration-200 z-40 ${
-              activeGenerator === gen.id
-                ? `${gen.color} text-white scale-110 ring-2 ring-white`
-                : 'bg-white hover:scale-105 border-2 border-stone-200 hover:border-amber-400'
-            }`}
-            style={{ left: pos.left, bottom: pos.bottom }}
-            title={gen.label}
-          >
-            {gen.icon}
-          </button>
-        );
-      })}
+    <div className="fixed bottom-4 right-4 z-50 flex flex-col-reverse items-end gap-2">
+      {/* Hlavní plovoucí tlačítko */}
+      <button
+        onClick={() => {
+          if (isOpen) {
+            closeAll();
+          } else {
+            setIsOpen(true);
+          }
+        }}
+        className={`w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl transition-all duration-300 ${
+          isOpen
+            ? 'bg-amber-600 text-white'
+            : 'bg-amber-500 hover:bg-amber-600 text-white hover:scale-110'
+        }`}
+        title="Rychlé generátory"
+      >
+        {isOpen ? '✕' : '🎲'}
+      </button>
+
+      {/* Vertikální menu generátorů */}
+      {isOpen && (
+        <div className="flex flex-col gap-2 items-end">
+          {generators.map((gen) => (
+            <button
+              key={gen.id}
+              onClick={() => handleGeneratorClick(gen.id)}
+              className={`h-10 px-3 rounded-full shadow-lg flex items-center gap-2 text-sm transition-all duration-200 ${
+                activeGenerator === gen.id
+                  ? `${gen.color} text-white`
+                  : 'bg-white hover:bg-stone-50 border border-stone-200'
+              }`}
+              title={gen.label}
+            >
+              <span className="text-lg">{gen.icon}</span>
+              <span className="font-medium">{gen.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Panel pro vybraný generátor */}
       {isOpen && activeGenerator && (
-        <div
-          className="absolute bottom-20 right-16 bg-white rounded-xl shadow-2xl border border-amber-200 p-4 w-64"
-          style={{ animation: 'slideIn 0.2s ease-out' }}
-        >
-          <div className="flex justify-between items-center mb-3">
-            <h4 className="font-bold text-amber-900 text-sm">
-              {generators.find(g => g.id === activeGenerator)?.icon} {generators.find(g => g.id === activeGenerator)?.label}
-            </h4>
-            <span className="text-xs text-stone-400">🤫 tiše</span>
-          </div>
-
+        <div className="bg-white rounded-xl shadow-2xl border border-amber-200 p-3 w-72 mr-2">
           {/* Kostky */}
           {activeGenerator === 'dice' && (
             <div className="grid grid-cols-4 gap-2">
@@ -7800,28 +7832,28 @@ const FloatingDice = () => {
 
           {/* Akce + Téma */}
           {activeGenerator === 'action' && (
-            <button onClick={rollActionTheme} className="w-full px-4 py-3 bg-purple-100 hover:bg-purple-200 rounded font-medium text-purple-900">
-              🎯 Generovat
+            <button onClick={rollActionTheme} className="w-full px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded font-medium text-purple-900">
+              🎯 Generovat Akci + Téma
             </button>
           )}
 
           {/* Komplikace */}
           {activeGenerator === 'complication' && (
-            <button onClick={rollComplication} className="w-full px-4 py-3 bg-orange-100 hover:bg-orange-200 rounded font-medium text-orange-900">
+            <button onClick={rollComplication} className="w-full px-4 py-2 bg-orange-100 hover:bg-orange-200 rounded font-medium text-orange-900">
               ⚡ Co se komplikuje?
             </button>
           )}
 
           {/* Důsledek */}
           {activeGenerator === 'consequence' && (
-            <button onClick={rollConsequence} className="w-full px-4 py-3 bg-red-100 hover:bg-red-200 rounded font-medium text-red-900">
+            <button onClick={rollConsequence} className="w-full px-4 py-2 bg-red-100 hover:bg-red-200 rounded font-medium text-red-900">
               💀 Jaký důsledek?
             </button>
           )}
 
           {/* Karta */}
           {activeGenerator === 'card' && (
-            <button onClick={drawCard} className="w-full px-4 py-3 bg-green-100 hover:bg-green-200 rounded font-medium text-green-900">
+            <button onClick={drawCard} className="w-full px-4 py-2 bg-green-100 hover:bg-green-200 rounded font-medium text-green-900">
               🃏 Táhnout kartu
             </button>
           )}
@@ -7860,41 +7892,20 @@ const FloatingDice = () => {
                   <div className="text-xs text-stone-500 mt-1">{lastRoll.meaning}</div>
                 </>
               )}
+
+              {/* Tlačítko pro zápis do deníku */}
+              {onLogEntry && (
+                <button
+                  onClick={logRollToJournal}
+                  className="mt-3 w-full px-3 py-1.5 bg-stone-700 hover:bg-stone-800 text-white rounded text-xs font-medium flex items-center justify-center gap-1"
+                >
+                  📝 Zapsat do deníku
+                </button>
+              )}
             </div>
           )}
         </div>
       )}
-
-      {/* Hlavní plovoucí tlačítko */}
-      <button
-        onClick={() => {
-          if (isOpen) {
-            closeAll();
-          } else {
-            setIsOpen(true);
-          }
-        }}
-        className={`w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl transition-all duration-300 ${
-          isOpen
-            ? 'bg-amber-600 text-white rotate-180 scale-110'
-            : 'bg-amber-500 hover:bg-amber-600 text-white hover:scale-110'
-        }`}
-        title="Rychlé generátory"
-      >
-        {isOpen ? '✕' : '🎲'}
-      </button>
-
-      {/* CSS animace */}
-      <style>{`
-        @keyframes popIn {
-          0% { opacity: 0; transform: translate(0, 0) scale(0); }
-          100% { opacity: 1; transform: translate(var(--tx, 0), var(--ty, 0)) scale(1); }
-        }
-        @keyframes slideIn {
-          0% { opacity: 0; transform: translateY(10px); }
-          100% { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </div>
   );
 };
@@ -8724,7 +8735,6 @@ function MausritterSoloCompanion() {
     { id: 'character', label: 'Postavy', icon: '🐭' },
     { id: 'oracle', label: 'Věštírna', icon: '🔮' },
     { id: 'combat', label: 'Boj', icon: '⚔️' },
-    { id: 'time', label: 'Čas', icon: '⏰' },
     { id: 'world', label: 'Svět', icon: '🌍' },
     { id: 'factions', label: 'Frakce', icon: '🏰' },
     { id: 'studio', label: 'Kartičky', icon: '🎴' },
@@ -9075,20 +9085,7 @@ function MausritterSoloCompanion() {
             onLogEntry={handleLogEntry}
           />
         )}
-        
-        {activePanel === 'time' && (
-          <TimePanel
-            party={activeParty}
-            updateParty={(updates) => activePartyId && updateParty(activePartyId, updates)}
-            updateCharacterInParty={(charId, updates) => 
-              activePartyId && updateCharacterInParty(activePartyId, charId, updates)
-            }
-            factions={factions}
-            setFactions={setFactions}
-            onLogEntry={handleLogEntry}
-          />
-        )}
-        
+
         {activePanel === 'world' && (
           <WorldPanel
             onLogEntry={handleLogEntry}
@@ -9124,7 +9121,7 @@ function MausritterSoloCompanion() {
       </main>
 
       {/* Plovoucí kostky - vždy viditelné */}
-      <FloatingDice />
+      <FloatingDice onLogEntry={handleLogEntry} />
 
       {/* Footer */}
       <footer className="bg-amber-900 text-amber-200 text-center py-4 mt-8">
