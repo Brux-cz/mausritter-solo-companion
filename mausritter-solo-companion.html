@@ -6736,6 +6736,56 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
   const [editText, setEditText] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
+  // Multi-select mode
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const longPressTimer = useRef(null);
+
+  // Long press handler
+  const handleTouchStart = (entryId) => {
+    longPressTimer.current = setTimeout(() => {
+      setSelectionMode(true);
+      setSelectedIds(new Set([entryId]));
+    }, 500); // 500ms pro long press
+  };
+
+  const handleTouchEnd = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  };
+
+  // Toggle selection
+  const toggleSelect = (entryId) => {
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(entryId)) {
+      newSelected.delete(entryId);
+    } else {
+      newSelected.add(entryId);
+    }
+    setSelectedIds(newSelected);
+
+    // Exit selection mode if nothing selected
+    if (newSelected.size === 0) {
+      setSelectionMode(false);
+    }
+  };
+
+  // Delete selected entries
+  const deleteSelected = () => {
+    if (selectedIds.size === 0) return;
+    setJournal(journal.filter(e => !selectedIds.has(e.id)));
+    setSelectedIds(new Set());
+    setSelectionMode(false);
+  };
+
+  // Cancel selection mode
+  const cancelSelection = () => {
+    setSelectedIds(new Set());
+    setSelectionMode(false);
+  };
+
   const addNarrativeEntry = () => {
     if (!newEntry.trim()) return;
     
@@ -7194,10 +7244,36 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                 {entries.map((entry, i) => {
                   const content = formatEntry(entry);
                   if (!content) return null; // Skip entries that return null
-                  
+                  const isSelected = selectedIds.has(entry.id);
+
                   return (
-                    <div key={entry.id}>
-                      {content}
+                    <div
+                      key={entry.id}
+                      className={`flex items-start gap-2 ${isSelected ? 'bg-amber-100 rounded -mx-2 px-2' : ''}`}
+                      onTouchStart={() => !selectionMode && handleTouchStart(entry.id)}
+                      onTouchEnd={handleTouchEnd}
+                      onTouchMove={handleTouchEnd}
+                      onContextMenu={(e) => {
+                        e.preventDefault();
+                        setSelectionMode(true);
+                        setSelectedIds(new Set([entry.id]));
+                      }}
+                    >
+                      {selectionMode && (
+                        <button
+                          onClick={() => toggleSelect(entry.id)}
+                          className={`mt-2 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
+                            isSelected
+                              ? 'bg-amber-500 border-amber-500 text-white'
+                              : 'border-stone-300 hover:border-amber-400'
+                          }`}
+                        >
+                          {isSelected && '✓'}
+                        </button>
+                      )}
+                      <div className="flex-1">
+                        {content}
+                      </div>
                     </div>
                   );
                 })}
@@ -7208,9 +7284,44 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
       </div>
 
       {/* Reading tip */}
-      <p className="text-center text-xs text-stone-400 mt-6 font-sans">
-        💡 Klikni na záznam pro úpravu nebo smazání
-      </p>
+      {!selectionMode && (
+        <p className="text-center text-xs text-stone-400 mt-6 font-sans">
+          💡 Klikni pro úpravu • Dlouze podrž pro výběr více
+        </p>
+      )}
+
+      {/* Selection toolbar */}
+      {selectionMode && (
+        <div className="fixed bottom-16 left-0 right-0 bg-stone-800 text-white p-3 shadow-lg z-50 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={cancelSelection}
+              className="p-2 hover:bg-stone-700 rounded"
+            >
+              ✕
+            </button>
+            <span className="font-medium">{selectedIds.size} vybráno</span>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                // Select all visible
+                const allIds = new Set(filteredJournal.map(e => e.id));
+                setSelectedIds(allIds);
+              }}
+              className="px-3 py-1 bg-stone-700 hover:bg-stone-600 rounded text-sm"
+            >
+              Vybrat vše
+            </button>
+            <button
+              onClick={deleteSelected}
+              className="px-3 py-1 bg-red-600 hover:bg-red-500 rounded text-sm font-medium"
+            >
+              🗑️ Smazat ({selectedIds.size})
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
