@@ -7669,6 +7669,9 @@ function MausritterSoloCompanion() {
   const [googleLastSync, setGoogleLastSync] = useState(null);
   const [googleDriveFolderId, setGoogleDriveFolderId] = useState(null);
   const [googleDriveFolderName, setGoogleDriveFolderName] = useState(null);
+  const [syncConflict, setSyncConflict] = useState(null); // { localDate, cloudDate, cloudFileId, cloudModifiedTime, token, folderId }
+  const [showFolderChoice, setShowFolderChoice] = useState(false);
+  const [pendingToken, setPendingToken] = useState(null); // Token for pending folder choice
   const googleTokenClientRef = useRef(null);
 
   // NEW: Parties system - replaces single character
@@ -8070,18 +8073,108 @@ function MausritterSoloCompanion() {
     googleTokenClientRef.current = google.accounts.oauth2.initTokenClient({
       client_id: GOOGLE_CLIENT_ID,
       scope: GOOGLE_SCOPES,
-      callback: (response) => {
+      callback: async (response) => {
         if (response.error) {
           console.error('Google OAuth error:', response);
           setGoogleSyncStatus('error');
           return;
         }
         setGoogleAccessToken(response.access_token);
-        // Open folder picker after successful auth
-        openFolderPicker(response.access_token);
+        // Check if we have a saved folder in localStorage
+        const savedFolderId = localStorage.getItem('googleDriveFolderId');
+        const savedFolderName = localStorage.getItem('googleDriveFolderName');
+        console.log('Saved folder from localStorage:', savedFolderId, savedFolderName);
+
+        if (savedFolderId) {
+          // Verify folder still exists on Drive
+          try {
+            const verifyRes = await fetch(
+              `https://www.googleapis.com/drive/v3/files/${savedFolderId}?fields=id,name,trashed`,
+              { headers: { Authorization: `Bearer ${response.access_token}` } }
+            );
+            const folderData = await verifyRes.json();
+            console.log('Folder verification:', folderData);
+
+            if (folderData.id && !folderData.trashed) {
+              // Folder exists - use it
+              setGoogleDriveFolderId(savedFolderId);
+              setGoogleDriveFolderName(folderData.name || savedFolderName);
+              setGoogleSyncStatus('connected');
+              findOrCreateGoogleDriveFile(response.access_token, savedFolderId);
+            } else {
+              // Folder was deleted or trashed - clear localStorage and open picker
+              console.warn('Saved folder no longer exists, opening picker');
+              localStorage.removeItem('googleDriveFolderId');
+              localStorage.removeItem('googleDriveFolderName');
+              openFolderPicker(response.access_token);
+            }
+          } catch (err) {
+            console.error('Folder verification failed:', err);
+            localStorage.removeItem('googleDriveFolderId');
+            localStorage.removeItem('googleDriveFolderName');
+            openFolderPicker(response.access_token);
+          }
+        } else {
+          // No saved folder - show folder choice dialog
+          setPendingToken(response.access_token);
+          setShowFolderChoice(true);
+        }
       }
     });
   }, []);
+
+  // Folder choice dialog handlers
+  const handleChooseExistingFolder = () => {
+    setShowFolderChoice(false);
+    if (pendingToken) {
+      openFolderPicker(pendingToken);
+    }
+  };
+
+  const handleCreateNewFolder = async () => {
+    if (!pendingToken) return;
+
+    const folderName = prompt('Název nové složky:');
+    if (!folderName) return;
+
+    setShowFolderChoice(false);
+
+    try {
+      const response = await fetch('https://www.googleapis.com/drive/v3/files', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${pendingToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: folderName,
+          mimeType: 'application/vnd.google-apps.folder'
+        })
+      });
+      const folder = await response.json();
+
+      if (folder.id) {
+        setGoogleDriveFolderId(folder.id);
+        setGoogleDriveFolderName(folder.name);
+        localStorage.setItem('googleDriveFolderId', folder.id);
+        localStorage.setItem('googleDriveFolderName', folder.name);
+        setGoogleSyncStatus('connected');
+        findOrCreateGoogleDriveFile(pendingToken, folder.id);
+        setPendingToken(null);
+      }
+    } catch (err) {
+      console.error('Failed to create folder:', err);
+      alert('Nepodařilo se vytvořit složku.');
+      setGoogleSyncStatus('disconnected');
+    }
+  };
+
+  const handleCancelFolderChoice = () => {
+    setShowFolderChoice(false);
+    setPendingToken(null);
+    setGoogleSyncStatus('disconnected');
+    setGoogleAccessToken(null);
+  };
 
   // Open Google Picker to select folder
   const openFolderPicker = (token) => {
@@ -8099,6 +8192,9 @@ function MausritterSoloCompanion() {
             const folder = data.docs[0];
             setGoogleDriveFolderId(folder.id);
             setGoogleDriveFolderName(folder.name);
+            // Save to localStorage for next time
+            localStorage.setItem('googleDriveFolderId', folder.id);
+            localStorage.setItem('googleDriveFolderName', folder.name);
             setGoogleSyncStatus('connected');
             // Find or create save file in selected folder
             findOrCreateGoogleDriveFile(token, folder.id);
@@ -8116,7 +8212,7 @@ function MausritterSoloCompanion() {
   const findOrCreateGoogleDriveFile = async (token, folderId = googleDriveFolderId) => {
     try {
       // Search for existing file in folder
-      const query = folderId 
+      const query = folderId
         ? `name='mausritter-save.json' and '${folderId}' in parents and trashed=false`
         : `name='mausritter-save.json' and trashed=false`;
       const searchResponse = await fetch(
@@ -8128,10 +8224,37 @@ function MausritterSoloCompanion() {
       const searchData = await searchResponse.json();
 
       if (searchData.files && searchData.files.length > 0) {
-        // Use existing file
-        const fileId = searchData.files[0].id;
-        setGoogleDriveFileId(fileId);
-        await loadFromGoogleDrive(token, fileId);
+        // Existing file found - check for conflicts
+        const cloudFile = searchData.files[0];
+        const cloudModifiedTime = cloudFile.modifiedTime;
+
+        // Get local data to compare
+        const localSave = localStorage.getItem('mausritter-save');
+        if (localSave) {
+          try {
+            const localData = JSON.parse(localSave);
+            const localDate = new Date(localData.lastModified);
+            const cloudDate = new Date(cloudModifiedTime);
+
+            // If difference is more than 1 minute, show conflict dialog
+            if (Math.abs(localDate - cloudDate) > 60000) {
+              setSyncConflict({
+                localDate: localData.lastModified,
+                cloudDate: cloudModifiedTime,
+                cloudFileId: cloudFile.id,
+                token,
+                folderId
+              });
+              return; // Wait for user decision
+            }
+          } catch (e) {
+            console.warn('Failed to parse local save for conflict check:', e);
+          }
+        }
+
+        // No conflict or no local data - just load from cloud
+        setGoogleDriveFileId(cloudFile.id);
+        await loadFromGoogleDrive(token, cloudFile.id);
         setGoogleLastSync(new Date());
       } else {
         // Create new file in selected folder
@@ -8141,6 +8264,33 @@ function MausritterSoloCompanion() {
       console.error('Google Drive file search failed:', err);
       setGoogleSyncStatus('error');
     }
+  };
+
+  // Resolve sync conflict - use local data (upload to cloud)
+  const resolveConflictUseLocal = async () => {
+    if (!syncConflict) return;
+    const { token, folderId, cloudFileId } = syncConflict;
+    setSyncConflict(null);
+    setGoogleDriveFileId(cloudFileId);
+    await saveToGoogleDrive(token, cloudFileId, folderId);
+    setGoogleLastSync(new Date());
+  };
+
+  // Resolve sync conflict - use cloud data (overwrite local)
+  const resolveConflictUseCloud = async () => {
+    if (!syncConflict) return;
+    const { token, cloudFileId } = syncConflict;
+    setSyncConflict(null);
+    setGoogleDriveFileId(cloudFileId);
+    await loadFromGoogleDrive(token, cloudFileId);
+    setGoogleLastSync(new Date());
+  };
+
+  // Cancel sync conflict - disconnect
+  const resolveConflictCancel = () => {
+    setSyncConflict(null);
+    setGoogleSyncStatus('disconnected');
+    setGoogleAccessToken(null);
   };
 
   // Connect to Google Drive
@@ -8164,6 +8314,58 @@ function MausritterSoloCompanion() {
     setGoogleDriveFolderName(null);
     setGoogleSyncStatus('disconnected');
     setGoogleLastSync(null);
+    // Clear localStorage
+    localStorage.removeItem('googleDriveFolderId');
+    localStorage.removeItem('googleDriveFolderName');
+  };
+
+  // Change Google Drive folder
+  const changeGoogleDriveFolder = () => {
+    if (googleAccessToken) {
+      // Clear current folder from localStorage
+      localStorage.removeItem('googleDriveFolderId');
+      localStorage.removeItem('googleDriveFolderName');
+      setGoogleDriveFileId(null);
+      // Open picker to select new folder
+      openFolderPicker(googleAccessToken);
+    }
+  };
+
+  // Create new folder on Google Drive
+  const createGoogleDriveFolder = async () => {
+    if (!googleAccessToken) return;
+    
+    const folderName = prompt('Název nové složky:');
+    if (!folderName) return;
+
+    try {
+      const response = await fetch('https://www.googleapis.com/drive/v3/files', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${googleAccessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: folderName,
+          mimeType: 'application/vnd.google-apps.folder'
+        })
+      });
+      const folder = await response.json();
+      
+      if (folder.id) {
+        setGoogleDriveFolderId(folder.id);
+        setGoogleDriveFolderName(folder.name);
+        localStorage.setItem('googleDriveFolderId', folder.id);
+        localStorage.setItem('googleDriveFolderName', folder.name);
+        setGoogleDriveFileId(null); // Reset file ID for new folder
+        setGoogleSyncStatus('connected');
+        findOrCreateGoogleDriveFile(googleAccessToken, folder.id);
+        alert(`Složka "${folderName}" vytvořena!`);
+      }
+    } catch (err) {
+      console.error('Failed to create folder:', err);
+      alert('Nepodařilo se vytvořit složku.');
+    }
   };
 
   // Save to Google Drive
@@ -8285,7 +8487,89 @@ function MausritterSoloCompanion() {
       <div className="fixed inset-0 opacity-5 pointer-events-none" style={{
         backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
       }} />
-      
+
+      {/* Sync Conflict Dialog */}
+      {syncConflict && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100]">
+          <div className="bg-stone-800 text-stone-100 p-6 rounded-lg max-w-md mx-4 shadow-2xl border border-stone-600">
+            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <span>⚠️</span> Nalezen konflikt verzí
+            </h3>
+            <div className="space-y-3 mb-6">
+              <div className="flex justify-between items-center bg-stone-700 p-3 rounded">
+                <span className="text-stone-300">💾 Lokální data:</span>
+                <span className="font-mono text-amber-400">
+                  {new Date(syncConflict.localDate).toLocaleString('cs-CZ')}
+                </span>
+              </div>
+              <div className="flex justify-between items-center bg-stone-700 p-3 rounded">
+                <span className="text-stone-300">☁️ Cloud data:</span>
+                <span className="font-mono text-blue-400">
+                  {new Date(syncConflict.cloudDate).toLocaleString('cs-CZ')}
+                </span>
+              </div>
+              <p className="text-stone-400 text-sm">
+                Kterou verzi chceš použít? Druhá bude přepsána.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={resolveConflictUseLocal}
+                className="w-full px-4 py-3 bg-amber-700 hover:bg-amber-600 rounded font-medium transition-colors"
+              >
+                💾 Použít lokální (nahrát na cloud)
+              </button>
+              <button
+                onClick={resolveConflictUseCloud}
+                className="w-full px-4 py-3 bg-blue-700 hover:bg-blue-600 rounded font-medium transition-colors"
+              >
+                ☁️ Použít cloud (přepsat lokální)
+              </button>
+              <button
+                onClick={resolveConflictCancel}
+                className="w-full px-4 py-2 bg-stone-600 hover:bg-stone-500 rounded text-sm transition-colors"
+              >
+                Zrušit připojení
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Folder Choice Dialog */}
+      {showFolderChoice && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100]">
+          <div className="bg-stone-800 text-stone-100 p-6 rounded-lg max-w-sm mx-4 shadow-2xl border border-stone-600">
+            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <span>📁</span> Kam ukládat data?
+            </h3>
+            <p className="text-stone-400 text-sm mb-6">
+              Vyber složku na Google Drive nebo vytvoř novou.
+            </p>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={handleChooseExistingFolder}
+                className="w-full px-4 py-3 bg-blue-700 hover:bg-blue-600 rounded font-medium transition-colors flex items-center justify-center gap-2"
+              >
+                <span>📂</span> Vybrat existující složku
+              </button>
+              <button
+                onClick={handleCreateNewFolder}
+                className="w-full px-4 py-3 bg-green-700 hover:bg-green-600 rounded font-medium transition-colors flex items-center justify-center gap-2"
+              >
+                <span>➕</span> Vytvořit novou složku
+              </button>
+              <button
+                onClick={handleCancelFolderChoice}
+                className="w-full px-4 py-2 bg-stone-600 hover:bg-stone-500 rounded text-sm transition-colors"
+              >
+                Zrušit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="bg-gradient-to-r from-amber-900 via-amber-800 to-amber-900 text-amber-50 shadow-xl sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 py-4">
@@ -8381,6 +8665,20 @@ function MausritterSoloCompanion() {
                     title="Uložit do Google Drive"
                   >
                     💾
+                  </button>
+                  <button
+                    onClick={changeGoogleDriveFolder}
+                    className="px-2 py-1 bg-blue-700 hover:bg-blue-600 rounded text-xs transition-colors"
+                    title="Změnit složku"
+                  >
+                    📂
+                  </button>
+                  <button
+                    onClick={createGoogleDriveFolder}
+                    className="px-2 py-1 bg-blue-700 hover:bg-blue-600 rounded text-xs transition-colors"
+                    title="Vytvořit novou složku"
+                  >
+                    ➕
                   </button>
                   <button
                     onClick={disconnectGoogleDrive}
