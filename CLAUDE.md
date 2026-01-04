@@ -1,117 +1,87 @@
-# CLAUDE.md
+# Mausritter Solo Companion
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository. mluv na mě česky.
+Webová aplikace pro sólo hraní stolní RPG hry Mausritter. Mluv na mě česky.
 
-Vždy používej Serena MCP nástroje pro navigaci kódu.
+## Jak pracovat s kódem
 
-Preferuj find_symbol a find_referencing_symbols před grepem.
+```bash
+# 1. Edituj zdrojový kód
+mausritter-project/mausritter-solo-companion.jsx
 
-## Přehled projektu
+# 2. Buildni HTML
+node mausritter-project/build-html.js
 
-Mausritter Solo Companion je webová aplikace pro sólo hraní stolní RPG hry Mausritter. Obsahuje správu postav, orákulum pro rozhodování, sledování soubojů, tvorbu světa, frakce, kalendář a deník sezení.
+# 3. Spusť dev server
+python3 -m http.server 8081
 
-## Technologie
+# 4. Otevři v prohlížeči
+firefox http://localhost:8081/mausritter-solo-companion.html
+```
 
-- React 18 + Tailwind CSS (z CDN)
-- Babel pro in-browser JSX transpilaci
-- Google Drive API pro cloud sync
-- File System Access API pro lokální sync
-- Čistý frontend bez serveru
+Používej Serena MCP nástroje (find_symbol, find_referencing_symbols) místo grepu.
 
 ## Struktura projektu
 
 ```
 mausritter-project/
-├── mausritter-solo-companion.jsx   # Zdrojový kód (upravovat zde!)
-└── build-html.js                    # Build skript
+├── mausritter-solo-companion.jsx    # HLAVNÍ ZDROJOVÝ KÓD
+└── build-html.js                     # Build skript
 
-saves/                               # Složka pro lokální save soubory
-pravidla/                            # Pravidla Mausritter CZ
-kampaně/                             # Materiály pro kampaně
+saves/                                # Lokální save soubory
+pravidla/                             # Pravidla Mausritter CZ
+kampaně/                              # Materiály pro kampaně
 
-.serena/
-├── memories/
-│   ├── code_style.md               # Styl kódu projektu
-│   ├── project_overview.md         # Přehled projektu
-│   └── lore/ -> symlink            # LORE ze Zámeček kampaně
-└── project.yml                      # Konfigurace Serena
+.serena/memories/
+├── lore/ → ../Mausritter-Zámeček/   # LORE světa (symlink)
+└── *.md                              # Technické memories
 ```
 
 ## LORE (Herní svět)
 
-LORE je symlinkované z projektu `Mausritter-Zámeček`:
-- `.serena/memories/lore/` -> `../Mausritter-Zámeček/.serena/memories/`
-- Obsahuje 29+ souborů s postavami, lokacemi, příběhy
-- Pro čtení: `read_memory("lore/nazev-souboru.md")`
+Symlinkované z `Mausritter-Zámeček` - 29 souborů s postavami a lokacemi.
 
-Klíčové LORE soubory:
-- `sabrina-hlavni-antagonista.md` - hlavní záporná postava
-- `kralovna-madriga.md` - královna včel
-- `alkoun-carodej.md` - čaroděj Alkoun
-- `cihlin-a-starostka.md` - osada Cihlín
-- `SESSION-HANDOFF.md` - stav kampaně
-
-## Vývoj
-
-```bash
-# Upravovat zdrojový JSX soubor
-mausritter-project/mausritter-solo-companion.jsx
-
-# Build do HTML
-node mausritter-project/build-html.js
-
-# Spustit dev server (port 8081)
-python3 -m http.server 8081
+```
+read_memory("lore/SESSION-HANDOFF.md")     # Stav kampaně
+read_memory("lore/sabrina-hlavni-antagonista.md")
+read_memory("lore/kralovna-madriga.md")
+read_memory("lore/alkoun-carodej.md")
+read_memory("lore/cihlin-a-starostka.md")
 ```
 
-## Spuštění
+## Technologie
 
-```bash
-xdg-open mausritter-solo-companion.html
-# nebo
-firefox http://localhost:8081/mausritter-solo-companion.html
-```
+| Co | Jak |
+|----|-----|
+| UI | React 18 + Tailwind CSS (z CDN) |
+| Transpilace | Babel in-browser |
+| Cloud sync | Google Drive API v3 + Picker API |
+| Lokální sync | File System Access API |
+| Data | localStorage + JSON export/import |
 
-## Architektura
+## Architektura aplikace
 
-### Hlavní komponenty (navigační panely)
-- `OraclePanel` - Orákulum pro rozhodování (2d6)
-- `CombatPanel` - Soubojový tracker (iniciativa, útoky, morálka)
-- `CharacterPanel` - Editor postav a správa družiny
-- `WorldPanel` - Osady, orientační body, NPC generátor
-- `FactionPanel` - Frakce a vztahy
-- `TimePanel` - Herní kalendář (hlídky, dny, roční období)
-- `JournalPanel` - Deník sezení a export
+**Panely:**
+- `OraclePanel` - Orákulum (2d6)
+- `CombatPanel` - Souboje
+- `CharacterPanel` - Postavy a družiny
+- `WorldPanel` - Osady, NPC
+- `FactionPanel` - Frakce
+- `TimePanel` - Kalendář
+- `JournalPanel` - Deník
 
-### Sync systém
-- **Google Drive**: OAuth 2.0 + Drive API v3 + Picker API
-  - Conflict dialog při rozdílu verzí
-  - Persistence vybrané složky v localStorage
-- **Lokální soubor**: File System Access API (Chrome/Edge)
-- **Export/Import**: Ruční JSON zálohy
+**Sync:**
+- Google Drive - OAuth + conflict dialog + folder picker
+- Lokální soubor - File System API (Chrome/Edge)
+- Export/Import - ruční JSON zálohy
 
-### Správa stavu
-- Hlavní komponenta `MausritterSoloCompanion` spravuje globální stav
-- React hooks (useState, useEffect, useCallback, useRef)
-- LocalStorage pro persistenci dat
-- Migrační systém (aktuální verze: 3)
+**Stav:**
+- Hlavní komponenta `MausritterSoloCompanion`
+- localStorage persistence
+- Migrační systém v3
 
-### Klíčové utility funkce
-- `generateId()` - unikátní ID
-- `rollDice(count, sides)` - hod kostkou
-- `randomFrom(array)` - náhodný výběr
-
-### Herní data (konstanty)
-72+ konstant definuje herní mechaniky:
-- Orákulum (ORACLE_TABLE - unlikely/even/likely)
-- Souboj (HIT_TABLE, FAILURE_CONSEQUENCES)
-- Generování postav (jména, vlastnosti, původy, kouzla)
-- Generování světa (bestie BESTIARY, osady, NPC)
-- Kalendář (počasí WEATHER_TABLE, podmínky)
-
-## GCP Konfigurace
+## GCP
 
 Projekt: `mausritter-solo-companion`
-- OAuth Client ID: nakonfigurováno pro localhost:8081
-- API Key: pro Google Picker
-- Povolená API: Drive API, Picker API
+- OAuth Client ID pro localhost:8081
+- API Key pro Picker
+- Drive API + Picker API povoleno
