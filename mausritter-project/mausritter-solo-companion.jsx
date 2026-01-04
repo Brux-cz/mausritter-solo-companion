@@ -8979,6 +8979,7 @@ function MausritterSoloCompanion() {
     { id: 'character', label: 'Postavy', icon: '🐭' },
     { id: 'oracle', label: 'Věštírna', icon: '🔮' },
     { id: 'combat', label: 'Boj', icon: '⚔️' },
+    { id: 'time', label: 'Čas', icon: '⏰' },
     { id: 'world', label: 'Svět', icon: '🌍' },
     { id: 'factions', label: 'Frakce', icon: '🏰' },
     { id: 'studio', label: 'Kartičky', icon: '🎴' },
@@ -9297,15 +9298,28 @@ function MausritterSoloCompanion() {
         )}
         
         {activePanel === 'combat' && (
-          <CombatPanel 
+          <CombatPanel
             party={activeParty}
-            updateCharacterInParty={(charId, updates) => 
+            updateCharacterInParty={(charId, updates) =>
               activePartyId && updateCharacterInParty(activePartyId, charId, updates)
             }
             onLogEntry={handleLogEntry}
           />
         )}
-        
+
+        {activePanel === 'time' && (
+          <TimePanel
+            party={activeParty}
+            updateParty={(updates) => activePartyId && updateParty(activePartyId, updates)}
+            updateCharacterInParty={(charId, updates) =>
+              activePartyId && updateCharacterInParty(activePartyId, charId, updates)
+            }
+            factions={factions}
+            setFactions={setFactions}
+            onLogEntry={handleLogEntry}
+          />
+        )}
+
         {activePanel === 'character' && (
           <CharacterPanel 
             character={activeCharacter}
