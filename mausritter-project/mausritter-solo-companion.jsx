@@ -4615,7 +4615,7 @@ const ItemCardStudio = ({ parties, activePartyId, activeCharacterId, updateChara
 // WORLD GENERATOR PANEL
 // ============================================
 
-const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWorldNPCs, parties, activeParty }) => {
+const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWorldNPCs, parties, activeParty, activePartyId, updateParty }) => {
   const [generated, setGenerated] = useState(null);
   const [activeGen, setActiveGen] = useState('mySettlements');
   const [season, setSeason] = useState('spring');
@@ -5023,13 +5023,15 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
           )}
 
           {/* Party location */}
-          {activeParty && (
+          {activeParty && activePartyId && updateParty && (
             <ResultCard>
               <h4 className="font-bold text-amber-900 mb-2">📍 Pozice družiny: {activeParty.name}</h4>
               <Select
                 value={activeParty.currentSettlement || ''}
                 onChange={(v) => {
-                  // This would need to be passed from App
+                  updateParty(activePartyId, { currentSettlement: v || null });
+                  const settlementName = v ? settlements.find(s => s.id === v)?.name : 'na cestě';
+                  onLogEntry && onLogEntry(`Družina ${activeParty.name} se přesunula do: ${settlementName}`);
                 }}
                 options={[
                   { value: '', label: '— Na cestě / neznámo —' },
@@ -8816,7 +8818,7 @@ function MausritterSoloCompanion() {
         )}
         
         {activePanel === 'world' && (
-          <WorldPanel 
+          <WorldPanel
             onLogEntry={handleLogEntry}
             settlements={settlements}
             setSettlements={setSettlements}
@@ -8824,6 +8826,8 @@ function MausritterSoloCompanion() {
             setWorldNPCs={setWorldNPCs}
             parties={parties}
             activeParty={activeParty}
+            activePartyId={activePartyId}
+            updateParty={updateParty}
           />
         )}
         
