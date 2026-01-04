@@ -7676,17 +7676,29 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
 };
 
 // ============================================
-// FLOATING DICE - Plovoucí kostky
+// FLOATING DICE - Plovoucí kostky s radiálním menu
 // ============================================
 
 const FloatingDice = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [activeGenerator, setActiveGenerator] = useState(null);
   const [lastRoll, setLastRoll] = useState(null);
 
+  // Generátory v radiálním menu
+  const generators = [
+    { id: 'dice', icon: '🎲', label: 'Kostky', color: 'bg-amber-500' },
+    { id: 'yesno', icon: '❓', label: 'Ano/Ne', color: 'bg-blue-500' },
+    { id: 'action', icon: '💡', label: 'Akce+Téma', color: 'bg-purple-500' },
+    { id: 'complication', icon: '⚡', label: 'Komplikace', color: 'bg-orange-500' },
+    { id: 'consequence', icon: '💀', label: 'Důsledek', color: 'bg-red-500' },
+    { id: 'card', icon: '🃏', label: 'Karta', color: 'bg-green-500' },
+  ];
+
+  // Roll funkce
   const quickRoll = (count, sides) => {
     const results = rollDice(count, sides);
     const total = results.reduce((a, b) => a + b, 0);
-    setLastRoll({ dice: results, total, sides, count });
+    setLastRoll({ type: 'dice', dice: results, total, sides, count });
   };
 
   const quickYesNo = (probability = 'even') => {
@@ -7695,45 +7707,175 @@ const FloatingDice = () => {
     setLastRoll({ type: 'yesno', dice, total, result, probability });
   };
 
+  const rollActionTheme = () => {
+    const action = randomFrom(ACTION_ORACLE);
+    const theme = randomFrom(THEME_ORACLE);
+    setLastRoll({ type: 'action', action, theme, result: `${action} + ${theme}` });
+  };
+
+  const rollComplication = () => {
+    const die = rollD6();
+    const result = SCENE_COMPLICATIONS[die - 1];
+    setLastRoll({ type: 'complication', dice: [die], result });
+  };
+
+  const rollConsequence = () => {
+    const die = rollD6();
+    const result = FAILURE_CONSEQUENCES[die - 1];
+    setLastRoll({ type: 'consequence', dice: [die], result });
+  };
+
+  const drawCard = () => {
+    const suit = randomFrom(CARD_SUITS);
+    const value = randomFrom(CARD_VALUES);
+    setLastRoll({
+      type: 'card',
+      suit,
+      value,
+      meaning: CARD_VALUE_MEANINGS[value],
+      result: `${value}${suit.symbol}`
+    });
+  };
+
+  const handleGeneratorClick = (genId) => {
+    if (activeGenerator === genId) {
+      setActiveGenerator(null);
+    } else {
+      setActiveGenerator(genId);
+      setLastRoll(null);
+    }
+  };
+
+  const closeAll = () => {
+    setIsOpen(false);
+    setActiveGenerator(null);
+  };
+
   return (
     <div className="fixed bottom-4 right-4 z-50">
-      {/* Rozbalený panel */}
+      {/* Radiální menu */}
       {isOpen && (
-        <div className="absolute bottom-14 right-0 bg-white rounded-xl shadow-2xl border border-amber-200 p-4 w-72 mb-2">
+        <div className="absolute bottom-0 right-0">
+          {generators.map((gen, index) => {
+            const angle = -90 - (index * 45); // Rozmístění po kruhu směrem nahoru a doleva
+            const radius = 70;
+            const x = Math.cos((angle * Math.PI) / 180) * radius;
+            const y = Math.sin((angle * Math.PI) / 180) * radius;
+
+            return (
+              <button
+                key={gen.id}
+                onClick={() => handleGeneratorClick(gen.id)}
+                className={`absolute w-12 h-12 rounded-full shadow-lg flex items-center justify-center text-xl transition-all duration-300 ${
+                  activeGenerator === gen.id
+                    ? `${gen.color} text-white scale-110 ring-2 ring-white`
+                    : 'bg-white hover:scale-110 border-2 border-stone-200'
+                }`}
+                style={{
+                  transform: `translate(${x - 24}px, ${y - 24}px)`,
+                  animation: `popIn 0.3s ease-out ${index * 0.05}s both`
+                }}
+                title={gen.label}
+              >
+                {gen.icon}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Panel pro vybraný generátor */}
+      {isOpen && activeGenerator && (
+        <div
+          className="absolute bottom-20 right-16 bg-white rounded-xl shadow-2xl border border-amber-200 p-4 w-64"
+          style={{ animation: 'slideIn 0.2s ease-out' }}
+        >
           <div className="flex justify-between items-center mb-3">
-            <h4 className="font-bold text-amber-900">🎲 Rychlý hod</h4>
-            <span className="text-xs text-stone-400">bez zápisu do deníku</span>
+            <h4 className="font-bold text-amber-900 text-sm">
+              {generators.find(g => g.id === activeGenerator)?.icon} {generators.find(g => g.id === activeGenerator)?.label}
+            </h4>
+            <span className="text-xs text-stone-400">🤫 tiše</span>
           </div>
 
-          {/* Rychlé kostky */}
-          <div className="grid grid-cols-4 gap-2 mb-3">
-            <button onClick={() => quickRoll(1, 6)} className="px-2 py-2 bg-amber-100 hover:bg-amber-200 rounded text-sm font-medium transition-colors">1d6</button>
-            <button onClick={() => quickRoll(2, 6)} className="px-2 py-2 bg-amber-100 hover:bg-amber-200 rounded text-sm font-medium transition-colors">2d6</button>
-            <button onClick={() => quickRoll(1, 20)} className="px-2 py-2 bg-amber-100 hover:bg-amber-200 rounded text-sm font-medium transition-colors">1d20</button>
-            <button onClick={() => quickRoll(1, 100)} className="px-2 py-2 bg-amber-100 hover:bg-amber-200 rounded text-sm font-medium transition-colors">d100</button>
-          </div>
+          {/* Kostky */}
+          {activeGenerator === 'dice' && (
+            <div className="grid grid-cols-4 gap-2">
+              <button onClick={() => quickRoll(1, 6)} className="px-2 py-2 bg-amber-100 hover:bg-amber-200 rounded text-sm font-medium">1d6</button>
+              <button onClick={() => quickRoll(2, 6)} className="px-2 py-2 bg-amber-100 hover:bg-amber-200 rounded text-sm font-medium">2d6</button>
+              <button onClick={() => quickRoll(1, 20)} className="px-2 py-2 bg-amber-100 hover:bg-amber-200 rounded text-sm font-medium">d20</button>
+              <button onClick={() => quickRoll(1, 100)} className="px-2 py-2 bg-amber-100 hover:bg-amber-200 rounded text-sm font-medium">d100</button>
+            </div>
+          )}
 
-          {/* Oracle */}
-          <div className="grid grid-cols-3 gap-2 mb-3">
-            <button onClick={() => quickYesNo('unlikely')} className="px-2 py-2 bg-red-100 hover:bg-red-200 rounded text-xs font-medium transition-colors">❓ Sotva</button>
-            <button onClick={() => quickYesNo('even')} className="px-2 py-2 bg-yellow-100 hover:bg-yellow-200 rounded text-xs font-medium transition-colors">❓ 50/50</button>
-            <button onClick={() => quickYesNo('likely')} className="px-2 py-2 bg-green-100 hover:bg-green-200 rounded text-xs font-medium transition-colors">❓ Asi ano</button>
-          </div>
+          {/* Ano/Ne Oracle */}
+          {activeGenerator === 'yesno' && (
+            <div className="grid grid-cols-3 gap-2">
+              <button onClick={() => quickYesNo('unlikely')} className="px-2 py-2 bg-red-100 hover:bg-red-200 rounded text-xs font-medium">Sotva</button>
+              <button onClick={() => quickYesNo('even')} className="px-2 py-2 bg-yellow-100 hover:bg-yellow-200 rounded text-xs font-medium">50/50</button>
+              <button onClick={() => quickYesNo('likely')} className="px-2 py-2 bg-green-100 hover:bg-green-200 rounded text-xs font-medium">Asi ano</button>
+            </div>
+          )}
+
+          {/* Akce + Téma */}
+          {activeGenerator === 'action' && (
+            <button onClick={rollActionTheme} className="w-full px-4 py-3 bg-purple-100 hover:bg-purple-200 rounded font-medium text-purple-900">
+              🎯 Generovat
+            </button>
+          )}
+
+          {/* Komplikace */}
+          {activeGenerator === 'complication' && (
+            <button onClick={rollComplication} className="w-full px-4 py-3 bg-orange-100 hover:bg-orange-200 rounded font-medium text-orange-900">
+              ⚡ Co se komplikuje?
+            </button>
+          )}
+
+          {/* Důsledek */}
+          {activeGenerator === 'consequence' && (
+            <button onClick={rollConsequence} className="w-full px-4 py-3 bg-red-100 hover:bg-red-200 rounded font-medium text-red-900">
+              💀 Jaký důsledek?
+            </button>
+          )}
+
+          {/* Karta */}
+          {activeGenerator === 'card' && (
+            <button onClick={drawCard} className="w-full px-4 py-3 bg-green-100 hover:bg-green-200 rounded font-medium text-green-900">
+              🃏 Táhnout kartu
+            </button>
+          )}
 
           {/* Výsledek */}
           {lastRoll && (
-            <div className="bg-amber-50 rounded-lg p-3 text-center border border-amber-200">
-              {lastRoll.type === 'yesno' ? (
+            <div className="mt-3 bg-amber-50 rounded-lg p-3 text-center border border-amber-200">
+              {lastRoll.type === 'dice' && (
+                <>
+                  <div className="text-3xl font-bold text-amber-900">{lastRoll.total}</div>
+                  <div className="text-xs text-stone-500">{lastRoll.count}d{lastRoll.sides}: [{lastRoll.dice.join(', ')}]</div>
+                </>
+              )}
+              {lastRoll.type === 'yesno' && (
                 <>
                   <div className="text-2xl font-bold text-amber-900">{lastRoll.result}</div>
                   <div className="text-xs text-stone-500">[{lastRoll.dice.join(', ')}] = {lastRoll.total}</div>
                 </>
-              ) : (
+              )}
+              {lastRoll.type === 'action' && (
                 <>
-                  <div className="text-3xl font-bold text-amber-900">{lastRoll.total}</div>
-                  <div className="text-xs text-stone-500">
-                    {lastRoll.count}d{lastRoll.sides}: [{lastRoll.dice.join(', ')}]
-                  </div>
+                  <div className="text-lg font-bold text-purple-900">{lastRoll.action}</div>
+                  <div className="text-lg font-bold text-purple-700">+ {lastRoll.theme}</div>
+                </>
+              )}
+              {lastRoll.type === 'complication' && (
+                <div className="text-sm font-medium text-orange-900">{lastRoll.result}</div>
+              )}
+              {lastRoll.type === 'consequence' && (
+                <div className="text-sm font-medium text-red-900">{lastRoll.result}</div>
+              )}
+              {lastRoll.type === 'card' && (
+                <>
+                  <div className="text-4xl mb-1">{lastRoll.value}{lastRoll.suit.symbol}</div>
+                  <div className="text-xs text-stone-600">{lastRoll.suit.domain}</div>
+                  <div className="text-xs text-stone-500 mt-1">{lastRoll.meaning}</div>
                 </>
               )}
             </div>
@@ -7741,18 +7883,36 @@ const FloatingDice = () => {
         </div>
       )}
 
-      {/* Plovoucí tlačítko */}
+      {/* Hlavní plovoucí tlačítko */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl transition-all duration-200 ${
+        onClick={() => {
+          if (isOpen) {
+            closeAll();
+          } else {
+            setIsOpen(true);
+          }
+        }}
+        className={`w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl transition-all duration-300 ${
           isOpen
-            ? 'bg-amber-600 text-white rotate-45'
+            ? 'bg-amber-600 text-white rotate-180 scale-110'
             : 'bg-amber-500 hover:bg-amber-600 text-white hover:scale-110'
         }`}
-        title="Rychlé kostky"
+        title="Rychlé generátory"
       >
         {isOpen ? '✕' : '🎲'}
       </button>
+
+      {/* CSS animace */}
+      <style>{`
+        @keyframes popIn {
+          0% { opacity: 0; transform: translate(0, 0) scale(0); }
+          100% { opacity: 1; transform: translate(var(--tx, 0), var(--ty, 0)) scale(1); }
+        }
+        @keyframes slideIn {
+          0% { opacity: 0; transform: translateY(10px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 };
