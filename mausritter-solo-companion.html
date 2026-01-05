@@ -8036,6 +8036,7 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
   };
 
   const { day = 1, season = 'spring', watch = 0, turn = 0, restedToday = false } = gameTime;
+  const [showRules, setShowRules] = React.useState(false);
 
   const currentSeason = TIMEBAR_SEASONS.find(s => s.id === season) || TIMEBAR_SEASONS[0];
   const currentWatch = TIMEBAR_WATCHES.find(w => w.id === watch) || TIMEBAR_WATCHES[0];
@@ -8218,6 +8219,35 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
           )}
         </div>
       </ResultCard>
+
+      {/* Nápověda pravidel */}
+      <div className="border border-amber-200 rounded-lg p-3 bg-amber-50/50">
+        <button
+          onClick={() => setShowRules(!showRules)}
+          className="text-xs text-stone-500 hover:text-stone-700 flex items-center gap-1 w-full"
+        >
+          <span>{showRules ? '▼' : '▶'}</span> 📖 Pravidla času
+        </button>
+        {showRules && (
+          <div className="mt-3 text-xs text-stone-600 space-y-3">
+            <table className="w-full">
+              <thead><tr className="text-left border-b border-amber-200">
+                <th className="pb-1">Měřítko</th><th className="pb-1">Délka</th><th className="pb-1">Použití</th>
+              </tr></thead>
+              <tbody>
+                <tr><td className="py-1">Kolo</td><td>~1 min</td><td>Boj</td></tr>
+                <tr><td className="py-1">Směna</td><td>10 min</td><td>Průzkum (1 místnost)</td></tr>
+                <tr><td className="py-1">Hlídka</td><td>6 hod (36 směn)</td><td>Cestování (1 hex)</td></tr>
+              </tbody>
+            </table>
+            <div className="border-t border-amber-200 pt-2 space-y-1">
+              <p><strong>🗺️ Cestování:</strong> 1 hex = 1 hlídka • Náročný terén = 2 hlídky</p>
+              <p><strong>💤 Odpočinek:</strong> Krátký (1 směna) = k6+1 BO • Dlouhý (1 hlídka) = všechny BO</p>
+              <p><strong>🍖 Hledání potravy:</strong> 1 hlídka = k3 zásob</p>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Nastavení */}
       <ResultCard title="⚙️ Ruční nastavení">
