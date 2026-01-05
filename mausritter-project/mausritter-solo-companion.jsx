@@ -8244,6 +8244,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [expandedCreature, setExpandedCreature] = useState(null); // Pro zobrazení detailu tvora
 
   // Multi-select mode
   const [selectionMode, setSelectionMode] = useState(false);
@@ -8434,8 +8435,8 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
           const c = entry.data;
           return (
             <div className="my-2 pl-4 border-l-2 border-amber-500 cursor-pointer hover:bg-amber-50 rounded transition-colors"
-                 onClick={() => startEdit(entry)}
-                 title="Klikni pro úpravu">
+                 onClick={() => setExpandedCreature({ ...c, entryId: entry.id, note: entry.note })}
+                 title="Klikni pro detail">
               <p className="font-bold text-amber-900">
                 {c.type?.icon || '🐭'} {c.name} <span className="font-normal text-stone-500">— {c.type?.name}</span>
               </p>
@@ -8446,26 +8447,47 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
         }
         // Fallback pro starší textové záznamy tvorů (markdown formát)
         if (entry.result && typeof entry.result === 'string' && entry.result.includes('**Vzhled:**')) {
-          // Parse: **Jméno** - typ emoji Jméno dělá... Je osobnost.
+          // Parse celý markdown záznam
           const nameMatch = entry.result.match(/^\*\*([^*]+)\*\*/);
           const name = nameMatch ? nameMatch[1].trim() : 'Tvor';
 
-          // Type je mezi " - " a opakováním jména
           const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
           const typeRegex = new RegExp(`\\s-\\s(.+?)\\s+${escapedName}`);
           const typeMatch = entry.result.match(typeRegex);
           const typePart = typeMatch ? typeMatch[1].trim() : '';
 
-          // Personality - "Je ..." věta
           const personalityMatch = entry.result.match(/\.\s*(Je [^.]+\.)/);
           const personality = personalityMatch ? personalityMatch[1] : '';
 
+          // Parse dalších polí z markdown
+          const appearanceMatch = entry.result.match(/\*\*Vzhled:\*\*\s*([^*\n]+)/);
+          const goalMatch = entry.result.match(/\*\*Cíl:\*\*\s*([^*\n]+)/);
+          const quirkMatch = entry.result.match(/\*\*Zvláštnost:\*\*\s*([^*\n🔒]+)/);
+          const secretMatch = entry.result.match(/Tajemství \(pouze GM\):\s*([^*]+)\*/);
+          const doingMatch = entry.result.match(new RegExp(`${escapedName}\\s+([^.]+\\.)`));
+          const moodMatch = entry.result.match(/Je [^.]+\.\s*([^.]+\.)\s*\*\*Vzhled/);
+
+          const parsedCreature = {
+            name,
+            type: { name: typePart.replace(/[🌷🐭🐀🦎🐸🐦🦇🐝🐜🦋🐌🦗🐛🕷️🦂🐞🪲🪳🦟🪰🐾🦔🦡🦦🦫🐿️🦨🦝🦙🐰🐹🐁]/g, '').trim(), icon: typePart.match(/[🌷🐭🐀🦎🐸🐦🦇🐝🐜🦋🐌🦗🐛🕷️🦂🐞🪲🪳🦟🪰🐾🦔🦡🦦🦫🐿️🦨🦝🦙🐰🐹🐁]/)?.[0] || '🐭' },
+            personality: personality.replace(/^Je\s*/, '').replace(/\.$/, ''),
+            appearance: appearanceMatch ? appearanceMatch[1].trim().replace(/\.$/, '') : null,
+            goal: goalMatch ? goalMatch[1].trim().replace(/\.$/, '') : null,
+            quirk: quirkMatch ? quirkMatch[1].trim().replace(/\.$/, '') : null,
+            secret: secretMatch ? secretMatch[1].trim().replace(/\.$/, '') : null,
+            doing: doingMatch ? doingMatch[1].trim().replace(/\.$/, '') : null,
+            mood: moodMatch ? moodMatch[1].trim().replace(/\.$/, '') : null,
+            entryId: entry.id,
+            note: entry.note,
+            rawMarkdown: entry.result
+          };
+
           return (
             <div className="my-2 pl-4 border-l-2 border-amber-500 cursor-pointer hover:bg-amber-50 rounded transition-colors"
-                 onClick={() => startEdit(entry)}
-                 title="Klikni pro úpravu">
+                 onClick={() => setExpandedCreature(parsedCreature)}
+                 title="Klikni pro detail">
               <p className="font-bold text-amber-900">
-                🐭 {name} {typePart && <span className="font-normal text-stone-500">— {typePart}</span>}
+                {parsedCreature.type.icon} {name} {parsedCreature.type.name && <span className="font-normal text-stone-500">— {parsedCreature.type.name}</span>}
               </p>
               {personality && <p className="text-stone-600 text-sm">{personality}</p>}
               {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1">{entry.note}</p>}
@@ -8897,6 +8919,106 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
             >
               🗑️ Smazat ({selectedIds.size})
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal pro detail tvora */}
+      {expandedCreature && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setExpandedCreature(null)}>
+          <div className="bg-amber-50 rounded-xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-y-auto border-4 border-amber-700" onClick={e => e.stopPropagation()}>
+            {/* Header */}
+            <div className="bg-amber-700 text-white p-4 flex items-center justify-between sticky top-0">
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                {expandedCreature.type?.icon || '🐭'} {expandedCreature.name}
+              </h2>
+              <button onClick={() => setExpandedCreature(null)} className="text-2xl hover:text-amber-200">×</button>
+            </div>
+
+            {/* Content */}
+            <div className="p-4 space-y-3">
+              {/* Typ */}
+              {expandedCreature.type?.name && (
+                <div className="flex items-center gap-2">
+                  <span className="text-stone-500 text-sm w-24">Typ:</span>
+                  <span className="font-medium">{expandedCreature.type.name}</span>
+                </div>
+              )}
+
+              {/* Osobnost */}
+              {expandedCreature.personality && (
+                <div className="flex items-start gap-2">
+                  <span className="text-stone-500 text-sm w-24">Osobnost:</span>
+                  <span className="font-medium">{expandedCreature.personality}</span>
+                </div>
+              )}
+
+              {/* Co dělá */}
+              {expandedCreature.doing && (
+                <div className="flex items-start gap-2">
+                  <span className="text-stone-500 text-sm w-24">Aktivita:</span>
+                  <span>{expandedCreature.doing}</span>
+                </div>
+              )}
+
+              {/* Nálada */}
+              {expandedCreature.mood && (
+                <div className="flex items-start gap-2">
+                  <span className="text-stone-500 text-sm w-24">Nálada:</span>
+                  <span>{expandedCreature.mood}</span>
+                </div>
+              )}
+
+              {/* Vzhled */}
+              {expandedCreature.appearance && (
+                <div className="flex items-start gap-2 bg-amber-100 p-2 rounded">
+                  <span className="text-stone-500 text-sm w-24">Vzhled:</span>
+                  <span>{expandedCreature.appearance}</span>
+                </div>
+              )}
+
+              {/* Cíl */}
+              {expandedCreature.goal && (
+                <div className="flex items-start gap-2 bg-amber-100 p-2 rounded">
+                  <span className="text-stone-500 text-sm w-24">Cíl:</span>
+                  <span>{expandedCreature.goal}</span>
+                </div>
+              )}
+
+              {/* Zvláštnost */}
+              {expandedCreature.quirk && (
+                <div className="flex items-start gap-2">
+                  <span className="text-stone-500 text-sm w-24">Zvláštnost:</span>
+                  <span className="italic">{expandedCreature.quirk}</span>
+                </div>
+              )}
+
+              {/* Tajemství */}
+              {expandedCreature.secret && (
+                <div className="bg-stone-800 text-amber-100 p-3 rounded mt-4">
+                  <p className="text-xs text-stone-400 mb-1">🔒 Tajemství (pouze GM):</p>
+                  <p>{expandedCreature.secret}</p>
+                </div>
+              )}
+
+              {/* Poznámka */}
+              {expandedCreature.note && (
+                <div className="border-t border-amber-300 pt-3 mt-4">
+                  <p className="text-xs text-stone-500 mb-1">📝 Poznámka:</p>
+                  <p className="italic text-stone-700">{expandedCreature.note}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 border-t border-amber-200 flex justify-end">
+              <button
+                onClick={() => setExpandedCreature(null)}
+                className="px-4 py-2 bg-amber-600 text-white rounded hover:bg-amber-700 font-medium"
+              >
+                Zavřít
+              </button>
+            </div>
           </div>
         </div>
       )}
