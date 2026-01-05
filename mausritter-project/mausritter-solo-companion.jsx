@@ -8429,6 +8429,47 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
         );
       
       case 'oracle':
+        // Handle creature subtype - kratší zobrazení
+        if (entry.subtype === 'creature' && entry.data) {
+          const c = entry.data;
+          return (
+            <div className="my-2 pl-4 border-l-2 border-amber-500 cursor-pointer hover:bg-amber-50 rounded transition-colors"
+                 onClick={() => startEdit(entry)}
+                 title="Klikni pro úpravu">
+              <p className="font-bold text-amber-900">
+                {c.type?.icon || '🐭'} {c.name} <span className="font-normal text-stone-500">— {c.type?.name}</span>
+              </p>
+              <p className="text-stone-600 text-sm">{c.personality}</p>
+              {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1">{entry.note}</p>}
+            </div>
+          );
+        }
+        // Handle encounter subtype - kratší zobrazení
+        if (entry.subtype === 'encounter' && entry.data) {
+          const e = entry.data;
+          return (
+            <div className="my-2 pl-4 border-l-2 border-red-400 cursor-pointer hover:bg-red-50 rounded transition-colors"
+                 onClick={() => startEdit(entry)}
+                 title="Klikni pro úpravu">
+              <p className="font-bold text-stone-800">
+                {e.danger ? '⚠️' : '👁️'} {e.creature?.name}
+              </p>
+              <p className="text-stone-600 text-sm">{e.activity}</p>
+              {entry.note && <p className="text-stone-700 italic text-sm mt-1">{entry.note}</p>}
+            </div>
+          );
+        }
+        // Handle narrative subtype - abstraktní slova
+        if (entry.subtype === 'narrative') {
+          return (
+            <div className="my-2 pl-4 border-l-2 border-purple-400 cursor-pointer hover:bg-purple-50 rounded transition-colors"
+                 onClick={() => startEdit(entry)}
+                 title="Klikni pro úpravu">
+              <p className="font-medium text-purple-900">{entry.result}</p>
+              {entry.note && <p className="text-stone-700 italic text-sm mt-1">{entry.note}</p>}
+            </div>
+          );
+        }
         // Handle custom_dice subtype differently
         if (entry.subtype === 'custom_dice') {
           return (
