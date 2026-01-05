@@ -776,6 +776,373 @@ const CREATURE_QUIRKS = [
 ];
 
 // ============================================
+// NARRATIVE GENERATOR TABLES
+// Čistě narativní generátor scén a situací
+// ============================================
+
+// Úvodní věty - jak scéna začíná (40)
+const NARRATIVE_OPENINGS = [
+  'Slunce právě zapadá za korunami stromů, když',
+  'V tichu před úsvitem',
+  'Uprostřed cesty se náhle',
+  'Pod závojem mlhy',
+  'Když se ohlédneš zpět,',
+  'Vzduch zhoustne a',
+  'Ze stínů se vynoří',
+  'Praskot větve přeruší ticho a',
+  'Vítr přinese podivnou vůni a',
+  'Na okamžik se ti zdá, že',
+  'Země se zachvěje a',
+  'Světlo projde mezi listy a',
+  'Ticho je náhle přerušeno',
+  'V dálce se ozve',
+  'Cesta před tebou se',
+  'Stíny se prodlouží a',
+  'Chlad projde tvou srstí, když',
+  'Měsíc vyjde zpoza mraků a',
+  'První kapky deště začnou padat, když',
+  'Vůně kouře tě přivede k',
+  'Podivný zvuk tě donutí zastavit -',
+  'Na horizontu se objeví',
+  'Instinkt tě varuje, že',
+  'Vzpomínka se ti vynoří, když',
+  'Srdce ti poskočí, protože',
+  'V tom okamžiku si uvědomíš, že',
+  'Tvůj stín se zachvěje a',
+  'Vzduch se náhle ochladí a',
+  'Pocit, že jsi pozorován, zesílí, když',
+  'Známá melodie se ozve z',
+  'Blesk osvětlí krajinu a ty vidíš',
+  'Tiché kroky se blíží a',
+  'Záblesk světla prozradí',
+  'Rosa na trávě odráží',
+  'Tvé vousy se napnou - někdo',
+  'V tom tichu slyšíš jen',
+  'Šepot větru přinese slova',
+  'Na místě, kde jsi včera byl, teď',
+  'Něco se změnilo - teď',
+  'Čas jako by se zastavil, když'
+];
+
+// Prostředí a lokace (45)
+const NARRATIVE_SETTINGS = [
+  'na rozcestí označeném ztracenými věcmi',
+  'u vstupu do staré nory, odkud vane teplý vzduch',
+  'pod obřím listem, který ukrývá tajemství',
+  'na břehu louže, kde se zrcadlí obloha',
+  'mezi kořeny, které tvoří přírodní bránu',
+  'v trávě vysoké jako les, kde se skrývá',
+  'pod pavučinou zdobenou rosou',
+  'u zbytků lidského pikniku, kde',
+  'na prahu opuštěné osady',
+  'v dutině stromu, kde kdysi žil někdo',
+  'pod kamennou římsou, kde se ukrývají',
+  'na místě starého tábořiště',
+  'u potoka, jehož voda zpívá podivnou melodii',
+  'mezi hřiby, které tvoří kruh',
+  'na vrcholu kopečku, odkud je vidět daleko',
+  'v rozvalinách ptačího hnízda',
+  'pod listem, kde kapky deště bubnují',
+  'u ztracené lidské mince, kolem které',
+  'na místě, kde se stýkají světlo a stín',
+  'v houští, odkud není vidět obloha',
+  'u staré studánky, jejíž voda',
+  'na hranici dvou území',
+  'pod hvězdami, které vyprávějí příběhy',
+  'v místě, kde vítr mění směr',
+  'u zbytků staré pasti',
+  'na cestě, kterou už nikdo nechodí',
+  'mezi kameny, které pamatují staré časy',
+  'pod střechou z listí, která',
+  'u vchodu do temnoty',
+  'na místě, kde se něco stalo',
+  'v tichu lesa, kde i šepot je hlasitý',
+  'na okraji lidského světa',
+  'u stromu, který byl zasažen bleskem',
+  'pod nebem, které hrozí bouří',
+  'v údolí mezi kořeny',
+  'na místě, které bylo kdysi domovem',
+  'u zbytků ohně, který už nevydává teplo',
+  'pod závojem padajících listů',
+  'na hranici mezi snem a bděním',
+  'v místě, kde končí mapy',
+  'u pomníku, který někdo postavil',
+  'pod ochranou starého ducha',
+  'na prahu neznámého',
+  'v objetí stínů',
+  'mezi ozvěnami minulosti'
+];
+
+// Atmosféra a nálada (40)
+const NARRATIVE_ATMOSPHERES = [
+  'Vzduch je těžký očekáváním.',
+  'Ticho je tak hluboké, že slyšíš vlastní srdce.',
+  'Všude kolem je podivný klid.',
+  'Něco visí ve vzduchu - něco nevyřčeného.',
+  'Svět se zdá neskutečný, jako ve snu.',
+  'Cítíš, že nejsi sám.',
+  'Čas plyne jinak na tomto místě.',
+  'Stíny se zdají živé.',
+  'Vzduch voní po dávných časech.',
+  'Je tu smutek, starý jako kameny.',
+  'Naděje se mísí se strachem.',
+  'Místo dýchá historií.',
+  'Je tu ticho, které předchází bouři.',
+  'Vzduch se chvěje nevyřčenými slovy.',
+  'Cítíš spojení s těmi, kdo tu byli před tebou.',
+  'Svět kolem tebe čeká.',
+  'Je tu bezpečí - ale na jak dlouho?',
+  'Něco se blíží ke konci.',
+  'Nový začátek je na dosah.',
+  'Minulost a přítomnost se tu prolínají.',
+  'Magie je tu hmatatelná.',
+  'Je tu klid před bouří.',
+  'Vzduch je nabitý možnostmi.',
+  'Cítíš tíhu rozhodnutí.',
+  'Osud se zdá být blízko.',
+  'Je tu melancholie, ale i krása.',
+  'Všechno se zdá být důležité.',
+  'Okamžik je křehký jako rosa.',
+  'Je tu divokost, která čeká.',
+  'Cítíš, že jsi na správném místě.',
+  'Něco se probouzí.',
+  'Svět je plný tajemství.',
+  'Je tu ticho po bouři.',
+  'Vzduch chutná po dobrodružství.',
+  'Cítíš volání do neznáma.',
+  'Domov se zdá být daleko.',
+  'Je tu posvátnost okamžiku.',
+  'Všechno je možné.',
+  'Něco končí, něco začíná.',
+  'Svět čeká na tvé rozhodnutí.'
+];
+
+// Události a dění (50)
+const NARRATIVE_EVENTS = [
+  'objevíš stopu, která vede do neznáma',
+  'uslyšíš hlas, který ti připomíná někoho ztraceného',
+  'najdeš předmět, který tu nepatří',
+  'spatříš postavu na hranici viditelnosti',
+  'ucítíš vůni, která evokuje vzpomínky',
+  'objevíš zprávu určenou někomu jinému',
+  'uslyšíš melodii, kterou nikdo nehraje',
+  'najdeš místo, které odpovídá tvým snům',
+  'spatříš světlo, které by tu nemělo být',
+  'ucítíš, jak se země chvěje',
+  'objevíš vstup, který tu včera nebyl',
+  'uslyšíš své jméno šeptané větrem',
+  'najdeš pozůstatek dávné bitvy',
+  'spatříš stín bez majitele',
+  'ucítíš přítomnost něčeho starého',
+  'objevíš mapu vedoucí nikam',
+  'uslyšíš tiché pláč',
+  'najdeš dar od neznámého',
+  'spatříš odraz něčeho, co tu není',
+  'ucítíš, jak se tvůj osud mění',
+  'objevíš znamení, které znáš',
+  'uslyšíš varování v šumu listí',
+  'najdeš důkaz, že tu byl někdo před tebou',
+  'spatříš cestu, která se otevírá',
+  'ucítíš naději tam, kde jsi čekal zoufalství',
+  'objevíš odpověď na otázku, kterou jsi nepoložil',
+  'uslyšíš ozvěnu dávného příběhu',
+  'najdeš klíč k něčemu neznámému',
+  'spatříš pravdu ukrytou v detailu',
+  'ucítíš, že nejsi sám ve svém boji',
+  'objevíš spojence tam, kde jsi čekal nepřítele',
+  'uslyšíš tep země',
+  'najdeš cestu domů tam, kde jsi ji nečekal',
+  'spatříš budoucnost v kapce rosy',
+  'ucítíš, že tohle je ten okamžik',
+  'objevíš sílu, o které jsi nevěděl',
+  'uslyšíš ticho, které mluví',
+  'najdeš krásu v neočekávaném',
+  'spatříš změnu, která právě nastává',
+  'ucítíš, jak příběh pokračuje',
+  'objevíš, že nic není, jak se zdálo',
+  'uslyšíš volání do neznáma',
+  'najdeš důvod pokračovat',
+  'spatříš světlo na konci cesty',
+  'ucítíš, že tohle je začátek něčeho',
+  'objevíš, že máš víc, než jsi myslel',
+  'uslyšíš odpověď ve svém srdci',
+  'najdeš cestu tam, kde žádná nebyla',
+  'spatříš možnost, která mizí',
+  'ucítíš váhu své volby'
+];
+
+// Napětí a konflikt (40)
+const NARRATIVE_TENSIONS = [
+  'Ale něco není v pořádku.',
+  'Jenže čas se krátí.',
+  'Však cesta zpět je uzavřena.',
+  'Ale cena může být vysoká.',
+  'Jenže nejsi jediný, kdo hledá.',
+  'Však rozhodnutí musí padnout teď.',
+  'Ale stíny se prodlužují.',
+  'Jenže pravda může bolet.',
+  'Však někdo tě sleduje.',
+  'Ale tohle jsi nečekal.',
+  'Jenže nic není zadarmo.',
+  'Však minulost tě dohání.',
+  'Ale volba je pouze tvá.',
+  'Jenže důvěra byla zrazena.',
+  'Však někde se stala chyba.',
+  'Ale není cesty zpět.',
+  'Jenže tohle mění všechno.',
+  'Však odpověď přináší nové otázky.',
+  'Ale čas na rozhodnutí vypršel.',
+  'Jenže pravda je složitější.',
+  'Však není všechno ztraceno.',
+  'Ale někdo musí zaplatit.',
+  'Jenže příběh nekončí.',
+  'Však tohle je jen začátek.',
+  'Ale co když se mýlíš?',
+  'Jenže volba má následky.',
+  'Však osud čeká.',
+  'Ale strach je skutečný.',
+  'Jenže naděje zůstává.',
+  'Však někdo tě potřebuje.',
+  'Ale čas běží.',
+  'Jenže tohle není konec.',
+  'Však pravda vyjde najevo.',
+  'Ale jsi připraven?',
+  'Jenže svět se mění.',
+  'Však tvůj příběh pokračuje.',
+  'Ale co když je pozdě?',
+  'Jenže vzdát se nemůžeš.',
+  'Však tohle je tvůj okamžik.',
+  'Ale co přijde potom?'
+];
+
+// Smyslové detaily (45)
+const NARRATIVE_DETAILS = [
+  'Vůně mokré země stoupá vzhůru.',
+  'Světlo se láme v kapkách rosy.',
+  'Vítr šeptá mezi listy.',
+  'Tvé tlapky cítí chlad kamene.',
+  'Vzduch chutná po dešti.',
+  'Stíny tančí na zemi.',
+  'Teplo slunce hladí tvou srst.',
+  'Tiché bzučení hmyzu vyplňuje vzduch.',
+  'Voda zurčí někde poblíž.',
+  'Praskání větví zní jako kroky.',
+  'Měsíční světlo stříbří krajinu.',
+  'Pach kouře visí ve vzduchu.',
+  'Chlad noci se blíží.',
+  'Tvůj dech je vidět v chladném vzduchu.',
+  'Listy šustí pod tvými kroky.',
+  'Ptáci umlkli.',
+  'Pavučiny se třpytí v ranním světle.',
+  'Země je měkká a vlhká.',
+  'Vzduch vibruje tichým napětím.',
+  'Stíny jsou hlubší než obvykle.',
+  'Světlo má zlatavý nádech.',
+  'Vůně květin je omamná.',
+  'Chlad proniká až ke kostem.',
+  'Ticho je téměř hmatatelné.',
+  'Barvy se zdají jasnější.',
+  'Vzduch je hustý a nehybný.',
+  'Hvězdy se třpytí jasněji než jindy.',
+  'Země pod tebou se zdá nestabilní.',
+  'Teplo ohně se dotýká tvé tváře.',
+  'Vůně lesa je silná a živá.',
+  'Světlo a stín hrají podivnou hru.',
+  'Tvé srdce buší v uších.',
+  'Vzduch voní po změně.',
+  'Chlad se plíží po zádech.',
+  'Ticho před bouří.',
+  'Svět se zdá být zpomalený.',
+  'Každý zvuk je zesílený.',
+  'Barvy se mísí v soumraku.',
+  'Vzduch je svěží a čistý.',
+  'Prach tančí ve světelném paprsku.',
+  'Voda odráží oblohu.',
+  'Stíny vyprávějí vlastní příběh.',
+  'Země voní po životě.',
+  'Ticho zní hlasitěji než křik.',
+  'Svět dýchá kolem tebe.'
+];
+
+// Náznaky a otázky (35)
+const NARRATIVE_HOOKS = [
+  'Co se tu stalo?',
+  'Kdo tu byl před tebou?',
+  'Kam vede tato cesta?',
+  'Co se skrývá ve stínech?',
+  'Proč je tu takové ticho?',
+  'Co znamená toto znamení?',
+  'Kdo zanechal tuto stopu?',
+  'Kam zmizel ten, koho hledáš?',
+  'Co čeká za další zatáčkou?',
+  'Proč máš pocit, že tě někdo sleduje?',
+  'Co ti říká tvůj instinkt?',
+  'Kdo by mohl vědět víc?',
+  'Kam vede pravda?',
+  'Co zůstalo nevyřčeno?',
+  'Proč se to stalo právě teď?',
+  'Co by udělal ten, koho obdivuješ?',
+  'Kdo profituje z této situace?',
+  'Kam zmizela naděje?',
+  'Co bys dal za odpověď?',
+  'Proč se bojíš pokračovat?',
+  'Co tě drží zpátky?',
+  'Kdo tě čeká na konci cesty?',
+  'Kam vede tvé srdce?',
+  'Co znamená tohle všechno?',
+  'Proč právě ty?',
+  'Co bys změnil, kdybys mohl?',
+  'Kdo ti může pomoci?',
+  'Kam zmizela odvaha?',
+  'Co je důležitější - pravda nebo klid?',
+  'Proč se svět zdá jiný?',
+  'Co vidíš, když zavřeš oči?',
+  'Kdo drží klíč k tajemství?',
+  'Kam vede tato volba?',
+  'Co říká ticho?',
+  'Proč je tohle důležité?'
+];
+
+// Zakončení a pokračování (35)
+const NARRATIVE_CONCLUSIONS = [
+  'A tak příběh pokračuje...',
+  'Tohle je teprve začátek.',
+  'Odpověď čeká za horizontem.',
+  'Osud je ve tvých tlapkách.',
+  'Cesta dál je nejistá, ale možná.',
+  'Někde tam venku je pravda.',
+  'Noc je ještě mladá.',
+  'Svítání přinese odpovědi.',
+  'Tohle změní všechno.',
+  'A ty stojíš na rozcestí.',
+  'Další kapitola se právě otevírá.',
+  'Svět čeká na tvůj další krok.',
+  'Ticho před dalším dobrodružstvím.',
+  'Něco se probudilo.',
+  'A někde se otevřely dveře.',
+  'Příběh se zapsal do kamene.',
+  'Budoucnost je nepsaná.',
+  'A ty jsi součástí něčeho většího.',
+  'Tohle není konec - je to pozvánka.',
+  'Svět je větší, než jsi myslel.',
+  'A tak jdeš dál, protože musíš.',
+  'Odpovědi přijdou, až budeš připraven.',
+  'Každý konec je novým začátkem.',
+  'A příběh si tě našel.',
+  'Osud má smysl pro načasování.',
+  'Někde tam venku na tebe někdo čeká.',
+  'A tohle je tvůj příběh.',
+  'Svět se změnil - a ty s ním.',
+  'Další dobrodružství klepe na dveře.',
+  'A ty víš, co musíš udělat.',
+  'Cesta pokračuje, dokud ty pokračuješ.',
+  'Tohle je jen jedna z mnoha cest.',
+  'A hvězdy sledují tvůj příběh.',
+  'Svět dýchá a čeká.',
+  'A tak to začíná znovu...'
+];
+
+// ============================================
 // BESTIARY - CREATURE DATA
 // ============================================
 
@@ -2104,6 +2471,56 @@ const OraclePanel = ({ onLogEntry }) => {
     categoryFilter: 'any' // 'any', 'mouse', 'rat', 'insect', 'spirit', 'fae', 'creature', 'construct', 'predator'
   });
 
+  // State pro čistě narativní generátor
+  const [narrativeResult, setNarrativeResult] = useState(null);
+  const [narrativeOptions, setNarrativeOptions] = useState({
+    includeTension: true,
+    includeHook: true,
+    style: 'full' // 'full', 'short', 'poetic'
+  });
+
+  // Čistě narativní generátor - plynulý text bez struktur
+  const generateNarrative = () => {
+    const opening = randomFrom(NARRATIVE_OPENINGS);
+    const setting = randomFrom(NARRATIVE_SETTINGS);
+    const atmosphere = randomFrom(NARRATIVE_ATMOSPHERES);
+    const event = randomFrom(NARRATIVE_EVENTS);
+    const detail = randomFrom(NARRATIVE_DETAILS);
+    const tension = narrativeOptions.includeTension ? randomFrom(NARRATIVE_TENSIONS) : null;
+    const hook = narrativeOptions.includeHook ? randomFrom(NARRATIVE_HOOKS) : null;
+    const conclusion = randomFrom(NARRATIVE_CONCLUSIONS);
+
+    let text = '';
+
+    if (narrativeOptions.style === 'short') {
+      // Krátký narativ
+      text = `${opening} ${event}. ${detail} ${tension || ''} ${conclusion}`;
+    } else if (narrativeOptions.style === 'poetic') {
+      // Poetický styl s odstavci
+      text = `${opening}\n\n${setting}...\n\n${atmosphere}\n\n${detail}\n\n${event}.\n\n`;
+      if (tension) text += `${tension}\n\n`;
+      if (hook) text += `*${hook}*\n\n`;
+      text += `${conclusion}`;
+    } else {
+      // Plný narativ - plynulý text
+      text = `${opening} ${setting}, ${event}.\n\n${atmosphere} ${detail}\n\n`;
+      if (tension) text += `${tension} `;
+      if (hook) text += `*${hook}*\n\n`;
+      text += `${conclusion}`;
+    }
+
+    setNarrativeResult(text);
+
+    const entry = {
+      type: 'oracle',
+      subtype: 'narrative',
+      timestamp: formatTimestamp(),
+      result: text
+    };
+    setLastResult(entry);
+    logEntry(entry);
+  };
+
   // Generátor setkání - kombinuje tabulky pro narativní výstup
   const generateEncounter = () => {
     // Filtruj tvory podle nebezpečí pokud je nastaveno
@@ -2230,6 +2647,7 @@ const OraclePanel = ({ onLogEntry }) => {
 
   const oracleTabs = [
     { id: 'yesno', label: 'Ano/Ne', icon: '🎲' },
+    { id: 'narrative', label: 'Narativ', icon: '📜' },
     { id: 'encounter', label: 'Setkání', icon: '👁️' },
     { id: 'creature', label: 'Tvor', icon: '🐭' },
     { id: 'dice', label: 'Kostky', icon: '🎯' },
@@ -2321,6 +2739,90 @@ const OraclePanel = ({ onLogEntry }) => {
               🎲 Hodit 2d6
             </Button>
           </div>
+        </ResultCard>
+      )}
+
+      {/* ========== NARRATIVE GENERATOR ========== */}
+      {activeOracle === 'narrative' && (
+        <ResultCard>
+          <HelpHeader
+            title="Narativní generátor"
+            icon="📜"
+            tooltip={
+              <div>
+                <p className="font-bold mb-2">📜 Co je tohle?</p>
+                <p className="text-xs mb-2">
+                  Čistě narativní generátor scén a situací.
+                  Vytváří plynulý text bez struktur - čistou inspiraci pro příběh.
+                </p>
+
+                <p className="font-bold mb-1">✍️ Styly:</p>
+                <ul className="text-xs space-y-1">
+                  <li>• <b>Plný</b> - bohatý narativ s atmosférou</li>
+                  <li>• <b>Krátký</b> - stručná situace</li>
+                  <li>• <b>Poetický</b> - oddělené odstavce, lyrický</li>
+                </ul>
+              </div>
+            }
+          />
+
+          {/* Možnosti generátoru */}
+          <div className="mb-4 p-3 bg-stone-100 rounded-lg space-y-3">
+            <div className="flex flex-wrap gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={narrativeOptions.includeTension}
+                  onChange={(e) => setNarrativeOptions(prev => ({ ...prev, includeTension: e.target.checked }))}
+                  className="w-4 h-4 rounded border-stone-300"
+                />
+                <span className="text-sm text-stone-700">Přidat napětí</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={narrativeOptions.includeHook}
+                  onChange={(e) => setNarrativeOptions(prev => ({ ...prev, includeHook: e.target.checked }))}
+                  className="w-4 h-4 rounded border-stone-300"
+                />
+                <span className="text-sm text-stone-700">Přidat otázku</span>
+              </label>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-stone-600">Styl:</span>
+              <select
+                value={narrativeOptions.style}
+                onChange={(e) => setNarrativeOptions(prev => ({ ...prev, style: e.target.value }))}
+                className="text-sm border border-stone-300 rounded px-2 py-1"
+              >
+                <option value="full">Plný narativ</option>
+                <option value="short">Krátký</option>
+                <option value="poetic">Poetický</option>
+              </select>
+            </div>
+          </div>
+
+          <Button onClick={generateNarrative} variant="primary" size="large" className="w-full mb-4">
+            📜 Generovat narativ
+          </Button>
+
+          {/* Výsledek - čistý text */}
+          {narrativeResult && (
+            <div className="p-5 rounded-lg bg-amber-50 border border-amber-200">
+              <div className="prose prose-stone prose-sm max-w-none">
+                {narrativeResult.split('\n\n').map((paragraph, i) => (
+                  <p key={i} className="text-stone-700 leading-relaxed mb-3 last:mb-0 italic">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Statistiky */}
+          <p className="text-center text-xs text-stone-400 mt-4">
+            40 × 45 × 40 × 50 × 45 × 40 × 35 × 35 = ~176 miliard kombinací
+          </p>
         </ResultCard>
       )}
 
