@@ -10015,6 +10015,34 @@ function MausritterSoloCompanion() {
     event.target.value = ''; // Reset input
   };
 
+  // New game - reset everything to defaults
+  const handleNewGame = () => {
+    if (!confirm('⚠️ Opravdu chceš začít novou hru?\n\nVšechna data budou smazána!\nDoporučuji nejprve exportovat aktuální save.')) {
+      return;
+    }
+    
+    // Reset all state to defaults
+    setParties([]);
+    setActivePartyId(null);
+    setActiveCharacterId(null);
+    setJournal([]);
+    setFactions([]);
+    setSettlements([]);
+    setWorldNPCs([]);
+    
+    // Clear localStorage
+    localStorage.removeItem('mausritter-save');
+    
+    // Disconnect syncs
+    if (fileHandle) {
+      setFileHandle(null);
+      setSyncStatus('disconnected');
+      setLastSyncTime(null);
+    }
+    
+    alert('✅ Nová hra připravena!\n\nZačni vytvořením nové družiny v záložce Postavy.');
+  };
+
   // ============================================
   // CLOUD SYNC (File System Access API)
   // ============================================
@@ -10769,6 +10797,7 @@ function MausritterSoloCompanion() {
                 📥
                 <input type="file" accept=".json" onChange={handleImport} className="hidden" />
               </label>
+              <button onClick={handleNewGame} className="px-3 py-1.5 bg-red-700 hover:bg-red-600 rounded text-sm font-medium transition-colors" title="Nová hra - smazat vše">🆕</button>
             </div>
 
             {/* Mobile: Hamburger button */}
@@ -10835,7 +10864,7 @@ function MausritterSoloCompanion() {
                 )}
               </div>
 
-              {/* Export/Import */}
+              {/* Export/Import/New */}
               <div className="flex gap-2 pt-2 border-t border-amber-700">
                 <button onClick={() => { handleExport(); setMobileMenuOpen(false); }} className="flex-1 px-3 py-2 bg-amber-700 hover:bg-amber-600 rounded text-sm font-medium">
                   📤 Export
@@ -10844,6 +10873,9 @@ function MausritterSoloCompanion() {
                   📥 Import
                   <input type="file" accept=".json" onChange={(e) => { handleImport(e); setMobileMenuOpen(false); }} className="hidden" />
                 </label>
+                <button onClick={() => { handleNewGame(); setMobileMenuOpen(false); }} className="px-3 py-2 bg-red-700 hover:bg-red-600 rounded text-sm font-medium">
+                  🆕 Nová
+                </button>
               </div>
             </div>
           )}
