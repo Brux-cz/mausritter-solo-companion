@@ -3115,22 +3115,7 @@ const OraclePanel = ({ onLogEntry }) => {
                 min="2"
                 max="1000"
                 value={customDice.sides}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  if (val === '') {
-                    setCustomDice({ ...customDice, sides: '' });
-                  } else {
-                    const num = parseInt(val);
-                    if (!isNaN(num)) {
-                      setCustomDice({ ...customDice, sides: Math.min(1000, Math.max(2, num)) });
-                    }
-                  }
-                }}
-                onBlur={() => {
-                  if (customDice.sides === '' || customDice.sides < 2) {
-                    setCustomDice({ ...customDice, sides: 6 });
-                  }
-                }}
+                onChange={(e) => setCustomDice({ ...customDice, sides: parseInt(e.target.value) || 6 })}
                 className="px-3 py-2 rounded border border-stone-300 bg-white font-bold w-20"
               />
             </div>
@@ -4084,11 +4069,20 @@ const CharacterPanel = ({
 
   const updateAttribute = (attr, field, value) => {
     if (!character) return;
-    const parsed = parseInt(value) || 0;
-    updateCharacter({
-      [attr]: { ...character[attr], [field]: Math.max(1, Math.min(18, parsed)) }
-    });
-  };
+    // Povolit prázdný string během editace
+    if (value === '' || value === '-') {
+      updateCharacter({
+        [attr]: { ...character[attr], [field]: '' }
+      });
+      return;
+    }
+    const parsed = parseInt(value);
+    if (!isNaN(parsed)) {
+      updateCharacter({
+        [attr]: { ...character[attr], [field]: Math.max(1, Math.min(18, parsed)) }
+      });
+    }
+  };;
 
   const toggleCondition = (condId) => {
     if (!character) return;
@@ -4682,18 +4676,20 @@ const CharacterPanel = ({
                       <div className="flex items-center justify-center gap-1">
                         <input
                           type="number"
-                          value={character[attr]?.current || 10}
+                          value={character[attr]?.current ?? ''}
                           onChange={(e) => updateAttribute(attr, 'current', e.target.value)}
-                          className="w-12 text-center text-xl font-bold text-amber-900 bg-white border border-amber-300 rounded"
+                          onBlur={(e) => { if (e.target.value === '') updateAttribute(attr, 'current', '10'); }}
+                          className="w-14 h-10 text-center text-xl font-bold text-amber-900 bg-white border-2 border-amber-300 rounded"
                           min="1"
                           max="18"
                         />
                         <span className="text-stone-400">/</span>
                         <input
                           type="number"
-                          value={character[attr]?.max || 10}
+                          value={character[attr]?.max ?? ''}
                           onChange={(e) => updateAttribute(attr, 'max', e.target.value)}
-                          className="w-12 text-center text-sm font-medium text-stone-500 bg-white border border-stone-200 rounded"
+                          onBlur={(e) => { if (e.target.value === '') updateAttribute(attr, 'max', '10'); }}
+                          className="w-14 h-10 text-center text-lg font-medium text-stone-600 bg-white border-2 border-stone-300 rounded"
                           min="1"
                           max="18"
                         />
@@ -6215,6 +6211,7 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
   const [editingSettlement, setEditingSettlement] = useState(null);
   const [editingNPC, setEditingNPC] = useState(null);
   const [viewingSettlement, setViewingSettlement] = useState(null);
+  const [expandedNPCs, setExpandedNPCs] = useState({});
 
   // ========== SETTLEMENT MANAGEMENT ==========
   const createEmptySettlement = () => {
@@ -6370,16 +6367,24 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
   };
 
   const generateNPC = () => {
+    // Náhodně vybrat pohlaví pro správný rod jména
+    const isFemale = Math.random() < 0.5;
+    const firstName = isFemale
+      ? randomFrom(FEMALE_FIRST_NAMES)
+      : randomFrom(MALE_FIRST_NAMES);
+    const familyName = randomFrom(FAMILY_NAMES);
+    const lastName = isFemale ? familyName.female : familyName.male;
+
     const npc = {
       type: 'npc',
-      name: `${randomFrom(FIRST_NAMES)} ${randomFrom(LAST_NAMES)}`,
+      name: `${firstName} ${lastName}`,
       birthsign: randomFrom(BIRTHSIGNS),
       physicalDetail: randomFrom(PHYSICAL_DETAILS),
       quirk: randomFrom(NPC_QUIRKS),
       goal: randomFrom(NPC_GOALS),
       reaction: roll2D6()
     };
-    
+
     setGenerated(npc);
     onLogEntry({
       type: 'discovery',
@@ -6709,31 +6714,41 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
                       </div>
                     </div>
                   ) : (
-                    // View mode
-                    <div 
-                      className="cursor-pointer hover:bg-amber-50 -m-3 p-3 rounded-lg transition-colors"
-                      onClick={() => setEditingNPC(npc.id)}
-                    >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-bold text-amber-900">{npc.name}</h3>
-                          <p className="text-sm text-stone-600">
-                            {npc.role && `${npc.role} • `}
-                            {npc.settlementId 
-                              ? settlements.find(s => s.id === npc.settlementId)?.name 
-                              : 'Bez domova'}
-                          </p>
-                        </div>
+                    // View mode - kompaktní s možností rozbalení
+                    <div className="-m-3 p-2">
+                      <div
+                        className="flex items-center gap-2 cursor-pointer hover:bg-amber-50 rounded-lg p-1 transition-colors"
+                        onClick={() => setExpandedNPCs(prev => ({ ...prev, [npc.id]: !prev[npc.id] }))}
+                      >
+                        <span className="text-stone-400 text-xs w-4">{expandedNPCs[npc.id] ? '▼' : '▶'}</span>
+                        <span className="font-bold text-amber-900">{npc.name}</span>
+                        <span className="text-stone-400">•</span>
+                        <span className="text-sm text-stone-600 flex-1">
+                          {npc.role && `${npc.role}, `}
+                          {npc.settlementId
+                            ? settlements.find(s => s.id === npc.settlementId)?.name
+                            : 'Bez domova'}
+                        </span>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setEditingNPC(npc.id); }}
+                          className="text-stone-400 hover:text-amber-700 px-1"
+                          title="Upravit"
+                        >✏️</button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); deleteNPC(npc.id); }}
+                          className="text-stone-400 hover:text-red-500 px-1"
+                          title="Smazat"
+                        >🗑️</button>
                       </div>
-                      {(npc.birthsign || npc.physicalDetail || npc.quirk || npc.goal) && (
-                        <div className="mt-2 text-sm text-stone-600 space-y-1">
+                      {expandedNPCs[npc.id] && (npc.birthsign || npc.physicalDetail || npc.quirk || npc.goal || npc.notes) && (
+                        <div className="ml-6 mt-1 text-sm text-stone-600 space-y-0.5 border-l-2 border-amber-200 pl-2">
                           {npc.birthsign && <p>⭐ {npc.birthsign}</p>}
                           {npc.physicalDetail && <p>👁️ {npc.physicalDetail}</p>}
                           {npc.quirk && <p>🎭 {npc.quirk}</p>}
                           {npc.goal && <p>🎯 {npc.goal}</p>}
+                          {npc.notes && <p className="italic text-stone-500">{npc.notes}</p>}
                         </div>
                       )}
-                      {npc.notes && <p className="mt-2 text-sm italic text-stone-500">{npc.notes}</p>}
                     </div>
                   )}
                 </ResultCard>
@@ -8015,140 +8030,9 @@ const TIMEBAR_WATCHES = [
   { id: 3, name: 'Noc', icon: '🌙' }
 ];
 
-// Efekty počasí podle typu a sezóny
-const WEATHER_EFFECTS = {
-  // Extrémní počasí (hod 2)
-  'Bouře': { icon: '⛈️', danger: true, travelMod: 2, effect: 'STR save nebo Vyčerpání. Cestování ×2.' },
-  'Vánice': { icon: '🌨️', danger: true, travelMod: 2, effect: 'STR save nebo Vyčerpání. Cestování ×2.' },
-  'Sucho': { icon: '🏜️', danger: true, travelMod: 1, effect: 'STR save bez vody nebo Vyčerpání.' },
-  'Vichřice': { icon: '🌪️', danger: true, travelMod: 2, effect: 'STR save nebo Vyčerpání. Cestování ×2.' },
-  // Špatné počasí (hod 3-4)
-  'Déšť': { icon: '🌧️', danger: false, travelMod: 1.5, effect: 'Pomalé cestování (×1.5 hlídky).' },
-  'Sněžení': { icon: '❄️', danger: false, travelMod: 1.5, effect: 'Pomalé cestování (×1.5 hlídky).' },
-  'Horko': { icon: '🥵', danger: true, travelMod: 1, effect: 'STR save bez vody nebo Vyčerpání.' },
-  'Mlha': { icon: '🌫️', danger: false, travelMod: 1.5, effect: 'Snížená viditelnost. Cestování ×1.5.' },
-  // Průměrné počasí (hod 5-6)
-  'Zataženo': { icon: '☁️', danger: false, travelMod: 1, effect: null },
-  'Zima': { icon: '🥶', danger: false, travelMod: 1, effect: 'Potřeba přístřeší v noci.' },
-  'Teplo': { icon: '🌤️', danger: false, travelMod: 1, effect: null },
-  // Normální počasí (hod 7-9)
-  'Mírné': { icon: '🌤️', danger: false, travelMod: 1, effect: null },
-  'Příjemné': { icon: '😊', danger: false, travelMod: 1, effect: null },
-  'Chladno': { icon: '🍃', danger: false, travelMod: 1, effect: null },
-  'Mráz': { icon: '🥶', danger: true, travelMod: 1, effect: 'STR save každou hlídku venku nebo Vyčerpání.' },
-  // Dobré počasí (hod 10-12)
-  'Slunečno': { icon: '☀️', danger: false, travelMod: 1, effect: null },
-  'Svěží': { icon: '🍂', danger: false, travelMod: 1, effect: null },
-  'Jasno': { icon: '✨', danger: false, travelMod: 1, effect: null },
-  'Nádherné': { icon: '🌈', danger: false, travelMod: 1, effect: null },
-  'Perfektní': { icon: '🌅', danger: false, travelMod: 1, effect: null },
-  'Zlaté': { icon: '🍁', danger: false, travelMod: 1, effect: null },
-  'Klidné': { icon: '❄️', danger: false, travelMod: 1, effect: null }
-};
-
-// Generování počasí s efekty
-const generateWeather = (season) => {
-  const d1 = Math.floor(Math.random() * 6) + 1;
-  const d2 = Math.floor(Math.random() * 6) + 1;
-  const total = d1 + d2;
-  const type = WEATHER_TABLE[season]?.[total] || 'Mírné';
-  const effects = WEATHER_EFFECTS[type] || { icon: '🌤️', danger: false, travelMod: 1, effect: null };
-
-  return {
-    type,
-    roll: total,
-    dice: [d1, d2],
-    ...effects
-  };
-};
-
-// Kalkulačka cestování
-const TravelCalculator = ({ weather }) => {
-  const [hexCount, setHexCount] = React.useState(1);
-  const [difficultTerrain, setDifficultTerrain] = React.useState(false);
-  const [badWeather, setBadWeather] = React.useState(false);
-
-  // Modifikátor počasí z aktuálního stavu nebo ruční volby
-  const weatherMod = badWeather ? 1.5 : (weather?.travelMod || 1);
-  const weatherLabel = weather?.type || (badWeather ? 'Špatné' : 'Normální');
-
-  const baseWatches = hexCount * (difficultTerrain ? 2 : 1);
-  const watches = Math.ceil(baseWatches * weatherMod);
-  const days = Math.ceil(watches / 3); // 3 hlídky aktivní + 1 odpočinek
-  const encounterRolls = days * 2; // ráno + večer
-  const avgEncounters = (encounterRolls / 6).toFixed(1);
-
-  return (
-    <ResultCard title="🗺️ Kalkulačka cestování">
-      <div className="space-y-4">
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-stone-600">Hexů:</label>
-            <Input
-              type="number"
-              min="1"
-              max="100"
-              value={hexCount}
-              onChange={(v) => setHexCount(Math.max(1, parseInt(v) || 1))}
-              className="w-20"
-            />
-          </div>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={difficultTerrain}
-              onChange={(e) => setDifficultTerrain(e.target.checked)}
-              className="w-4 h-4 rounded border-stone-300"
-            />
-            <span className="text-sm text-stone-600">Náročný terén (×2)</span>
-          </label>
-          {!weather && (
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={badWeather}
-                onChange={(e) => setBadWeather(e.target.checked)}
-                className="w-4 h-4 rounded border-stone-300"
-              />
-              <span className="text-sm text-stone-600">Špatné počasí (×1.5)</span>
-            </label>
-          )}
-        </div>
-
-        {/* Aktuální počasí */}
-        {weather && weatherMod > 1 && (
-          <div className="text-xs text-amber-700 bg-amber-50 p-2 rounded">
-            {weather.icon} Počasí "{weather.type}" zpomaluje cestování (×{weatherMod})
-          </div>
-        )}
-
-        <div className="grid grid-cols-3 gap-3 text-center">
-          <div className="bg-amber-50 rounded-lg p-3">
-            <div className="text-2xl font-bold text-amber-600">{watches}</div>
-            <div className="text-xs text-stone-600">Hlídek</div>
-            {weatherMod > 1 && <div className="text-xs text-amber-500">({baseWatches} × {weatherMod})</div>}
-          </div>
-          <div className="bg-blue-50 rounded-lg p-3">
-            <div className="text-2xl font-bold text-blue-600">{days}</div>
-            <div className="text-xs text-stone-600">Dnů</div>
-          </div>
-          <div className="bg-red-50 rounded-lg p-3">
-            <div className="text-2xl font-bold text-red-600">~{avgEncounters}</div>
-            <div className="text-xs text-stone-600">Setkání</div>
-          </div>
-        </div>
-
-        <p className="text-xs text-stone-500 text-center">
-          {encounterRolls} hodů na d6 (1 = setkání, 2 = omen) • {days} {days === 1 ? 'den' : days < 5 ? 'dny' : 'dnů'} s odpočinkem
-        </p>
-      </div>
-    </ResultCard>
-  );
-};
-
 const TimePanel = ({ party, updateParty, onLogEntry }) => {
   // Extract gameTime from party
-  const gameTime = party?.gameTime || { watch: 0, day: 1, season: 'spring', turn: 0, restedToday: false, context: 'wilderness', weather: null };
+  const gameTime = party?.gameTime || { watch: 0, day: 1, season: 'spring', turn: 0, restedToday: false };
 
   const setGameTime = (newTime) => {
     if (party) {
@@ -8156,7 +8040,7 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
     }
   };
 
-  const { day = 1, season = 'spring', watch = 0, turn = 0, restedToday = false, context = 'wilderness', weather = null } = gameTime;
+  const { day = 1, season = 'spring', watch = 0, turn = 0, restedToday = false } = gameTime;
   const [showRules, setShowRules] = React.useState(false);
 
   const currentSeason = TIMEBAR_SEASONS.find(s => s.id === season) || TIMEBAR_SEASONS[0];
@@ -8187,97 +8071,41 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
       setGameTime({ ...gameTime, turn: newTurn });
     }
 
-    // Připomínka setkání každé 3 směny - JEN V DUNGEONU
-    if (context === 'dungeon' && newTurn % 3 === 0 && newTurn > 0) {
+    // Připomínka setkání každé 3 směny
+    if (newTurn % 3 === 0 && newTurn > 0) {
       onLogEntry({
         type: 'encounter_reminder',
         timestamp: formatTimestamp(),
-        turn: newTurn,
-        message: `⚔️ Dungeon: Směna ${newTurn} - hoď na setkání!`
+        turn: newTurn
       });
     }
   };
 
   // Další hlídka
   const nextWatch = () => {
-    const nextWatchId = watch >= 3 ? 0 : watch + 1;
-    const isNewDay = watch >= 3;
-    const newDay = isNewDay ? day + 1 : day;
-
-    // Generovat počasí při novém dni (v divočině)
-    let newWeather = weather;
-    if (isNewDay && context === 'wilderness') {
-      newWeather = generateWeather(season);
-      onLogEntry({
-        type: 'weather',
-        timestamp: formatTimestamp(),
-        message: `${newWeather.icon} Počasí: ${newWeather.type} (${newWeather.dice[0]}+${newWeather.dice[1]}=${newWeather.roll})`,
-        data: newWeather
-      });
-      // Varování při nebezpečném počasí
-      if (newWeather.danger && newWeather.effect) {
-        onLogEntry({
-          type: 'weather_warning',
-          timestamp: formatTimestamp(),
-          message: `⚠️ ${newWeather.effect}`
-        });
-      }
-    }
-
-    // Aktualizovat čas
-    if (isNewDay) {
+    if (watch >= 3) {
       setGameTime({
         ...gameTime,
-        day: newDay,
+        day: day + 1,
         watch: 0,
         turn: 0,
-        restedToday: false,
-        weather: newWeather
+        restedToday: false
       });
       onLogEntry({
         type: 'time_advance',
         timestamp: formatTimestamp(),
-        message: `Nový den ${newDay}`
+        message: `Nový den ${day + 1}`
       });
     } else {
       setGameTime({
         ...gameTime,
-        watch: nextWatchId,
+        watch: watch + 1,
         turn: 0
       });
       onLogEntry({
         type: 'time_advance',
         timestamp: formatTimestamp(),
-        message: `${TIMEBAR_WATCHES[nextWatchId]?.name || 'Další hlídka'}`
-      });
-    }
-
-    // Upozornění na setkání v DIVOČINĚ - ráno (0) a večer (2)
-    if (context === 'wilderness' && (nextWatchId === 0 || nextWatchId === 2)) {
-      const watchName = nextWatchId === 0 ? 'Ranní' : 'Večerní';
-      onLogEntry({
-        type: 'encounter_reminder',
-        timestamp: formatTimestamp(),
-        message: `🌲 ${watchName} hlídka - hoď d6 na setkání (1 = setkání, 2 = omen)`
-      });
-    }
-  };
-
-  // Ruční přehození počasí
-  const rerollWeather = () => {
-    const newWeather = generateWeather(season);
-    setGameTime({ ...gameTime, weather: newWeather });
-    onLogEntry({
-      type: 'weather',
-      timestamp: formatTimestamp(),
-      message: `${newWeather.icon} Počasí přehozeno: ${newWeather.type} (${newWeather.dice[0]}+${newWeather.dice[1]}=${newWeather.roll})`,
-      data: newWeather
-    });
-    if (newWeather.danger && newWeather.effect) {
-      onLogEntry({
-        type: 'weather_warning',
-        timestamp: formatTimestamp(),
-        message: `⚠️ ${newWeather.effect}`
+        message: `${TIMEBAR_WATCHES[watch + 1]?.name || 'Další hlídka'}`
       });
     }
   };
@@ -8327,65 +8155,20 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
         subtitle={`${party.name} • ${currentSeason.icon} ${currentSeason.name}`}
       />
 
-      {/* Přepínač kontextu */}
-      <div className="flex justify-center gap-2">
-        <button
-          onClick={() => setGameTime({ ...gameTime, context: 'dungeon' })}
-          className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
-            context === 'dungeon'
-              ? 'bg-stone-700 text-white shadow-lg'
-              : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
-          }`}
-        >
-          🏚️ Dungeon
-        </button>
-        <button
-          onClick={() => setGameTime({ ...gameTime, context: 'wilderness' })}
-          className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
-            context === 'wilderness'
-              ? 'bg-green-600 text-white shadow-lg'
-              : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
-          }`}
-        >
-          🌲 Divočina
-        </button>
-      </div>
-
       {/* Hlavní přehled */}
       <ResultCard>
         <div className="space-y-6">
-          {/* Den, sezóna a počasí */}
-          <div className="flex items-center justify-center gap-6 text-center flex-wrap">
+          {/* Den a sezóna */}
+          <div className="flex items-center justify-center gap-8 text-center">
             <div>
-              <div className="text-4xl mb-1">{currentSeason.icon}</div>
-              <div className="text-sm font-bold text-amber-900">{currentSeason.name}</div>
+              <div className="text-5xl mb-2">{currentSeason.icon}</div>
+              <div className="text-lg font-bold text-amber-900">{currentSeason.name}</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-amber-600">{day}</div>
-              <div className="text-sm text-stone-600">Den</div>
+              <div className="text-5xl font-bold text-amber-600">{day}</div>
+              <div className="text-stone-600">Den</div>
             </div>
-            {/* Počasí - jen v divočině */}
-            {context === 'wilderness' && (
-              <div
-                onClick={rerollWeather}
-                className="cursor-pointer hover:scale-105 transition-transform"
-                title="Klikni pro přehození počasí"
-              >
-                <div className="text-4xl mb-1">{weather?.icon || '🌤️'}</div>
-                <div className="text-sm text-stone-600">{weather?.type || 'Neznámé'}</div>
-                {weather?.roll && (
-                  <div className="text-xs text-stone-400">({weather.roll})</div>
-                )}
-              </div>
-            )}
           </div>
-
-          {/* Varování při špatném počasí */}
-          {context === 'wilderness' && weather?.danger && weather?.effect && (
-            <div className="bg-red-100 border border-red-300 rounded-lg p-3 text-center text-red-800">
-              ⚠️ <strong>{weather.type}:</strong> {weather.effect}
-            </div>
-          )}
 
           {/* Hlídky */}
           <div className="flex justify-center gap-3">
@@ -8416,10 +8199,7 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
               {renderTurnProgress()}
             </div>
             <p className="text-xs text-stone-500 text-center">
-              {context === 'dungeon'
-                ? '🏚️ Dungeon: Setkání každé 3 směny'
-                : '🌲 Divočina: Setkání ráno + večer (d6)'
-              } • 36 směn = 1 hlídka
+              Připomínka setkání každé 3 směny • 36 směn = 1 hlídka
             </p>
           </div>
 
@@ -8465,53 +8245,14 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
                 <tr><td className="py-1">Hlídka</td><td>6 hod (36 směn)</td><td>Cestování (1 hex)</td></tr>
               </tbody>
             </table>
-
-            {/* Kompaktní přehled podle kontextu */}
-            {context === 'dungeon' ? (
-              <div className="border-t border-amber-200 pt-2">
-                <p className="font-bold mb-2">🏚️ CHECKLIST DUNGEON</p>
-                <div className="space-y-1 text-stone-700">
-                  <p>☐ <strong>Každé 3 směny:</strong> Hoď na setkání</p>
-                  <p>☐ <strong>Směna = 10 min:</strong> Průzkum 1 místnosti</p>
-                  <p>☐ <strong>Odpočinek:</strong> Krátký (1 směna) = k6+1 BO</p>
-                </div>
-              </div>
-            ) : (
-              <div className="border-t border-amber-200 pt-2">
-                <p className="font-bold mb-2">🌲 CHECKLIST DIVOČINA</p>
-                <div className="space-y-2">
-                  <div className="bg-amber-50 p-2 rounded">
-                    <p className="font-medium text-amber-800">☀️ KAŽDÝ DEN:</p>
-                    <p>☐ Počasí (automaticky při novém dni)</p>
-                    <p>☐ Min. 1 hlídka odpočinku</p>
-                  </div>
-                  <div className="bg-green-50 p-2 rounded">
-                    <p className="font-medium text-green-800">🌅 RÁNO + 🌆 VEČER:</p>
-                    <p>☐ Hoď d6 na setkání</p>
-                    <p className="text-xs text-stone-500">1 = setkání, 2 = omen</p>
-                  </div>
-                  <div className="bg-blue-50 p-2 rounded">
-                    <p className="font-medium text-blue-800">🗺️ CESTOVÁNÍ:</p>
-                    <p>☐ 1 hex = 1 hlídka</p>
-                    <p>☐ Náročný terén = 2 hlídky</p>
-                    <p>☐ Špatné počasí = ×1.5 nebo ×2</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
             <div className="border-t border-amber-200 pt-2 space-y-1">
-              <p><strong>💤 Odpočinek:</strong> Krátký = k6+1 BO • Dlouhý (1 hlídka) = všechny BO</p>
-              <p><strong>🍖 Hledání:</strong> 1 hlídka = k3 zásob</p>
+              <p><strong>🗺️ Cestování:</strong> 1 hex = 1 hlídka • Náročný terén = 2 hlídky</p>
+              <p><strong>💤 Odpočinek:</strong> Krátký (1 směna) = k6+1 BO • Dlouhý (1 hlídka) = všechny BO</p>
+              <p><strong>🍖 Hledání potravy:</strong> 1 hlídka = k3 zásob</p>
             </div>
           </div>
         )}
       </div>
-
-      {/* Kalkulačka cestování - jen v divočině */}
-      {context === 'wilderness' && (
-        <TravelCalculator weather={weather} />
-      )}
 
       {/* Nastavení */}
       <ResultCard title="⚙️ Ruční nastavení">
@@ -9032,34 +8773,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
           );
         }
         return null; // Hide other state changes
-
-      case 'weather':
-        return (
-          <p className="my-1 text-sm text-blue-700 cursor-pointer hover:bg-blue-50 rounded px-1 -mx-1 transition-colors"
-             onClick={() => startEdit(entry)}
-             title="Klikni pro úpravu">
-            {entry.message || `☁️ Počasí: ${entry.data?.type || 'neznámé'}`}
-          </p>
-        );
-
-      case 'weather_warning':
-        return (
-          <p className="my-1 text-sm text-red-700 bg-red-50 rounded px-2 py-1 cursor-pointer hover:bg-red-100 transition-colors"
-             onClick={() => startEdit(entry)}
-             title="Klikni pro úpravu">
-            {entry.message || '⚠️ Varování počasí'}
-          </p>
-        );
-
-      case 'encounter_reminder':
-        return (
-          <p className="my-1 text-sm text-green-700 bg-green-50 rounded px-2 py-1 cursor-pointer hover:bg-green-100 transition-colors"
-             onClick={() => startEdit(entry)}
-             title="Klikni pro úpravu">
-            {entry.message || '🎲 Připomínka setkání'}
-          </p>
-        );
-
+      
       default:
         // For any other type, show as mechanical note
         const content = entry.content || entry.data || entry;
