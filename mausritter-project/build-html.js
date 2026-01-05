@@ -23,6 +23,8 @@ const html = `<!DOCTYPE html>
     body { overscroll-behavior: none; }
     .hide-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
+    /* Google Picker centering fix */
+    .picker-dialog { top: 50% !important; transform: translateY(-50%) !important; }
   </style>
 </head>
 <body>
