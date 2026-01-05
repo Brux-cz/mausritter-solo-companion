@@ -8454,8 +8454,8 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
         );
       
       case 'oracle':
-        // Handle creature subtype - kratší zobrazení
-        if (entry.subtype === 'creature' && entry.data) {
+        // Handle creature subtype - kratší zobrazení (+ fallback pro staré záznamy bez subtype)
+        if ((entry.subtype === 'creature' || (entry.data?.type?.name && entry.data?.personality)) && entry.data) {
           const c = entry.data;
           return (
             <div className="my-2 pl-4 border-l-2 border-amber-500 cursor-pointer hover:bg-amber-50 rounded transition-colors"
@@ -8469,8 +8469,8 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
             </div>
           );
         }
-        // Handle encounter subtype - kratší zobrazení
-        if (entry.subtype === 'encounter' && entry.data) {
+        // Handle encounter subtype - kratší zobrazení (+ fallback pro staré záznamy)
+        if ((entry.subtype === 'encounter' || (entry.data?.creature && entry.data?.activity)) && entry.data) {
           const e = entry.data;
           return (
             <div className="my-2 pl-4 border-l-2 border-red-400 cursor-pointer hover:bg-red-50 rounded transition-colors"
