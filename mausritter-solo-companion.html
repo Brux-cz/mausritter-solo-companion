@@ -8471,26 +8471,31 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
         }
         // Fallback pro starší textové záznamy tvorů (markdown formát)
         if (entry.result && typeof entry.result === 'string' && entry.result.includes('**Vzhled:**')) {
-          // Parse: **Jméno** - typ emoji Text. Je osobnost.
-          const match = entry.result.match(/^\*\*([^*]+)\*\*\s*-\s*([^🐭🐀🦎🐸🐦🦇🐝🐜🦋🐌🦗🐛🕷️🦂🐞🪲🪳🦟🪰🐾🦔🦡🦦🦫🐿️🦨🦝🦙🐰🐹🐁]+)?(.+?)(?:\*\*Vzhled)/);
-          if (match) {
-            const name = match[1]?.trim() || 'Tvor';
-            const typePart = match[2]?.trim() || '';
-            // Najdi první větu s "Je ..."
-            const personalityMatch = entry.result.match(/Je ([^.]+\.)/);
-            const personality = personalityMatch ? `Je ${personalityMatch[1]}` : '';
-            return (
-              <div className="my-2 pl-4 border-l-2 border-amber-500 cursor-pointer hover:bg-amber-50 rounded transition-colors"
-                   onClick={() => startEdit(entry)}
-                   title="Klikni pro úpravu">
-                <p className="font-bold text-amber-900">
-                  🐭 {name} {typePart && <span className="font-normal text-stone-500">— {typePart}</span>}
-                </p>
-                {personality && <p className="text-stone-600 text-sm">{personality}</p>}
-                {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1">{entry.note}</p>}
-              </div>
-            );
-          }
+          // Parse: **Jméno** - typ emoji Jméno dělá... Je osobnost.
+          const nameMatch = entry.result.match(/^\*\*([^*]+)\*\*/);
+          const name = nameMatch ? nameMatch[1].trim() : 'Tvor';
+
+          // Type je mezi " - " a opakováním jména
+          const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const typeRegex = new RegExp(`\\s-\\s(.+?)\\s+${escapedName}`);
+          const typeMatch = entry.result.match(typeRegex);
+          const typePart = typeMatch ? typeMatch[1].trim() : '';
+
+          // Personality - "Je ..." věta
+          const personalityMatch = entry.result.match(/\.\s*(Je [^.]+\.)/);
+          const personality = personalityMatch ? personalityMatch[1] : '';
+
+          return (
+            <div className="my-2 pl-4 border-l-2 border-amber-500 cursor-pointer hover:bg-amber-50 rounded transition-colors"
+                 onClick={() => startEdit(entry)}
+                 title="Klikni pro úpravu">
+              <p className="font-bold text-amber-900">
+                🐭 {name} {typePart && <span className="font-normal text-stone-500">— {typePart}</span>}
+              </p>
+              {personality && <p className="text-stone-600 text-sm">{personality}</p>}
+              {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1">{entry.note}</p>}
+            </div>
+          );
         }
         // Handle encounter subtype - kratší zobrazení (+ fallback pro staré záznamy)
         if ((entry.subtype === 'encounter' || (entry.data?.creature && entry.data?.activity)) && entry.data) {
