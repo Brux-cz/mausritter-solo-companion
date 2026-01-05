@@ -290,7 +290,7 @@
       "landmark": "",
       "feature": "",
       "event": "",
-      "ruler": null,
+      "ruler": "4ejbwhb47",
       "notes": "",
       "npcs": []
     }
@@ -298,15 +298,15 @@
   "worldNPCs": [
     {
       "id": "4ejbwhb47",
-      "name": "Nová postava",
-      "birthsign": "",
-      "physicalDetail": "",
-      "quirk": "",
-      "goal": "",
-      "role": "",
+      "name": "Andula Ďobková",
+      "birthsign": "vyhnankyně z hrabství Ek",
+      "physicalDetail": "Vždy upravená",
+      "quirk": "Výmluvná",
+      "goal": "Obnova chrámu, Vyjednávání míru se strakamai a dlaší.",
+      "role": "starostka",
       "settlementId": "6tejxdti1",
       "notes": ""
     }
   ],
-  "lastModified": "2026-01-04T01:28:48.094Z"
+  "lastModified": "2026-01-04T07:54:54.993Z"
 }
