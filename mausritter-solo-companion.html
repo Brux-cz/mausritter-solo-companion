@@ -3142,7 +3142,22 @@ const OraclePanel = ({ onLogEntry }) => {
                 min="2"
                 max="1000"
                 value={customDice.sides}
-                onChange={(e) => setCustomDice({ ...customDice, sides: parseInt(e.target.value) || 6 })}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === '') {
+                    setCustomDice({ ...customDice, sides: '' });
+                  } else {
+                    const num = parseInt(val);
+                    if (!isNaN(num)) {
+                      setCustomDice({ ...customDice, sides: Math.min(1000, Math.max(2, num)) });
+                    }
+                  }
+                }}
+                onBlur={() => {
+                  if (customDice.sides === '' || customDice.sides < 2) {
+                    setCustomDice({ ...customDice, sides: 6 });
+                  }
+                }}
                 className="px-3 py-2 rounded border border-stone-300 bg-white font-bold w-20"
               />
             </div>
