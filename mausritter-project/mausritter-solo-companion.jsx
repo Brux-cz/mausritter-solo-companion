@@ -3972,12 +3972,39 @@ const CharacterPanel = ({
       name: newTreasuryItem.name.trim(),
       amount: amount
     };
-    updateParty({ treasuryItems: [...treasuryItems, newItem] });
+    updateParty(activePartyId, { treasuryItems: [...treasuryItems, newItem] });
     setNewTreasuryItem({ name: '', amount: '' });
   };
 
   const removeTreasuryItem = (itemId) => {
-    updateParty({ treasuryItems: treasuryItems.filter(i => i.id !== itemId) });
+    updateParty(activePartyId, { treasuryItems: treasuryItems.filter(i => i.id !== itemId) });
+  };
+
+  // Pay hireling from treasury
+  const payHireling = (hirelingCharacter) => {
+    const hirelingTypeInfo = HIRELING_TYPES.find(t => t.type === hirelingCharacter.hirelingType);
+    const wageStr = hirelingTypeInfo?.cost || hirelingCharacter.cost || '1 ď';
+    const wageAmount = parseInt(wageStr) || 1;
+
+    if (treasuryTotal < wageAmount) {
+      alert(`Nedostatek peněz v pokladně! Potřeba: ${wageAmount} ď, k dispozici: ${treasuryTotal} ď`);
+      return;
+    }
+
+    const newTreasuryItem = {
+      id: generateId(),
+      name: `Výplata: ${hirelingCharacter.name}`,
+      amount: -wageAmount
+    };
+
+    updateParty(activePartyId, { treasuryItems: [...treasuryItems, newTreasuryItem] });
+
+    onLogEntry({
+      type: 'treasury',
+      subtype: 'payment',
+      timestamp: formatTimestamp(),
+      description: `Vyplacen ${hirelingCharacter.name}: -${wageAmount} ď`
+    });
   };
 
   // Hireling recruitment functions
@@ -5260,6 +5287,8 @@ const CharacterPanel = ({
               editMode={editMode}
               setEditMode={setEditMode}
               onLogEntry={onLogEntry}
+              treasuryTotal={treasuryTotal}
+              onPayHireling={() => payHireling(character)}
             />
           )}
         </>
@@ -5269,7 +5298,7 @@ const CharacterPanel = ({
 };
 
 // ========== HIRELING SHEET COMPONENT ==========
-const HirelingSheet = ({ character, updateCharacter, editMode, setEditMode, onLogEntry }) => {
+const HirelingSheet = ({ character, updateCharacter, editMode, setEditMode, onLogEntry, treasuryTotal, onPayHireling }) => {
   // Get hireling type info if available
   const hirelingTypeInfo = character.hirelingType && character.hirelingType !== 'generic'
     ? HIRELING_TYPES.find(t => t.type === character.hirelingType)
@@ -5359,14 +5388,14 @@ const HirelingSheet = ({ character, updateCharacter, editMode, setEditMode, onLo
             );
           })}
         </div>
-        <div className="w-20 text-center">
-          <div className="text-xs text-stone-500">💰 Dluh</div>
-          <input
-            type="number"
-            value={character.owed || 0}
-            onChange={(e) => updateCharacter({ owed: parseInt(e.target.value) || 0 })}
-            className="w-full text-center font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded px-1 py-1"
-          />
+        <div className="text-center">
+          <div className="text-xs text-stone-500 mb-1">💰 Mzda: {hirelingTypeInfo?.cost || character.cost || '1 ď'}</div>
+          <button
+            onClick={onPayHireling}
+            className="px-3 py-1.5 bg-amber-500 text-white rounded-lg text-sm font-medium hover:bg-amber-600 transition-colors"
+          >
+            Vyplatit
+          </button>
         </div>
       </div>
     </ResultCard>
@@ -9616,6 +9645,16 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
           </p>
         );
 
+      case 'treasury':
+        return (
+          <p className="my-1 text-sm text-amber-700 cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
+             onClick={() => startEdit(entry)}
+             title="Klikni pro úpravu">
+            💰 {entry.description}
+            {entry.note && <span className="italic ml-1">({entry.note})</span>}
+          </p>
+        );
+
       default:
         // For any other type, show as mechanical note
         const content = entry.content || entry.data || entry;
@@ -10314,7 +10353,7 @@ function MausritterSoloCompanion() {
 
   // Helper: Update party
   const updateParty = (partyId, updates) => {
-    setParties(parties.map(p => p.id === partyId ? { ...p, ...updates } : p));
+    setParties(prevParties => prevParties.map(p => p.id === partyId ? { ...p, ...updates } : p));
   };
 
   // Helper: Update character within party
