@@ -3965,11 +3965,12 @@ const CharacterPanel = ({
   const treasuryTotal = treasuryItems.reduce((sum, item) => sum + (item.amount || 0), 0);
 
   const addTreasuryItem = () => {
-    if (!newTreasuryItem.name.trim() || !newTreasuryItem.amount) return;
+    const amount = parseInt(newTreasuryItem.amount);
+    if (!newTreasuryItem.name.trim() || isNaN(amount)) return;
     const newItem = {
       id: generateId(),
       name: newTreasuryItem.name.trim(),
-      amount: parseInt(newTreasuryItem.amount) || 0
+      amount: amount
     };
     updateParty({ treasuryItems: [...treasuryItems, newItem] });
     setNewTreasuryItem({ name: '', amount: '' });
@@ -4730,6 +4731,69 @@ const CharacterPanel = ({
         </div>
       )}
 
+      {/* Treasury Modal */}
+      {showTreasury && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl p-4 max-w-md w-full shadow-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-amber-900">💰 Pokladna družiny</h3>
+              <button onClick={() => setShowTreasury(false)} className="text-stone-400 hover:text-stone-600 text-xl">✕</button>
+            </div>
+
+            {/* Total */}
+            <div className={`text-center py-3 mb-4 rounded-lg ${treasuryTotal >= 0 ? 'bg-amber-50' : 'bg-red-50'}`}>
+              <div className="text-xs text-stone-500">Celkem</div>
+              <div className={`text-3xl font-bold ${treasuryTotal >= 0 ? 'text-amber-600' : 'text-red-600'}`}>
+                {treasuryTotal} ď
+              </div>
+            </div>
+
+            {/* Add new item */}
+            <div className="flex gap-2 mb-3">
+              <input
+                type="text"
+                placeholder="Popis..."
+                value={newTreasuryItem.name}
+                onChange={(e) => setNewTreasuryItem(prev => ({ ...prev, name: e.target.value }))}
+                onKeyDown={(e) => e.key === 'Enter' && addTreasuryItem()}
+                className="flex-1 px-3 py-2 text-sm border border-stone-300 rounded-lg"
+              />
+              <input
+                type="number"
+                placeholder="±"
+                value={newTreasuryItem.amount}
+                onChange={(e) => setNewTreasuryItem(prev => ({ ...prev, amount: e.target.value }))}
+                onKeyDown={(e) => e.key === 'Enter' && addTreasuryItem()}
+                className="w-20 px-2 py-2 text-sm border border-stone-300 rounded-lg text-center"
+              />
+              <Button onClick={addTreasuryItem}>+</Button>
+            </div>
+
+            {/* Items list */}
+            <div className="max-h-60 overflow-y-auto space-y-1">
+              {treasuryItems.length === 0 ? (
+                <p className="text-center text-stone-400 py-4">Prázdná pokladna</p>
+              ) : (
+                treasuryItems.map(item => (
+                  <div key={item.id} className="flex items-center justify-between text-sm bg-stone-50 rounded-lg px-3 py-2">
+                    <span className="text-stone-700">{item.name}</span>
+                    <div className="flex items-center gap-3">
+                      <span className={`font-bold ${item.amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {item.amount > 0 ? '+' : ''}{item.amount}
+                      </span>
+                      <button
+                        onClick={() => removeTreasuryItem(item.id)}
+                        className="text-stone-400 hover:text-red-500"
+                      >✕</button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Hireling Recruitment Picker Modal */}
       {showHirelingPicker && (
         <div className="fixed inset-0 bg-black/50 z-50 overflow-y-auto">
@@ -4880,61 +4944,20 @@ const CharacterPanel = ({
           <Button size="small" variant="ghost" onClick={() => party && setDeleteConfirm({ type: 'party', id: party.id, name: party.name })}>🗑️</Button>
         </div>
 
-        {/* Treasury section */}
+        {/* Treasury button */}
         {party && (
           <div className="mb-4 pb-4 border-b border-stone-200">
-            <div
-              className="flex items-center justify-between cursor-pointer"
-              onClick={() => setShowTreasury(!showTreasury)}
+            <button
+              onClick={() => setShowTreasury(true)}
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg ${
+                treasuryTotal >= 0 ? 'bg-amber-50 hover:bg-amber-100' : 'bg-red-50 hover:bg-red-100'
+              }`}
             >
-              <span className="text-sm font-bold text-stone-500">💰 Pokladna</span>
-              <span className={`font-bold text-lg ${treasuryTotal >= 0 ? 'text-amber-600' : 'text-red-600'}`}>
+              <span className="text-sm font-bold text-stone-600">💰 Pokladna</span>
+              <span className={`font-bold ${treasuryTotal >= 0 ? 'text-amber-600' : 'text-red-600'}`}>
                 {treasuryTotal} ď
               </span>
-            </div>
-
-            {showTreasury && (
-              <div className="mt-3 space-y-2">
-                {/* Add new item */}
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Popis (náramek, mzda...)"
-                    value={newTreasuryItem.name}
-                    onChange={(e) => setNewTreasuryItem(prev => ({ ...prev, name: e.target.value }))}
-                    className="flex-1 px-2 py-1 text-sm border border-stone-300 rounded"
-                  />
-                  <input
-                    type="number"
-                    placeholder="+/-"
-                    value={newTreasuryItem.amount}
-                    onChange={(e) => setNewTreasuryItem(prev => ({ ...prev, amount: e.target.value }))}
-                    className="w-20 px-2 py-1 text-sm border border-stone-300 rounded text-center"
-                  />
-                  <Button size="small" onClick={addTreasuryItem}>+</Button>
-                </div>
-
-                {/* Items list */}
-                {treasuryItems.length > 0 && (
-                  <div className="max-h-40 overflow-y-auto space-y-1">
-                    {treasuryItems.map(item => (
-                      <div key={item.id} className="flex items-center justify-between text-sm bg-stone-50 rounded px-2 py-1">
-                        <span className="text-stone-700">{item.name}</span>
-                        <div className="flex items-center gap-2">
-                          <span className={`font-medium ${item.amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                            {item.amount > 0 ? '+' : ''}{item.amount}
-                          </span>
-                          <button
-                            onClick={() => removeTreasuryItem(item.id)}
-                            className="text-stone-400 hover:text-red-500 text-xs"
-                          >✕</button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+            </button>
           </div>
         )}
 
