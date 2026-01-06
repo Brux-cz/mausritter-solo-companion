@@ -3951,8 +3951,9 @@ const CharacterPanel = ({
   activeCharacterId, 
   setActiveCharacterId, 
   createParty,
-  createPC, 
+  createPC,
   createHireling,
+  addHirelingsToParty,
   updateParty,
   updateCharacterInParty,
   removeCharacter,
@@ -4080,12 +4081,8 @@ const CharacterPanel = ({
         physicalDetail: candidate.physicalDetail
       }));
 
-    // Add all hirelings to party in one update
-    setParties(prev => prev.map(p =>
-      p.id === activePartyId
-        ? { ...p, members: [...p.members, ...newHirelings] }
-        : p
-    ));
+    // Add all hirelings to party
+    addHirelingsToParty(activePartyId, newHirelings);
 
     // Switch to last hired character
     if (newHirelings.length > 0) {
@@ -4790,12 +4787,17 @@ const CharacterPanel = ({
               {hirelingCandidates.length > 0 && currentRecruitType && (
                 <div className="border-t border-stone-200 pt-4">
                   <div className="flex items-center justify-between mb-3">
-                    <h4 className="font-bold text-amber-900">
-                      Dostupní kandidáti ({hirelingCandidates.length})
-                      {' '}<span className="text-stone-500 font-normal">
-                        - {HIRELING_TYPES.find(t => t.type === currentRecruitType)?.name}
-                      </span>
-                    </h4>
+                    <div>
+                      <h4 className="font-bold text-amber-900">
+                        Dostupní kandidáti ({hirelingCandidates.length})
+                        {' '}<span className="text-stone-500 font-normal">
+                          - {HIRELING_TYPES.find(t => t.type === currentRecruitType)?.name}
+                        </span>
+                      </h4>
+                      <p className="text-sm text-amber-700 mt-1">
+                        🎯 {HIRELING_TYPES.find(t => t.type === currentRecruitType)?.skill}
+                      </p>
+                    </div>
                     {selectedCandidateIds.length > 0 && (
                       <Button onClick={hireSelectedCandidates}>
                         Najmout vybrané ({selectedCandidateIds.length})
@@ -4877,6 +4879,16 @@ const CharacterPanel = ({
               <option key={p.id} value={p.id}>{p.name} ({p.members?.length || 0})</option>
             ))}
           </select>
+          <div className="flex items-center gap-1 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1">
+            <span className="text-xs text-amber-600">💰</span>
+            <input
+              type="number"
+              value={party?.treasury || 0}
+              onChange={(e) => updateParty({ treasury: parseInt(e.target.value) || 0 })}
+              className="w-16 text-center font-bold text-amber-700 bg-transparent"
+              title="Pokladna družiny"
+            />
+          </div>
           <Button size="small" variant="ghost" onClick={() => createParty()}>+</Button>
           <Button size="small" variant="ghost" onClick={() => setEditingName('party')}>✏️</Button>
           <Button size="small" variant="ghost" onClick={() => party && setDeleteConfirm({ type: 'party', id: party.id, name: party.name })}>🗑️</Button>
@@ -4962,19 +4974,19 @@ const CharacterPanel = ({
               </button>
             </div>
 
-            {/* HP & Pips */}
-            <div className="flex gap-4">
-              <div className="flex-1 bg-white rounded-lg p-3 text-center shadow-sm">
-                <div className="text-xs text-stone-500 mb-1">❤️ HP</div>
-                <div className="flex items-center justify-center gap-2">
-                  <button onClick={() => updateHP(-1)} className="w-10 h-10 bg-red-100 text-red-700 rounded-lg font-bold text-xl">-</button>
-                  <span className="text-2xl font-bold text-red-700 min-w-[60px]">
-                    {character.hp?.current || 0}/{character.hp?.max || 6}
-                  </span>
-                  <button onClick={() => updateHP(1)} className="w-10 h-10 bg-green-100 text-green-700 rounded-lg font-bold text-xl">+</button>
+            {/* HP & Pips - only for PC (hirelings have their own in HirelingSheet) */}
+            {character.type === 'pc' && (
+              <div className="flex gap-4">
+                <div className="flex-1 bg-white rounded-lg p-3 text-center shadow-sm">
+                  <div className="text-xs text-stone-500 mb-1">❤️ HP</div>
+                  <div className="flex items-center justify-center gap-2">
+                    <button onClick={() => updateHP(-1)} className="w-10 h-10 bg-red-100 text-red-700 rounded-lg font-bold text-xl">-</button>
+                    <span className="text-2xl font-bold text-red-700 min-w-[60px]">
+                      {character.hp?.current || 0}/{character.hp?.max || 6}
+                    </span>
+                    <button onClick={() => updateHP(1)} className="w-10 h-10 bg-green-100 text-green-700 rounded-lg font-bold text-xl">+</button>
+                  </div>
                 </div>
-              </div>
-              {character.type === 'pc' ? (
                 <div className="flex-1 bg-white rounded-lg p-3 text-center shadow-sm">
                   <div className="text-xs text-stone-500 mb-1">💰 Pips</div>
                   <div className="flex items-center justify-center gap-2">
@@ -4983,24 +4995,8 @@ const CharacterPanel = ({
                     <button onClick={() => updatePips(1)} className="w-10 h-10 bg-stone-100 text-stone-700 rounded-lg font-bold text-xl">+</button>
                   </div>
                 </div>
-              ) : (
-                <div className="flex-1 bg-white rounded-lg p-3 text-center shadow-sm">
-                  <div className="text-xs text-stone-500 mb-1">🤝 Loyalty</div>
-                  <div className="text-2xl font-bold text-blue-700">{character.loyalty || 7}</div>
-                  <Button 
-                    size="small" 
-                    className="mt-2"
-                    onClick={() => {
-                      const { dice, total } = roll2D6();
-                      const success = total <= (character.loyalty || 7);
-                      alert(`[${dice.join(',')}] = ${total}\n${success ? '✓ OK!' : '✗ SELHÁNÍ!'}`);
-                    }}
-                  >
-                    🎲 Test
-                  </Button>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
           </ResultCard>
 
           {/* PC-only sections */}
@@ -5191,25 +5187,13 @@ const CharacterPanel = ({
 
           {/* Hireling-only sections */}
           {character.type === 'hireling' && (
-            <ResultCard title="🎯 Schopnosti">
-              <div className="flex flex-wrap gap-2">
-                {['Boj', 'Průzkum', 'Léčení', 'Plížení', 'Vaření', 'Opravy', 'Navigace'].map(skill => (
-                  <button
-                    key={skill}
-                    onClick={() => updateCharacter({
-                      skills: character.skills?.includes(skill)
-                        ? character.skills.filter(s => s !== skill)
-                        : [...(character.skills || []), skill]
-                    })}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                      character.skills?.includes(skill) ? 'bg-blue-500 text-white' : 'bg-stone-100 text-stone-600'
-                    }`}
-                  >
-                    {skill}
-                  </button>
-                ))}
-              </div>
-            </ResultCard>
+            <HirelingSheet
+              character={character}
+              updateCharacter={updateCharacter}
+              editMode={editMode}
+              setEditMode={setEditMode}
+              onLogEntry={onLogEntry}
+            />
           )}
         </>
       )}
@@ -5256,129 +5240,69 @@ const HirelingSheet = ({ character, updateCharacter, editMode, setEditMode, onLo
   const HIRELING_SLOTS = ['strongPaw1', 'strongPaw2', 'weakPaw1', 'weakPaw2'];
 
   return (
-    <>
-      {/* Main Card - Stats & Inventory side by side */}
-      <ResultCard title={hirelingTypeInfo ? `🐿️ ${hirelingTypeInfo.name}` : "🐿️ Pomocník"}>
-        <div className="flex justify-between items-start mb-3">
-          <div className="text-sm text-stone-500">
-            Mzda: <span className="font-bold text-amber-700">{character.cost || '1 ď'}</span>
-            {character.physicalDetail && <span className="ml-2">• {character.physicalDetail}</span>}
-          </div>
-          <Button size="small" variant="ghost" onClick={() => setEditMode(!editMode)}>
-            {editMode ? '✓ Hotovo' : '✏️ Upravit'}
-          </Button>
+    <ResultCard>
+      {/* Header with skill */}
+      <div className="flex justify-between items-center mb-2">
+        <div className="text-sm text-stone-600">
+          {hirelingTypeInfo && <span className="font-medium text-amber-800">{hirelingTypeInfo.skill}</span>}
+          {!hirelingTypeInfo && character.physicalDetail && <span className="italic">{character.physicalDetail}</span>}
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* LEFT: Stats */}
-          <div className="space-y-2">
-            <div className="text-xs font-bold text-stone-500 mb-2">STATY</div>
-            {[
-              { key: 'STR', label: 'Síla', color: 'red' },
-              { key: 'DEX', label: 'Mrš.', color: 'green' },
-              { key: 'WIL', label: 'Vůle', color: 'blue' },
-              { key: 'hp', label: 'BO', color: 'amber' }
-            ].map(({ key, label, color }) => (
-              <div key={key} className="flex items-center gap-2 p-2 bg-stone-50 rounded">
-                <div className="w-12 font-bold text-stone-700">{label}</div>
-                <div className="flex-1 flex items-center gap-2">
-                  <span className="text-xs text-stone-400">Max</span>
-                  <span className={`font-bold text-${color}-700`}>{character[key]?.max || '?'}</span>
-                  <span className="text-xs text-stone-400 ml-2">Akt</span>
-                  <span className={`font-bold text-${color}-700`}>{character[key]?.current || '?'}</span>
-                </div>
-                <div className="flex gap-1">
-                  <button className="w-6 h-6 bg-stone-200 rounded text-sm hover:bg-stone-300" onClick={() => updateStat(key, 'current', -1)}>-</button>
-                  <button className="w-6 h-6 bg-stone-200 rounded text-sm hover:bg-stone-300" onClick={() => updateStat(key, 'current', 1)}>+</button>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* RIGHT: Inventory (2x2 grid) */}
-          <div>
-            <div className="text-xs font-bold text-stone-500 mb-2">INVENTÁŘ</div>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="col-span-2 text-xs text-center text-stone-400">Silnější packa</div>
-              {['strongPaw1', 'strongPaw2'].map(slotId => {
-                const item = character.inventorySlots?.[slotId];
-                return (
-                  <div key={slotId} className="h-16 border-2 border-dashed border-stone-300 rounded flex items-center justify-center bg-stone-50">
-                    {item ? (
-                      <div className="text-center p-1">
-                        <div className="text-xs font-medium truncate">{item.name}</div>
-                        {editMode && (
-                          <button className="text-xs text-red-500" onClick={() => {
-                            const slots = { ...character.inventorySlots, [slotId]: null };
-                            updateCharacter({ inventorySlots: slots });
-                          }}>✕</button>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="text-stone-300 text-xs">prázdné</span>
-                    )}
-                  </div>
-                );
-              })}
-              <div className="col-span-2 text-xs text-center text-stone-400 mt-2">Slabší packa</div>
-              {['weakPaw1', 'weakPaw2'].map(slotId => {
-                const item = character.inventorySlots?.[slotId];
-                return (
-                  <div key={slotId} className="h-16 border-2 border-dashed border-stone-300 rounded flex items-center justify-center bg-stone-50">
-                    {item ? (
-                      <div className="text-center p-1">
-                        <div className="text-xs font-medium truncate">{item.name}</div>
-                        {editMode && (
-                          <button className="text-xs text-red-500" onClick={() => {
-                            const slots = { ...character.inventorySlots, [slotId]: null };
-                            updateCharacter({ inventorySlots: slots });
-                          }}>✕</button>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="text-stone-300 text-xs">prázdné</span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </ResultCard>
-
-      {/* Specialization (if has type) */}
-      {hirelingTypeInfo && (
-        <ResultCard title="🎯 Specializace">
-          <div className="p-3 bg-amber-100 rounded-lg">
-            <div className="font-medium text-amber-900">{hirelingTypeInfo.skill}</div>
-          </div>
-        </ResultCard>
-      )}
-
-      {/* Morale Check - now uses WIL */}
-      <ResultCard title="🎲 Test morálky">
-        <p className="text-stone-600 mb-3 text-sm">
-          Když ve stresující situaci (nebezpečí, žádný žold, riskantní rozkaz),
-          hoď záchranou na Vůli. Neúspěch = uteče.
-        </p>
-        <Button onClick={() => {
+        <Button size="small" variant="ghost" onClick={() => {
           const { dice, total } = roll2D6();
           const threshold = character.WIL?.current || 7;
           const success = total <= threshold;
-          onLogEntry({
-            type: 'morale_check',
-            timestamp: formatTimestamp(),
-            hireling: character.name,
-            dice, total,
-            threshold,
-            success
-          });
           alert(`Morálka: [${dice.join(', ')}] = ${total} vs VŮL ${threshold}\n${success ? '✓ Zůstává!' : '✗ UTEČE!'}`);
         }}>
-          🎲 Test Vůle (2d6 ≤ {character.WIL?.current || '?'})
+          🎲 Morálka
         </Button>
-      </ResultCard>
-    </>
+      </div>
+
+      {/* Stats row */}
+      <div className="flex gap-2 mb-3">
+        {[
+          { key: 'STR', label: 'SÍL', color: 'red' },
+          { key: 'DEX', label: 'MRŠ', color: 'green' },
+          { key: 'WIL', label: 'VŮL', color: 'blue' },
+          { key: 'hp', label: 'BO', color: 'amber' }
+        ].map(({ key, label, color }) => (
+          <div key={key} className={`flex-1 text-center p-2 bg-${color}-50 rounded`}>
+            <div className={`text-xs text-${color}-600`}>{label}</div>
+            <div className="flex items-center justify-center gap-1">
+              <button className="w-5 h-5 text-xs bg-stone-200 rounded hover:bg-stone-300" onClick={() => updateStat(key, 'current', -1)}>-</button>
+              <span className={`font-bold text-${color}-700`}>{character[key]?.current || '?'}/{character[key]?.max || '?'}</span>
+              <button className="w-5 h-5 text-xs bg-stone-200 rounded hover:bg-stone-300" onClick={() => updateStat(key, 'current', 1)}>+</button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Inventory + Money row */}
+      <div className="flex gap-2">
+        <div className="flex-1 grid grid-cols-4 gap-1">
+          {['strongPaw1', 'strongPaw2', 'weakPaw1', 'weakPaw2'].map(slotId => {
+            const item = character.inventorySlots?.[slotId];
+            return (
+              <div key={slotId} className="h-10 border border-dashed border-stone-300 rounded flex items-center justify-center bg-stone-50 text-xs">
+                {item ? (
+                  <span className="truncate px-1" title={item.name}>{item.name}</span>
+                ) : (
+                  <span className="text-stone-300">—</span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <div className="w-20 text-center">
+          <div className="text-xs text-stone-500">💰 Dluh</div>
+          <input
+            type="number"
+            value={character.owed || 0}
+            onChange={(e) => updateCharacter({ owed: parseInt(e.target.value) || 0 })}
+            className="w-full text-center font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded px-1 py-1"
+          />
+        </div>
+      </div>
+    </ResultCard>
   );
 };
 
@@ -10436,6 +10360,15 @@ function MausritterSoloCompanion() {
     return newHireling;
   };
 
+  // Helper: Add multiple pre-created hirelings to party
+  const addHirelingsToParty = (partyId, hirelings) => {
+    if (!hirelings || hirelings.length === 0) return;
+    setParties(parties.map(p => {
+      if (p.id !== partyId) return p;
+      return { ...p, members: [...p.members, ...hirelings] };
+    }));
+  };
+
   // Helper: Remove character from party
   const removeCharacter = (partyId, charId) => {
     setParties(parties.map(p => {
@@ -11483,6 +11416,7 @@ function MausritterSoloCompanion() {
             createParty={createParty}
             createPC={createPC}
             createHireling={createHireling}
+            addHirelingsToParty={addHirelingsToParty}
             updateParty={updateParty}
             updateCharacterInParty={updateCharacterInParty}
             removeCharacter={removeCharacter}
