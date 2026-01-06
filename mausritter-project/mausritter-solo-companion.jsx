@@ -1537,6 +1537,65 @@ const BIRTHSIGNS = [
   { sign: 'Matka', trait: 'Pečující/ustaraná' }
 ];
 
+// NPC chování - nálady
+const NPC_BEHAVIOR_MOODS = [
+  'přátelsky', 'nepřátelsky', 'lhostejně', 'podezíravě', 'nervózně', 'vesele',
+  'smutně', 'rozčíleně', 'klidně', 'vyděšeně', 'znuděně', 'nadšeně',
+  'rezervovaně', 'důvěřivě', 'pohrdavě', 'úslužně', 'tajemně', 'vychytrale'
+];
+
+// NPC chování - akce
+const NPC_BEHAVIOR_ACTIONS = [
+  'hledá něco', 'utíká před někým', 'sleduje někoho', 'čeká na něco',
+  'opravuje věc', 'sbírá zásoby', 'obchoduje', 'odpočívá', 'hlídkuje',
+  'vaří jídlo', 'uklízí', 'zpívá', 'bručí', 'krade', 'pomlouvá',
+  'vypráví příběh', 'hádá se', 'prosí o pomoc', 'nabízí služby'
+];
+
+// NPC chování - motivace
+const NPC_BEHAVIOR_MOTIVATIONS = [
+  'chce vydělat ďobky', 'hledá ztracenou věc', 'chrání někoho blízkého',
+  'touží po dobrodružství', 'utíká před minulostí', 'chce pomstu',
+  'hledá nový domov', 'sbírá informace', 'chce být nechán/a na pokoji',
+  'hledá přátele', 'touží po moci', 'chce napravit křivdu',
+  'chrání tajemství', 'hledá lásku', 'chce dokázat svou hodnotu'
+];
+
+// NPC tajemství
+const NPC_SECRETS = [
+  'pracuje pro nepřátelskou frakci', 'má dluh u nebezpečné osoby',
+  'je na útěku před zákonem', 'skrývá magickou schopnost',
+  'ví o ukrytém pokladu', 'je členem tajného spolku',
+  'má zakázanou lásku', 'spáchal/a zločin v minulosti',
+  'zná cestu do nebezpečného místa', 'je ve skutečnosti šlechtic/šlechtična v přestrojení',
+  'má smrtelnou nemoc', 'ukrývá někoho hledaného',
+  'plánuje zradu', 'je špehem jiné osady',
+  'má dědictví, o kterém neví', 'viděl/a něco, co neměl/a'
+];
+
+// NPC reakce na hráče
+const NPC_REACTIONS = [
+  'nabídne pomoc za úplatu', 'chce něco výměnou',
+  'bude varovat před nebezpečím', 'požádá o laskavost',
+  'pokusí se oklamat', 'bude jednat agresivně',
+  'nabídne informace', 'bude ignorovat',
+  'požádá o ochranu', 'zkusí ukrást věc',
+  'nabídne spojenectví', 'bude vyjednávat',
+  'utíká pryč', 'zavolá na pomoc',
+  'zve k jídlu/pití', 'vypráví příběh o sobě'
+];
+
+// NPC role/povolání
+const NPC_ROLES = [
+  'Kovář', 'Kuchař', 'Sládek', 'Lékař', 'Léčitelka', 'Kupec', 'Stráž',
+  'Rybář', 'Honák brouků', 'Horník', 'Pěstitel hub', 'Tkadlena', 'Švec',
+  'Tesař', 'Kartograf', 'Učenec', 'Knihovník', 'Hospodský', 'Pekař',
+  'Sběrač', 'Stopař', 'Kurýr', 'Zbrojíř', 'Průvodce', 'Kejklíř',
+  'Hudebník', 'Vypravěč', 'Věštec', 'Kněz', 'Zloděj', 'Pašerák',
+  'Dobrodruh', 'Žoldnéř', 'Rytíř', 'Podomní obchodník', 'Dráteník',
+  'Bylinkář', 'Kožešník', 'Sladovník', 'Vorař', 'Kameník', 'Mlynář'
+];
+
 // Barva srsti (k6)
 const FUR_COLORS = ['Čokoládová', 'Černá', 'Bílá', 'Světle hnědá', 'Šedá', 'Namodralá'];
 
@@ -1615,6 +1674,20 @@ const STARTING_WEAPONS = [
 const FIRST_NAMES = [...MALE_FIRST_NAMES, ...FEMALE_FIRST_NAMES];
 const LAST_NAMES = FAMILY_NAMES.map(f => f.male);
 const PHYSICAL_DETAILS = Object.values(DISTINCTIVE_FEATURES);
+
+// Typy pomocníků k verbování (podle pravidel Mausritter)
+// HP se hází k6, staty 2k6 - stejné pro všechny typy
+const HIRELING_TYPES = [
+  { type: 'torch', name: 'Světlonoš', dice: 'd6', cost: '1 ď', skill: 'Nosí pochodně, osvětluje cestu' },
+  { type: 'laborer', name: 'Dělník', dice: 'd6', cost: '2 ď', skill: 'Nošení nákladu, jednoduché práce' },
+  { type: 'tunneler', name: 'Kopáč chodeb', dice: 'd4', cost: '5 ď', skill: 'Kopání tunelů, odstraňování překážek' },
+  { type: 'smith', name: 'Zbrojíř/kovář', dice: 'd2', cost: '8 ď', skill: 'Opravy zbraní a zbrojí v terénu' },
+  { type: 'guide', name: 'Místní průvodce', dice: 'd4', cost: '10 ď', skill: 'Zná okolí, vyhne se nebezpečím' },
+  { type: 'soldier', name: 'Zbrojmyš', dice: 'd6', cost: '10 ď', skill: 'Bojovník - umí bojovat!' },
+  { type: 'scholar', name: 'Učenec', dice: 'd2', cost: '20 ď', skill: 'Čtení, magie, historie, záhady' },
+  { type: 'knight', name: 'Rytíř', dice: 'd3', cost: '25 ď', skill: 'Elitní bojovník s vybavením' },
+  { type: 'interpreter', name: 'Tlumočník', dice: 'd2', cost: '30 ď', skill: 'Mluví s jinými tvory/jazyky' },
+];
 
 const NPC_QUIRKS = [
   'Mluví ve třetí osobě', 'Sbírá lesklé věci', 'Neustále si opakuje plány', 'Má tajného mazlíčka',
@@ -3875,6 +3948,134 @@ const CharacterPanel = ({
   const [bonusOrigin, setBonusOrigin] = useState(null);
   const [selectedBonusItems, setSelectedBonusItems] = useState([]);
 
+  // State for hireling recruitment picker
+  const [showHirelingPicker, setShowHirelingPicker] = useState(false);
+  const [hirelingAvailability, setHirelingAvailability] = useState({});
+  const [hirelingCandidates, setHirelingCandidates] = useState([]);
+  const [selectedCandidateIds, setSelectedCandidateIds] = useState([]);
+  const [currentRecruitType, setCurrentRecruitType] = useState(null);
+
+  // Hireling recruitment functions
+  const rollHirelingDice = (diceStr) => {
+    const match = diceStr.match(/d(\d+)/);
+    if (!match) return 1;
+    return Math.floor(Math.random() * parseInt(match[1])) + 1;
+  };
+
+  const rollAvailability = (typeKey) => {
+    const type = HIRELING_TYPES.find(t => t.type === typeKey);
+    if (!type) return 0;
+    const count = rollHirelingDice(type.dice);
+    setHirelingAvailability(prev => ({ ...prev, [typeKey]: count }));
+    return count;
+  };
+
+  const hireHireling = (typeKey) => {
+    if (!activePartyId) return;
+    const available = hirelingAvailability[typeKey] || 0;
+    if (available <= 0) return;
+    const hireling = createHireling(activePartyId, typeKey);
+    setHirelingAvailability(prev => ({ ...prev, [typeKey]: prev[typeKey] - 1 }));
+    setActiveCharacterId(hireling.id);
+    setShowHirelingPicker(false);
+  };
+
+  const openHirelingPicker = () => {
+    if (!activePartyId) return;
+    setHirelingAvailability({});
+    setHirelingCandidates([]);
+    setSelectedCandidateIds([]);
+    setCurrentRecruitType(null);
+    setShowHirelingPicker(true);
+  };
+
+  // Generate candidates with stats for a hireling type
+  const generateCandidates = (typeKey) => {
+    const hirelingType = HIRELING_TYPES.find(t => t.type === typeKey);
+    if (!hirelingType) return;
+
+    const count = rollHirelingDice(hirelingType.dice);
+
+    const candidates = [];
+    for (let i = 0; i < count; i++) {
+      const roll2k6 = () => rollD6() + rollD6();
+      candidates.push({
+        tempId: generateId(),
+        name: `${randomFrom(FIRST_NAMES)} ${randomFrom(LAST_NAMES)}`,
+        STR: roll2k6(),
+        DEX: roll2k6(),
+        WIL: roll2k6(),
+        HP: rollD6(),
+        physicalDetail: randomFrom(PHYSICAL_DETAILS)
+      });
+    }
+
+    setCurrentRecruitType(typeKey);
+    setHirelingCandidates(candidates);
+    setSelectedCandidates(new Set());
+    setHirelingAvailability(prev => ({ ...prev, [typeKey]: count }));
+  };
+
+  // Toggle candidate selection
+  const toggleCandidate = (tempId) => {
+    setSelectedCandidates(prev => {
+      const next = new Set(prev);
+      if (next.has(tempId)) {
+        next.delete(tempId);
+      } else {
+        next.add(tempId);
+      }
+      return next;
+    });
+  };
+
+  // Hire selected candidates
+  const hireSelectedCandidates = () => {
+    if (!activePartyId || !currentRecruitType) return;
+    const hirelingType = HIRELING_TYPES.find(t => t.type === currentRecruitType);
+
+    let lastHiredId = null;
+    hirelingCandidates
+      .filter(c => selectedCandidates.has(c.tempId))
+      .forEach(candidate => {
+        const newHireling = {
+          id: generateId(),
+          type: 'hireling',
+          hirelingType: currentRecruitType,
+          name: candidate.name,
+          STR: { current: candidate.STR, max: candidate.STR },
+          DEX: { current: candidate.DEX, max: candidate.DEX },
+          WIL: { current: candidate.WIL, max: candidate.WIL },
+          hp: { current: candidate.HP, max: candidate.HP },
+          cost: hirelingType?.cost || '1 ď',
+          skill: hirelingType?.skill || null,
+          inventorySlots: {
+            strongPaw1: null, strongPaw2: null,
+            weakPaw1: null, weakPaw2: null
+          },
+          physicalDetail: candidate.physicalDetail
+        };
+
+        setParties(prev => prev.map(p =>
+          p.id === activePartyId
+            ? { ...p, members: [...p.members, newHireling] }
+            : p
+        ));
+        lastHiredId = newHireling.id;
+      });
+
+    // Switch to last hired character
+    if (lastHiredId) {
+      setActiveCharacterId(lastHiredId);
+    }
+
+    // Clear and close
+    setHirelingCandidates([]);
+    setSelectedCandidates(new Set());
+    setCurrentRecruitType(null);
+    setShowHirelingPicker(false);
+  };
+
   // Roll new character for generator
   const rollNewCharacter = (preferredGender = null) => {
     // Reset bonus origin and selected items
@@ -4069,20 +4270,11 @@ const CharacterPanel = ({
 
   const updateAttribute = (attr, field, value) => {
     if (!character) return;
-    // Povolit prázdný string během editace
-    if (value === '' || value === '-') {
-      updateCharacter({
-        [attr]: { ...character[attr], [field]: '' }
-      });
-      return;
-    }
-    const parsed = parseInt(value);
-    if (!isNaN(parsed)) {
-      updateCharacter({
-        [attr]: { ...character[attr], [field]: Math.max(1, Math.min(18, parsed)) }
-      });
-    }
-  };;
+    const parsed = parseInt(value) || 0;
+    updateCharacter({
+      [attr]: { ...character[attr], [field]: Math.max(1, Math.min(18, parsed)) }
+    });
+  };
 
   const toggleCondition = (condId) => {
     if (!character) return;
@@ -4522,6 +4714,127 @@ const CharacterPanel = ({
         </div>
       )}
 
+      {/* Hireling Recruitment Picker Modal */}
+      {showHirelingPicker && (
+        <div className="fixed inset-0 bg-black/50 z-50 overflow-y-auto">
+          <div className="min-h-full flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl p-4 md:p-6 max-w-2xl w-full shadow-2xl my-8">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold text-amber-900">🐿️ Verbování pomocníků</h3>
+                <button onClick={() => setShowHirelingPicker(false)} className="text-stone-400 hover:text-stone-600 text-2xl">✕</button>
+              </div>
+
+              <p className="text-sm text-stone-600 mb-4">
+                Klikni na typ pro vygenerování dostupných kandidátů. Vyber které chceš naverbovat.
+              </p>
+
+              {/* Hireling type list */}
+              <div className="space-y-2 mb-4">
+                {HIRELING_TYPES.map(ht => {
+                  const isSelected = currentRecruitType === ht.type;
+
+                  return (
+                    <div
+                      key={ht.type}
+                      className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
+                        isSelected ? 'bg-amber-200 ring-2 ring-amber-400' : 'bg-amber-50 hover:bg-amber-100'
+                      }`}
+                      onClick={() => generateCandidates(ht.type)}
+                    >
+                      <div className="flex-1">
+                        <div className="font-bold text-amber-900">{ht.name}</div>
+                        <div className="text-xs text-stone-500">{ht.skill}</div>
+                      </div>
+                      <div className="text-center w-16">
+                        <div className="text-xs text-stone-400">Počet</div>
+                        <div className="font-bold">{ht.dice}</div>
+                      </div>
+                      <div className="text-center w-16">
+                        <div className="text-xs text-stone-400">Mzda</div>
+                        <div className="font-bold text-amber-700">{ht.cost}</div>
+                      </div>
+                      <div className="w-20 text-center">
+                        <Button size="small" variant={isSelected ? 'primary' : 'ghost'}>
+                          🎲 {ht.dice}
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Candidates list */}
+              {hirelingCandidates.length > 0 && currentRecruitType && (
+                <div className="border-t border-stone-200 pt-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-bold text-amber-900">
+                      Dostupní kandidáti ({hirelingCandidates.length})
+                      {' '}<span className="text-stone-500 font-normal">
+                        - {HIRELING_TYPES.find(t => t.type === currentRecruitType)?.name}
+                      </span>
+                    </h4>
+                    {selectedCandidates.size > 0 && (
+                      <Button onClick={hireSelectedCandidates}>
+                        Najmout vybrané ({selectedCandidates.size})
+                      </Button>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    {hirelingCandidates.map(c => (
+                      <div
+                        key={c.tempId}
+                        className={`flex items-center gap-3 p-3 rounded-lg border-2 transition-colors cursor-pointer ${
+                          selectedCandidates.has(c.tempId)
+                            ? 'border-green-500 bg-green-50'
+                            : 'border-stone-200 bg-stone-50 hover:border-stone-300'
+                        }`}
+                        onClick={() => toggleCandidate(c.tempId)}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedCandidates.has(c.tempId)}
+                          onChange={() => toggleCandidate(c.tempId)}
+                          className="w-5 h-5 text-green-600 rounded"
+                        />
+                        <div className="flex-1">
+                          <div className="font-bold text-stone-800">{c.name}</div>
+                          <div className="text-xs text-stone-500 italic">{c.physicalDetail}</div>
+                        </div>
+                        <div className="flex gap-2 text-sm">
+                          <span className="px-2 py-1 bg-red-100 text-red-700 rounded">
+                            SÍL {c.STR}
+                          </span>
+                          <span className="px-2 py-1 bg-green-100 text-green-700 rounded">
+                            MRŠ {c.DEX}
+                          </span>
+                          <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded">
+                            VŮL {c.WIL}
+                          </span>
+                          <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded">
+                            BO {c.HP}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {hirelingCandidates.length === 0 && (
+                    <div className="text-center py-4 text-stone-500">
+                      Žádní kandidáti nejsou k dispozici
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="mt-4 pt-4 border-t border-stone-200 text-xs text-stone-500">
+                <strong>Morálka:</strong> Test záchranou na Vůli (2d6 ≤ VŮL) když ve stresu
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ===== PARTY & MEMBER SELECTOR ===== */}
       <ResultCard>
         {/* Party row */}
@@ -4553,7 +4866,7 @@ const CharacterPanel = ({
               <span className="text-sm font-bold text-stone-500">👥 Členové</span>
               <div className="flex gap-1">
                 <Button size="small" onClick={openGenerator}>🎲 Myš</Button>
-                <Button size="small" variant="ghost" onClick={addHireling}>🐿️</Button>
+                <Button size="small" variant="ghost" onClick={openHirelingPicker}>🐿️ Verbovat</Button>
               </div>
             </div>
             
@@ -4609,9 +4922,12 @@ const CharacterPanel = ({
                     {character.name}
                   </h2>
                   <p className="text-sm text-stone-500">
-                    {character.type === 'pc' 
-                      ? `${character.origin?.name || character.background || 'Level ' + (character.level || 1)}` 
-                      : `Hireling • Loyalty ${character.loyalty || 7}`}
+                    {character.type === 'pc'
+                      ? `${character.origin?.name || character.background || 'Level ' + (character.level || 1)}`
+                      : (() => {
+                          const ht = HIRELING_TYPES.find(t => t.type === character.hirelingType);
+                          return ht ? `${ht.name} • ${ht.cost}` : 'Pomocník';
+                        })()}
                   </p>
                 </div>
               </div>
@@ -4676,20 +4992,18 @@ const CharacterPanel = ({
                       <div className="flex items-center justify-center gap-1">
                         <input
                           type="number"
-                          value={character[attr]?.current ?? ''}
+                          value={character[attr]?.current || 10}
                           onChange={(e) => updateAttribute(attr, 'current', e.target.value)}
-                          onBlur={(e) => { if (e.target.value === '') updateAttribute(attr, 'current', '10'); }}
-                          className="w-14 h-10 text-center text-xl font-bold text-amber-900 bg-white border-2 border-amber-300 rounded"
+                          className="w-12 text-center text-xl font-bold text-amber-900 bg-white border border-amber-300 rounded"
                           min="1"
                           max="18"
                         />
                         <span className="text-stone-400">/</span>
                         <input
                           type="number"
-                          value={character[attr]?.max ?? ''}
+                          value={character[attr]?.max || 10}
                           onChange={(e) => updateAttribute(attr, 'max', e.target.value)}
-                          onBlur={(e) => { if (e.target.value === '') updateAttribute(attr, 'max', '10'); }}
-                          className="w-14 h-10 text-center text-lg font-medium text-stone-600 bg-white border-2 border-stone-300 rounded"
+                          className="w-12 text-center text-sm font-medium text-stone-500 bg-white border border-stone-200 rounded"
                           min="1"
                           max="18"
                         />
@@ -4882,94 +5196,163 @@ const CharacterPanel = ({
 
 // ========== HIRELING SHEET COMPONENT ==========
 const HirelingSheet = ({ character, updateCharacter, editMode, setEditMode, onLogEntry }) => {
-  const HIRELING_SKILLS = ['Boj', 'Průzkum', 'Léčení', 'Plížení', 'Vaření', 'Opravy', 'Navigace', 'Obchod'];
+  // Get hireling type info if available
+  const hirelingTypeInfo = character.hirelingType && character.hirelingType !== 'generic'
+    ? HIRELING_TYPES.find(t => t.type === character.hirelingType)
+    : null;
+
+  // Migrate old hirelings that don't have stats
+  React.useEffect(() => {
+    if (!character.STR) {
+      const roll2k6 = () => Math.floor(Math.random() * 6) + 1 + Math.floor(Math.random() * 6) + 1;
+      const str = roll2k6();
+      const dex = roll2k6();
+      const wil = roll2k6();
+      const hp = character.hp?.max || Math.floor(Math.random() * 6) + 1;
+      updateCharacter({
+        STR: { current: str, max: str },
+        DEX: { current: dex, max: dex },
+        WIL: { current: wil, max: wil },
+        hp: { current: hp, max: hp },
+        inventorySlots: character.inventorySlots || {
+          strongPaw1: null, strongPaw2: null,
+          weakPaw1: null, weakPaw2: null
+        }
+      });
+    }
+  }, [character.id]);
+
+  const updateStat = (stat, field, delta) => {
+    const current = character[stat]?.[field] || 0;
+    const max = field === 'current' ? (character[stat]?.max || 12) : 12;
+    const newVal = Math.max(0, Math.min(max, current + delta));
+    updateCharacter({ [stat]: { ...character[stat], [field]: newVal } });
+  };
+
+  // Hireling inventory slots
+  const HIRELING_SLOTS = ['strongPaw1', 'strongPaw2', 'weakPaw1', 'weakPaw2'];
 
   return (
     <>
-      <ResultCard title="🐿️ Hireling Sheet">
-        <div className="flex justify-end mb-3">
+      {/* Main Card - Stats & Inventory side by side */}
+      <ResultCard title={hirelingTypeInfo ? `🐿️ ${hirelingTypeInfo.name}` : "🐿️ Pomocník"}>
+        <div className="flex justify-between items-start mb-3">
+          <div className="text-sm text-stone-500">
+            Mzda: <span className="font-bold text-amber-700">{character.cost || '1 ď'}</span>
+            {character.physicalDetail && <span className="ml-2">• {character.physicalDetail}</span>}
+          </div>
           <Button size="small" variant="ghost" onClick={() => setEditMode(!editMode)}>
             {editMode ? '✓ Hotovo' : '✏️ Upravit'}
           </Button>
         </div>
-        
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div>
-            <label className="text-sm text-stone-500 block">HP</label>
-            <div className="text-2xl font-bold text-red-700">
-              {character.hp?.current || 0}/{character.hp?.max || 3}
-            </div>
-            <div className="flex gap-1 mt-1">
-              <Button size="small" variant="danger" onClick={() => updateCharacter({ hp: { ...character.hp, current: Math.max(0, (character.hp?.current || 0) - 1) } })}>-</Button>
-              <Button size="small" variant="success" onClick={() => updateCharacter({ hp: { ...character.hp, current: Math.min(character.hp?.max || 3, (character.hp?.current || 0) + 1) } })}>+</Button>
-            </div>
-          </div>
-          <div>
-            <label className="text-sm text-stone-500 block">Loajalita</label>
-            <div className="text-2xl font-bold text-blue-700">{character.loyalty || 7}</div>
-            {editMode && (
-              <div className="flex gap-1 mt-1">
-                <Button size="small" variant="ghost" onClick={() => updateCharacter({ loyalty: Math.max(2, (character.loyalty || 7) - 1) })}>-</Button>
-                <Button size="small" variant="ghost" onClick={() => updateCharacter({ loyalty: Math.min(12, (character.loyalty || 7) + 1) })}>+</Button>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* LEFT: Stats */}
+          <div className="space-y-2">
+            <div className="text-xs font-bold text-stone-500 mb-2">STATY</div>
+            {[
+              { key: 'STR', label: 'Síla', color: 'red' },
+              { key: 'DEX', label: 'Mrš.', color: 'green' },
+              { key: 'WIL', label: 'Vůle', color: 'blue' },
+              { key: 'hp', label: 'BO', color: 'amber' }
+            ].map(({ key, label, color }) => (
+              <div key={key} className="flex items-center gap-2 p-2 bg-stone-50 rounded">
+                <div className="w-12 font-bold text-stone-700">{label}</div>
+                <div className="flex-1 flex items-center gap-2">
+                  <span className="text-xs text-stone-400">Max</span>
+                  <span className={`font-bold text-${color}-700`}>{character[key]?.max || '?'}</span>
+                  <span className="text-xs text-stone-400 ml-2">Akt</span>
+                  <span className={`font-bold text-${color}-700`}>{character[key]?.current || '?'}</span>
+                </div>
+                <div className="flex gap-1">
+                  <button className="w-6 h-6 bg-stone-200 rounded text-sm hover:bg-stone-300" onClick={() => updateStat(key, 'current', -1)}>-</button>
+                  <button className="w-6 h-6 bg-stone-200 rounded text-sm hover:bg-stone-300" onClick={() => updateStat(key, 'current', 1)}>+</button>
+                </div>
               </div>
-            )}
+            ))}
           </div>
-          <div>
-            <label className="text-sm text-stone-500 block">Cena</label>
-            {editMode ? (
-              <Input value={character.cost || '1 pip/den'} onChange={(v) => updateCharacter({ cost: v })} />
-            ) : (
-              <p className="font-bold">{character.cost || '1 pip/den'}</p>
-            )}
-          </div>
-          <div>
-            <label className="text-sm text-stone-500 block">Fyzický detail</label>
-            <p className="text-stone-700">{character.physicalDetail || '—'}</p>
-          </div>
-        </div>
-      </ResultCard>
 
-      <ResultCard title="🎯 Schopnosti">
-        <div className="flex flex-wrap gap-2">
-          {HIRELING_SKILLS.map(skill => (
-            <button
-              key={skill}
-              onClick={() => updateCharacter({
-                skills: character.skills?.includes(skill) 
-                  ? character.skills.filter(s => s !== skill)
-                  : [...(character.skills || []), skill]
+          {/* RIGHT: Inventory (2x2 grid) */}
+          <div>
+            <div className="text-xs font-bold text-stone-500 mb-2">INVENTÁŘ</div>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="col-span-2 text-xs text-center text-stone-400">Silnější packa</div>
+              {['strongPaw1', 'strongPaw2'].map(slotId => {
+                const item = character.inventorySlots?.[slotId];
+                return (
+                  <div key={slotId} className="h-16 border-2 border-dashed border-stone-300 rounded flex items-center justify-center bg-stone-50">
+                    {item ? (
+                      <div className="text-center p-1">
+                        <div className="text-xs font-medium truncate">{item.name}</div>
+                        {editMode && (
+                          <button className="text-xs text-red-500" onClick={() => {
+                            const slots = { ...character.inventorySlots, [slotId]: null };
+                            updateCharacter({ inventorySlots: slots });
+                          }}>✕</button>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-stone-300 text-xs">prázdné</span>
+                    )}
+                  </div>
+                );
               })}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                character.skills?.includes(skill)
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-stone-200 text-stone-700 hover:bg-stone-300'
-              }`}
-            >
-              {skill}
-            </button>
-          ))}
+              <div className="col-span-2 text-xs text-center text-stone-400 mt-2">Slabší packa</div>
+              {['weakPaw1', 'weakPaw2'].map(slotId => {
+                const item = character.inventorySlots?.[slotId];
+                return (
+                  <div key={slotId} className="h-16 border-2 border-dashed border-stone-300 rounded flex items-center justify-center bg-stone-50">
+                    {item ? (
+                      <div className="text-center p-1">
+                        <div className="text-xs font-medium truncate">{item.name}</div>
+                        {editMode && (
+                          <button className="text-xs text-red-500" onClick={() => {
+                            const slots = { ...character.inventorySlots, [slotId]: null };
+                            updateCharacter({ inventorySlots: slots });
+                          }}>✕</button>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-stone-300 text-xs">prázdné</span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </ResultCard>
 
-      <ResultCard title="🎲 Loyalty Check">
+      {/* Specialization (if has type) */}
+      {hirelingTypeInfo && (
+        <ResultCard title="🎯 Specializace">
+          <div className="p-3 bg-amber-100 rounded-lg">
+            <div className="font-medium text-amber-900">{hirelingTypeInfo.skill}</div>
+          </div>
+        </ResultCard>
+      )}
+
+      {/* Morale Check - now uses WIL */}
+      <ResultCard title="🎲 Test morálky">
         <p className="text-stone-600 mb-3 text-sm">
-          Hoď 2d6 když hireling čelí nebezpečí nebo je mu rozkázáno něco riskantního. 
-          Výsledek musí být ≤ {character.loyalty || 7}.
+          Když ve stresující situaci (nebezpečí, žádný žold, riskantní rozkaz),
+          hoď záchranou na Vůli. Neúspěch = uteče.
         </p>
         <Button onClick={() => {
           const { dice, total } = roll2D6();
-          const success = total <= (character.loyalty || 7);
+          const threshold = character.WIL?.current || 7;
+          const success = total <= threshold;
           onLogEntry({
-            type: 'loyalty_check',
+            type: 'morale_check',
             timestamp: formatTimestamp(),
             hireling: character.name,
             dice, total,
-            threshold: character.loyalty || 7,
+            threshold,
             success
           });
-          alert(`Loyalty: [${dice.join(', ')}] = ${total} vs ${character.loyalty || 7}\n${success ? '✓ Loajální!' : '✗ PROBLÉM!'}`);
+          alert(`Morálka: [${dice.join(', ')}] = ${total} vs VŮL ${threshold}\n${success ? '✓ Zůstává!' : '✗ UTEČE!'}`);
         }}>
-          🎲 Hodit (2d6 ≤ {character.loyalty || 7})
+          🎲 Test Vůle (2d6 ≤ {character.WIL?.current || '?'})
         </Button>
       </ResultCard>
     </>
@@ -6212,6 +6595,7 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
   const [editingNPC, setEditingNPC] = useState(null);
   const [viewingSettlement, setViewingSettlement] = useState(null);
   const [expandedNPCs, setExpandedNPCs] = useState({});
+  const [npcBehaviors, setNpcBehaviors] = useState({});
 
   // ========== SETTLEMENT MANAGEMENT ==========
   const createEmptySettlement = () => {
@@ -6253,6 +6637,12 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
 
   // ========== NPC MANAGEMENT ==========
   const createEmptyNPC = (settlementId = null) => {
+    // Staty pomocníka podle pravidel: k6 BO, 2k6 síla/mrštnost/vůle
+    const hp = rollDice(1, 6)[0];
+    const str = rollDice(2, 6).reduce((a, b) => a + b, 0);
+    const dex = rollDice(2, 6).reduce((a, b) => a + b, 0);
+    const wil = rollDice(2, 6).reduce((a, b) => a + b, 0);
+
     const newNPC = {
       id: generateId(),
       name: 'Nová postava',
@@ -6262,7 +6652,11 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
       goal: '',
       role: '',
       settlementId,
-      notes: ''
+      notes: '',
+      hp: { current: hp, max: hp },
+      str: { current: str, max: str },
+      dex: { current: dex, max: dex },
+      wil: { current: wil, max: wil }
     };
     setWorldNPCs([...worldNPCs, newNPC]);
     setEditingNPC(newNPC.id);
@@ -6291,11 +6685,50 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
   const deleteNPC = (id) => {
     setWorldNPCs(worldNPCs.filter(n => n.id !== id));
     // Remove NPC from settlements
-    setSettlements(settlements.map(s => ({ 
-      ...s, 
+    setSettlements(settlements.map(s => ({
+      ...s,
       npcs: s.npcs?.filter(npcId => npcId !== id) || [],
       ruler: s.ruler === id ? null : s.ruler
     })));
+  };
+
+  const generateNPCBehavior = (npcId) => {
+    const mood = randomFrom(NPC_BEHAVIOR_MOODS);
+    const action = randomFrom(NPC_BEHAVIOR_ACTIONS);
+    const motivation = randomFrom(NPC_BEHAVIOR_MOTIVATIONS);
+    const behavior = `🎭 Chová se ${mood}, ${action}, protože ${motivation}.`;
+    setNpcBehaviors({ ...npcBehaviors, [npcId]: behavior });
+  };
+
+  const generateNPCMood = (npcId) => {
+    const mood = randomFrom(NPC_BEHAVIOR_MOODS);
+    setNpcBehaviors({ ...npcBehaviors, [npcId]: `😊 Nálada: ${mood}` });
+  };
+
+  const generateNPCAction = (npcId) => {
+    const action = randomFrom(NPC_BEHAVIOR_ACTIONS);
+    setNpcBehaviors({ ...npcBehaviors, [npcId]: `🏃 Právě teď: ${action}` });
+  };
+
+  const generateNPCMotivation = (npcId) => {
+    const motivation = randomFrom(NPC_BEHAVIOR_MOTIVATIONS);
+    setNpcBehaviors({ ...npcBehaviors, [npcId]: `💭 Motivace: ${motivation}` });
+  };
+
+  const generateNPCSecret = (npcId) => {
+    const secret = randomFrom(NPC_SECRETS);
+    setNpcBehaviors({ ...npcBehaviors, [npcId]: `🤫 Tajemství: ${secret}` });
+  };
+
+  const generateNPCReaction = (npcId) => {
+    const reaction = randomFrom(NPC_REACTIONS);
+    setNpcBehaviors({ ...npcBehaviors, [npcId]: `⚡ Reakce: ${reaction}` });
+  };
+
+  const generateNPCRole = (npcId) => {
+    const role = randomFrom(NPC_ROLES);
+    updateNPC(npcId, { role });
+    setNpcBehaviors({ ...npcBehaviors, [npcId]: `🔧 Povolání: ${role}` });
   };
 
   const assignNPCToSettlement = (npcId, settlementId) => {
@@ -6375,14 +6808,25 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
     const familyName = randomFrom(FAMILY_NAMES);
     const lastName = isFemale ? familyName.female : familyName.male;
 
+    // Staty pomocníka podle pravidel: k6 BO, 2k6 síla/mrštnost/vůle
+    const hp = rollDice(1, 6)[0];
+    const str = rollDice(2, 6).reduce((a, b) => a + b, 0);
+    const dex = rollDice(2, 6).reduce((a, b) => a + b, 0);
+    const wil = rollDice(2, 6).reduce((a, b) => a + b, 0);
+
     const npc = {
       type: 'npc',
       name: `${firstName} ${lastName}`,
+      role: randomFrom(NPC_ROLES),
       birthsign: randomFrom(BIRTHSIGNS),
       physicalDetail: randomFrom(PHYSICAL_DETAILS),
       quirk: randomFrom(NPC_QUIRKS),
       goal: randomFrom(NPC_GOALS),
-      reaction: roll2D6()
+      reaction: roll2D6(),
+      hp: { current: hp, max: hp },
+      str: { current: str, max: str },
+      dex: { current: dex, max: dex },
+      wil: { current: wil, max: wil }
     };
 
     setGenerated(npc);
@@ -6659,96 +7103,126 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
               {worldNPCs.map(npc => (
                 <ResultCard key={npc.id}>
                   {editingNPC === npc.id ? (
-                    // Edit mode
+                    // Edit mode - karta jako v generátoru
                     <div className="space-y-3">
-                      <Input 
-                        value={npc.name} 
-                        onChange={(v) => updateNPC(npc.id, { name: v })}
-                        placeholder="Jméno"
-                        className="font-bold"
-                      />
-                      <div className="grid grid-cols-2 gap-3">
-                        <Input 
-                          value={npc.role || ''} 
-                          onChange={(v) => updateNPC(npc.id, { role: v })}
-                          placeholder="Role/povolání"
+                      <div className="flex justify-between items-start">
+                        <input
+                          value={npc.name}
+                          onChange={(e) => updateNPC(npc.id, { name: e.target.value })}
+                          className="text-2xl font-bold text-amber-900 bg-transparent border-b-2 border-amber-300 focus:border-amber-500 outline-none"
                         />
-                        <Select
-                          value={npc.settlementId || ''}
-                          onChange={(v) => assignNPCToSettlement(npc.id, v || null)}
-                          options={[
-                            { value: '', label: '— Bez domova —' },
-                            ...settlements.map(s => ({ value: s.id, label: s.name }))
-                          ]}
-                        />
+                        <div className="flex gap-2">
+                          <Button variant="ghost" size="sm" onClick={() => setEditingNPC(null)}>✓</Button>
+                          <Button variant="ghost" size="sm" className="text-red-500" onClick={() => deleteNPC(npc.id)}>🗑️</Button>
+                        </div>
                       </div>
-                      <Input 
-                        value={npc.birthsign || ''} 
-                        onChange={(v) => updateNPC(npc.id, { birthsign: v })}
-                        placeholder="Znamení/povaha"
-                      />
-                      <Input 
-                        value={npc.physicalDetail || ''} 
-                        onChange={(v) => updateNPC(npc.id, { physicalDetail: v })}
-                        placeholder="Fyzický detail (vzhled)"
-                      />
-                      <Input 
-                        value={npc.quirk || ''} 
-                        onChange={(v) => updateNPC(npc.id, { quirk: v })}
-                        placeholder="Zvláštnost (chování)"
-                      />
-                      <Input 
-                        value={npc.goal || ''} 
-                        onChange={(v) => updateNPC(npc.id, { goal: v })}
-                        placeholder="Cíl (co chce)"
-                      />
-                      <textarea
-                        value={npc.notes || ''}
-                        onChange={(e) => updateNPC(npc.id, { notes: e.target.value })}
-                        placeholder="Poznámky..."
-                        className="w-full h-20 px-3 py-2 border border-stone-300 rounded-lg resize-none"
-                      />
-                      <div className="flex justify-between">
-                        <Button variant="ghost" onClick={() => setEditingNPC(null)}>✓ Hotovo</Button>
-                        <Button variant="ghost" className="text-red-500" onClick={() => deleteNPC(npc.id)}>Smazat</Button>
+
+                      {/* Staty - editovatelné */}
+                      <div className="flex flex-wrap gap-2 text-sm font-mono bg-stone-100 rounded px-3 py-2 justify-center items-center">
+                        <span className="font-bold">BO:</span>
+                        <input type="text" inputMode="numeric" value={npc.hp?.current || 0} onChange={(e) => updateNPC(npc.id, { hp: { ...npc.hp, current: parseInt(e.target.value) || 0 } })} className="w-12 h-8 text-center border rounded bg-white font-bold" />
+                        <span>/</span>
+                        <input type="text" inputMode="numeric" value={npc.hp?.max || 0} onChange={(e) => updateNPC(npc.id, { hp: { ...npc.hp, max: parseInt(e.target.value) || 0 } })} className="w-12 h-8 text-center border rounded bg-white font-bold" />
+                        <span className="ml-3 font-bold">SÍL:</span>
+                        <input type="text" inputMode="numeric" value={npc.str?.current || 0} onChange={(e) => updateNPC(npc.id, { str: { ...npc.str, current: parseInt(e.target.value) || 0 } })} className="w-12 h-8 text-center border rounded bg-white font-bold" />
+                        <span>/</span>
+                        <input type="text" inputMode="numeric" value={npc.str?.max || 0} onChange={(e) => updateNPC(npc.id, { str: { ...npc.str, max: parseInt(e.target.value) || 0 } })} className="w-12 h-8 text-center border rounded bg-white font-bold" />
+                        <span className="ml-3 font-bold">MRŠ:</span>
+                        <input type="text" inputMode="numeric" value={npc.dex?.current || 0} onChange={(e) => updateNPC(npc.id, { dex: { ...npc.dex, current: parseInt(e.target.value) || 0 } })} className="w-12 h-8 text-center border rounded bg-white font-bold" />
+                        <span>/</span>
+                        <input type="text" inputMode="numeric" value={npc.dex?.max || 0} onChange={(e) => updateNPC(npc.id, { dex: { ...npc.dex, max: parseInt(e.target.value) || 0 } })} className="w-12 h-8 text-center border rounded bg-white font-bold" />
+                        <span className="ml-3 font-bold">VŮL:</span>
+                        <input type="text" inputMode="numeric" value={npc.wil?.current || 0} onChange={(e) => updateNPC(npc.id, { wil: { ...npc.wil, current: parseInt(e.target.value) || 0 } })} className="w-12 h-8 text-center border rounded bg-white font-bold" />
+                        <span>/</span>
+                        <input type="text" inputMode="numeric" value={npc.wil?.max || 0} onChange={(e) => updateNPC(npc.id, { wil: { ...npc.wil, max: parseInt(e.target.value) || 0 } })} className="w-12 h-8 text-center border rounded bg-white font-bold" />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="p-3 bg-amber-100/50 rounded">
+                          <span className="text-sm text-stone-500">Znamení</span>
+                          <input value={npc.birthsign || ''} onChange={(e) => updateNPC(npc.id, { birthsign: e.target.value })} placeholder="Znamení" className="w-full font-bold bg-transparent border-b border-amber-300 focus:border-amber-500 outline-none" />
+                        </div>
+                        <div className="p-3 bg-amber-100/50 rounded">
+                          <span className="text-sm text-stone-500">Vzhled</span>
+                          <input value={npc.physicalDetail || ''} onChange={(e) => updateNPC(npc.id, { physicalDetail: e.target.value })} placeholder="Vzhled" className="w-full font-bold bg-transparent border-b border-amber-300 focus:border-amber-500 outline-none" />
+                        </div>
+                      </div>
+                      <div className="p-3 bg-purple-100 rounded">
+                        <span className="text-sm text-purple-700">Zvláštnost</span>
+                        <input value={npc.quirk || ''} onChange={(e) => updateNPC(npc.id, { quirk: e.target.value })} placeholder="Zvláštnost" className="w-full font-bold text-purple-900 bg-transparent border-b border-purple-300 focus:border-purple-500 outline-none" />
+                      </div>
+                      <div className="p-3 bg-blue-100 rounded">
+                        <span className="text-sm text-blue-700">Cíl</span>
+                        <input value={npc.goal || ''} onChange={(e) => updateNPC(npc.id, { goal: e.target.value })} placeholder="Cíl" className="w-full font-bold text-blue-900 bg-transparent border-b border-blue-300 focus:border-blue-500 outline-none" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="p-3 bg-stone-100 rounded">
+                          <span className="text-sm text-stone-500">Role</span>
+                          <input value={npc.role || ''} onChange={(e) => updateNPC(npc.id, { role: e.target.value })} placeholder="Role/povolání" className="w-full font-bold bg-transparent border-b border-stone-300 focus:border-stone-500 outline-none" />
+                        </div>
+                        <div className="p-3 bg-stone-100 rounded">
+                          <span className="text-sm text-stone-500">Osada</span>
+                          <Select value={npc.settlementId || ''} onChange={(v) => assignNPCToSettlement(npc.id, v || null)} options={[{ value: '', label: '— Bez domova —' }, ...settlements.map(s => ({ value: s.id, label: s.name }))]} />
+                        </div>
+                      </div>
+                      <textarea value={npc.notes || ''} onChange={(e) => updateNPC(npc.id, { notes: e.target.value })} placeholder="Poznámky..." className="w-full h-16 px-3 py-2 border border-stone-300 rounded-lg resize-none text-sm" />
+
+                      {/* Generátory chování */}
+                      <div className="border-t pt-3 space-y-3">
+                        <p className="text-sm font-medium text-stone-600">🎲 Generátory:</p>
+                        <div className="flex flex-wrap gap-2">
+                          <button onClick={() => generateNPCBehavior(npc.id)} className="px-3 py-2 text-sm bg-purple-500 hover:bg-purple-600 text-white rounded-lg shadow transition-colors font-medium">
+                            🎭 Chování
+                          </button>
+                          <button onClick={() => generateNPCMood(npc.id)} className="px-3 py-2 text-sm bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow transition-colors font-medium">
+                            😊 Nálada
+                          </button>
+                          <button onClick={() => generateNPCAction(npc.id)} className="px-3 py-2 text-sm bg-green-500 hover:bg-green-600 text-white rounded-lg shadow transition-colors font-medium">
+                            🏃 Co dělá
+                          </button>
+                          <button onClick={() => generateNPCMotivation(npc.id)} className="px-3 py-2 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow transition-colors font-medium">
+                            💭 Motivace
+                          </button>
+                          <button onClick={() => generateNPCSecret(npc.id)} className="px-3 py-2 text-sm bg-rose-500 hover:bg-rose-600 text-white rounded-lg shadow transition-colors font-medium">
+                            🤫 Tajemství
+                          </button>
+                          <button onClick={() => generateNPCReaction(npc.id)} className="px-3 py-2 text-sm bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg shadow transition-colors font-medium">
+                            ⚡ Reakce
+                          </button>
+                          <button onClick={() => generateNPCRole(npc.id)} className="px-3 py-2 text-sm bg-stone-500 hover:bg-stone-600 text-white rounded-lg shadow transition-colors font-medium">
+                            🔧 Povolání
+                          </button>
+                        </div>
+                        {npcBehaviors[npc.id] && (
+                          <div className="p-4 bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg border-2 border-purple-300 shadow-inner animate-pulse-once">
+                            <p className="text-lg font-bold text-purple-900">{npcBehaviors[npc.id]}</p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ) : (
-                    // View mode - kompaktní s možností rozbalení
-                    <div className="-m-3 p-2">
-                      <div
-                        className="flex items-center gap-2 cursor-pointer hover:bg-amber-50 rounded-lg p-1 transition-colors"
-                        onClick={() => setExpandedNPCs(prev => ({ ...prev, [npc.id]: !prev[npc.id] }))}
-                      >
-                        <span className="text-stone-400 text-xs w-4">{expandedNPCs[npc.id] ? '▼' : '▶'}</span>
-                        <span className="font-bold text-amber-900">{npc.name}</span>
-                        <span className="text-stone-400">•</span>
-                        <span className="text-sm text-stone-600 flex-1">
-                          {npc.role && `${npc.role}, `}
-                          {npc.settlementId
-                            ? settlements.find(s => s.id === npc.settlementId)?.name
-                            : 'Bez domova'}
-                        </span>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); setEditingNPC(npc.id); }}
-                          className="text-stone-400 hover:text-amber-700 px-1"
-                          title="Upravit"
-                        >✏️</button>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); deleteNPC(npc.id); }}
-                          className="text-stone-400 hover:text-red-500 px-1"
-                          title="Smazat"
-                        >🗑️</button>
+                    // View mode - kompaktní
+                    <div className="cursor-pointer hover:bg-amber-50 -m-3 p-3 rounded-lg transition-colors" onClick={() => setEditingNPC(npc.id)}>
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-bold text-amber-900">{npc.name}</h3>
+                          <p className="text-sm text-stone-600">{npc.role && `${npc.role} • `}{npc.settlementId ? settlements.find(s => s.id === npc.settlementId)?.name : 'Bez domova'}</p>
+                        </div>
+                        {(npc.hp || npc.str) && (
+                          <div className="text-xs font-mono text-stone-500">
+                            BO:{npc.hp?.current}/{npc.hp?.max} SÍL:{npc.str?.max} MRŠ:{npc.dex?.max} VŮL:{npc.wil?.max}
+                          </div>
+                        )}
                       </div>
-                      {expandedNPCs[npc.id] && (npc.birthsign || npc.physicalDetail || npc.quirk || npc.goal || npc.notes) && (
-                        <div className="ml-6 mt-1 text-sm text-stone-600 space-y-0.5 border-l-2 border-amber-200 pl-2">
+                      {(npc.birthsign || npc.physicalDetail || npc.quirk || npc.goal) && (
+                        <div className="mt-2 text-sm text-stone-600 space-y-1">
                           {npc.birthsign && <p>⭐ {npc.birthsign}</p>}
                           {npc.physicalDetail && <p>👁️ {npc.physicalDetail}</p>}
                           {npc.quirk && <p>🎭 {npc.quirk}</p>}
                           {npc.goal && <p>🎯 {npc.goal}</p>}
-                          {npc.notes && <p className="italic text-stone-500">{npc.notes}</p>}
                         </div>
                       )}
+                      {npc.notes && <p className="mt-2 text-sm italic text-stone-500">{npc.notes}</p>}
                     </div>
                   )}
                 </ResultCard>
@@ -7156,11 +7630,21 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
           {generated.type === 'npc' && (
             <div className="space-y-3">
               <h3 className="text-2xl font-bold text-amber-900">{generated.name}</h3>
+              {generated.role && (
+                <p className="text-center text-stone-600 font-medium">🔧 {generated.role}</p>
+              )}
+              {/* Staty NPC */}
+              <div className="flex gap-4 text-sm font-mono bg-stone-100 rounded px-3 py-2 justify-center">
+                <span>BO: <b>{generated.hp?.max}</b></span>
+                <span>SÍL: <b>{generated.str?.max}</b></span>
+                <span>MRŠ: <b>{generated.dex?.max}</b></span>
+                <span>VŮL: <b>{generated.wil?.max}</b></span>
+              </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 bg-amber-100/50 rounded">
                   <span className="text-sm text-stone-500">Znamení</span>
-                  <p className="font-bold">{generated.birthsign.name}</p>
-                  <p className="text-sm text-stone-600">{generated.birthsign.traits}</p>
+                  <p className="font-bold">{generated.birthsign?.sign}</p>
+                  <p className="text-sm text-stone-600">{generated.birthsign?.trait}</p>
                 </div>
                 <div className="p-3 bg-amber-100/50 rounded">
                   <span className="text-sm text-stone-500">Vzhled</span>
@@ -7187,7 +7671,7 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
               </div>
               <Button onClick={() => saveNPCToWorld({
                 ...generated,
-                birthsign: `${generated.birthsign.name} (${generated.birthsign.traits})`
+                birthsign: `${generated.birthsign?.sign} (${generated.birthsign?.trait})`
               })} className="w-full">
                 📥 Uložit do Moji NPC
               </Button>
@@ -8030,9 +8514,140 @@ const TIMEBAR_WATCHES = [
   { id: 3, name: 'Noc', icon: '🌙' }
 ];
 
+// Efekty počasí podle typu a sezóny
+const WEATHER_EFFECTS = {
+  // Extrémní počasí (hod 2)
+  'Bouře': { icon: '⛈️', danger: true, travelMod: 2, effect: 'STR save nebo Vyčerpání. Cestování ×2.' },
+  'Vánice': { icon: '🌨️', danger: true, travelMod: 2, effect: 'STR save nebo Vyčerpání. Cestování ×2.' },
+  'Sucho': { icon: '🏜️', danger: true, travelMod: 1, effect: 'STR save bez vody nebo Vyčerpání.' },
+  'Vichřice': { icon: '🌪️', danger: true, travelMod: 2, effect: 'STR save nebo Vyčerpání. Cestování ×2.' },
+  // Špatné počasí (hod 3-4)
+  'Déšť': { icon: '🌧️', danger: false, travelMod: 1.5, effect: 'Pomalé cestování (×1.5 hlídky).' },
+  'Sněžení': { icon: '❄️', danger: false, travelMod: 1.5, effect: 'Pomalé cestování (×1.5 hlídky).' },
+  'Horko': { icon: '🥵', danger: true, travelMod: 1, effect: 'STR save bez vody nebo Vyčerpání.' },
+  'Mlha': { icon: '🌫️', danger: false, travelMod: 1.5, effect: 'Snížená viditelnost. Cestování ×1.5.' },
+  // Průměrné počasí (hod 5-6)
+  'Zataženo': { icon: '☁️', danger: false, travelMod: 1, effect: null },
+  'Zima': { icon: '🥶', danger: false, travelMod: 1, effect: 'Potřeba přístřeší v noci.' },
+  'Teplo': { icon: '🌤️', danger: false, travelMod: 1, effect: null },
+  // Normální počasí (hod 7-9)
+  'Mírné': { icon: '🌤️', danger: false, travelMod: 1, effect: null },
+  'Příjemné': { icon: '😊', danger: false, travelMod: 1, effect: null },
+  'Chladno': { icon: '🍃', danger: false, travelMod: 1, effect: null },
+  'Mráz': { icon: '🥶', danger: true, travelMod: 1, effect: 'STR save každou hlídku venku nebo Vyčerpání.' },
+  // Dobré počasí (hod 10-12)
+  'Slunečno': { icon: '☀️', danger: false, travelMod: 1, effect: null },
+  'Svěží': { icon: '🍂', danger: false, travelMod: 1, effect: null },
+  'Jasno': { icon: '✨', danger: false, travelMod: 1, effect: null },
+  'Nádherné': { icon: '🌈', danger: false, travelMod: 1, effect: null },
+  'Perfektní': { icon: '🌅', danger: false, travelMod: 1, effect: null },
+  'Zlaté': { icon: '🍁', danger: false, travelMod: 1, effect: null },
+  'Klidné': { icon: '❄️', danger: false, travelMod: 1, effect: null }
+};
+
+// Generování počasí s efekty
+const generateWeather = (season) => {
+  const d1 = Math.floor(Math.random() * 6) + 1;
+  const d2 = Math.floor(Math.random() * 6) + 1;
+  const total = d1 + d2;
+  const type = WEATHER_TABLE[season]?.[total] || 'Mírné';
+  const effects = WEATHER_EFFECTS[type] || { icon: '🌤️', danger: false, travelMod: 1, effect: null };
+
+  return {
+    type,
+    roll: total,
+    dice: [d1, d2],
+    ...effects
+  };
+};
+
+// Kalkulačka cestování
+const TravelCalculator = ({ weather }) => {
+  const [hexCount, setHexCount] = React.useState(1);
+  const [difficultTerrain, setDifficultTerrain] = React.useState(false);
+  const [badWeather, setBadWeather] = React.useState(false);
+
+  // Modifikátor počasí z aktuálního stavu nebo ruční volby
+  const weatherMod = badWeather ? 1.5 : (weather?.travelMod || 1);
+  const weatherLabel = weather?.type || (badWeather ? 'Špatné' : 'Normální');
+
+  const baseWatches = hexCount * (difficultTerrain ? 2 : 1);
+  const watches = Math.ceil(baseWatches * weatherMod);
+  const days = Math.ceil(watches / 3); // 3 hlídky aktivní + 1 odpočinek
+  const encounterRolls = days * 2; // ráno + večer
+  const avgEncounters = (encounterRolls / 6).toFixed(1);
+
+  return (
+    <ResultCard title="🗺️ Kalkulačka cestování">
+      <div className="space-y-4">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-stone-600">Hexů:</label>
+            <Input
+              type="number"
+              min="1"
+              max="100"
+              value={hexCount}
+              onChange={(v) => setHexCount(Math.max(1, parseInt(v) || 1))}
+              className="w-20"
+            />
+          </div>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={difficultTerrain}
+              onChange={(e) => setDifficultTerrain(e.target.checked)}
+              className="w-4 h-4 rounded border-stone-300"
+            />
+            <span className="text-sm text-stone-600">Náročný terén (×2)</span>
+          </label>
+          {!weather && (
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={badWeather}
+                onChange={(e) => setBadWeather(e.target.checked)}
+                className="w-4 h-4 rounded border-stone-300"
+              />
+              <span className="text-sm text-stone-600">Špatné počasí (×1.5)</span>
+            </label>
+          )}
+        </div>
+
+        {/* Aktuální počasí */}
+        {weather && weatherMod > 1 && (
+          <div className="text-xs text-amber-700 bg-amber-50 p-2 rounded">
+            {weather.icon} Počasí "{weather.type}" zpomaluje cestování (×{weatherMod})
+          </div>
+        )}
+
+        <div className="grid grid-cols-3 gap-3 text-center">
+          <div className="bg-amber-50 rounded-lg p-3">
+            <div className="text-2xl font-bold text-amber-600">{watches}</div>
+            <div className="text-xs text-stone-600">Hlídek</div>
+            {weatherMod > 1 && <div className="text-xs text-amber-500">({baseWatches} × {weatherMod})</div>}
+          </div>
+          <div className="bg-blue-50 rounded-lg p-3">
+            <div className="text-2xl font-bold text-blue-600">{days}</div>
+            <div className="text-xs text-stone-600">Dnů</div>
+          </div>
+          <div className="bg-red-50 rounded-lg p-3">
+            <div className="text-2xl font-bold text-red-600">~{avgEncounters}</div>
+            <div className="text-xs text-stone-600">Setkání</div>
+          </div>
+        </div>
+
+        <p className="text-xs text-stone-500 text-center">
+          {encounterRolls} hodů na d6 (1 = setkání, 2 = omen) • {days} {days === 1 ? 'den' : days < 5 ? 'dny' : 'dnů'} s odpočinkem
+        </p>
+      </div>
+    </ResultCard>
+  );
+};
+
 const TimePanel = ({ party, updateParty, onLogEntry }) => {
   // Extract gameTime from party
-  const gameTime = party?.gameTime || { watch: 0, day: 1, season: 'spring', turn: 0, restedToday: false };
+  const gameTime = party?.gameTime || { watch: 0, day: 1, season: 'spring', turn: 0, restedToday: false, context: 'wilderness', weather: null };
 
   const setGameTime = (newTime) => {
     if (party) {
@@ -8040,8 +8655,10 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
     }
   };
 
-  const { day = 1, season = 'spring', watch = 0, turn = 0, restedToday = false } = gameTime;
+  const { day = 1, season = 'spring', watch = 0, turn = 0, restedToday = false, context = 'wilderness', weather = null } = gameTime;
   const [showRules, setShowRules] = React.useState(false);
+  const [showEncounterReminder, setShowEncounterReminder] = React.useState(false);
+  const [encounterRollResult, setEncounterRollResult] = React.useState(null);
 
   const currentSeason = TIMEBAR_SEASONS.find(s => s.id === season) || TIMEBAR_SEASONS[0];
   const currentWatch = TIMEBAR_WATCHES.find(w => w.id === watch) || TIMEBAR_WATCHES[0];
@@ -8071,41 +8688,107 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
       setGameTime({ ...gameTime, turn: newTurn });
     }
 
-    // Připomínka setkání každé 3 směny
-    if (newTurn % 3 === 0 && newTurn > 0) {
+    // Připomínka setkání každé 3 směny - JEN V DUNGEONU
+    if (context === 'dungeon' && newTurn % 3 === 0 && newTurn > 0) {
+      // Automatický hod na setkání
+      const result = rollD6();
+      setEncounterRollResult(result);
+      setShowEncounterReminder(true);
+      // Log do deníku
       onLogEntry({
         type: 'encounter_reminder',
         timestamp: formatTimestamp(),
-        turn: newTurn
+        turn: newTurn,
+        message: `⚔️ Dungeon: Směna ${newTurn} - hoď na setkání!`
       });
     }
   };
 
   // Další hlídka
   const nextWatch = () => {
-    if (watch >= 3) {
+    const nextWatchId = watch >= 3 ? 0 : watch + 1;
+    const isNewDay = watch >= 3;
+    const newDay = isNewDay ? day + 1 : day;
+
+    // Generovat počasí při novém dni (v divočině)
+    let newWeather = weather;
+    if (isNewDay && context === 'wilderness') {
+      newWeather = generateWeather(season);
+      onLogEntry({
+        type: 'weather',
+        timestamp: formatTimestamp(),
+        message: `${newWeather.icon} Počasí: ${newWeather.type} (${newWeather.dice[0]}+${newWeather.dice[1]}=${newWeather.roll})`,
+        data: newWeather
+      });
+      // Varování při nebezpečném počasí
+      if (newWeather.danger && newWeather.effect) {
+        onLogEntry({
+          type: 'weather_warning',
+          timestamp: formatTimestamp(),
+          message: `⚠️ ${newWeather.effect}`
+        });
+      }
+    }
+
+    // Aktualizovat čas
+    if (isNewDay) {
       setGameTime({
         ...gameTime,
-        day: day + 1,
+        day: newDay,
         watch: 0,
         turn: 0,
-        restedToday: false
+        restedToday: false,
+        weather: newWeather
       });
       onLogEntry({
         type: 'time_advance',
         timestamp: formatTimestamp(),
-        message: `Nový den ${day + 1}`
+        message: `Nový den ${newDay}`
       });
     } else {
       setGameTime({
         ...gameTime,
-        watch: watch + 1,
+        watch: nextWatchId,
         turn: 0
       });
       onLogEntry({
         type: 'time_advance',
         timestamp: formatTimestamp(),
-        message: `${TIMEBAR_WATCHES[watch + 1]?.name || 'Další hlídka'}`
+        message: `${TIMEBAR_WATCHES[nextWatchId]?.name || 'Další hlídka'}`
+      });
+    }
+
+    // Upozornění na setkání v DIVOČINĚ - ráno (0) a večer (2)
+    if (context === 'wilderness' && (nextWatchId === 0 || nextWatchId === 2)) {
+      const watchName = nextWatchId === 0 ? 'Ranní' : 'Večerní';
+      // Automatický hod na setkání
+      const result = rollD6();
+      setEncounterRollResult(result);
+      setShowEncounterReminder(true);
+      // Log do deníku
+      onLogEntry({
+        type: 'encounter_reminder',
+        timestamp: formatTimestamp(),
+        message: `🌲 ${watchName} hlídka - hoď d6 na setkání (1 = setkání, 2 = omen)`
+      });
+    }
+  };
+
+  // Ruční přehození počasí
+  const rerollWeather = () => {
+    const newWeather = generateWeather(season);
+    setGameTime({ ...gameTime, weather: newWeather });
+    onLogEntry({
+      type: 'weather',
+      timestamp: formatTimestamp(),
+      message: `${newWeather.icon} Počasí přehozeno: ${newWeather.type} (${newWeather.dice[0]}+${newWeather.dice[1]}=${newWeather.roll})`,
+      data: newWeather
+    });
+    if (newWeather.danger && newWeather.effect) {
+      onLogEntry({
+        type: 'weather_warning',
+        timestamp: formatTimestamp(),
+        message: `⚠️ ${newWeather.effect}`
       });
     }
   };
@@ -8155,20 +8838,65 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
         subtitle={`${party.name} • ${currentSeason.icon} ${currentSeason.name}`}
       />
 
+      {/* Přepínač kontextu */}
+      <div className="flex justify-center gap-2">
+        <button
+          onClick={() => setGameTime({ ...gameTime, context: 'dungeon' })}
+          className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
+            context === 'dungeon'
+              ? 'bg-stone-700 text-white shadow-lg'
+              : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+          }`}
+        >
+          🏚️ Dungeon
+        </button>
+        <button
+          onClick={() => setGameTime({ ...gameTime, context: 'wilderness' })}
+          className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
+            context === 'wilderness'
+              ? 'bg-green-600 text-white shadow-lg'
+              : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+          }`}
+        >
+          🌲 Divočina
+        </button>
+      </div>
+
       {/* Hlavní přehled */}
       <ResultCard>
         <div className="space-y-6">
-          {/* Den a sezóna */}
-          <div className="flex items-center justify-center gap-8 text-center">
+          {/* Den, sezóna a počasí */}
+          <div className="flex items-center justify-center gap-6 text-center flex-wrap">
             <div>
-              <div className="text-5xl mb-2">{currentSeason.icon}</div>
-              <div className="text-lg font-bold text-amber-900">{currentSeason.name}</div>
+              <div className="text-4xl mb-1">{currentSeason.icon}</div>
+              <div className="text-sm font-bold text-amber-900">{currentSeason.name}</div>
             </div>
             <div>
-              <div className="text-5xl font-bold text-amber-600">{day}</div>
-              <div className="text-stone-600">Den</div>
+              <div className="text-4xl font-bold text-amber-600">{day}</div>
+              <div className="text-sm text-stone-600">Den</div>
             </div>
+            {/* Počasí - jen v divočině */}
+            {context === 'wilderness' && (
+              <div
+                onClick={rerollWeather}
+                className="cursor-pointer hover:scale-105 transition-transform"
+                title="Klikni pro přehození počasí"
+              >
+                <div className="text-4xl mb-1">{weather?.icon || '🌤️'}</div>
+                <div className="text-sm text-stone-600">{weather?.type || 'Neznámé'}</div>
+                {weather?.roll && (
+                  <div className="text-xs text-stone-400">({weather.roll})</div>
+                )}
+              </div>
+            )}
           </div>
+
+          {/* Varování při špatném počasí */}
+          {context === 'wilderness' && weather?.danger && weather?.effect && (
+            <div className="bg-red-100 border border-red-300 rounded-lg p-3 text-center text-red-800">
+              ⚠️ <strong>{weather.type}:</strong> {weather.effect}
+            </div>
+          )}
 
           {/* Hlídky */}
           <div className="flex justify-center gap-3">
@@ -8199,7 +8927,10 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
               {renderTurnProgress()}
             </div>
             <p className="text-xs text-stone-500 text-center">
-              Připomínka setkání každé 3 směny • 36 směn = 1 hlídka
+              {context === 'dungeon'
+                ? '🏚️ Dungeon: Setkání každé 3 směny'
+                : '🌲 Divočina: Setkání ráno + večer (d6)'
+              } • 36 směn = 1 hlídka
             </p>
           </div>
 
@@ -8245,14 +8976,53 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
                 <tr><td className="py-1">Hlídka</td><td>6 hod (36 směn)</td><td>Cestování (1 hex)</td></tr>
               </tbody>
             </table>
+
+            {/* Kompaktní přehled podle kontextu */}
+            {context === 'dungeon' ? (
+              <div className="border-t border-amber-200 pt-2">
+                <p className="font-bold mb-2">🏚️ CHECKLIST DUNGEON</p>
+                <div className="space-y-1 text-stone-700">
+                  <p>☐ <strong>Každé 3 směny:</strong> Hoď na setkání</p>
+                  <p>☐ <strong>Směna = 10 min:</strong> Průzkum 1 místnosti</p>
+                  <p>☐ <strong>Odpočinek:</strong> Krátký (1 směna) = k6+1 BO</p>
+                </div>
+              </div>
+            ) : (
+              <div className="border-t border-amber-200 pt-2">
+                <p className="font-bold mb-2">🌲 CHECKLIST DIVOČINA</p>
+                <div className="space-y-2">
+                  <div className="bg-amber-50 p-2 rounded">
+                    <p className="font-medium text-amber-800">☀️ KAŽDÝ DEN:</p>
+                    <p>☐ Počasí (automaticky při novém dni)</p>
+                    <p>☐ Min. 1 hlídka odpočinku</p>
+                  </div>
+                  <div className="bg-green-50 p-2 rounded">
+                    <p className="font-medium text-green-800">🌅 RÁNO + 🌆 VEČER:</p>
+                    <p>☐ Hoď d6 na setkání</p>
+                    <p className="text-xs text-stone-500">1 = setkání, 2 = omen</p>
+                  </div>
+                  <div className="bg-blue-50 p-2 rounded">
+                    <p className="font-medium text-blue-800">🗺️ CESTOVÁNÍ:</p>
+                    <p>☐ 1 hex = 1 hlídka</p>
+                    <p>☐ Náročný terén = 2 hlídky</p>
+                    <p>☐ Špatné počasí = ×1.5 nebo ×2</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="border-t border-amber-200 pt-2 space-y-1">
-              <p><strong>🗺️ Cestování:</strong> 1 hex = 1 hlídka • Náročný terén = 2 hlídky</p>
-              <p><strong>💤 Odpočinek:</strong> Krátký (1 směna) = k6+1 BO • Dlouhý (1 hlídka) = všechny BO</p>
-              <p><strong>🍖 Hledání potravy:</strong> 1 hlídka = k3 zásob</p>
+              <p><strong>💤 Odpočinek:</strong> Krátký = k6+1 BO • Dlouhý (1 hlídka) = všechny BO</p>
+              <p><strong>🍖 Hledání:</strong> 1 hlídka = k3 zásob</p>
             </div>
           </div>
         )}
       </div>
+
+      {/* Kalkulačka cestování - jen v divočině */}
+      {context === 'wilderness' && (
+        <TravelCalculator weather={weather} />
+      )}
 
       {/* Nastavení */}
       <ResultCard title="⚙️ Ruční nastavení">
@@ -8289,6 +9059,37 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
           </div>
         </div>
       </ResultCard>
+      {/* Vizuální upozornění na setkání - modální okno s automatickým hodem */}
+      {showEncounterReminder && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className={`px-8 py-6 rounded-xl shadow-2xl text-center max-w-sm text-white ${
+            encounterRollResult === 1 ? 'bg-red-600' :
+            encounterRollResult === 2 ? 'bg-orange-500' :
+            'bg-green-600'
+          }`}>
+            <div className="text-lg mb-2 opacity-80">
+              {context === 'dungeon'
+                ? `🎲 Směna ${turn}`
+                : `🌲 ${watch === 0 ? 'Ranní' : 'Večerní'} hlídka`
+              }
+            </div>
+            <div className="text-6xl font-bold mb-2">
+              {encounterRollResult}
+            </div>
+            <div className="text-4xl font-bold mb-4">
+              {encounterRollResult === 1 ? '⚔️ SETKÁNÍ!' :
+               encounterRollResult === 2 ? '👁️ OMEN' :
+               '✓ NIC'}
+            </div>
+            <button
+              onClick={() => setShowEncounterReminder(false)}
+              className="bg-white/20 hover:bg-white/30 text-white font-bold px-6 py-2 rounded-lg transition-colors"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -8773,7 +9574,34 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
           );
         }
         return null; // Hide other state changes
-      
+
+      case 'weather':
+        return (
+          <p className="my-1 text-sm text-blue-700 cursor-pointer hover:bg-blue-50 rounded px-1 -mx-1 transition-colors"
+             onClick={() => startEdit(entry)}
+             title="Klikni pro úpravu">
+            {entry.message || `☁️ Počasí: ${entry.data?.type || 'neznámé'}`}
+          </p>
+        );
+
+      case 'weather_warning':
+        return (
+          <p className="my-1 text-sm text-red-700 bg-red-50 rounded px-2 py-1 cursor-pointer hover:bg-red-100 transition-colors"
+             onClick={() => startEdit(entry)}
+             title="Klikni pro úpravu">
+            {entry.message || '⚠️ Varování počasí'}
+          </p>
+        );
+
+      case 'encounter_reminder':
+        return (
+          <p className="my-1 text-sm text-green-700 bg-green-50 rounded px-2 py-1 cursor-pointer hover:bg-green-100 transition-colors"
+             onClick={() => startEdit(entry)}
+             title="Klikni pro úpravu">
+            {entry.message || '🎲 Připomínka setkání'}
+          </p>
+        );
+
       default:
         // For any other type, show as mechanical note
         const content = entry.content || entry.data || entry;
@@ -9545,19 +10373,39 @@ function MausritterSoloCompanion() {
   };
 
   // Helper: Create new Hireling
-  const createHireling = (partyId) => {
+  const createHireling = (partyId, hirelingTypeKey = null) => {
+    const hirelingType = hirelingTypeKey
+      ? HIRELING_TYPES.find(t => t.type === hirelingTypeKey)
+      : null;
+
+    // Roll stats: 2k6 for STR/DEX/WIL, k6 for HP
+    const roll2k6 = () => rollD6() + rollD6();
+    const str = roll2k6();
+    const dex = roll2k6();
+    const wil = roll2k6();
+    const hp = rollD6();
+
     const newHireling = {
       id: generateId(),
       type: 'hireling',
+      hirelingType: hirelingType?.type || 'generic',
       name: `${randomFrom(FIRST_NAMES)} ${randomFrom(LAST_NAMES)}`,
-      hp: { current: 3, max: 3 },
-      loyalty: 7, // 2d6 check threshold
-      cost: '1 pip/den',
-      skills: [],
-      mount: null,
+      // Stats podle pravidel
+      STR: { current: str, max: str },
+      DEX: { current: dex, max: dex },
+      WIL: { current: wil, max: wil },
+      hp: { current: hp, max: hp },
+      // Type-specific
+      cost: hirelingType?.cost || '1 ď',
+      skill: hirelingType?.skill || null,
+      // Inventory: 4 sloty (2 v silnější pacce, 2 ve slabší)
+      inventorySlots: {
+        strongPaw1: null, strongPaw2: null,
+        weakPaw1: null, weakPaw2: null
+      },
       physicalDetail: randomFrom(PHYSICAL_DETAILS)
     };
-    
+
     setParties(parties.map(p => {
       if (p.id !== partyId) return p;
       return { ...p, members: [...p.members, newHireling] };
