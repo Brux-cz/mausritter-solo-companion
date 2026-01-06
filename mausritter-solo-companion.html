@@ -4045,60 +4045,56 @@ const CharacterPanel = ({
 
   // Toggle candidate selection
   const toggleCandidate = (tempId) => {
-    setSelectedCandidates(prev => {
-      const next = new Set(prev);
-      if (next.has(tempId)) {
-        next.delete(tempId);
+    setSelectedCandidateIds(prev => {
+      if (prev.includes(tempId)) {
+        return prev.filter(id => id !== tempId);
       } else {
-        next.add(tempId);
+        return [...prev, tempId];
       }
-      return next;
     });
   };
 
   // Hire selected candidates
   const hireSelectedCandidates = () => {
-    if (!activePartyId || !currentRecruitType) return;
+    if (!activePartyId || !currentRecruitType || selectedCandidateIds.length === 0) return;
     const hirelingType = HIRELING_TYPES.find(t => t.type === currentRecruitType);
 
-    let lastHiredId = null;
-    hirelingCandidates
-      .filter(c => selectedCandidates.has(c.tempId))
-      .forEach(candidate => {
-        const newHireling = {
-          id: generateId(),
-          type: 'hireling',
-          hirelingType: currentRecruitType,
-          name: candidate.name,
-          STR: { current: candidate.STR, max: candidate.STR },
-          DEX: { current: candidate.DEX, max: candidate.DEX },
-          WIL: { current: candidate.WIL, max: candidate.WIL },
-          hp: { current: candidate.HP, max: candidate.HP },
-          cost: hirelingType?.cost || '1 ď',
-          skill: hirelingType?.skill || null,
-          inventorySlots: {
-            strongPaw1: null, strongPaw2: null,
-            weakPaw1: null, weakPaw2: null
-          },
-          physicalDetail: candidate.physicalDetail
-        };
+    // Create all new hirelings first
+    const newHirelings = hirelingCandidates
+      .filter(c => selectedCandidateIds.includes(c.tempId))
+      .map(candidate => ({
+        id: generateId(),
+        type: 'hireling',
+        hirelingType: currentRecruitType,
+        name: candidate.name,
+        STR: { current: candidate.STR, max: candidate.STR },
+        DEX: { current: candidate.DEX, max: candidate.DEX },
+        WIL: { current: candidate.WIL, max: candidate.WIL },
+        hp: { current: candidate.HP, max: candidate.HP },
+        cost: hirelingType?.cost || '1 ď',
+        skill: hirelingType?.skill || null,
+        inventorySlots: {
+          strongPaw1: null, strongPaw2: null,
+          weakPaw1: null, weakPaw2: null
+        },
+        physicalDetail: candidate.physicalDetail
+      }));
 
-        setParties(prev => prev.map(p =>
-          p.id === activePartyId
-            ? { ...p, members: [...p.members, newHireling] }
-            : p
-        ));
-        lastHiredId = newHireling.id;
-      });
+    // Add all hirelings to party in one update
+    setParties(prev => prev.map(p =>
+      p.id === activePartyId
+        ? { ...p, members: [...p.members, ...newHirelings] }
+        : p
+    ));
 
     // Switch to last hired character
-    if (lastHiredId) {
-      setActiveCharacterId(lastHiredId);
+    if (newHirelings.length > 0) {
+      setActiveCharacterId(newHirelings[newHirelings.length - 1].id);
     }
 
     // Clear and close
     setHirelingCandidates([]);
-    setSelectedCandidates(new Set());
+    setSelectedCandidateIds([]);
     setCurrentRecruitType(null);
     setShowHirelingPicker(false);
   };
@@ -4800,9 +4796,9 @@ const CharacterPanel = ({
                         - {HIRELING_TYPES.find(t => t.type === currentRecruitType)?.name}
                       </span>
                     </h4>
-                    {selectedCandidates.size > 0 && (
+                    {selectedCandidateIds.length > 0 && (
                       <Button onClick={hireSelectedCandidates}>
-                        Najmout vybrané ({selectedCandidates.size})
+                        Najmout vybrané ({selectedCandidateIds.length})
                       </Button>
                     )}
                   </div>
@@ -4812,7 +4808,7 @@ const CharacterPanel = ({
                       <div
                         key={c.tempId}
                         className={`flex items-center gap-3 p-3 rounded-lg border-2 transition-colors cursor-pointer ${
-                          selectedCandidates.has(c.tempId)
+                          selectedCandidateIds.includes(c.tempId)
                             ? 'border-green-500 bg-green-50'
                             : 'border-stone-200 bg-stone-50 hover:border-stone-300'
                         }`}
@@ -4820,7 +4816,7 @@ const CharacterPanel = ({
                       >
                         <input
                           type="checkbox"
-                          checked={selectedCandidates.has(c.tempId)}
+                          checked={selectedCandidateIds.includes(c.tempId)}
                           onChange={() => toggleCandidate(c.tempId)}
                           className="w-5 h-5 text-green-600 rounded"
                         />
