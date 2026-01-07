@@ -25,6 +25,7 @@
   <div id="root"></div>
   <script>var exports = {}; var module = { exports: exports };</script>
   <script type="text/babel" data-presets="react">
+// === constants/all.js ===
 const { useState, useEffect, useCallback, useRef } = React;
 
 // ============================================
@@ -1886,6 +1887,9 @@ const randomFrom = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
+
+// === components/ui/common.jsx ===
+
 const formatTimestamp = () => new Date().toLocaleString('cs-CZ');
 
 // --- COMPONENTS ---
@@ -2034,10 +2038,34 @@ const HelpHeader = ({ title, tooltip, icon }) => (
   </div>
 );
 
-// ============================================
-// HOW TO PLAY PANEL
-// ============================================
 
+
+// === hooks/useSlotSize.js ===
+const useSlotSize = (containerRef) => {
+  const [size, setSize] = useState(44);
+  
+  useEffect(() => {
+    const updateSize = () => {
+      if (containerRef?.current) {
+        // Calculate slot size based on container width
+        // Layout: paw(1 slot) + body(1 slot) + pack(3 slots) = 5 columns + gaps
+        const containerWidth = containerRef.current.offsetWidth;
+        // 5 columns + 4 gaps (~12px each)
+        const calculatedSize = Math.floor((containerWidth - 60) / 5);
+        // Clamp between 44 and 120
+        const newSize = Math.min(120, Math.max(44, calculatedSize));
+        if (newSize !== size) setSize(newSize);
+      }
+    };
+    
+    // Initial update after render
+    const timer = setTimeout(updateSize, 50);
+    
+    window.addEventListener('resize', updateSize);
+    return () => {
+
+
+// === components/panels/HowToPlayPanel.jsx ===
 const HowToPlayPanel = () => {
   const [activeSection, setActiveSection] = useState('basics');
 
@@ -2402,6 +2430,9 @@ const TabNav = ({ tabs, activeTab, onTabChange }) => (
 // ORACLE PANEL
 // ============================================
 
+
+
+// === components/panels/OraclePanel.jsx ===
 const OraclePanel = ({ onLogEntry }) => {
   const [question, setQuestion] = useState('');
   const [probability, setProbability] = useState('even');
@@ -3484,6 +3515,9 @@ const OraclePanel = ({ onLogEntry }) => {
 // COMBAT PANEL
 // ============================================
 
+
+
+// === components/panels/CombatPanel.jsx ===
 const CombatPanel = ({ party, updateCharacterInParty, onLogEntry }) => {
   const [combatants, setCombatants] = useState([]);
   const [currentRound, setCurrentRound] = useState(0);
@@ -3941,6 +3975,9 @@ const CombatPanel = ({ party, updateCharacterInParty, onLogEntry }) => {
 // CHARACTER PANEL
 // ============================================
 
+
+
+// === components/panels/CharacterPanel.jsx ===
 const CharacterPanel = ({ 
   character, 
   updateCharacter, 
@@ -5156,9 +5193,10 @@ const CharacterPanel = ({
               {/* Inventory Grid - Mausritter Original Layout */}
               <ResultCard title="🎒 Inventář">
                 {/* Item detail popup */}
-                {popupItem && (
-                  <ItemPopup 
-                    item={popupItem.item} 
+                {popupItem && character.inventorySlots?.[popupItem.slotId] && (
+                  <ItemPopup
+                    key={`${popupItem.slotId}-${character.inventorySlots[popupItem.slotId]?.usageDots}`}
+                    item={character.inventorySlots[popupItem.slotId]}
                     slotId={popupItem.slotId}
                     onUpdate={updateSlotItem}
                     onRemove={removeSlotItem}
@@ -6660,6 +6698,9 @@ const ItemCardStudio = ({ parties, activePartyId, activeCharacterId, updateChara
 // WORLD GENERATOR PANEL
 // ============================================
 
+
+
+// === components/panels/WorldPanel.jsx ===
 const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWorldNPCs, parties, activeParty, activePartyId, updateParty }) => {
   const [generated, setGenerated] = useState(null);
   const [activeGen, setActiveGen] = useState('mySettlements');
@@ -7809,6 +7850,9 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
 // FACTION PANEL
 // ============================================
 
+
+
+// === components/panels/FactionPanel.jsx ===
 const FactionPanel = ({ factions, setFactions, onLogEntry }) => {
   const [editingFaction, setEditingFaction] = useState(null);
 
@@ -8093,6 +8137,9 @@ const FactionPanel = ({ factions, setFactions, onLogEntry }) => {
 // PARTY PANEL
 // ============================================
 
+
+
+// === components/panels/PartyPanel.jsx ===
 const PartyPanel = ({ 
   parties, 
   activePartyId, 
@@ -8720,6 +8767,9 @@ const TravelCalculator = ({ weather }) => {
   );
 };
 
+
+
+// === components/panels/TimePanel.jsx ===
 const TimePanel = ({ party, updateParty, onLogEntry }) => {
   // Extract gameTime from party
   const gameTime = party?.gameTime || { watch: 0, day: 1, season: 'spring', turn: 0, restedToday: false, context: 'wilderness', weather: null };
@@ -9173,6 +9223,9 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
 // JOURNAL PANEL
 // ============================================
 
+
+
+// === components/panels/JournalPanel.jsx ===
 const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilter, onExport }) => {
   const [newEntry, setNewEntry] = useState('');
   const [filter, setFilter] = useState('all');
@@ -9881,6 +9934,9 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
 // TIME BAR - Sledování času
 // ============================================
 
+
+
+// === components/ui/TimeBar.jsx ===
 const TimeBar = ({ gameTime, updateGameTime, partyName }) => {
   const [showEncounterReminder, setShowEncounterReminder] = useState(false);
   const [showExhaustionWarning, setShowExhaustionWarning] = useState(false);
@@ -10084,6 +10140,9 @@ const TimeBar = ({ gameTime, updateGameTime, partyName }) => {
 // FLOATING DICE - Plovoucí kostky s radiálním menu
 // ============================================
 
+
+
+// === components/ui/FloatingDice.jsx ===
 const FloatingDice = ({ onLogEntry }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeGenerator, setActiveGenerator] = useState(null);
@@ -10232,6 +10291,9 @@ const FloatingDice = ({ onLogEntry }) => {
               }`}
               title={gen.label}
             >
+
+
+// === components/MausritterApp.jsx ===
               <span className="text-lg">{gen.icon}</span>
               <span className="font-medium">{gen.label}</span>
             </button>
@@ -12171,6 +12233,8 @@ function MausritterSoloCompanion() {
 // Render the app
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(<MausritterSoloCompanion />);
+
+
 
   </script>
 </body>

@@ -2,7 +2,56 @@ const fs = require('fs');
 const path = require('path');
 
 const projectDir = path.dirname(__dirname);
-const jsxContent = fs.readFileSync(path.join(__dirname, 'mausritter-solo-companion.jsx'), 'utf8');
+const srcDir = path.join(__dirname, 'src');
+
+// Pořadí souborů pro spojení
+const fileOrder = [
+  // 1. Všechny konstanty
+  'constants/all.js',
+  // 2. UI komponenty
+  'components/ui/common.jsx',
+  // 3. Hooks
+  'hooks/useSlotSize.js',
+  // 4. Panely
+  'components/panels/HowToPlayPanel.jsx',
+  'components/panels/OraclePanel.jsx',
+  'components/panels/CombatPanel.jsx',
+  'components/panels/CharacterPanel.jsx',
+  'components/panels/WorldPanel.jsx',
+  'components/panels/FactionPanel.jsx',
+  'components/panels/PartyPanel.jsx',
+  'components/panels/TimePanel.jsx',
+  'components/panels/JournalPanel.jsx',
+  // 5. Další UI komponenty
+  'components/ui/TimeBar.jsx',
+  'components/ui/FloatingDice.jsx',
+  // 6. Hlavní aplikace
+  'components/MausritterApp.jsx',
+];
+
+// Spojit soubory
+let jsxContent = '';
+
+// Nejdřív zkusit novou strukturu
+let usedNewStructure = false;
+for (const file of fileOrder) {
+  const filePath = path.join(srcDir, file);
+  if (fs.existsSync(filePath)) {
+    jsxContent += `// === ${file} ===\n`;
+    jsxContent += fs.readFileSync(filePath, 'utf8');
+    jsxContent += '\n\n';
+    usedNewStructure = true;
+  }
+}
+
+// Fallback na starý monolitický soubor
+if (!usedNewStructure) {
+  const oldFile = path.join(__dirname, 'mausritter-solo-companion.jsx');
+  if (fs.existsSync(oldFile)) {
+    jsxContent = fs.readFileSync(oldFile, 'utf8');
+    console.log('Using legacy monolithic file');
+  }
+}
 
 const html = `<!DOCTYPE html>
 <html lang="cs">
