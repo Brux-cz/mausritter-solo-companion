@@ -6,35 +6,11 @@ const srcDir = path.join(__dirname, 'src');
 
 // Pořadí souborů pro spojení
 const fileOrder = [
-  // 1. Konstanty
-  'constants/config.js',
-  'constants/oracle.js',
-  'constants/combat.js',
-  'constants/items.js',
-  'constants/character.js',
-  'constants/weather.js',
-  'constants/world.js',
-  // 2. Hooks
-  'hooks/useSlotSize.js',
-  // 3. UI komponenty
-  'components/ui/Button.jsx',
-  'components/ui/ResultCard.jsx',
-  // 4. Inventory komponenty
-  'components/inventory/ItemPopup.jsx',
-  'components/inventory/MiniCard.jsx',
-  'components/inventory/InvSlot.jsx',
-  // 5. Panely
-  'components/panels/HowToPlayPanel.jsx',
-  'components/panels/OraclePanel.jsx',
-  'components/panels/CombatPanel.jsx',
-  'components/panels/CharacterPanel.jsx',
-  'components/panels/ItemCardStudio.jsx',
-  'components/panels/WorldPanel.jsx',
-  'components/panels/FactionPanel.jsx',
-  'components/panels/PartyPanel.jsx',
-  'components/panels/TimePanel.jsx',
-  'components/panels/JournalPanel.jsx',
-  // 6. Hlavní aplikace
+  // 1. Všechny konstanty
+  'constants/all.js',
+  // 2. UI komponenty
+  'components/ui/common.jsx',
+  // 3. Zbytek aplikace
   'App.jsx',
 ];
 
