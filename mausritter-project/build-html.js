@@ -10,8 +10,23 @@ const fileOrder = [
   'constants/all.js',
   // 2. UI komponenty
   'components/ui/common.jsx',
-  // 3. Zbytek aplikace
-  'App.jsx',
+  // 3. Hooks
+  'hooks/useSlotSize.js',
+  // 4. Panely
+  'components/panels/HowToPlayPanel.jsx',
+  'components/panels/OraclePanel.jsx',
+  'components/panels/CombatPanel.jsx',
+  'components/panels/CharacterPanel.jsx',
+  'components/panels/WorldPanel.jsx',
+  'components/panels/FactionPanel.jsx',
+  'components/panels/PartyPanel.jsx',
+  'components/panels/TimePanel.jsx',
+  'components/panels/JournalPanel.jsx',
+  // 5. Další UI komponenty
+  'components/ui/TimeBar.jsx',
+  'components/ui/FloatingDice.jsx',
+  // 6. Hlavní aplikace
+  'components/MausritterApp.jsx',
 ];
 
 // Spojit soubory
