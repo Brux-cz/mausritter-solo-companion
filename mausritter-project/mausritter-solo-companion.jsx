@@ -10333,6 +10333,12 @@ function MausritterSoloCompanion() {
   const [syncConflict, setSyncConflict] = useState(null); // { localDate, cloudDate, cloudFileId, cloudModifiedTime, token, folderId }
   const [showFolderChoice, setShowFolderChoice] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false); // Dialog for save options
+  const [showLoadDialog, setShowLoadDialog] = useState(false); // Dialog for loading files
+  const [driveFiles, setDriveFiles] = useState([]); // List of files in current folder
+  const [driveFolders, setDriveFolders] = useState([]); // List of folders for navigation
+  const [driveLoading, setDriveLoading] = useState(false); // Loading state for Drive operations
+  const [saveFileName, setSaveFileName] = useState(''); // Editable file name for save dialog
+  const [showFolderPicker, setShowFolderPicker] = useState(false); // Folder picker within dialogs
   const [pendingToken, setPendingToken] = useState(null); // Token for pending folder choice
   const googleTokenClientRef = useRef(null);
 
@@ -11139,6 +11145,195 @@ function MausritterSoloCompanion() {
     }
   };
 
+  // Fetch list of JSON files from a folder
+  const fetchDriveFiles = async (folderId = googleDriveFolderId, token = googleAccessToken) => {
+    if (!token || !folderId) return [];
+
+    setDriveLoading(true);
+    try {
+      const query = `'${folderId}' in parents and mimeType='application/json' and trashed=false`;
+      const response = await fetch(
+        `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name,modifiedTime)&orderBy=modifiedTime desc`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const data = await response.json();
+      setDriveFiles(data.files || []);
+      return data.files || [];
+    } catch (err) {
+      console.error('Failed to fetch files:', err);
+      setDriveFiles([]);
+      return [];
+    } finally {
+      setDriveLoading(false);
+    }
+  };
+
+  // Fetch list of folders from Google Drive
+  const fetchDriveFolders = async (parentId = 'root', token = googleAccessToken) => {
+    if (!token) return [];
+
+    setDriveLoading(true);
+    try {
+      const query = parentId === 'root'
+        ? `mimeType='application/vnd.google-apps.folder' and 'root' in parents and trashed=false`
+        : `mimeType='application/vnd.google-apps.folder' and '${parentId}' in parents and trashed=false`;
+      const response = await fetch(
+        `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name)&orderBy=name`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const data = await response.json();
+      setDriveFolders(data.files || []);
+      return data.files || [];
+    } catch (err) {
+      console.error('Failed to fetch folders:', err);
+      setDriveFolders([]);
+      return [];
+    } finally {
+      setDriveLoading(false);
+    }
+  };
+
+  // Open Save dialog
+  const openSaveDialog = async () => {
+    if (!googleAccessToken) {
+      connectGoogleDrive();
+      return;
+    }
+    // Default filename based on current file or generate new
+    const defaultName = googleDriveFileName
+      ? googleDriveFileName.replace('.json', '')
+      : `mausritter-save-${new Date().toISOString().slice(0, 10)}`;
+    setSaveFileName(defaultName);
+    setShowSaveDialog(true);
+
+    // Fetch existing files to show in dialog
+    if (googleDriveFolderId) {
+      await fetchDriveFiles();
+    }
+  };
+
+  // Open Load dialog
+  const openLoadDialog = async () => {
+    if (!googleAccessToken) {
+      connectGoogleDrive();
+      return;
+    }
+    setShowLoadDialog(true);
+
+    // Fetch files from current folder
+    if (googleDriveFolderId) {
+      await fetchDriveFiles();
+    } else {
+      // No folder selected - show folder picker first
+      setShowFolderPicker(true);
+      await fetchDriveFolders();
+    }
+  };
+
+  // Save with custom filename
+  const saveWithFileName = async (fileName) => {
+    if (!googleAccessToken || !googleDriveFolderId) return;
+
+    const fullName = fileName.endsWith('.json') ? fileName : `${fileName}.json`;
+
+    // Check if file with this name already exists
+    const existingFile = driveFiles.find(f => f.name === fullName);
+
+    try {
+      setGoogleSyncStatus('saving');
+      const data = getSaveData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+
+      if (existingFile) {
+        // Update existing file
+        await fetch(`https://www.googleapis.com/upload/drive/v3/files/${existingFile.id}?uploadType=media`, {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${googleAccessToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: blob
+        });
+        setGoogleDriveFileId(existingFile.id);
+        setGoogleDriveFileName(fullName);
+      } else {
+        // Create new file
+        const metadata = {
+          name: fullName,
+          mimeType: 'application/json',
+          parents: [googleDriveFolderId]
+        };
+
+        const form = new FormData();
+        form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+        form.append('file', blob);
+
+        const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${googleAccessToken}` },
+          body: form
+        });
+        const result = await response.json();
+
+        if (result.id) {
+          setGoogleDriveFileId(result.id);
+          setGoogleDriveFileName(result.name);
+        }
+      }
+
+      setGoogleLastSync(new Date());
+      setGoogleSyncStatus('connected');
+      setShowSaveDialog(false);
+    } catch (err) {
+      console.error('Save failed:', err);
+      setGoogleSyncStatus('error');
+    }
+  };
+
+  // Load selected file
+  const loadSelectedFile = async (file) => {
+    if (!googleAccessToken || !file) return;
+
+    try {
+      setGoogleSyncStatus('saving');
+      const response = await fetch(`https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`, {
+        headers: { Authorization: `Bearer ${googleAccessToken}` }
+      });
+      const rawData = await response.json();
+      const data = migrateSaveData(rawData);
+
+      // Apply data
+      if (data.parties) setParties(data.parties);
+      if (data.activePartyId) setActivePartyId(data.activePartyId);
+      if (data.activeCharacterId) setActiveCharacterId(data.activeCharacterId);
+      if (data.journal) setJournal(data.journal);
+      if (data.factions) setFactions(data.factions);
+      if (data.settlements) setSettlements(data.settlements);
+      if (data.worldNPCs) setWorldNPCs(data.worldNPCs);
+
+      setGoogleDriveFileId(file.id);
+      setGoogleDriveFileName(file.name);
+      setGoogleLastSync(new Date());
+      setGoogleSyncStatus('connected');
+      setShowLoadDialog(false);
+    } catch (err) {
+      console.error('Load failed:', err);
+      setGoogleSyncStatus('error');
+    }
+  };
+
+  // Select folder for save/load
+  const selectDriveFolder = async (folder) => {
+    setGoogleDriveFolderId(folder.id);
+    setGoogleDriveFolderName(folder.name);
+    localStorage.setItem('googleDriveFolderId', folder.id);
+    localStorage.setItem('googleDriveFolderName', folder.name);
+    setShowFolderPicker(false);
+
+    // Refresh files list for new folder
+    await fetchDriveFiles(folder.id);
+  };
+
   // Save to Google Drive
   const saveToGoogleDrive = async (token = googleAccessToken, fileId = googleDriveFileId, folderId = googleDriveFolderId) => {
     if (!token) return;
@@ -11345,49 +11540,187 @@ function MausritterSoloCompanion() {
       {/* Save Dialog */}
       {showSaveDialog && googleAccessToken && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100]">
-          <div className="bg-stone-800 text-stone-100 p-6 rounded-lg max-w-sm mx-4 shadow-2xl border border-stone-600">
+          <div className="bg-stone-800 text-stone-100 p-6 rounded-lg max-w-md w-full mx-4 shadow-2xl border border-stone-600">
             <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-              <span>💾</span> Uložit na Google Drive
+              <span>💾</span> Uložit hru
             </h3>
-            {googleDriveFileName && (
-              <div className="bg-stone-700 p-3 rounded mb-4">
-                <span className="text-stone-400 text-sm">Aktuální soubor:</span>
-                <p className="text-amber-400 font-mono">{googleDriveFileName}</p>
+
+            {/* Folder selection */}
+            <div className="mb-4">
+              <label className="text-stone-400 text-sm block mb-1">Složka:</label>
+              <div className="flex gap-2">
+                <div className="flex-1 bg-stone-700 px-3 py-2 rounded text-amber-400 font-mono text-sm truncate">
+                  {googleDriveFolderName || 'Nevybráno'}
+                </div>
+                <button
+                  onClick={async () => {
+                    setShowFolderPicker(true);
+                    await fetchDriveFolders();
+                  }}
+                  className="px-3 py-2 bg-stone-600 hover:bg-stone-500 rounded text-sm transition-colors"
+                >
+                  Změnit
+                </button>
+              </div>
+            </div>
+
+            {/* Folder picker inline */}
+            {showFolderPicker && (
+              <div className="mb-4 bg-stone-700 rounded p-3 max-h-40 overflow-y-auto">
+                {driveLoading ? (
+                  <div className="text-center text-stone-400 py-2">Načítám složky...</div>
+                ) : driveFolders.length === 0 ? (
+                  <div className="text-center text-stone-400 py-2">Žádné složky</div>
+                ) : (
+                  driveFolders.map(folder => (
+                    <button
+                      key={folder.id}
+                      onClick={() => selectDriveFolder(folder)}
+                      className="w-full text-left px-3 py-2 hover:bg-stone-600 rounded flex items-center gap-2 transition-colors"
+                    >
+                      <span>📁</span> {folder.name}
+                    </button>
+                  ))
+                )}
               </div>
             )}
-            <div className="flex flex-col gap-3">
-              {googleDriveFileId && (
+
+            {/* File name input */}
+            <div className="mb-4">
+              <label className="text-stone-400 text-sm block mb-1">Název souboru:</label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={saveFileName}
+                  onChange={(e) => setSaveFileName(e.target.value)}
+                  className="flex-1 bg-stone-700 px-3 py-2 rounded text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  placeholder="mausritter-save"
+                />
+                <span className="bg-stone-600 px-3 py-2 rounded text-stone-400">.json</span>
+              </div>
+            </div>
+
+            {/* Existing files in folder */}
+            {driveFiles.length > 0 && !showFolderPicker && (
+              <div className="mb-4">
+                <label className="text-stone-400 text-sm block mb-1">Existující soubory (klikni pro přepsání):</label>
+                <div className="bg-stone-700 rounded p-2 max-h-32 overflow-y-auto">
+                  {driveFiles.map(file => (
+                    <button
+                      key={file.id}
+                      onClick={() => setSaveFileName(file.name.replace('.json', ''))}
+                      className={`w-full text-left px-3 py-1.5 rounded flex items-center justify-between transition-colors ${
+                        saveFileName + '.json' === file.name ? 'bg-amber-700' : 'hover:bg-stone-600'
+                      }`}
+                    >
+                      <span className="truncate">{file.name}</span>
+                      <span className="text-stone-400 text-xs ml-2">{new Date(file.modifiedTime).toLocaleDateString('cs-CZ')}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setShowSaveDialog(false); setShowFolderPicker(false); }}
+                className="flex-1 px-4 py-3 bg-stone-600 hover:bg-stone-500 rounded font-medium transition-colors"
+              >
+                Zrušit
+              </button>
+              <button
+                onClick={() => { saveWithFileName(saveFileName); setShowFolderPicker(false); }}
+                disabled={!saveFileName.trim() || !googleDriveFolderId}
+                className="flex-1 px-4 py-3 bg-green-700 hover:bg-green-600 disabled:bg-stone-600 disabled:cursor-not-allowed rounded font-medium transition-colors flex items-center justify-center gap-2"
+              >
+                <span>💾</span> Uložit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Load Dialog */}
+      {showLoadDialog && googleAccessToken && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100]">
+          <div className="bg-stone-800 text-stone-100 p-6 rounded-lg max-w-md w-full mx-4 shadow-2xl border border-stone-600">
+            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <span>📂</span> Načíst hru
+            </h3>
+
+            {/* Folder selection */}
+            <div className="mb-4">
+              <label className="text-stone-400 text-sm block mb-1">Složka:</label>
+              <div className="flex gap-2">
+                <div className="flex-1 bg-stone-700 px-3 py-2 rounded text-amber-400 font-mono text-sm truncate">
+                  {googleDriveFolderName || 'Nevybráno'}
+                </div>
                 <button
-                  onClick={() => {
-                    saveToGoogleDrive();
-                    setShowSaveDialog(false);
+                  onClick={async () => {
+                    setShowFolderPicker(true);
+                    await fetchDriveFolders();
                   }}
-                  className="w-full px-4 py-3 bg-blue-700 hover:bg-blue-600 rounded font-medium transition-colors flex items-center justify-center gap-2"
+                  className="px-3 py-2 bg-stone-600 hover:bg-stone-500 rounded text-sm transition-colors"
                 >
-                  <span>🔄</span> Přepsat stávající
+                  Změnit
                 </button>
-              )}
+              </div>
+            </div>
+
+            {/* Folder picker inline */}
+            {showFolderPicker && (
+              <div className="mb-4 bg-stone-700 rounded p-3 max-h-40 overflow-y-auto">
+                {driveLoading ? (
+                  <div className="text-center text-stone-400 py-2">Načítám složky...</div>
+                ) : driveFolders.length === 0 ? (
+                  <div className="text-center text-stone-400 py-2">Žádné složky</div>
+                ) : (
+                  driveFolders.map(folder => (
+                    <button
+                      key={folder.id}
+                      onClick={() => selectDriveFolder(folder)}
+                      className="w-full text-left px-3 py-2 hover:bg-stone-600 rounded flex items-center gap-2 transition-colors"
+                    >
+                      <span>📁</span> {folder.name}
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
+
+            {/* Files list */}
+            {!showFolderPicker && (
+              <div className="mb-4">
+                <label className="text-stone-400 text-sm block mb-1">Uložené hry:</label>
+                <div className="bg-stone-700 rounded p-2 max-h-64 overflow-y-auto">
+                  {driveLoading ? (
+                    <div className="text-center text-stone-400 py-4">Načítám soubory...</div>
+                  ) : driveFiles.length === 0 ? (
+                    <div className="text-center text-stone-400 py-4">Žádné uložené hry</div>
+                  ) : (
+                    driveFiles.map(file => (
+                      <button
+                        key={file.id}
+                        onClick={() => loadSelectedFile(file)}
+                        className="w-full text-left px-3 py-2 hover:bg-stone-600 rounded flex items-center justify-between transition-colors"
+                      >
+                        <span className="truncate flex items-center gap-2">
+                          <span>🎮</span> {file.name.replace('.json', '')}
+                        </span>
+                        <span className="text-stone-400 text-xs ml-2">{new Date(file.modifiedTime).toLocaleDateString('cs-CZ')}</span>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="flex gap-3">
               <button
-                onClick={() => {
-                  saveAsNewGoogleDriveFile();
-                  setShowSaveDialog(false);
-                }}
-                className="w-full px-4 py-3 bg-green-700 hover:bg-green-600 rounded font-medium transition-colors flex items-center justify-center gap-2"
-              >
-                <span>✨</span> Uložit jako nový soubor
-              </button>
-              <button
-                onClick={() => {
-                  openGoogleDriveFilePicker();
-                  setShowSaveDialog(false);
-                }}
-                className="w-full px-4 py-3 bg-amber-700 hover:bg-amber-600 rounded font-medium transition-colors flex items-center justify-center gap-2"
-              >
-                <span>📂</span> Načíst jiný soubor
-              </button>
-              <button
-                onClick={() => setShowSaveDialog(false)}
-                className="w-full px-4 py-2 bg-stone-600 hover:bg-stone-500 rounded text-sm transition-colors"
+                onClick={() => { setShowLoadDialog(false); setShowFolderPicker(false); }}
+                className="w-full px-4 py-3 bg-stone-600 hover:bg-stone-500 rounded font-medium transition-colors"
               >
                 Zrušit
               </button>
@@ -11462,31 +11795,38 @@ function MausritterSoloCompanion() {
                 )}
               </div>
 
-              {/* Google Drive Sync */}
+              {/* Google Drive Save/Load */}
               <div className="flex items-center gap-1">
                 {googleAccessToken ? (
                   <>
                     <button
-                      onClick={() => setShowSaveDialog(true)}
-                      className={`text-xs px-2 py-1 rounded flex items-center gap-1 cursor-pointer transition-colors ${
+                      onClick={openSaveDialog}
+                      className={`text-xs px-2 py-1.5 rounded flex items-center gap-1 cursor-pointer transition-colors ${
                         googleSyncStatus === 'saving' ? 'bg-yellow-600 text-yellow-100 hover:bg-yellow-500' :
                         googleSyncStatus === 'error' ? 'bg-red-600 text-red-100 hover:bg-red-500' :
                         'bg-blue-600 text-blue-100 hover:bg-blue-500'
                       }`}
-                      title={googleLastSync ? `Klikni pro správu souborů\n${googleDriveFileName || 'mausritter-save.json'}\nSložka: ${googleDriveFolderName || 'Můj disk'}\nPoslední sync: ${googleLastSync.toLocaleTimeString('cs-CZ')}` : `Klikni pro správu souborů\n${googleDriveFileName || 'Žádný soubor'}\nSložka: ${googleDriveFolderName || 'Můj disk'}`}
+                      title={googleLastSync ? `Uložit na Google Drive\n${googleDriveFileName || 'Nový soubor'}\nPoslední sync: ${googleLastSync.toLocaleTimeString('cs-CZ')}` : 'Uložit na Google Drive'}
                     >
-                      {googleSyncStatus === 'saving' ? '⏳' : googleSyncStatus === 'error' ? '❌' : '☁️'} {googleDriveFileName ? googleDriveFileName.replace('.json', '') : googleDriveFolderName || 'Drive'}
+                      💾 Save
                     </button>
-                    <button onClick={disconnectGoogleDrive} className="px-1.5 py-1 bg-blue-600/50 hover:bg-red-600 rounded text-xs transition-colors" title="Odpojit">✕</button>
+                    <button
+                      onClick={openLoadDialog}
+                      className="text-xs px-2 py-1.5 rounded bg-blue-600 text-blue-100 hover:bg-blue-500 cursor-pointer transition-colors"
+                      title="Načíst z Google Drive"
+                    >
+                      📂 Load
+                    </button>
+                    <button onClick={disconnectGoogleDrive} className="px-1.5 py-1 bg-blue-600/50 hover:bg-red-600 rounded text-xs transition-colors" title="Odpojit Google Drive">✕</button>
                   </>
                 ) : (
                   <button
                     type="button"
                     onClick={connectGoogleDrive}
                     className="px-2 py-1.5 bg-blue-600 hover:bg-blue-500 rounded text-xs font-medium transition-colors cursor-pointer"
-                    title="Připojit Google Drive pro cloud sync"
+                    title="Připojit Google Drive"
                   >
-                    ☁️ Drive
+                    ☁️ Připojit Drive
                   </button>
                 )}
               </div>
@@ -11540,20 +11880,26 @@ function MausritterSoloCompanion() {
                 )}
               </div>
 
-              {/* Google Drive sync */}
+              {/* Google Drive Save/Load */}
               <div className="flex items-center justify-between">
                 <span className="text-sm">☁️ Google Drive</span>
                 {googleAccessToken ? (
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => { setShowSaveDialog(true); setMobileMenuOpen(false); }}
-                      className={`text-xs px-2 py-1 rounded ${
+                      onClick={() => { openSaveDialog(); setMobileMenuOpen(false); }}
+                      className={`text-xs px-2 py-1.5 rounded ${
                         googleSyncStatus === 'saving' ? 'bg-yellow-600' : googleSyncStatus === 'error' ? 'bg-red-600' : 'bg-blue-600'
                       }`}
                     >
-                      {googleSyncStatus === 'saving' ? '⏳ Ukládám' : googleSyncStatus === 'error' ? '❌ Chyba' : `✓ ${googleDriveFileName ? googleDriveFileName.replace('.json', '') : googleDriveFolderName || 'Drive'}`}
+                      💾 Save
                     </button>
-                    <button onClick={() => { disconnectGoogleDrive(); setMobileMenuOpen(false); }} className="px-2 py-1 bg-red-600 hover:bg-red-500 rounded text-xs">Odpojit</button>
+                    <button
+                      onClick={() => { openLoadDialog(); setMobileMenuOpen(false); }}
+                      className="text-xs px-2 py-1.5 rounded bg-blue-600"
+                    >
+                      📂 Load
+                    </button>
+                    <button onClick={() => { disconnectGoogleDrive(); setMobileMenuOpen(false); }} className="px-2 py-1 bg-red-600 hover:bg-red-500 rounded text-xs">✕</button>
                   </div>
                 ) : (
                   <button
