@@ -5787,11 +5787,13 @@ const ItemPopup = ({ item, slotId, onUpdate, onRemove, onMove, onClose }) => {
                   <button
                     key={i}
                     onClick={() => onUpdate(slotId, 'usageDots', i < (item.usageDots||0) ? i : i+1)}
+                    className="active:scale-90 hover:scale-110 transition-transform duration-100"
                     style={{
-                      width: 28, height: 28, borderRadius: '50%',
+                      width: 32, height: 32, borderRadius: '50%',
                       border: '3px solid #292524',
                       background: i < (item.usageDots||0) ? '#292524' : 'transparent',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
+                      boxShadow: i < (item.usageDots||0) ? 'inset 0 2px 4px rgba(0,0,0,0.3)' : 'none'
                     }}
                   />
                 ))}
@@ -5889,31 +5891,34 @@ const MiniCard = ({ item, is2H, isSelected, slotSize = 44 }) => {
   const isCond = item.type === 'condition' || item.isCondition;
   const cardSize = slotSize - 4;
   const bg = item.bgColor || (isCond ? '#fecaca' : item.type === 'weapon' ? '#f1f5f9' : item.type === 'armor' ? '#e0e7ff' : '#fef3c7');
-  
+
   // Dynamic font size based on slot size
   const fontSize = Math.max(8, Math.floor(slotSize * 0.18));
   const fontSize2H = Math.max(9, Math.floor(slotSize * 0.16));
   const dotSize = Math.max(4, Math.floor(slotSize * 0.08));
-  
+
   return (
-    <div style={{
-      width: cardSize,
-      height: is2H ? cardSize * 2 + 8 : cardSize,
-      background: bg,
-      border: isSelected ? '2px solid #f59e0b' : '1.5px solid #292524',
-      borderRadius: 3,
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      position: is2H ? 'absolute' : 'relative',
-      top: 0, left: 2, zIndex: is2H ? 10 : 1,
-      boxShadow: isSelected ? '0 0 8px rgba(245, 158, 11, 0.5)' : 'none',
-      padding: 2,
-      textAlign: 'center'
-    }}>
-      <span style={{ 
-        fontWeight: 700, 
+    <div
+      className="active:scale-95 active:brightness-90 transition-transform duration-100"
+      style={{
+        width: cardSize,
+        height: is2H ? cardSize * 2 + 8 : cardSize,
+        background: bg,
+        border: isSelected ? '2px solid #f59e0b' : '1.5px solid #292524',
+        borderRadius: 3,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: is2H ? 'absolute' : 'relative',
+        top: 0, left: 2, zIndex: is2H ? 10 : 1,
+        boxShadow: isSelected ? '0 0 8px rgba(245, 158, 11, 0.5)' : 'none',
+        padding: 2,
+        textAlign: 'center',
+        cursor: 'pointer'
+      }}>
+      <span style={{
+        fontWeight: 700,
         fontSize: is2H ? fontSize2H : fontSize,
         lineHeight: 1.1,
         overflow: 'hidden',
