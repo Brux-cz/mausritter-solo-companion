@@ -10812,17 +10812,19 @@ function MausritterSoloCompanion() {
               setGoogleSyncStatus('connected');
               findOrCreateGoogleDriveFile(response.access_token, savedFolderId);
             } else {
-              // Folder was deleted or trashed - clear localStorage and open picker
-              console.warn('Saved folder no longer exists, opening picker');
+              // Folder was deleted or trashed - clear localStorage and show dialog
+              console.warn('Saved folder no longer exists, showing folder choice');
               localStorage.removeItem('googleDriveFolderId');
               localStorage.removeItem('googleDriveFolderName');
-              openFolderPicker(response.access_token);
+              setPendingToken(response.access_token);
+              setShowFolderChoice(true);
             }
           } catch (err) {
             console.error('Folder verification failed:', err);
             localStorage.removeItem('googleDriveFolderId');
             localStorage.removeItem('googleDriveFolderName');
-            openFolderPicker(response.access_token);
+            setPendingToken(response.access_token);
+            setShowFolderChoice(true);
           }
         } else {
           // No saved folder - show folder choice dialog
