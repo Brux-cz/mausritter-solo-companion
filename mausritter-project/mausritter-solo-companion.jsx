@@ -10337,6 +10337,9 @@ function MausritterSoloCompanion() {
   const [googleDriveFolderName, setGoogleDriveFolderName] = useState(null);
   const [syncConflict, setSyncConflict] = useState(null); // { localDate, cloudDate, cloudFileId, cloudModifiedTime, token, folderId }
   const [showFolderChoice, setShowFolderChoice] = useState(false);
+  const [showSyncDirectionChoice, setShowSyncDirectionChoice] = useState(null); // { token, folderId, cloudFileId, hasCloudFile, hasLocalData }
+  const [syncSaveFileName, setSyncSaveFileName] = useState('mausritter-save.json'); // Editable filename for sync
+  const [showSyncConfirm, setShowSyncConfirm] = useState(null); // Confirm overwrite dialog
   const [showSaveDialog, setShowSaveDialog] = useState(false); // Dialog for save options
   const [showLoadDialog, setShowLoadDialog] = useState(false); // Dialog for loading files
   const [driveFiles, setDriveFiles] = useState([]); // List of files in current folder
@@ -10924,56 +10927,40 @@ function MausritterSoloCompanion() {
   // Find existing save file or create new one in selected folder
   const findOrCreateGoogleDriveFile = async (token, folderId = googleDriveFolderId) => {
     try {
-      // Search for existing file in folder
+      // Search for all JSON files in folder
       const query = folderId
-        ? `name='mausritter-save.json' and '${folderId}' in parents and trashed=false`
-        : `name='mausritter-save.json' and trashed=false`;
+        ? `mimeType='application/json' and '${folderId}' in parents and trashed=false`
+        : `mimeType='application/json' and trashed=false`;
       const searchResponse = await fetch(
-        `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name,modifiedTime)`,
+        `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name,modifiedTime)&orderBy=modifiedTime desc`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
       const searchData = await searchResponse.json();
 
-      if (searchData.files && searchData.files.length > 0) {
-        // Existing file found - check for conflicts
-        const cloudFile = searchData.files[0];
-        const cloudModifiedTime = cloudFile.modifiedTime;
+      const cloudFiles = searchData.files || [];
+      const mainSaveFile = cloudFiles.find(f => f.name === 'mausritter-save.json');
+      const hasCloudFile = !!mainSaveFile;
+      const localSave = localStorage.getItem('mausritter-save');
+      const hasLocalData = localSave && localSave.length > 10; // More than just empty object
 
-        // Get local data to compare
-        const localSave = localStorage.getItem('mausritter-save');
-        if (localSave) {
-          try {
-            const localData = JSON.parse(localSave);
-            const localDate = new Date(localData.lastModified);
-            const cloudDate = new Date(cloudModifiedTime);
-
-            // If difference is more than 1 minute, show conflict dialog
-            if (Math.abs(localDate - cloudDate) > 60000) {
-              setSyncConflict({
-                localDate: localData.lastModified,
-                cloudDate: cloudModifiedTime,
-                cloudFileId: cloudFile.id,
-                token,
-                folderId
-              });
-              return; // Wait for user decision
-            }
-          } catch (e) {
-            console.warn('Failed to parse local save for conflict check:', e);
-          }
-        }
-
-        // No conflict or no local data - just load from cloud
-        setGoogleDriveFileId(cloudFile.id);
-        setGoogleDriveFileName(cloudFile.name);
-        await loadFromGoogleDrive(token, cloudFile.id);
-        setGoogleLastSync(new Date());
-      } else {
-        // Create new file in selected folder
-        await saveToGoogleDrive(token, null, folderId);
+      // Always show direction choice dialog when connecting
+      if (hasCloudFile || hasLocalData || cloudFiles.length > 0) {
+        setShowSyncDirectionChoice({
+          token,
+          folderId,
+          cloudFileId: mainSaveFile?.id || null,
+          cloudModifiedTime: mainSaveFile?.modifiedTime || null,
+          hasCloudFile,
+          hasLocalData,
+          cloudFiles // All JSON files in folder
+        });
+        return; // Wait for user decision
       }
+
+      // Neither cloud nor local data - just create new empty file
+      await saveToGoogleDrive(token, null, folderId);
     } catch (err) {
       console.error('Google Drive file search failed:', err);
       setGoogleSyncStatus('error');
@@ -11003,6 +10990,66 @@ function MausritterSoloCompanion() {
   // Cancel sync conflict - disconnect
   const resolveConflictCancel = () => {
     setSyncConflict(null);
+    setGoogleSyncStatus('disconnected');
+    setGoogleAccessToken(null);
+  };
+
+  // Sync direction choice handlers
+  const handleSyncUpload = async () => {
+    if (!showSyncDirectionChoice) return;
+    const { token, folderId, cloudFiles } = showSyncDirectionChoice;
+
+    // Check if file with this name already exists
+    const existingFile = cloudFiles?.find(f => f.name === syncSaveFileName);
+
+    if (existingFile) {
+      // Show confirmation dialog
+      setShowSyncConfirm({
+        token,
+        folderId,
+        existingFileId: existingFile.id,
+        existingFileName: existingFile.name,
+        existingModifiedTime: existingFile.modifiedTime
+      });
+    } else {
+      // No existing file - save directly with custom name
+      setShowSyncDirectionChoice(null);
+      await saveToGoogleDriveWithName(token, null, folderId, syncSaveFileName);
+    }
+  };
+
+  // Confirm overwrite
+  const handleSyncConfirmOverwrite = async () => {
+    if (!showSyncConfirm) return;
+    const { token, folderId, existingFileId } = showSyncConfirm;
+    setShowSyncConfirm(null);
+    setShowSyncDirectionChoice(null);
+    await saveToGoogleDriveWithName(token, existingFileId, folderId, syncSaveFileName);
+  };
+
+  const handleSyncConfirmCancel = () => {
+    setShowSyncConfirm(null);
+    // Go back to direction choice dialog
+  };
+
+  const handleSyncDownload = async () => {
+    if (!showSyncDirectionChoice) return;
+    const { token, cloudFileId } = showSyncDirectionChoice;
+    setShowSyncDirectionChoice(null);
+    if (cloudFileId) {
+      // Download from cloud (overwrite local)
+      setGoogleDriveFileId(cloudFileId);
+      await loadFromGoogleDrive(token, cloudFileId);
+      setGoogleLastSync(new Date());
+    } else {
+      // No cloud file - nothing to download
+      alert('Na Google Drive není žádný uložený soubor.');
+    }
+  };
+
+  const handleSyncCancel = () => {
+    setShowSyncDirectionChoice(null);
+    setSyncSaveFileName('mausritter-save.json'); // Reset filename
     setGoogleSyncStatus('disconnected');
     setGoogleAccessToken(null);
   };
@@ -11421,6 +11468,67 @@ function MausritterSoloCompanion() {
     }
   };
 
+  // Save to Google Drive with custom filename
+  const saveToGoogleDriveWithName = async (token, fileId, folderId, fileName) => {
+    if (!token) return;
+
+    try {
+      setGoogleSyncStatus('saving');
+      const data = getSaveData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+
+      if (fileId) {
+        // Update existing file (also update name if different)
+        const updateMetadata = { name: fileName };
+        await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}`, {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(updateMetadata)
+        });
+        await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`, {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: blob
+        });
+        setGoogleDriveFileId(fileId);
+        setGoogleDriveFileName(fileName);
+      } else {
+        // Create new file with custom name
+        const metadata = {
+          name: fileName,
+          mimeType: 'application/json',
+          ...(folderId && { parents: [folderId] })
+        };
+
+        const form = new FormData();
+        form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+        form.append('file', blob);
+
+        const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body: form
+        });
+        const result = await response.json();
+        setGoogleDriveFileId(result.id);
+        setGoogleDriveFileName(result.name);
+      }
+
+      setGoogleLastSync(new Date());
+      setGoogleSyncStatus('connected');
+      setSyncSaveFileName('mausritter-save.json'); // Reset for next time
+    } catch (err) {
+      console.error('Google Drive save failed:', err);
+      setGoogleSyncStatus('error');
+    }
+  };
+
   // Load from Google Drive
   const loadFromGoogleDrive = async (token = googleAccessToken, fileId = googleDriveFileId) => {
     if (!token || !fileId) return false;
@@ -11535,6 +11643,128 @@ function MausritterSoloCompanion() {
                 className="w-full px-4 py-2 bg-stone-600 hover:bg-stone-500 rounded text-sm transition-colors"
               >
                 Zrušit připojení
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Sync Direction Choice Dialog */}
+      {showSyncDirectionChoice && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100]">
+          <div className="bg-stone-800 text-stone-100 p-6 rounded-lg max-w-md mx-4 shadow-2xl border border-stone-600">
+            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <span>🔄</span> Co chceš udělat?
+            </h3>
+            <div className="space-y-3 mb-6">
+              {showSyncDirectionChoice.hasLocalData && (
+                <div className="flex items-center gap-2 bg-stone-700 p-3 rounded">
+                  <span className="text-amber-400">💾</span>
+                  <span className="text-stone-300">Máš lokální data v prohlížeči</span>
+                </div>
+              )}
+              {showSyncDirectionChoice.cloudFiles && showSyncDirectionChoice.cloudFiles.length > 0 && (
+                <div className="bg-stone-700 p-3 rounded">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-blue-400">☁️</span>
+                    <span className="text-stone-300">Soubory na Drive:</span>
+                  </div>
+                  <div className="ml-6 space-y-1 max-h-32 overflow-y-auto">
+                    {showSyncDirectionChoice.cloudFiles.map((file, idx) => (
+                      <div key={idx} className="flex justify-between text-sm">
+                        <span className={file.name === 'mausritter-save.json' ? 'text-amber-400 font-medium' : 'text-stone-400'}>
+                          {file.name}
+                        </span>
+                        <span className="text-stone-500">
+                          {new Date(file.modifiedTime).toLocaleString('cs-CZ')}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {showSyncDirectionChoice.cloudFiles && showSyncDirectionChoice.cloudFiles.length === 0 && (
+                <div className="flex items-center gap-2 bg-stone-700 p-3 rounded">
+                  <span className="text-stone-500">☁️</span>
+                  <span className="text-stone-400">Složka na Drive je prázdná</span>
+                </div>
+              )}
+              {showSyncDirectionChoice.hasLocalData && (
+                <div className="bg-stone-700/50 p-3 rounded">
+                  <label className="text-stone-400 text-sm block mb-1">Uloží se jako:</label>
+                  <input
+                    type="text"
+                    value={syncSaveFileName}
+                    onChange={(e) => setSyncSaveFileName(e.target.value.endsWith('.json') ? e.target.value : e.target.value + '.json')}
+                    className="w-full bg-stone-700 text-amber-400 font-mono px-3 py-2 rounded border border-stone-600 focus:border-amber-500 focus:outline-none"
+                  />
+                  {showSyncDirectionChoice.cloudFiles?.some(f => f.name === syncSaveFileName) && (
+                    <span className="text-red-400 text-sm mt-1 block">⚠️ Soubor s tímto názvem již existuje</span>
+                  )}
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col gap-2">
+              {showSyncDirectionChoice.hasLocalData && (
+                <button
+                  onClick={handleSyncUpload}
+                  className="w-full px-4 py-3 bg-amber-700 hover:bg-amber-600 rounded font-medium transition-colors flex items-center justify-center gap-2"
+                >
+                  <span>💾</span> Uložit na Drive
+                </button>
+              )}
+              {showSyncDirectionChoice.hasCloudFile && (
+                <button
+                  onClick={handleSyncDownload}
+                  className="w-full px-4 py-3 bg-blue-700 hover:bg-blue-600 rounded font-medium transition-colors flex items-center justify-center gap-2"
+                >
+                  <span>📂</span> Načíst z Drive
+                </button>
+              )}
+              <button
+                onClick={handleSyncCancel}
+                className="w-full px-4 py-2 bg-stone-600 hover:bg-stone-500 rounded text-sm transition-colors"
+              >
+                Zrušit připojení
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Sync Confirm Overwrite Dialog */}
+      {showSyncConfirm && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[110]">
+          <div className="bg-stone-800 text-stone-100 p-6 rounded-lg max-w-sm mx-4 shadow-2xl border border-red-600">
+            <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-red-400">
+              <span>⚠️</span> Přepsat soubor?
+            </h3>
+            <div className="space-y-3 mb-6">
+              <p className="text-stone-300">
+                Soubor <span className="text-amber-400 font-mono">{showSyncConfirm.existingFileName}</span> už existuje.
+              </p>
+              <div className="bg-stone-700 p-3 rounded text-sm">
+                <span className="text-stone-400">Naposledy upraven: </span>
+                <span className="text-stone-300">
+                  {new Date(showSyncConfirm.existingModifiedTime).toLocaleString('cs-CZ')}
+                </span>
+              </div>
+              <p className="text-red-400 text-sm">
+                Tato akce je nevratná!
+              </p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={handleSyncConfirmOverwrite}
+                className="w-full px-4 py-3 bg-red-700 hover:bg-red-600 rounded font-medium transition-colors"
+              >
+                Ano, přepsat
+              </button>
+              <button
+                onClick={handleSyncConfirmCancel}
+                className="w-full px-4 py-2 bg-stone-600 hover:bg-stone-500 rounded text-sm transition-colors"
+              >
+                Zpět
               </button>
             </div>
           </div>
