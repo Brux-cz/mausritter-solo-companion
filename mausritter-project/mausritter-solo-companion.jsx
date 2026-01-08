@@ -10897,6 +10897,7 @@ function MausritterSoloCompanion() {
           .setMimeTypes('application/vnd.google-apps.folder'))
         .setOAuthToken(token)
         .setDeveloperKey(GOOGLE_API_KEY)
+        .setOrigin(window.location.origin)
         .setCallback((data) => {
           if (data.action === google.picker.Action.PICKED) {
             const folder = data.docs[0];
@@ -11038,6 +11039,8 @@ function MausritterSoloCompanion() {
     gapi.load('picker', () => {
       const picker = new google.picker.PickerBuilder()
         .setOAuthToken(googleAccessToken)
+        .setDeveloperKey(GOOGLE_API_KEY)
+        .setOrigin(window.location.origin)
         .addView(
           new google.picker.DocsView()
             .setParent(googleDriveFolderId)
