@@ -10098,36 +10098,26 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
 
       case 'saved_npc':
         return (
-          <div
-            className="my-2 pl-4 border-l-2 border-amber-500 cursor-pointer hover:bg-amber-50 rounded transition-colors overflow-hidden"
+          <p
+            className="my-1 text-sm cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors truncate"
             onClick={() => setDetailModal({ type: 'npc', data: entry.data })}
             title="Klikni pro detail"
           >
-            <p className="font-bold text-amber-900 truncate">
-              🐭 {entry.data?.name}
-              {entry.data?.role && <span className="font-normal text-stone-500 ml-2">— {entry.data.role}</span>}
-            </p>
-            <p className="text-stone-600 text-sm truncate">
-              {entry.data?.quirk || entry.data?.goal}
-            </p>
-          </div>
+            🐭 <span className="font-medium text-amber-900">{entry.data?.name}</span>
+            {entry.data?.role && <span className="text-stone-500 ml-1">— {entry.data.role}</span>}
+          </p>
         );
 
       case 'saved_settlement':
         return (
-          <div
-            className="my-2 pl-4 border-l-2 border-green-500 cursor-pointer hover:bg-green-50 rounded transition-colors overflow-hidden"
+          <p
+            className="my-1 text-sm cursor-pointer hover:bg-green-50 rounded px-1 -mx-1 transition-colors truncate"
             onClick={() => setDetailModal({ type: 'settlement', data: entry.data })}
             title="Klikni pro detail"
           >
-            <p className="font-bold text-green-900 truncate">
-              🏘️ {entry.data?.name}
-              <span className="font-normal text-stone-500 ml-2">— {entry.data?.size}</span>
-            </p>
-            <p className="text-stone-600 text-sm truncate">
-              {entry.data?.event || entry.data?.landmark}
-            </p>
-          </div>
+            🏘️ <span className="font-medium text-green-900">{entry.data?.name}</span>
+            <span className="text-stone-500 ml-1">— {entry.data?.size}</span>
+          </p>
         );
 
       default:
