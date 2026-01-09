@@ -9579,7 +9579,7 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
 // JOURNAL PANEL
 // ============================================
 
-const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilter, onExport, worldNPCs = [], settlements = [], onMentionClick }) => {
+const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilter, onExport, worldNPCs = [], settlements = [], timedEvents = [], gameTime, onMentionClick, onOpenEvents }) => {
   const [newEntry, setNewEntry] = useState('');
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -10168,9 +10168,36 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
         )}
       </div>
 
+      {/* Widget nadcházejících událostí */}
+      {timedEvents && timedEvents.filter(e => !e.completed).length > 0 && (() => {
+        const currentDay = gameTime?.day || 1;
+        const activeEvents = timedEvents.filter(e => !e.completed).sort((a, b) => a.targetDay - b.targetDay).slice(0, 3);
+        return (
+          <div className="mb-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-orange-800">📅 Nadcházející události</span>
+              <button onClick={onOpenEvents} className="text-xs text-orange-600 hover:text-orange-800">Zobrazit vše →</button>
+            </div>
+            <div className="space-y-1">
+              {activeEvents.map(event => {
+                const daysLeft = event.targetDay - currentDay;
+                return (
+                  <div key={event.id} className="flex items-center gap-2 text-sm">
+                    <span className={`px-1.5 py-0.5 rounded text-xs ${daysLeft <= 0 ? 'bg-red-200 text-red-800' : daysLeft <= 1 ? 'bg-orange-200 text-orange-800' : 'bg-stone-200 text-stone-600'}`}>
+                      {daysLeft <= 0 ? 'DNES!' : daysLeft === 1 ? 'Zítra' : `${daysLeft}d`}
+                    </span>
+                    <span className="text-stone-700 truncate">{event.title}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Filters - Collapsible */}
       <div className="mb-6 border-b border-amber-200 pb-4">
-        <button 
+        <button
           onClick={() => setShowFilters(!showFilters)}
           className="text-sm text-stone-500 hover:text-stone-700 flex items-center gap-1"
         >
@@ -10467,10 +10494,154 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
 };
 
 // ============================================
+// EVENTS PANEL - Časované události
+// ============================================
+
+const EventsPanel = ({ timedEvents, setTimedEvents, gameTime }) => {
+  const [newEvent, setNewEvent] = useState({ title: '', daysFromNow: 1, notes: '' });
+  const [showForm, setShowForm] = useState(false);
+
+  const currentDay = gameTime?.day || 1;
+
+  const addEvent = () => {
+    if (!newEvent.title.trim()) return;
+    const event = {
+      id: Date.now().toString(),
+      title: newEvent.title.trim(),
+      targetDay: currentDay + parseInt(newEvent.daysFromNow || 1),
+      notes: newEvent.notes.trim(),
+      completed: false,
+      createdDay: currentDay
+    };
+    setTimedEvents([...timedEvents, event]);
+    setNewEvent({ title: '', daysFromNow: 1, notes: '' });
+    setShowForm(false);
+  };
+
+  const toggleComplete = (id) => {
+    setTimedEvents(timedEvents.map(e => e.id === id ? { ...e, completed: !e.completed } : e));
+  };
+
+  const deleteEvent = (id) => {
+    setTimedEvents(timedEvents.filter(e => e.id !== id));
+  };
+
+  // Seřadit podle targetDay, aktivní první
+  const sortedEvents = [...timedEvents].sort((a, b) => {
+    if (a.completed !== b.completed) return a.completed ? 1 : -1;
+    return a.targetDay - b.targetDay;
+  });
+
+  const getDaysRemaining = (targetDay) => {
+    const remaining = targetDay - currentDay;
+    if (remaining < 0) return { text: `${Math.abs(remaining)} dní po`, urgent: true, past: true };
+    if (remaining === 0) return { text: 'DNES!', urgent: true, past: false };
+    if (remaining === 1) return { text: 'Zítra', urgent: true, past: false };
+    return { text: `Za ${remaining} dní`, urgent: remaining <= 3, past: false };
+  };
+
+  return (
+    <div className="max-w-3xl mx-auto space-y-4">
+      <SectionHeader icon="⏰" title="Časované události" subtitle="Nadcházející události v kampani" />
+
+      {/* Přidat novou událost */}
+      {!showForm ? (
+        <Button onClick={() => setShowForm(true)} className="w-full">
+          + Přidat událost
+        </Button>
+      ) : (
+        <ResultCard>
+          <div className="space-y-3">
+            <Input
+              value={newEvent.title}
+              onChange={(v) => setNewEvent({ ...newEvent, title: v })}
+              placeholder="Co se stane? (např. Bandité zaútočí)"
+            />
+            <div className="flex gap-2 items-center">
+              <span className="text-sm text-stone-600">Za</span>
+              <input
+                type="number"
+                min="1"
+                value={newEvent.daysFromNow}
+                onChange={(e) => setNewEvent({ ...newEvent, daysFromNow: e.target.value })}
+                className="w-16 px-2 py-1 border border-stone-300 rounded text-center"
+              />
+              <span className="text-sm text-stone-600">dní (den {currentDay + parseInt(newEvent.daysFromNow || 1)})</span>
+            </div>
+            <Input
+              value={newEvent.notes}
+              onChange={(v) => setNewEvent({ ...newEvent, notes: v })}
+              placeholder="Poznámky (volitelné)"
+            />
+            <div className="flex gap-2">
+              <Button onClick={addEvent} className="flex-1">✓ Přidat</Button>
+              <Button onClick={() => setShowForm(false)} variant="secondary" className="flex-1">✕ Zrušit</Button>
+            </div>
+          </div>
+        </ResultCard>
+      )}
+
+      {/* Seznam událostí */}
+      {sortedEvents.length === 0 ? (
+        <ResultCard>
+          <p className="text-center text-stone-500 py-4">
+            Žádné naplánované události.<br/>
+            <span className="text-sm">Přidej první událost tlačítkem výše.</span>
+          </p>
+        </ResultCard>
+      ) : (
+        <div className="space-y-2">
+          {sortedEvents.map(event => {
+            const remaining = getDaysRemaining(event.targetDay);
+            return (
+              <ResultCard key={event.id} className={event.completed ? 'opacity-50' : ''}>
+                <div className="flex items-start gap-3">
+                  <button
+                    onClick={() => toggleComplete(event.id)}
+                    className={`mt-1 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
+                      event.completed ? 'bg-green-500 border-green-500 text-white' : 'border-stone-300 hover:border-amber-500'
+                    }`}
+                  >
+                    {event.completed && '✓'}
+                  </button>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className={`font-bold ${event.completed ? 'line-through text-stone-400' : 'text-stone-800'}`}>
+                        {event.title}
+                      </p>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${
+                        event.completed ? 'bg-green-100 text-green-700' :
+                        remaining.past ? 'bg-red-100 text-red-700' :
+                        remaining.urgent ? 'bg-orange-100 text-orange-700' :
+                        'bg-stone-100 text-stone-600'
+                      }`}>
+                        {remaining.text}
+                      </span>
+                    </div>
+                    {event.notes && <p className="text-sm text-stone-500 mt-1">{event.notes}</p>}
+                    <p className="text-xs text-stone-400 mt-1">Den {event.targetDay}</p>
+                  </div>
+                  <button
+                    onClick={() => deleteEvent(event.id)}
+                    className="text-stone-400 hover:text-red-500 p-1"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </ResultCard>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============================================
 // TIME BAR - Sledování času
 // ============================================
 
-const TimeBar = ({ gameTime, updateGameTime, partyName }) => {
+const TimeBar = ({ gameTime, updateGameTime, partyName, timedEvents }) => {
   const [showEncounterReminder, setShowEncounterReminder] = useState(false);
   const [showExhaustionWarning, setShowExhaustionWarning] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -10604,6 +10775,19 @@ const TimeBar = ({ gameTime, updateGameTime, partyName }) => {
                 {renderTurnProgress()}
               </div>
             </div>
+
+            {/* Widget událostí */}
+            {timedEvents && timedEvents.filter(e => !e.completed).length > 0 && (() => {
+              const activeEvents = timedEvents.filter(e => !e.completed);
+              const urgent = activeEvents.filter(e => e.targetDay <= day + 1);
+              const next = activeEvents.sort((a, b) => a.targetDay - b.targetDay)[0];
+              const daysLeft = next ? next.targetDay - day : 0;
+              return (
+                <div className={`px-2 py-1 rounded text-xs ${urgent.length > 0 ? 'bg-orange-600' : 'bg-stone-700'}`} title={next?.title}>
+                  ⏰ {activeEvents.length}{daysLeft <= 1 && daysLeft >= 0 ? '!' : ''}
+                </div>
+              );
+            })()}
 
             {/* Tlačítka */}
             <div className="flex gap-1">
@@ -10977,6 +11161,7 @@ function MausritterSoloCompanion() {
   const [factions, setFactions] = useState([]);
   const [settlements, setSettlements] = useState([]);
   const [worldNPCs, setWorldNPCs] = useState([]);
+  const [timedEvents, setTimedEvents] = useState([]); // { id, title, targetDay, targetWatch, notes, completed }
   const [journalPartyFilter, setJournalPartyFilter] = useState('all');
 
   // Helper: Get active party
@@ -11148,7 +11333,8 @@ function MausritterSoloCompanion() {
         setFactions(data.factions);
         setSettlements(data.settlements);
         setWorldNPCs(data.worldNPCs);
-        
+        if (data.timedEvents) setTimedEvents(data.timedEvents);
+
         // Log if migration happened
         const oldVersion = rawData.version || 1;
         if (oldVersion < SAVE_VERSION) {
@@ -11162,18 +11348,19 @@ function MausritterSoloCompanion() {
 
   // Auto-save
   useEffect(() => {
-    const saveData = { 
+    const saveData = {
       version: SAVE_VERSION,
-      parties, 
-      activePartyId, 
+      parties,
+      activePartyId,
       activeCharacterId,
-      journal, 
+      journal,
       factions,
       settlements,
-      worldNPCs
+      worldNPCs,
+      timedEvents
     };
     localStorage.setItem('mausritter-save', JSON.stringify(saveData));
-  }, [parties, activePartyId, activeCharacterId, journal, factions, settlements, worldNPCs]);
+  }, [parties, activePartyId, activeCharacterId, journal, factions, settlements, worldNPCs, timedEvents]);
 
   const handleLogEntry = useCallback((entry) => {
     setJournal(prev => [{ 
@@ -12205,6 +12392,7 @@ function MausritterSoloCompanion() {
     { id: 'oracle', label: 'Věštírna', icon: '🔮' },
     { id: 'combat', label: 'Boj', icon: '⚔️' },
     { id: 'time', label: 'Čas', icon: '⏰' },
+    { id: 'events', label: 'Události', icon: '📅' },
     { id: 'world', label: 'Svět', icon: '🌍' },
     { id: 'factions', label: 'Frakce', icon: '🏰' },
     { id: 'studio', label: 'Kartičky', icon: '🎴' },
@@ -12911,6 +13099,14 @@ function MausritterSoloCompanion() {
           />
         )}
 
+        {activePanel === 'events' && (
+          <EventsPanel
+            timedEvents={timedEvents}
+            setTimedEvents={setTimedEvents}
+            gameTime={activeParty?.gameTime}
+          />
+        )}
+
         {activePanel === 'character' && (
           <CharacterPanel 
             character={activeCharacter}
@@ -12970,10 +13166,13 @@ function MausritterSoloCompanion() {
             onExport={handleExport}
             worldNPCs={worldNPCs}
             settlements={settlements}
+            timedEvents={timedEvents}
+            gameTime={activeParty?.gameTime}
             onMentionClick={(type, id) => {
               setPendingMentionOpen({ type, id });
               setActivePanel('world');
             }}
+            onOpenEvents={() => setActivePanel('events')}
           />
         )}
       </main>
@@ -12984,6 +13183,7 @@ function MausritterSoloCompanion() {
           gameTime={activeParty.gameTime}
           updateGameTime={updateGameTime}
           partyName={activeParty.name}
+          timedEvents={timedEvents}
         />
       )}
 
