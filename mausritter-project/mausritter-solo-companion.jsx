@@ -1454,12 +1454,101 @@ const SETTLEMENT_FEATURES = [
   'Věštírna starého pána', 'Věznice a soudní síň'
 ];
 
+// ===== TABULKY OSAD PODLE PRAVIDEL =====
+
+// Velikost osady (k6, použij nižší z 2k6)
+const SETTLEMENT_SIZES = [
+  { roll: 1, name: 'Farma/zámeček', population: '1–3 rodiny', sizeIndex: 1 },
+  { roll: 2, name: 'Křižovatka', population: '3–5 rodin', sizeIndex: 2 },
+  { roll: 3, name: 'Víska', population: '50–150 myší', sizeIndex: 3 },
+  { roll: 4, name: 'Vesnice', population: '150–300 myší', sizeIndex: 4 },
+  { roll: 5, name: 'Město', population: '300–1000 myší', sizeIndex: 5 },
+  { roll: 6, name: 'Velkoměsto', population: '1000+ myší', sizeIndex: 6 }
+];
+
+// Společenské zřízení (k6 + velikost osady)
+const SETTLEMENT_GOVERNANCE = [
+  { roll: '2–3', name: 'Vedená vesnickými stařešiny' },
+  { roll: '4–5', name: 'Spravovaná rytířem nebo nižším šlechticem' },
+  { roll: '6–7', name: 'Organizovaná cechovním výborem' },
+  { roll: '8–9', name: 'Svobodná osada pod správou rady měšťanů' },
+  { roll: '10–11', name: 'Domov významnějšího šlechtice' },
+  { roll: '12', name: 'Hlavní sídlo šlechtické moci' }
+];
+
+// S čím myši obchodují? (k20)
+const SETTLEMENT_TRADES = [
+  'Zemědělci pečující o tyčící se plodiny',
+  'Dřevorubci s pilami a potahy',
+  'Drsní a ošlehaní rybáři se sítěmi a vory',
+  'Tmavá a zatuchlá houbová farma',
+  'Na každém rovném povrchu se suší obilí',
+  'Aromatický sýr, několik let uleželý',
+  'Zahrádky vzácných bylin, střežené sušáky',
+  'Včelí úly a včelaři v ochranných oděvech',
+  'Kupci a obchodníci, často shánějí stráže',
+  'Kameníci pracující v nedalekém lomu',
+  'Mlýn poháněný velkým vodním kolem',
+  'Hlubinný důl na železo, stříbro nebo cín',
+  'Chovají bource a tkají jemné hedvábí',
+  'Zkušení průzkumníci jeskyní a chodeb',
+  'Keramika s pestrobarevnými glazurami',
+  'Přádelna vlny ověšená jasnými látkami',
+  'Vynikající škola s neukázněnými žáky',
+  'Rušná, dobře zásobená tržnice',
+  'Páchnoucí hora odpadků, pečlivě přebíraná',
+  'Krásně vyřezávaný nábytek z leštěného dřeva'
+];
+
+// Co se děje při příchodu hráčských myší? (k20)
 const SETTLEMENT_EVENTS = [
-  'Cenná relikvie ukradena', 'Záhadná nemoc se šíří', 'Hrdina se nevrátil z výpravy', 'Obchodní karavana zmizela',
-  'Divná zvířata viděna poblíž', 'Stará smlouva vypršela', 'Návštěva z dalekých krajů', 'Festival se blíží',
-  'Starosta je nezvěstný', 'Podzemní třesy', 'Nový vynález způsobil chaos', 'Rivalská osada hrozí',
-  'Mystické znamení na obloze', 'Vzácná bylina odkvetla', 'Prastarý duch promluvil', 'Zloději řádí',
-  'Láska a skandál', 'Prorocké sny', 'Záhadný cizinec přišel', 'Soutěž o důležitou pozici'
+  'Katastrofa, všichni se balí a odcházejí',
+  'Svatba, ulice vyzdobené květinami',
+  'Příprava na velkou sezónní hostinu',
+  'Udeřila nemoc',
+  'Hmyz spořádal obsah spižíren',
+  'Koná se trh, do osady se sjíždějí kupci',
+  'Myši si jdou po krku',
+  'Formuje se tlupa na boj s velkým zvířetem',
+  'Několik myší se ztratilo',
+  'Myší šlechtic vznesl svévolný požadavek',
+  'Dorazila potulná divadelní kumpanie',
+  'Pohřeb, ulice plné kouře',
+  'Podvodník spřádá vyšinuté plány',
+  'Domácí brouk se pomátl a napadá myši',
+  'Vílí velvyslanec s nemožným požadavkem',
+  'V okolí se šíří zvláštní, rychle rostoucí rostlina',
+  'Někdo ukradl drahocenné dědictví',
+  'Kočičí pán si žádá nehoráznou daň',
+  'Mladé myši slaví svátek dospělosti',
+  'Na želvím hřbetě přijela čarodějova věž'
+];
+
+// Semínka názvů osad (2x k12)
+const SETTLEMENT_NAME_STARTS = [
+  ['Dub', 'Bláto'], ['Bob', 'Sova'], ['Vrba', 'Liška'], ['Pařez', 'Žalud'],
+  ['Smrk', 'Měď'], ['Měsíc', 'Lup'], ['Zelená', 'Sýr'], ['Černá', 'Mokro'],
+  ['Kámen', 'Růže'], ['Vysoký', 'Cín'], ['Buk', 'Dobro'], ['Jablko', 'Kmen']
+];
+const SETTLEMENT_NAME_ENDS = [
+  ['ov', 'Luh'], ['ovec', 'Háj'], ['ová', 'Věž'], ['ice', 'Újezd'],
+  ['iny', 'Most'], ['ín', 'Brod'], ['ec', 'Voda'], ['ník', 'Hora'],
+  ['any', 'Nora'], ['ves', 'Lhota'], ['Hradec', 'Hrob'], ['Městec', 'Žďár']
+];
+
+// Hospody a hostince
+const INN_NAME_FIRST = [
+  'Bílý', 'Zelený', 'Černý', 'Červený', 'Stříbrný', 'Křivý',
+  'Přátelský', 'Schovaný', 'Lstivý', 'Skleněný', 'Trnitý', 'Rozbitý'
+];
+const INN_NAME_SECOND = [
+  'Brouk', 'Liška', 'Špalek', 'Semínko', 'Krysa', 'Sýr',
+  'Orel', 'Červ', 'Včela', 'Lucerna', 'Růže', 'Rytíř'
+];
+const INN_SPECIALTIES = [
+  'Pečená kořeněná mrkev', 'Žížalí vývar', 'Ostružinový koláč', 'Uleželý aromatický sýr',
+  'Ječmenná kaše', 'Tlustý rybí řízek', 'Pečené jablko', 'Smažené hmyzí nožičky',
+  'Čerstvý máslový chléb', 'Ukořistěné sladkosti', 'Semínka pražená v medu', 'Houbový guláš'
 ];
 
 // ===== MAUSRITTER CHARACTER TABLES =====
@@ -6820,24 +6909,87 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
     });
   };
 
+  // Generátor jména osady podle pravidel (2x k12)
+  const generateSettlementName = () => {
+    const startPair = randomFrom(SETTLEMENT_NAME_STARTS);
+    const endPair = randomFrom(SETTLEMENT_NAME_ENDS);
+    const start = randomFrom(startPair);
+    const end = randomFrom(endPair);
+    // Kombinace - pokud konec začíná malým písmenem, připoj přímo
+    if (end[0] === end[0].toLowerCase()) {
+      return start + end;
+    }
+    return start + ' ' + end;
+  };
+
+  // Generátor zřízení podle velikosti
+  const getGovernance = (sizeIndex) => {
+    const roll = rollD6() + sizeIndex;
+    if (roll <= 3) return SETTLEMENT_GOVERNANCE[0].name;
+    if (roll <= 5) return SETTLEMENT_GOVERNANCE[1].name;
+    if (roll <= 7) return SETTLEMENT_GOVERNANCE[2].name;
+    if (roll <= 9) return SETTLEMENT_GOVERNANCE[3].name;
+    if (roll <= 11) return SETTLEMENT_GOVERNANCE[4].name;
+    return SETTLEMENT_GOVERNANCE[5].name;
+  };
+
+  // Generátor hostince
+  const generateInn = () => {
+    const first = randomFrom(INN_NAME_FIRST);
+    const second = randomFrom(INN_NAME_SECOND);
+    const specialty = randomFrom(INN_SPECIALTIES);
+    return { name: `U ${first}ho ${second}a`, specialty };
+  };
+
   const generateSettlement = () => {
-    const landmark = randomFrom(LANDMARKS);
-    const size = ['Osada', 'Vesnice', 'Město'][rollD6() <= 2 ? 0 : rollD6() <= 5 ? 1 : 2];
-    const feature = randomFrom(SETTLEMENT_FEATURES);
+    // Velikost: 2k6, použij nižší hodnotu
+    const roll1 = rollD6();
+    const roll2 = rollD6();
+    const sizeRoll = Math.min(roll1, roll2);
+    const sizeData = SETTLEMENT_SIZES[sizeRoll - 1];
+
+    // Zřízení: k6 + velikost
+    const governance = getGovernance(sizeData.sizeIndex);
+
+    // Živnost: k20 (města a velkoměsta hoď dvakrát)
+    const trades = [randomFrom(SETTLEMENT_TRADES)];
+    if (sizeData.sizeIndex >= 5) {
+      const second = randomFrom(SETTLEMENT_TRADES);
+      if (second !== trades[0]) trades.push(second);
+    }
+
+    // Událost: k20
     const event = randomFrom(SETTLEMENT_EVENTS);
-    const firstName = randomFrom(FIRST_NAMES);
-    const lastName = randomFrom(LAST_NAMES).split(/(?=[A-Z])/)[0]; // First part of compound name
-    
+
+    // Jméno podle pravidel
+    const name = generateSettlementName();
+
+    // Landmark a feature jako bonus
+    const landmark = randomFrom(LANDMARKS);
+    const feature = randomFrom(SETTLEMENT_FEATURES);
+
+    // Hostinec (pro vísky a větší)
+    const inn = sizeData.sizeIndex >= 3 ? generateInn() : null;
+
     const settlement = {
       type: 'settlement',
-      name: `${firstName} ${lastName}`,
-      landmark,
-      size,
-      feature,
+      name,
+      size: sizeData.name,
+      population: sizeData.population,
+      governance,
+      trades,
       event,
-      npcs: []
+      landmark,
+      feature,
+      inn,
+      npcs: [],
+      // Hody pro referenci
+      rolls: {
+        size: [roll1, roll2],
+        sizeResult: sizeRoll
+      }
     };
-    
+
     setGenerated(settlement);
     onLogEntry({
       type: 'discovery',
@@ -6941,9 +7093,8 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
   };
 
   const genTabs = [
-    { id: 'mySettlements', label: 'Moje osady', icon: '🗺️' },
-    { id: 'myNPCs', label: 'Moji NPC', icon: '👥' },
-    { id: 'settlement', label: '+ Osada', icon: '🏘️' },
+    { id: 'mySettlements', label: 'Osady', icon: '🏘️' },
+    { id: 'myNPCs', label: 'NPC', icon: '👥' },
     { id: 'npc', label: '+ NPC', icon: '🐭' },
     { id: 'dungeon', label: 'Dungeon', icon: '🗝️' },
     { id: 'bestiary', label: 'Bestiář', icon: '🐛' },
@@ -6963,16 +7114,97 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
       {/* ========== MY SETTLEMENTS ========== */}
       {activeGen === 'mySettlements' && (
         <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <p className="text-stone-600">Správa osad a měst ve tvém světě</p>
-            <Button onClick={createEmptySettlement}>+ Nová osada</Button>
-          </div>
+          {/* Generátor osady */}
+          <ResultCard>
+            <HelpHeader
+              title="Generátor osady"
+              icon="🎲"
+              tooltip={
+                <div>
+                  <p className="font-bold mb-2">🎯 Generování podle pravidel Mausritter</p>
+                  <ul className="text-xs space-y-1 mb-2">
+                    <li>📏 <b>Velikost</b> - 2k6 (nižší hodnota): Farma → Velkoměsto</li>
+                    <li>👑 <b>Zřízení</b> - k6 + velikost: stařešinové → šlechta</li>
+                    <li>🔧 <b>Živnost</b> - k20 (města hoď 2×)</li>
+                    <li>⚡ <b>Událost</b> - co se děje při příchodu</li>
+                    <li>🏷️ <b>Jméno</b> - 2× k12 z tabulky semínek</li>
+                    <li>🍺 <b>Hostinec</b> - pro vísky a větší</li>
+                  </ul>
+                </div>
+              }
+            />
+            <div className="flex gap-2 mt-3">
+              <Button onClick={generateSettlement} size="large" className="flex-1">
+                🎲 Generovat osadu
+              </Button>
+              <Button onClick={createEmptySettlement} variant="secondary">
+                + Prázdná
+              </Button>
+            </div>
+          </ResultCard>
 
+          {/* Vygenerovaná osada */}
+          {generated && generated.type === 'settlement' && (
+            <ResultCard title="📋 Vygenerováno" className="border-amber-500 border-2">
+              <div className="space-y-3">
+                <h3 className="text-2xl font-bold text-amber-900 truncate">{generated.name}</h3>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 bg-amber-100/50 rounded overflow-hidden">
+                    <span className="text-sm text-stone-500">Velikost</span>
+                    <p className="font-bold truncate">{generated.size}</p>
+                    <p className="text-xs text-stone-500">{generated.population}</p>
+                  </div>
+                  <div className="p-3 bg-amber-100/50 rounded overflow-hidden">
+                    <span className="text-sm text-stone-500">Zřízení</span>
+                    <p className="font-bold text-sm">{generated.governance}</p>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-blue-100 rounded overflow-hidden">
+                  <span className="text-sm text-blue-700">Živnost</span>
+                  {generated.trades?.map((trade, i) => (
+                    <p key={i} className="font-bold text-blue-900">{trade}</p>
+                  ))}
+                </div>
+
+                <div className="p-3 bg-orange-100 rounded overflow-hidden">
+                  <span className="text-sm text-orange-700">Co se děje při příchodu</span>
+                  <p className="font-bold text-orange-900">{generated.event}</p>
+                </div>
+
+                {generated.inn && (
+                  <div className="p-3 bg-purple-100 rounded overflow-hidden">
+                    <span className="text-sm text-purple-700">Hostinec</span>
+                    <p className="font-bold text-purple-900">{generated.inn.name}</p>
+                    <p className="text-sm text-purple-700">Specialita: {generated.inn.specialty}</p>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 bg-green-100 rounded overflow-hidden">
+                    <span className="text-sm text-green-700">Landmark</span>
+                    <p className="font-bold text-green-900 text-sm">{generated.landmark}</p>
+                  </div>
+                  <div className="p-3 bg-stone-100 rounded overflow-hidden">
+                    <span className="text-sm text-stone-500">Zajímavost</span>
+                    <p className="font-bold text-stone-700 text-sm">{generated.feature}</p>
+                  </div>
+                </div>
+
+                <Button onClick={() => saveSettlementToWorld(generated)} className="w-full">
+                  📥 Uložit do seznamu
+                </Button>
+              </div>
+            </ResultCard>
+          )}
+
+          {/* Seznam osad */}
           {settlements.length === 0 ? (
             <ResultCard>
-              <p className="text-center text-stone-500 py-8">
-                Zatím nemáš žádné osady.<br/>
-                <span className="text-sm">Vytvoř novou nebo vygeneruj pomocí "+ Osada"</span>
+              <p className="text-center text-stone-500 py-4">
+                Zatím nemáš žádné uložené osady.<br/>
+                <span className="text-sm">Vygeneruj novou pomocí tlačítka výše.</span>
               </p>
             </ResultCard>
           ) : (
@@ -6982,8 +7214,8 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
                   {editingSettlement === settlement.id ? (
                     // Edit mode
                     <div className="space-y-3">
-                      <Input 
-                        value={settlement.name} 
+                      <Input
+                        value={settlement.name}
                         onChange={(v) => updateSettlement(settlement.id, { name: v })}
                         placeholder="Jméno osady"
                         className="font-bold"
@@ -6992,32 +7224,45 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
                         <Select
                           value={settlement.size}
                           onChange={(v) => updateSettlement(settlement.id, { size: v })}
-                          options={[
-                            { value: 'Osada', label: 'Osada (do 20 myší)' },
-                            { value: 'Vesnice', label: 'Vesnice (20-100 myší)' },
-                            { value: 'Město', label: 'Město (100+ myší)' }
-                          ]}
+                          options={SETTLEMENT_SIZES.map(s => ({ value: s.name, label: `${s.name} (${s.population})` }))}
                         />
-                        <Input 
-                          value={settlement.population || ''} 
+                        <Input
+                          value={settlement.population || ''}
                           onChange={(v) => updateSettlement(settlement.id, { population: v })}
-                          placeholder="Populace (číslo)"
+                          placeholder="Populace"
                         />
                       </div>
-                      <Input 
-                        value={settlement.landmark || ''} 
-                        onChange={(v) => updateSettlement(settlement.id, { landmark: v })}
-                        placeholder="Landmark (co je poblíž)"
+                      <Input
+                        value={settlement.governance || ''}
+                        onChange={(v) => updateSettlement(settlement.id, { governance: v })}
+                        placeholder="Zřízení (kdo vládne)"
                       />
-                      <Input 
-                        value={settlement.feature || ''} 
-                        onChange={(v) => updateSettlement(settlement.id, { feature: v })}
-                        placeholder="Zajímavost (čím je známá)"
+                      <Input
+                        value={Array.isArray(settlement.trades) ? settlement.trades.join(', ') : (settlement.trades || '')}
+                        onChange={(v) => updateSettlement(settlement.id, { trades: v.split(',').map(t => t.trim()).filter(Boolean) })}
+                        placeholder="Živnosti (oddělené čárkou)"
                       />
-                      <Input 
-                        value={settlement.event || ''} 
+                      <Input
+                        value={settlement.event || ''}
                         onChange={(v) => updateSettlement(settlement.id, { event: v })}
                         placeholder="Aktuální událost/problém"
+                      />
+                      <div className="grid grid-cols-2 gap-3">
+                        <Input
+                          value={settlement.landmark || ''}
+                          onChange={(v) => updateSettlement(settlement.id, { landmark: v })}
+                          placeholder="Landmark"
+                        />
+                        <Input
+                          value={settlement.feature || ''}
+                          onChange={(v) => updateSettlement(settlement.id, { feature: v })}
+                          placeholder="Zajímavost"
+                        />
+                      </div>
+                      <Input
+                        value={settlement.inn?.name || ''}
+                        onChange={(v) => updateSettlement(settlement.id, { inn: { ...settlement.inn, name: v } })}
+                        placeholder="Hostinec (jméno)"
                       />
                       <Select
                         value={settlement.ruler || ''}
@@ -7040,32 +7285,39 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
                     </div>
                   ) : (
                     // View mode
-                    <div 
-                      className="cursor-pointer hover:bg-amber-50 -m-3 p-3 rounded-lg transition-colors"
+                    <div
+                      className="cursor-pointer hover:bg-amber-50 -m-3 p-3 rounded-lg transition-colors overflow-hidden"
                       onClick={() => setViewingSettlement(viewingSettlement === settlement.id ? null : settlement.id)}
                     >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-bold text-lg text-amber-900">{settlement.name}</h3>
-                          <p className="text-sm text-stone-600">
+                      <div className="flex justify-between items-start gap-2">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="font-bold text-lg text-amber-900 truncate">{settlement.name}</h3>
+                          <p className="text-sm text-stone-600 truncate">
                             {settlement.size}
-                            {settlement.population && ` • ${settlement.population} myší`}
+                            {settlement.population && ` • ${settlement.population}`}
+                            {settlement.governance && ` • ${settlement.governance}`}
                           </p>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 flex-shrink-0">
                           <span className="text-xs text-stone-400">{settlement.npcs?.length || 0} NPC</span>
-                          <button 
+                          <button
                             onClick={(e) => { e.stopPropagation(); setEditingSettlement(settlement.id); }}
                             className="text-stone-400 hover:text-stone-600"
                           >✏️</button>
                         </div>
                       </div>
-                      
+
                       {viewingSettlement === settlement.id && (
-                        <div className="mt-3 pt-3 border-t border-amber-200 space-y-2">
+                        <div className="mt-3 pt-3 border-t border-amber-200 space-y-2 text-sm">
+                          {settlement.trades?.length > 0 && (
+                            <p><span className="text-stone-500">Živnost:</span> {settlement.trades.join(', ')}</p>
+                          )}
+                          {settlement.event && <p><span className="text-stone-500">Událost:</span> {settlement.event}</p>}
+                          {settlement.inn?.name && (
+                            <p><span className="text-stone-500">Hostinec:</span> {settlement.inn.name}{settlement.inn.specialty && ` (${settlement.inn.specialty})`}</p>
+                          )}
                           {settlement.landmark && <p><span className="text-stone-500">Landmark:</span> {settlement.landmark}</p>}
                           {settlement.feature && <p><span className="text-stone-500">Zajímavost:</span> {settlement.feature}</p>}
-                          {settlement.event && <p><span className="text-stone-500">Událost:</span> {settlement.event}</p>}
                           {settlement.ruler && (
                             <p><span className="text-stone-500">Vládce:</span> {worldNPCs.find(n => n.id === settlement.ruler)?.name || '?'}</p>
                           )}
@@ -7250,27 +7502,50 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
                     </div>
                   ) : (
                     // View mode - kompaktní
-                    <div className="cursor-pointer hover:bg-amber-50 -m-3 p-3 rounded-lg transition-colors overflow-hidden" onClick={() => setEditingNPC(npc.id)}>
+                    <div className="overflow-hidden">
                       <div className="flex justify-between items-start gap-2">
-                        <div className="min-w-0 flex-1">
-                          <h3 className="font-bold text-amber-900 truncate">{npc.name}</h3>
-                          <p className="text-sm text-stone-600 truncate">{npc.role && `${npc.role} • `}{npc.settlementId ? settlements.find(s => s.id === npc.settlementId)?.name : 'Bez domova'}</p>
-                        </div>
-                        {(npc.hp || npc.str) && (
-                          <div className="text-xs font-mono text-stone-500 flex-shrink-0 whitespace-nowrap">
-                            BO:{npc.hp?.current}/{npc.hp?.max} SÍL:{npc.str?.max} MRŠ:{npc.dex?.max} VŮL:{npc.wil?.max}
+                        <div
+                          className="min-w-0 flex-1 cursor-pointer hover:bg-amber-50 -m-3 p-3 rounded-lg transition-colors"
+                          onClick={() => setEditingNPC(npc.id)}
+                        >
+                          <div className="flex justify-between items-start gap-2">
+                            <div className="min-w-0 flex-1">
+                              <h3 className="font-bold text-amber-900 truncate">{npc.name}</h3>
+                              <p className="text-sm text-stone-600 truncate">{npc.role && `${npc.role} • `}{npc.settlementId ? settlements.find(s => s.id === npc.settlementId)?.name : 'Bez domova'}</p>
+                            </div>
+                            {(npc.hp || npc.str) && (
+                              <div className="text-xs font-mono text-stone-500 flex-shrink-0 whitespace-nowrap hidden sm:block">
+                                BO:{npc.hp?.current}/{npc.hp?.max} SÍL:{npc.str?.max}
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </div>
-                      {(npc.birthsign || npc.physicalDetail || npc.quirk || npc.goal) && (
-                        <div className="mt-2 text-sm text-stone-600 space-y-1">
-                          {npc.birthsign && <p className="truncate">⭐ {npc.birthsign}</p>}
-                          {npc.physicalDetail && <p className="truncate">👁️ {npc.physicalDetail}</p>}
-                          {npc.quirk && <p className="truncate">🎭 {npc.quirk}</p>}
-                          {npc.goal && <p className="truncate">🎯 {npc.goal}</p>}
+                          {(npc.birthsign || npc.physicalDetail || npc.quirk || npc.goal) && (
+                            <div className="mt-2 text-sm text-stone-600 space-y-1">
+                              {npc.birthsign && <p className="truncate">⭐ {npc.birthsign}</p>}
+                              {npc.physicalDetail && <p className="truncate">👁️ {npc.physicalDetail}</p>}
+                              {npc.quirk && <p className="truncate">🎭 {npc.quirk}</p>}
+                              {npc.goal && <p className="truncate">🎯 {npc.goal}</p>}
+                            </div>
+                          )}
+                          {npc.notes && <p className="mt-2 text-sm italic text-stone-500 line-clamp-2">{npc.notes}</p>}
                         </div>
-                      )}
-                      {npc.notes && <p className="mt-2 text-sm italic text-stone-500 line-clamp-2">{npc.notes}</p>}
+                        <div className="flex flex-col gap-1 flex-shrink-0">
+                          <button
+                            onClick={() => setEditingNPC(npc.id)}
+                            className="p-2 text-stone-400 hover:text-amber-600 hover:bg-amber-100 rounded transition-colors"
+                            title="Upravit"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            onClick={() => deleteNPC(npc.id)}
+                            className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-100 rounded transition-colors"
+                            title="Smazat"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </ResultCard>
@@ -7278,38 +7553,6 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
             </div>
           )}
         </div>
-      )}
-
-      {activeGen === 'settlement' && (
-        <ResultCard>
-          <HelpHeader 
-            title="Generátor osady" 
-            icon="🏘️"
-            tooltip={
-              <div>
-                <p className="font-bold mb-2">🎯 K čemu to je?</p>
-                <p className="text-xs mb-2">Rychle vytvoří zajímavou myší osadu, kam mohou tví hrdinové přijít - s hotovým problémem k řešení!</p>
-                
-                <p className="font-bold mb-1">📝 Co vygeneruje:</p>
-                <ul className="text-xs space-y-1 mb-2">
-                  <li>🏷️ <b>Jméno</b> - náhodné myší jméno osady</li>
-                  <li>📏 <b>Velikost</b> - osada / vesnice / město</li>
-                  <li>🌳 <b>Landmark</b> - co je poblíž (starý dub, studna...)</li>
-                  <li>✨ <b>Zajímavý rys</b> - čím je osada zvláštní</li>
-                  <li>⚡ <b>Událost</b> - aktuální problém nebo situace</li>
-                </ul>
-                
-                <p className="text-xs text-stone-300 italic">
-                  💡 Tip: Událost je skvělý háček pro dobrodružství! "Relikvie ukradena" = quest!
-                </p>
-              </div>
-            }
-          />
-          <p className="text-stone-600 mb-4">Vygeneruj náhodnou myší osadu s landmarkem, rysem a aktuální událostí.</p>
-          <Button onClick={generateSettlement} size="large" className="w-full">
-            🏘️ Generovat osadu
-          </Button>
-        </ResultCard>
       )}
 
       {activeGen === 'npc' && (
@@ -7646,35 +7889,8 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
       )}
 
       {/* Generated Result */}
-      {generated && (
+      {generated && generated.type !== 'settlement' && (
         <ResultCard title="📋 Vygenerováno" className="border-amber-500 border-2">
-          {generated.type === 'settlement' && (
-            <div className="space-y-3">
-              <h3 className="text-2xl font-bold text-amber-900 truncate">{generated.name}</h3>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="p-3 bg-amber-100/50 rounded overflow-hidden">
-                  <span className="text-sm text-stone-500">Velikost</span>
-                  <p className="font-bold truncate">{generated.size}</p>
-                </div>
-                <div className="p-3 bg-amber-100/50 rounded overflow-hidden">
-                  <span className="text-sm text-stone-500">Landmark</span>
-                  <p className="font-bold truncate">{generated.landmark}</p>
-                </div>
-              </div>
-              <div className="p-3 bg-green-100 rounded overflow-hidden">
-                <span className="text-sm text-green-700">Zajímavý rys</span>
-                <p className="font-bold text-green-900">{generated.feature}</p>
-              </div>
-              <div className="p-3 bg-orange-100 rounded overflow-hidden">
-                <span className="text-sm text-orange-700">Aktuální událost</span>
-                <p className="font-bold text-orange-900">{generated.event}</p>
-              </div>
-              <Button onClick={() => saveSettlementToWorld(generated)} className="w-full">
-                📥 Uložit do Moje osady
-              </Button>
-            </div>
-          )}
-
           {generated.type === 'npc' && (
             <div className="space-y-3">
               <h3 className="text-2xl font-bold text-amber-900 truncate">{generated.name}</h3>
