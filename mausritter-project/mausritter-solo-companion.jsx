@@ -7502,27 +7502,50 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
                     </div>
                   ) : (
                     // View mode - kompaktní
-                    <div className="cursor-pointer hover:bg-amber-50 -m-3 p-3 rounded-lg transition-colors overflow-hidden" onClick={() => setEditingNPC(npc.id)}>
+                    <div className="overflow-hidden">
                       <div className="flex justify-between items-start gap-2">
-                        <div className="min-w-0 flex-1">
-                          <h3 className="font-bold text-amber-900 truncate">{npc.name}</h3>
-                          <p className="text-sm text-stone-600 truncate">{npc.role && `${npc.role} • `}{npc.settlementId ? settlements.find(s => s.id === npc.settlementId)?.name : 'Bez domova'}</p>
-                        </div>
-                        {(npc.hp || npc.str) && (
-                          <div className="text-xs font-mono text-stone-500 flex-shrink-0 whitespace-nowrap">
-                            BO:{npc.hp?.current}/{npc.hp?.max} SÍL:{npc.str?.max} MRŠ:{npc.dex?.max} VŮL:{npc.wil?.max}
+                        <div
+                          className="min-w-0 flex-1 cursor-pointer hover:bg-amber-50 -m-3 p-3 rounded-lg transition-colors"
+                          onClick={() => setEditingNPC(npc.id)}
+                        >
+                          <div className="flex justify-between items-start gap-2">
+                            <div className="min-w-0 flex-1">
+                              <h3 className="font-bold text-amber-900 truncate">{npc.name}</h3>
+                              <p className="text-sm text-stone-600 truncate">{npc.role && `${npc.role} • `}{npc.settlementId ? settlements.find(s => s.id === npc.settlementId)?.name : 'Bez domova'}</p>
+                            </div>
+                            {(npc.hp || npc.str) && (
+                              <div className="text-xs font-mono text-stone-500 flex-shrink-0 whitespace-nowrap hidden sm:block">
+                                BO:{npc.hp?.current}/{npc.hp?.max} SÍL:{npc.str?.max}
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </div>
-                      {(npc.birthsign || npc.physicalDetail || npc.quirk || npc.goal) && (
-                        <div className="mt-2 text-sm text-stone-600 space-y-1">
-                          {npc.birthsign && <p className="truncate">⭐ {npc.birthsign}</p>}
-                          {npc.physicalDetail && <p className="truncate">👁️ {npc.physicalDetail}</p>}
-                          {npc.quirk && <p className="truncate">🎭 {npc.quirk}</p>}
-                          {npc.goal && <p className="truncate">🎯 {npc.goal}</p>}
+                          {(npc.birthsign || npc.physicalDetail || npc.quirk || npc.goal) && (
+                            <div className="mt-2 text-sm text-stone-600 space-y-1">
+                              {npc.birthsign && <p className="truncate">⭐ {npc.birthsign}</p>}
+                              {npc.physicalDetail && <p className="truncate">👁️ {npc.physicalDetail}</p>}
+                              {npc.quirk && <p className="truncate">🎭 {npc.quirk}</p>}
+                              {npc.goal && <p className="truncate">🎯 {npc.goal}</p>}
+                            </div>
+                          )}
+                          {npc.notes && <p className="mt-2 text-sm italic text-stone-500 line-clamp-2">{npc.notes}</p>}
                         </div>
-                      )}
-                      {npc.notes && <p className="mt-2 text-sm italic text-stone-500 line-clamp-2">{npc.notes}</p>}
+                        <div className="flex flex-col gap-1 flex-shrink-0">
+                          <button
+                            onClick={() => setEditingNPC(npc.id)}
+                            className="p-2 text-stone-400 hover:text-amber-600 hover:bg-amber-100 rounded transition-colors"
+                            title="Upravit"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            onClick={() => deleteNPC(npc.id)}
+                            className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-100 rounded transition-colors"
+                            title="Smazat"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </ResultCard>
