@@ -2124,6 +2124,205 @@ const HelpHeader = ({ title, tooltip, icon }) => (
 );
 
 // ============================================
+// MENTION INPUT - textarea s @mentions autocomplete
+// ============================================
+
+const MentionInput = ({
+  value,
+  onChange,
+  placeholder,
+  npcs = [],
+  settlements = [],
+  onNPCClick,
+  className = '',
+  rows = 3
+}) => {
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [suggestionFilter, setSuggestionFilter] = useState('');
+  const [cursorPosition, setCursorPosition] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const textareaRef = useRef(null);
+  const suggestionsRef = useRef(null);
+
+  // Kombinované suggestions - NPC a osady
+  const allSuggestions = [
+    ...npcs.map(n => ({ type: 'npc', id: n.id, name: n.name, icon: '🐭', subtitle: n.role || n.settlementId ? settlements.find(s => s.id === n.settlementId)?.name : 'Bez domova' })),
+    ...settlements.map(s => ({ type: 'settlement', id: s.id, name: s.name, icon: '🏘️', subtitle: s.size }))
+  ];
+
+  // Filtrované suggestions podle toho co uživatel píše
+  const filteredSuggestions = suggestionFilter
+    ? allSuggestions.filter(s =>
+        s.name.toLowerCase().includes(suggestionFilter.toLowerCase())
+      ).slice(0, 8)
+    : allSuggestions.slice(0, 8);
+
+  // Detekce @ v textu
+  const handleInput = (e) => {
+    const newValue = e.target.value;
+    const pos = e.target.selectionStart;
+    setCursorPosition(pos);
+    onChange(newValue);
+
+    // Najdi @ před kurzorem
+    const textBeforeCursor = newValue.slice(0, pos);
+    const atMatch = textBeforeCursor.match(/@(\w*)$/);
+
+    if (atMatch) {
+      setSuggestionFilter(atMatch[1]);
+      setShowSuggestions(true);
+      setSelectedIndex(0);
+    } else {
+      setShowSuggestions(false);
+      setSuggestionFilter('');
+    }
+  };
+
+  // Keyboard navigation
+  const handleKeyDown = (e) => {
+    if (!showSuggestions) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex(i => Math.min(i + 1, filteredSuggestions.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex(i => Math.max(i - 1, 0));
+    } else if (e.key === 'Enter' && showSuggestions) {
+      e.preventDefault();
+      if (filteredSuggestions[selectedIndex]) {
+        insertMention(filteredSuggestions[selectedIndex]);
+      }
+    } else if (e.key === 'Escape') {
+      setShowSuggestions(false);
+    }
+  };
+
+  // Vložení mention do textu
+  const insertMention = (suggestion) => {
+    const textBeforeCursor = value.slice(0, cursorPosition);
+    const textAfterCursor = value.slice(cursorPosition);
+
+    // Najdi kde začíná @
+    const atIndex = textBeforeCursor.lastIndexOf('@');
+    const beforeAt = textBeforeCursor.slice(0, atIndex);
+
+    // Formát: @[Jméno](typ:id)
+    const mention = `@[${suggestion.name}](${suggestion.type}:${suggestion.id})`;
+
+    const newValue = beforeAt + mention + ' ' + textAfterCursor;
+    onChange(newValue);
+    setShowSuggestions(false);
+    setSuggestionFilter('');
+
+    // Nastav kurzor za mention
+    setTimeout(() => {
+      if (textareaRef.current) {
+        const newPos = beforeAt.length + mention.length + 1;
+        textareaRef.current.selectionStart = newPos;
+        textareaRef.current.selectionEnd = newPos;
+        textareaRef.current.focus();
+      }
+    }, 0);
+  };
+
+  return (
+    <div className="relative">
+      <textarea
+        ref={textareaRef}
+        value={value}
+        onChange={handleInput}
+        onKeyDown={handleKeyDown}
+        onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+        placeholder={placeholder}
+        rows={rows}
+        className={`w-full px-3 py-2 border border-stone-300 rounded-lg resize-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none ${className}`}
+      />
+
+      {/* Nápověda */}
+      <p className="text-xs text-stone-400 mt-1">💡 Napiš @ pro vložení NPC nebo osady</p>
+
+      {/* Suggestions dropdown */}
+      {showSuggestions && filteredSuggestions.length > 0 && (
+        <div
+          ref={suggestionsRef}
+          className="absolute left-0 right-0 top-full mt-1 bg-white border border-stone-300 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto"
+        >
+          {filteredSuggestions.map((suggestion, index) => (
+            <button
+              key={`${suggestion.type}-${suggestion.id}`}
+              type="button"
+              onClick={() => insertMention(suggestion)}
+              className={`w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-amber-50 transition-colors ${
+                index === selectedIndex ? 'bg-amber-100' : ''
+              }`}
+            >
+              <span className="text-lg">{suggestion.icon}</span>
+              <div className="min-w-0 flex-1">
+                <p className="font-medium text-stone-800 truncate">{suggestion.name}</p>
+                {suggestion.subtitle && (
+                  <p className="text-xs text-stone-500 truncate">{suggestion.subtitle}</p>
+                )}
+              </div>
+              <span className="text-xs text-stone-400 flex-shrink-0">
+                {suggestion.type === 'npc' ? 'NPC' : 'Osada'}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Prázdný stav */}
+      {showSuggestions && filteredSuggestions.length === 0 && suggestionFilter && (
+        <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-stone-300 rounded-lg shadow-lg z-50 p-3 text-center text-stone-500">
+          Žádné výsledky pro "{suggestionFilter}"
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Parsování textu s mentions - vrací React elementy
+const parseMentions = (text, onMentionClick) => {
+  if (!text) return null;
+
+  // Regex pro @[Jméno](typ:id)
+  const mentionRegex = /@\[([^\]]+)\]\((\w+):([^)]+)\)/g;
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = mentionRegex.exec(text)) !== null) {
+    // Text před mention
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+
+    // Mention jako klikatelný element
+    const [, name, type, id] = match;
+    parts.push(
+      <button
+        key={`${type}-${id}-${match.index}`}
+        onClick={() => onMentionClick && onMentionClick(type, id)}
+        className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded font-medium transition-colors"
+      >
+        {type === 'npc' ? '🐭' : '🏘️'}
+        {name}
+      </button>
+    );
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  // Zbytek textu
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+
+  return parts.length > 0 ? parts : text;
+};
+
+// ============================================
 // HOW TO PLAY PANEL
 // ============================================
 
@@ -6749,7 +6948,7 @@ const ItemCardStudio = ({ parties, activePartyId, activeCharacterId, updateChara
 // WORLD GENERATOR PANEL
 // ============================================
 
-const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWorldNPCs, parties, activeParty, activePartyId, updateParty }) => {
+const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWorldNPCs, parties, activeParty, activePartyId, updateParty, pendingMentionOpen, setPendingMentionOpen }) => {
   const [generated, setGenerated] = useState(null);
   const [activeGen, setActiveGen] = useState('mySettlements');
   const [season, setSeason] = useState('spring');
@@ -6760,6 +6959,20 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
   const [viewingSettlement, setViewingSettlement] = useState(null);
   const [expandedNPCs, setExpandedNPCs] = useState({});
   const [npcBehaviors, setNpcBehaviors] = useState({});
+
+  // Handle pending mention open from journal
+  useEffect(() => {
+    if (pendingMentionOpen) {
+      if (pendingMentionOpen.type === 'npc') {
+        setActiveGen('myNPCs');
+        setEditingNPC(pendingMentionOpen.id);
+      } else if (pendingMentionOpen.type === 'settlement') {
+        setActiveGen('mySettlements');
+        setEditingSettlement(pendingMentionOpen.id);
+      }
+      setPendingMentionOpen(null);
+    }
+  }, [pendingMentionOpen, setPendingMentionOpen]);
 
   // ========== SETTLEMENT MANAGEMENT ==========
   const createEmptySettlement = () => {
@@ -9377,7 +9590,7 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
 // JOURNAL PANEL
 // ============================================
 
-const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilter, onExport }) => {
+const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilter, onExport, worldNPCs = [], settlements = [], onMentionClick }) => {
   const [newEntry, setNewEntry] = useState('');
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -9560,10 +9773,10 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
     switch (entry.type) {
       case 'narrative':
         return (
-          <p className="text-stone-800 italic leading-relaxed my-3 cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors" 
+          <p className="text-stone-800 italic leading-relaxed my-3 cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
-            {entry.content}
+            {parseMentions(entry.content, onMentionClick)}
             {entry.edited && <span className="text-xs text-stone-400 ml-1">✎</span>}
           </p>
         );
@@ -9580,7 +9793,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                 {c.type?.icon || '🐭'} {c.name} <span className="font-normal text-stone-500">— {c.type?.name}</span>
               </p>
               <p className="text-stone-600 text-sm truncate">{c.personality}</p>
-              {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 line-clamp-2">{entry.note}</p>}
+              {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick)}</p>}
             </div>
           );
         }
@@ -9608,7 +9821,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                 🐭 {name} {typePart && <span className="font-normal text-stone-500">— {typePart}</span>}
               </p>
               {personality && <p className="text-stone-600 text-sm truncate">{personality}</p>}
-              {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 line-clamp-2">{entry.note}</p>}
+              {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick)}</p>}
             </div>
           );
         }
@@ -9623,7 +9836,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                 {e.danger ? '⚠️' : '👁️'} {e.creature?.name}
               </p>
               <p className="text-stone-600 text-sm truncate">{e.activity}</p>
-              {entry.note && <p className="text-stone-700 italic text-sm mt-1 line-clamp-2">{entry.note}</p>}
+              {entry.note && <p className="text-stone-700 italic text-sm mt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick)}</p>}
             </div>
           );
         }
@@ -9634,7 +9847,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                  onClick={() => startEdit(entry)}
                  title="Klikni pro úpravu">
               <p className="font-medium text-purple-900 truncate">{entry.result}</p>
-              {entry.note && <p className="text-stone-700 italic text-sm mt-1 line-clamp-2">{entry.note}</p>}
+              {entry.note && <p className="text-stone-700 italic text-sm mt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick)}</p>}
             </div>
           );
         }
@@ -9650,7 +9863,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                 <span className="font-bold">[{entry.dice?.join(', ')}]</span>
                 {entry.count > 1 && <span className="font-bold"> = {entry.total}</span>}
               </p>
-              {entry.note && <p className="text-stone-600 italic text-sm mt-1 line-clamp-2">{entry.note}</p>}
+              {entry.note && <p className="text-stone-600 italic text-sm mt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick)}</p>}
             </div>
           );
         }
@@ -9664,7 +9877,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
               {entry.dice && <span className="font-normal text-stone-500 text-xs">[{entry.dice.join(', ')}] </span>}
               {entry.result}
             </p>
-            {entry.note && <p className="text-stone-700 italic text-sm mt-1 line-clamp-2">{entry.note}</p>}
+            {entry.note && <p className="text-stone-700 italic text-sm mt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick)}</p>}
             {entry.edited && <span className="text-xs text-stone-400">✎</span>}
           </div>
         );
@@ -9675,7 +9888,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
             ⚔️ <strong>{entry.attacker}</strong> → <strong>{entry.target}</strong>: {entry.hitResult}, {entry.damage} dmg
-            {entry.note && <span className="font-normal italic text-stone-600 ml-2">{entry.note}</span>}
+            {entry.note && <span className="font-normal italic text-stone-600 ml-2">{parseMentions(entry.note, onMentionClick)}</span>}
           </p>
         );
 
@@ -9685,7 +9898,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
             🏁 Boj skončil
-            {entry.note && <span className="font-normal italic ml-2">{entry.note}</span>}
+            {entry.note && <span className="font-normal italic ml-2">{parseMentions(entry.note, onMentionClick)}</span>}
           </p>
         );
       
@@ -9697,7 +9910,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
             <p className="font-bold text-amber-900 truncate">{entry.subtype}: {entry.data?.name}</p>
             {entry.data?.trait && <p className="text-stone-600 text-sm italic truncate">{entry.data.trait}</p>}
             {entry.data?.appearance && <p className="text-stone-600 text-sm truncate">{entry.data.appearance}</p>}
-            {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 line-clamp-2">{entry.note}</p>}
+            {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick)}</p>}
           </div>
         );
       
@@ -9708,7 +9921,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
              title="Klikni pro úpravu">
             <span className="font-medium text-stone-700">{entry.faction}</span>: {entry.success ? '✓ pokrok' : '– beze změny'} 
             <span className="opacity-60"> (d6={entry.roll}+{entry.bonus})</span>
-            {entry.note && <span className="italic text-stone-600 ml-2">{entry.note}</span>}
+            {entry.note && <span className="italic text-stone-600 ml-2">{parseMentions(entry.note, onMentionClick)}</span>}
           </p>
         );
 
@@ -9720,7 +9933,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
             ☀️ {['Ráno', 'Odpoledne', 'Večer', 'Noc'][entry.to?.watch || 0]}
             {entry.events?.includes('new_day') && ' — Nový den'}
             {entry.events?.includes('new_week') && ' — Nový týden'}
-            {entry.note && <span className="normal-case font-normal text-stone-600 ml-2">• {entry.note}</span>}
+            {entry.note && <span className="normal-case font-normal text-stone-600 ml-2">• {parseMentions(entry.note, onMentionClick)}</span>}
           </p>
         );
 
@@ -9730,7 +9943,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
             <span className="text-blue-600">☁️</span> Počasí: <em>{entry.weather}</em>
-            {entry.note && <span className="italic ml-2">— {entry.note}</span>}
+            {entry.note && <span className="italic ml-2">— {parseMentions(entry.note, onMentionClick)}</span>}
           </p>
         );
 
@@ -9742,7 +9955,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                onClick={() => startEdit(entry)}
                title="Klikni pro úpravu">
               <span className="text-blue-600">☁️</span> Počasí: <em>{entry.data?.weather || entry.weather}</em>
-              {entry.note && <span className="italic ml-2">— {entry.note}</span>}
+              {entry.note && <span className="italic ml-2">— {parseMentions(entry.note, onMentionClick)}</span>}
             </p>
           );
         }
@@ -9752,7 +9965,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
             🌍 {entry.data?.name || entry.content || JSON.stringify(entry.data)}
-            {entry.note && <span className="italic ml-2">— {entry.note}</span>}
+            {entry.note && <span className="italic ml-2">— {parseMentions(entry.note, onMentionClick)}</span>}
           </p>
         );
 
@@ -9762,7 +9975,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
             {entry.subtype === 'short' ? '☕ Krátký odpočinek' : '🏕️ Dlouhý odpočinek v bezpečí'}
-            {entry.note && <span className="italic text-stone-600 ml-2">— {entry.note}</span>}
+            {entry.note && <span className="italic text-stone-600 ml-2">— {parseMentions(entry.note, onMentionClick)}</span>}
           </p>
         );
 
@@ -9772,7 +9985,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
             📦 {entry.item}: {entry.consumed ? <span className="text-orange-600">spotřebováno!</span> : <span className="text-green-600">OK</span>}
-            {entry.note && <span className="italic text-stone-600 ml-2">— {entry.note}</span>}
+            {entry.note && <span className="italic text-stone-600 ml-2">— {parseMentions(entry.note, onMentionClick)}</span>}
           </p>
         );
 
@@ -9782,7 +9995,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                onClick={() => startEdit(entry)}
                title="Klikni pro úpravu">
             <p className="text-red-700 font-bold">⚠️ Náhodné setkání!</p>
-            {entry.note && <p className="italic text-stone-700 text-sm">{entry.note}</p>}
+            {entry.note && <p className="italic text-stone-700 text-sm">{parseMentions(entry.note, onMentionClick)}</p>}
           </div>
         );
 
@@ -9792,7 +10005,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
             ⛏️ Tah {entry.turn} — pochodeň: {6 - entry.torchTurns}/6
-            {entry.note && <span className="normal-case ml-2">• {entry.note}</span>}
+            {entry.note && <span className="normal-case ml-2">• {parseMentions(entry.note, onMentionClick)}</span>}
           </p>
         );
 
@@ -9803,7 +10016,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                onClick={() => startEdit(entry)}
                title="Klikni pro úpravu">
             <p className="text-red-700 font-bold">👹 Něco se blíží!</p>
-            {entry.note && <p className="italic text-stone-700 text-sm">{entry.note}</p>}
+            {entry.note && <p className="italic text-stone-700 text-sm">{parseMentions(entry.note, onMentionClick)}</p>}
           </div>
         );
 
@@ -9813,7 +10026,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
             🔥 Nová pochodeň
-            {entry.note && <span className="text-stone-600 ml-2">— {entry.note}</span>}
+            {entry.note && <span className="text-stone-600 ml-2">— {parseMentions(entry.note, onMentionClick)}</span>}
           </p>
         );
 
@@ -9825,7 +10038,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
             🤝 Test loajality ({entry.hireling}): {entry.success 
               ? <span className="text-green-700">zůstává věrný</span> 
               : <span className="text-red-700 font-bold">ZRADA!</span>}
-            {entry.note && <span className="italic text-stone-600 ml-2">— {entry.note}</span>}
+            {entry.note && <span className="italic text-stone-600 ml-2">— {parseMentions(entry.note, onMentionClick)}</span>}
           </p>
         );
 
@@ -9835,7 +10048,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
             🐭 Na scénu vstupuje <strong>{entry.character}</strong>
-            {entry.note && <span className="font-normal italic text-stone-600 ml-2">— {entry.note}</span>}
+            {entry.note && <span className="font-normal italic text-stone-600 ml-2">— {parseMentions(entry.note, onMentionClick)}</span>}
           </p>
         );
 
@@ -9848,7 +10061,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                   onClick={() => startEdit(entry)}
                   title="Klikni pro úpravu">
               {entry.change > 0 ? '💚' : '💔'} {sign}{entry.change} HP
-              {entry.note && <span className="italic ml-1">({entry.note})</span>}
+              {entry.note && <span className="italic ml-1">({parseMentions(entry.note, onMentionClick)})</span>}
             </span>
           );
         }
@@ -9887,7 +10100,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
             💰 {entry.description}
-            {entry.note && <span className="italic ml-1">({entry.note})</span>}
+            {entry.note && <span className="italic ml-1">({parseMentions(entry.note, onMentionClick)})</span>}
           </p>
         );
 
@@ -9901,7 +10114,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
             <p className="text-xs text-stone-500 font-mono">
               {typeof content === 'string' ? content : JSON.stringify(content)}
             </p>
-            {entry.note && <p className="text-sm text-stone-700 italic mt-1">{entry.note}</p>}
+            {entry.note && <p className="text-sm text-stone-700 italic mt-1">{parseMentions(entry.note, onMentionClick)}</p>}
           </div>
         );
     }
@@ -9915,17 +10128,20 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
         <p className="text-stone-500 text-sm">{journal.length} záznamů</p>
       </div>
 
-      {/* New Entry - Expandable */}
+      {/* New Entry - Expandable with @mentions */}
       <div className="mb-8">
-        <textarea
+        <MentionInput
           value={newEntry}
-          onChange={(e) => setNewEntry(e.target.value)}
-          placeholder="Pokračuj v příběhu... (piš kurzívou pro vyprávění)"
-          className="w-full h-24 px-4 py-3 bg-white border border-amber-200 rounded-lg focus:outline-none focus:border-amber-400 text-stone-800 font-serif italic resize-none shadow-sm"
+          onChange={setNewEntry}
+          placeholder="Pokračuj v příběhu... (napiš @ pro vložení NPC nebo osady)"
+          npcs={worldNPCs}
+          settlements={settlements}
+          rows={3}
+          className="bg-white border-amber-200 focus:border-amber-400 text-stone-800 font-serif italic shadow-sm"
         />
         {newEntry.trim() && (
           <div className="flex justify-end mt-2">
-            <button 
+            <button
               onClick={addNarrativeEntry}
               className="px-4 py-2 bg-amber-700 text-white rounded-lg hover:bg-amber-800 transition-colors text-sm"
             >
@@ -10552,6 +10768,7 @@ const FloatingDice = ({ onLogEntry }) => {
 function MausritterSoloCompanion() {
   const [activePanel, setActivePanel] = useState('journal');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [pendingMentionOpen, setPendingMentionOpen] = useState(null); // { type: 'npc'|'settlement', id: string }
 
   // Cloud sync state (File System API)
   const [fileHandle, setFileHandle] = useState(null);
@@ -12561,6 +12778,8 @@ function MausritterSoloCompanion() {
             activeParty={activeParty}
             activePartyId={activePartyId}
             updateParty={updateParty}
+            pendingMentionOpen={pendingMentionOpen}
+            setPendingMentionOpen={setPendingMentionOpen}
           />
         )}
         
@@ -12573,13 +12792,19 @@ function MausritterSoloCompanion() {
         )}
         
         {activePanel === 'journal' && (
-          <JournalPanel 
+          <JournalPanel
             journal={journal}
             setJournal={setJournal}
             parties={parties}
             partyFilter={journalPartyFilter}
             setPartyFilter={setJournalPartyFilter}
             onExport={handleExport}
+            worldNPCs={worldNPCs}
+            settlements={settlements}
+            onMentionClick={(type, id) => {
+              setPendingMentionOpen({ type, id });
+              setActivePanel('world');
+            }}
           />
         )}
       </main>
