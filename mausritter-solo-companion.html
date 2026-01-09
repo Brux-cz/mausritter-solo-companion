@@ -7121,8 +7121,7 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
 
   const genTabs = [
     { id: 'mySettlements', label: 'Osady', icon: '🏘️' },
-    { id: 'myNPCs', label: 'NPC', icon: '👥' },
-    { id: 'npc', label: '+ NPC', icon: '🐭' },
+    { id: 'myNPCs', label: 'NPC', icon: '🐭' },
     { id: 'dungeon', label: 'Dungeon', icon: '🗝️' },
     { id: 'bestiary', label: 'Bestiář', icon: '🐛' },
     { id: 'weather', label: 'Počasí', icon: '☀️' }
@@ -7413,16 +7412,94 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
       {/* ========== MY NPCs ========== */}
       {activeGen === 'myNPCs' && (
         <div className="space-y-4">
-          <div className="flex justify-between items-center gap-2">
-            <p className="text-stone-600 min-w-0 truncate">Všechny postavy ve tvém světě</p>
-            <Button onClick={() => createEmptyNPC()} className="flex-shrink-0">+ Nová postava</Button>
-          </div>
+          {/* Generátor NPC */}
+          <ResultCard>
+            <HelpHeader
+              title="Generátor NPC"
+              icon="🎲"
+              tooltip={
+                <div>
+                  <p className="font-bold mb-2">🎯 Generování NPC</p>
+                  <ul className="text-xs space-y-1 mb-2">
+                    <li>🏷️ <b>Jméno</b> - české myší jméno</li>
+                    <li>⭐ <b>Znamení</b> - osobnostní archetyp</li>
+                    <li>👁️ <b>Vzhled</b> - fyzický detail</li>
+                    <li>🎭 <b>Zvláštnost</b> - jak se chová</li>
+                    <li>🎯 <b>Cíl</b> - co právě teď chce</li>
+                    <li>🎲 <b>Reakce (2d6)</b> - jak reaguje na hráče</li>
+                  </ul>
+                </div>
+              }
+            />
+            <div className="flex gap-2 mt-3">
+              <Button onClick={generateNPC} size="large" className="flex-1">
+                🎲 Generovat NPC
+              </Button>
+              <Button onClick={() => createEmptyNPC()} variant="secondary">
+                + Prázdná
+              </Button>
+            </div>
+          </ResultCard>
 
+          {/* Vygenerované NPC */}
+          {generated && generated.type === 'npc' && (
+            <ResultCard title="📋 Vygenerováno" className="border-amber-500 border-2">
+              <div className="space-y-3">
+                <h3 className="text-2xl font-bold text-amber-900 truncate">{generated.name}</h3>
+                {generated.role && (
+                  <p className="text-center text-stone-600 font-medium truncate">🔧 {generated.role}</p>
+                )}
+                <div className="flex flex-wrap gap-2 text-sm font-mono bg-stone-100 rounded px-3 py-2 justify-center">
+                  <span>BO: <b>{generated.hp?.max}</b></span>
+                  <span>SÍL: <b>{generated.str?.max}</b></span>
+                  <span>MRŠ: <b>{generated.dex?.max}</b></span>
+                  <span>VŮL: <b>{generated.wil?.max}</b></span>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 bg-amber-100/50 rounded overflow-hidden">
+                    <span className="text-sm text-stone-500">Znamení</span>
+                    <p className="font-bold truncate">{generated.birthsign?.sign}</p>
+                    <p className="text-sm text-stone-600 truncate">{generated.birthsign?.trait}</p>
+                  </div>
+                  <div className="p-3 bg-amber-100/50 rounded overflow-hidden">
+                    <span className="text-sm text-stone-500">Vzhled</span>
+                    <p className="font-bold truncate">{generated.physicalDetail}</p>
+                  </div>
+                </div>
+                <div className="p-3 bg-purple-100 rounded overflow-hidden">
+                  <span className="text-sm text-purple-700">Zvláštnost</span>
+                  <p className="font-bold text-purple-900">{generated.quirk}</p>
+                </div>
+                <div className="p-3 bg-blue-100 rounded overflow-hidden">
+                  <span className="text-sm text-blue-700">Cíl</span>
+                  <p className="font-bold text-blue-900">{generated.goal}</p>
+                </div>
+                <div className="p-3 bg-stone-100 rounded">
+                  <span className="text-sm text-stone-600">Reakce (2d6)</span>
+                  <p className="mt-1 font-bold text-center">
+                    [{generated.reaction?.dice?.join(', ')}] = {generated.reaction?.total} →{' '}
+                    {generated.reaction?.total <= 3 ? '😠 Nepřátelský' :
+                     generated.reaction?.total <= 5 ? '😒 Nevlídný' :
+                     generated.reaction?.total <= 8 ? '😐 Neutrální' :
+                     generated.reaction?.total <= 10 ? '😊 Přátelský' : '🤝 Nápomocný'}
+                  </p>
+                </div>
+                <Button onClick={() => saveNPCToWorld({
+                  ...generated,
+                  birthsign: `${generated.birthsign?.sign} (${generated.birthsign?.trait})`
+                })} className="w-full">
+                  📥 Uložit do seznamu
+                </Button>
+              </div>
+            </ResultCard>
+          )}
+
+          {/* Seznam NPC */}
           {worldNPCs.length === 0 ? (
             <ResultCard>
-              <p className="text-center text-stone-500 py-8">
-                Zatím nemáš žádné NPC.<br/>
-                <span className="text-sm">Vytvoř novou nebo vygeneruj pomocí "+ NPC"</span>
+              <p className="text-center text-stone-500 py-4">
+                Zatím nemáš žádné uložené NPC.<br/>
+                <span className="text-sm">Vygeneruj novou pomocí tlačítka výše.</span>
               </p>
             </ResultCard>
           ) : (
@@ -7580,44 +7657,6 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
             </div>
           )}
         </div>
-      )}
-
-      {activeGen === 'npc' && (
-        <ResultCard>
-          <HelpHeader 
-            title="Generátor NPC" 
-            icon="🐭"
-            tooltip={
-              <div>
-                <p className="font-bold mb-2">🎯 K čemu to je?</p>
-                <p className="text-xs mb-2">Vytvoří okamžitě zapamatovatelnou postavu, když tví hrdinové potkají někoho nového.</p>
-                
-                <p className="font-bold mb-1">📝 Co vygeneruje:</p>
-                <ul className="text-xs space-y-1 mb-2">
-                  <li>🏷️ <b>Jméno</b> - české myší jméno</li>
-                  <li>⭐ <b>Znamení</b> - osobnostní archetyp</li>
-                  <li>👁️ <b>Fyzický detail</b> - co si na ní všimneš</li>
-                  <li>🎭 <b>Zvláštnost</b> - jak se chová</li>
-                  <li>🎯 <b>Cíl</b> - co právě teď chce</li>
-                  <li>🎲 <b>Reakce (2d6)</b> - jak reaguje na hráče</li>
-                </ul>
-                
-                <p className="font-bold mb-1">🎲 Reakce:</p>
-                <ul className="text-xs space-y-0.5 text-stone-300">
-                  <li>2-3 = Nepřátelská</li>
-                  <li>4-5 = Nedůvěřivá</li>
-                  <li>6-8 = Neutrální</li>
-                  <li>9-10 = Přátelská</li>
-                  <li>11-12 = Nadšená/pomocná</li>
-                </ul>
-              </div>
-            }
-          />
-          <p className="text-stone-600 mb-4">Vygeneruj náhodnou myší postavu s osobností a cílem.</p>
-          <Button onClick={generateNPC} size="large" className="w-full">
-            🐭 Generovat NPC
-          </Button>
-        </ResultCard>
       )}
 
       {activeGen === 'dungeon' && (
@@ -7915,60 +7954,9 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
         </ResultCard>
       )}
 
-      {/* Generated Result */}
-      {generated && generated.type !== 'settlement' && (
+      {/* Generated Result (dungeon, weather, bestiary) */}
+      {generated && generated.type !== 'settlement' && generated.type !== 'npc' && (
         <ResultCard title="📋 Vygenerováno" className="border-amber-500 border-2">
-          {generated.type === 'npc' && (
-            <div className="space-y-3">
-              <h3 className="text-2xl font-bold text-amber-900 truncate">{generated.name}</h3>
-              {generated.role && (
-                <p className="text-center text-stone-600 font-medium truncate">🔧 {generated.role}</p>
-              )}
-              {/* Staty NPC */}
-              <div className="flex flex-wrap gap-2 text-sm font-mono bg-stone-100 rounded px-3 py-2 justify-center">
-                <span>BO: <b>{generated.hp?.max}</b></span>
-                <span>SÍL: <b>{generated.str?.max}</b></span>
-                <span>MRŠ: <b>{generated.dex?.max}</b></span>
-                <span>VŮL: <b>{generated.wil?.max}</b></span>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="p-3 bg-amber-100/50 rounded overflow-hidden">
-                  <span className="text-sm text-stone-500">Znamení</span>
-                  <p className="font-bold truncate">{generated.birthsign?.sign}</p>
-                  <p className="text-sm text-stone-600 truncate">{generated.birthsign?.trait}</p>
-                </div>
-                <div className="p-3 bg-amber-100/50 rounded overflow-hidden">
-                  <span className="text-sm text-stone-500">Vzhled</span>
-                  <p className="font-bold truncate">{generated.physicalDetail}</p>
-                </div>
-              </div>
-              <div className="p-3 bg-purple-100 rounded overflow-hidden">
-                <span className="text-sm text-purple-700">Zvláštnost</span>
-                <p className="font-bold text-purple-900">{generated.quirk}</p>
-              </div>
-              <div className="p-3 bg-blue-100 rounded overflow-hidden">
-                <span className="text-sm text-blue-700">Cíl</span>
-                <p className="font-bold text-blue-900">{generated.goal}</p>
-              </div>
-              <div className="p-3 bg-stone-100 rounded">
-                <span className="text-sm text-stone-600">Reakce (2d6)</span>
-                <DiceDisplay dice={generated.reaction.dice} />
-                <p className="mt-2 font-bold text-center">
-                  {generated.reaction.total <= 3 ? '😠 Nepřátelský' :
-                   generated.reaction.total <= 5 ? '😒 Nevlídný' :
-                   generated.reaction.total <= 8 ? '😐 Neutrální' :
-                   generated.reaction.total <= 10 ? '😊 Přátelský' : '🤝 Nápomocný'}
-                </p>
-              </div>
-              <Button onClick={() => saveNPCToWorld({
-                ...generated,
-                birthsign: `${generated.birthsign?.sign} (${generated.birthsign?.trait})`
-              })} className="w-full">
-                📥 Uložit do Moji NPC
-              </Button>
-            </div>
-          )}
-
           {generated.type === 'dungeon' && (
             <div className="space-y-3">
               <div className="p-3 bg-stone-800 text-stone-100 rounded">
