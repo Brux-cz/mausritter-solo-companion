@@ -9589,6 +9589,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
 
   // Modal pro zobrazení detailu NPC/osady
   const [detailModal, setDetailModal] = useState(null); // { type: 'npc'|'settlement', data: ... }
+  const [generatedBehavior, setGeneratedBehavior] = useState(null); // Dočasné vygenerované chování pro modal
 
   // Multi-select mode
   const [selectionMode, setSelectionMode] = useState(false);
@@ -10312,13 +10313,13 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
 
       {/* Detail modal pro NPC/osady */}
       {detailModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setDetailModal(null)}>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }}>
           <div className="bg-amber-50 rounded-lg shadow-xl max-w-md w-full max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             {detailModal.type === 'npc' && detailModal.data && (
               <div className="p-4 space-y-3">
                 <div className="flex justify-between items-start">
                   <h3 className="text-2xl font-bold text-amber-900">🐭 {detailModal.data.name}</h3>
-                  <button onClick={() => setDetailModal(null)} className="text-stone-400 hover:text-stone-600 text-xl">✕</button>
+                  <button onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }} className="text-stone-400 hover:text-stone-600 text-xl">✕</button>
                 </div>
                 {detailModal.data.role && (
                   <p className="text-stone-600 font-medium">🔧 {detailModal.data.role}</p>
@@ -10357,10 +10358,30 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                     <p className="text-stone-700">{detailModal.data.notes}</p>
                   </div>
                 )}
+
+                {/* Generátory chování */}
+                <div className="border-t border-amber-200 pt-3">
+                  <p className="text-xs text-stone-500 mb-2">🎲 Generátory (nezapisuje se)</p>
+                  <div className="flex flex-wrap gap-1">
+                    <button onClick={() => setGeneratedBehavior(`🎭 ${randomFrom(NPC_BEHAVIOR_MOODS)}, ${randomFrom(NPC_BEHAVIOR_ACTIONS)}`)} className="px-2 py-1 text-xs bg-purple-100 hover:bg-purple-200 rounded">Chování</button>
+                    <button onClick={() => setGeneratedBehavior(`😊 ${randomFrom(NPC_BEHAVIOR_MOODS)}`)} className="px-2 py-1 text-xs bg-amber-100 hover:bg-amber-200 rounded">Nálada</button>
+                    <button onClick={() => setGeneratedBehavior(`🏃 ${randomFrom(NPC_BEHAVIOR_ACTIONS)}`)} className="px-2 py-1 text-xs bg-blue-100 hover:bg-blue-200 rounded">Akce</button>
+                    <button onClick={() => setGeneratedBehavior(`💭 ${randomFrom(NPC_BEHAVIOR_MOTIVATIONS)}`)} className="px-2 py-1 text-xs bg-green-100 hover:bg-green-200 rounded">Motivace</button>
+                    <button onClick={() => setGeneratedBehavior(`🤫 ${randomFrom(NPC_SECRETS)}`)} className="px-2 py-1 text-xs bg-red-100 hover:bg-red-200 rounded">Tajemství</button>
+                    <button onClick={() => setGeneratedBehavior(`⚡ ${randomFrom(NPC_REACTIONS)}`)} className="px-2 py-1 text-xs bg-orange-100 hover:bg-orange-200 rounded">Reakce</button>
+                  </div>
+                  {generatedBehavior && (
+                    <div className="mt-2 p-2 bg-purple-50 rounded border border-purple-200">
+                      <p className="font-medium text-purple-900">{generatedBehavior}</p>
+                    </div>
+                  )}
+                </div>
+
                 <button
                   onClick={() => {
                     onMentionClick && onMentionClick('npc', detailModal.data.id);
                     setDetailModal(null);
+                    setGeneratedBehavior(null);
                   }}
                   className="w-full py-2 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium"
                 >
