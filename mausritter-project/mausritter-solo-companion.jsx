@@ -6972,6 +6972,14 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
       npcs: []
     };
     setSettlements([...settlements, newSettlement]);
+    // Log to journal
+    if (onLogEntry) {
+      onLogEntry({
+        type: 'saved_settlement',
+        settlementId: newSettlement.id,
+        data: newSettlement
+      });
+    }
     setGenerated(null);
   };
 
@@ -7021,8 +7029,16 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
     };
     setWorldNPCs([...worldNPCs, newNPC]);
     if (settlementId) {
-      updateSettlement(settlementId, { 
-        npcs: [...(settlements.find(s => s.id === settlementId)?.npcs || []), newNPC.id] 
+      updateSettlement(settlementId, {
+        npcs: [...(settlements.find(s => s.id === settlementId)?.npcs || []), newNPC.id]
+      });
+    }
+    // Log to journal
+    if (onLogEntry) {
+      onLogEntry({
+        type: 'saved_npc',
+        npcId: newNPC.id,
+        data: newNPC
       });
     }
     setGenerated(null);
@@ -9571,6 +9587,9 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
   const [editText, setEditText] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
+  // Modal pro zobrazení detailu NPC/osady
+  const [detailModal, setDetailModal] = useState(null); // { type: 'npc'|'settlement', data: ... }
+
   // Multi-select mode
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState(new Set());
@@ -10077,6 +10096,40 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
           </p>
         );
 
+      case 'saved_npc':
+        return (
+          <div
+            className="my-2 pl-4 border-l-2 border-amber-500 cursor-pointer hover:bg-amber-50 rounded transition-colors overflow-hidden"
+            onClick={() => setDetailModal({ type: 'npc', data: entry.data })}
+            title="Klikni pro detail"
+          >
+            <p className="font-bold text-amber-900 truncate">
+              🐭 {entry.data?.name}
+              {entry.data?.role && <span className="font-normal text-stone-500 ml-2">— {entry.data.role}</span>}
+            </p>
+            <p className="text-stone-600 text-sm truncate">
+              {entry.data?.quirk || entry.data?.goal}
+            </p>
+          </div>
+        );
+
+      case 'saved_settlement':
+        return (
+          <div
+            className="my-2 pl-4 border-l-2 border-green-500 cursor-pointer hover:bg-green-50 rounded transition-colors overflow-hidden"
+            onClick={() => setDetailModal({ type: 'settlement', data: entry.data })}
+            title="Klikni pro detail"
+          >
+            <p className="font-bold text-green-900 truncate">
+              🏘️ {entry.data?.name}
+              <span className="font-normal text-stone-500 ml-2">— {entry.data?.size}</span>
+            </p>
+            <p className="text-stone-600 text-sm truncate">
+              {entry.data?.event || entry.data?.landmark}
+            </p>
+          </div>
+        );
+
       default:
         // For any other type, show as mechanical note
         const content = entry.content || entry.data || entry;
@@ -10263,6 +10316,138 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
             >
               🗑️ Smazat ({selectedIds.size})
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Detail modal pro NPC/osady */}
+      {detailModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setDetailModal(null)}>
+          <div className="bg-amber-50 rounded-lg shadow-xl max-w-md w-full max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            {detailModal.type === 'npc' && detailModal.data && (
+              <div className="p-4 space-y-3">
+                <div className="flex justify-between items-start">
+                  <h3 className="text-2xl font-bold text-amber-900">🐭 {detailModal.data.name}</h3>
+                  <button onClick={() => setDetailModal(null)} className="text-stone-400 hover:text-stone-600 text-xl">✕</button>
+                </div>
+                {detailModal.data.role && (
+                  <p className="text-stone-600 font-medium">🔧 {detailModal.data.role}</p>
+                )}
+                <div className="flex flex-wrap gap-2 text-sm font-mono bg-stone-100 rounded px-3 py-2 justify-center">
+                  <span>BO: <b>{detailModal.data.hp?.max || detailModal.data.hp}</b></span>
+                  <span>SÍL: <b>{detailModal.data.str?.max || detailModal.data.str}</b></span>
+                  <span>MRŠ: <b>{detailModal.data.dex?.max || detailModal.data.dex}</b></span>
+                  <span>VŮL: <b>{detailModal.data.wil?.max || detailModal.data.wil}</b></span>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 bg-amber-100/50 rounded">
+                    <span className="text-sm text-stone-500">Znamení</span>
+                    <p className="font-bold truncate">{detailModal.data.birthsign}</p>
+                  </div>
+                  <div className="p-3 bg-amber-100/50 rounded">
+                    <span className="text-sm text-stone-500">Vzhled</span>
+                    <p className="font-bold truncate">{detailModal.data.physicalDetail}</p>
+                  </div>
+                </div>
+                {detailModal.data.quirk && (
+                  <div className="p-3 bg-purple-100 rounded">
+                    <span className="text-sm text-purple-700">Zvláštnost</span>
+                    <p className="font-bold text-purple-900">{detailModal.data.quirk}</p>
+                  </div>
+                )}
+                {detailModal.data.goal && (
+                  <div className="p-3 bg-blue-100 rounded">
+                    <span className="text-sm text-blue-700">Cíl</span>
+                    <p className="font-bold text-blue-900">{detailModal.data.goal}</p>
+                  </div>
+                )}
+                {detailModal.data.notes && (
+                  <div className="p-3 bg-stone-100 rounded">
+                    <span className="text-sm text-stone-500">Poznámky</span>
+                    <p className="text-stone-700">{detailModal.data.notes}</p>
+                  </div>
+                )}
+                <button
+                  onClick={() => {
+                    onMentionClick && onMentionClick('npc', detailModal.data.id);
+                    setDetailModal(null);
+                  }}
+                  className="w-full py-2 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium"
+                >
+                  ✏️ Upravit v Osadách
+                </button>
+              </div>
+            )}
+
+            {detailModal.type === 'settlement' && detailModal.data && (
+              <div className="p-4 space-y-3">
+                <div className="flex justify-between items-start">
+                  <h3 className="text-2xl font-bold text-green-900">🏘️ {detailModal.data.name}</h3>
+                  <button onClick={() => setDetailModal(null)} className="text-stone-400 hover:text-stone-600 text-xl">✕</button>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 bg-green-100 rounded">
+                    <span className="text-sm text-green-700">Velikost</span>
+                    <p className="font-bold text-green-900">{detailModal.data.size}</p>
+                    {detailModal.data.population && <p className="text-sm text-green-700">{detailModal.data.population}</p>}
+                  </div>
+                  <div className="p-3 bg-amber-100/50 rounded">
+                    <span className="text-sm text-stone-500">Zřízení</span>
+                    <p className="font-bold text-sm">{detailModal.data.governance}</p>
+                  </div>
+                </div>
+                {detailModal.data.trades?.length > 0 && (
+                  <div className="p-3 bg-blue-100 rounded">
+                    <span className="text-sm text-blue-700">Živnost</span>
+                    {detailModal.data.trades.map((trade, i) => (
+                      <p key={i} className="font-bold text-blue-900">{trade}</p>
+                    ))}
+                  </div>
+                )}
+                {detailModal.data.event && (
+                  <div className="p-3 bg-orange-100 rounded">
+                    <span className="text-sm text-orange-700">Co se děje při příchodu</span>
+                    <p className="font-bold text-orange-900">{detailModal.data.event}</p>
+                  </div>
+                )}
+                {detailModal.data.inn && (
+                  <div className="p-3 bg-purple-100 rounded">
+                    <span className="text-sm text-purple-700">Hostinec</span>
+                    <p className="font-bold text-purple-900">{detailModal.data.inn.name || detailModal.data.inn}</p>
+                    {detailModal.data.inn.specialty && <p className="text-sm text-purple-700">Specialita: {detailModal.data.inn.specialty}</p>}
+                  </div>
+                )}
+                <div className="grid grid-cols-2 gap-3">
+                  {detailModal.data.landmark && (
+                    <div className="p-3 bg-green-100 rounded">
+                      <span className="text-sm text-green-700">Landmark</span>
+                      <p className="font-bold text-green-900 text-sm">{detailModal.data.landmark}</p>
+                    </div>
+                  )}
+                  {detailModal.data.feature && (
+                    <div className="p-3 bg-stone-100 rounded">
+                      <span className="text-sm text-stone-500">Zajímavost</span>
+                      <p className="font-bold text-stone-700 text-sm">{detailModal.data.feature}</p>
+                    </div>
+                  )}
+                </div>
+                {detailModal.data.notes && (
+                  <div className="p-3 bg-stone-100 rounded">
+                    <span className="text-sm text-stone-500">Poznámky</span>
+                    <p className="text-stone-700">{detailModal.data.notes}</p>
+                  </div>
+                )}
+                <button
+                  onClick={() => {
+                    onMentionClick && onMentionClick('settlement', detailModal.data.id);
+                    setDetailModal(null);
+                  }}
+                  className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded font-medium"
+                >
+                  ✏️ Upravit v Osadách
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
