@@ -1911,8 +1911,8 @@ const SectionHeader = ({ icon, title, subtitle }) => (
 
 // Card Component for results
 const ResultCard = ({ title, children, className = '' }) => (
-  <div className={`bg-amber-50/80 border-2 border-amber-900/20 rounded-xl p-5 shadow-lg ${className}`}>
-    {title && <h3 className="font-bold text-amber-900 mb-3 text-lg border-b border-amber-900/20 pb-2">{title}</h3>}
+  <div className={`bg-amber-50/80 border-2 border-amber-900/20 rounded-xl p-5 shadow-lg overflow-hidden ${className}`}>
+    {title && <h3 className="font-bold text-amber-900 mb-3 text-lg border-b border-amber-900/20 pb-2 truncate">{title}</h3>}
     {children}
   </div>
 );
@@ -5482,18 +5482,18 @@ const PCSheet = ({ character, updateCharacter, editMode, setEditMode, onLogEntry
             <label className="text-sm text-stone-500 block">Level</label>
             <p className="font-bold text-lg text-amber-900">{character.level || 1}</p>
           </div>
-          <div>
+          <div className="overflow-hidden">
             <label className="text-sm text-stone-500 block">Znamení</label>
-            <p className="font-bold text-amber-900">
+            <p className="font-bold text-amber-900 truncate">
               {character.birthsign?.name || '—'}
               {character.birthsign?.traits && (
-                <span className="font-normal text-sm text-stone-600 block">{character.birthsign.traits}</span>
+                <span className="font-normal text-sm text-stone-600 block truncate">{character.birthsign.traits}</span>
               )}
             </p>
           </div>
-          <div>
+          <div className="overflow-hidden">
             <label className="text-sm text-stone-500 block">Fyzický detail</label>
-            <p className="text-stone-700">{character.physicalDetail || '—'}</p>
+            <p className="text-stone-700 truncate">{character.physicalDetail || '—'}</p>
           </div>
           <div>
             <label className="text-sm text-stone-500 block">Zájmena</label>
@@ -7134,9 +7134,9 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
       {/* ========== MY NPCs ========== */}
       {activeGen === 'myNPCs' && (
         <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <p className="text-stone-600">Všechny postavy ve tvém světě</p>
-            <Button onClick={() => createEmptyNPC()}>+ Nová postava</Button>
+          <div className="flex justify-between items-center gap-2">
+            <p className="text-stone-600 min-w-0 truncate">Všechny postavy ve tvém světě</p>
+            <Button onClick={() => createEmptyNPC()} className="flex-shrink-0">+ Nová postava</Button>
           </div>
 
           {worldNPCs.length === 0 ? (
@@ -7186,29 +7186,29 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
                       </div>
 
                       <div className="grid grid-cols-2 gap-3">
-                        <div className="p-3 bg-amber-100/50 rounded">
+                        <div className="p-3 bg-amber-100/50 rounded overflow-hidden">
                           <span className="text-sm text-stone-500">Znamení</span>
-                          <input value={npc.birthsign || ''} onChange={(e) => updateNPC(npc.id, { birthsign: e.target.value })} placeholder="Znamení" className="w-full font-bold bg-transparent border-b border-amber-300 focus:border-amber-500 outline-none" />
+                          <input value={npc.birthsign || ''} onChange={(e) => updateNPC(npc.id, { birthsign: e.target.value })} placeholder="Znamení" className="w-full font-bold bg-transparent border-b border-amber-300 focus:border-amber-500 outline-none truncate" />
                         </div>
-                        <div className="p-3 bg-amber-100/50 rounded">
+                        <div className="p-3 bg-amber-100/50 rounded overflow-hidden">
                           <span className="text-sm text-stone-500">Vzhled</span>
-                          <input value={npc.physicalDetail || ''} onChange={(e) => updateNPC(npc.id, { physicalDetail: e.target.value })} placeholder="Vzhled" className="w-full font-bold bg-transparent border-b border-amber-300 focus:border-amber-500 outline-none" />
+                          <input value={npc.physicalDetail || ''} onChange={(e) => updateNPC(npc.id, { physicalDetail: e.target.value })} placeholder="Vzhled" className="w-full font-bold bg-transparent border-b border-amber-300 focus:border-amber-500 outline-none truncate" />
                         </div>
                       </div>
-                      <div className="p-3 bg-purple-100 rounded">
+                      <div className="p-3 bg-purple-100 rounded overflow-hidden">
                         <span className="text-sm text-purple-700">Zvláštnost</span>
-                        <input value={npc.quirk || ''} onChange={(e) => updateNPC(npc.id, { quirk: e.target.value })} placeholder="Zvláštnost" className="w-full font-bold text-purple-900 bg-transparent border-b border-purple-300 focus:border-purple-500 outline-none" />
+                        <input value={npc.quirk || ''} onChange={(e) => updateNPC(npc.id, { quirk: e.target.value })} placeholder="Zvláštnost" className="w-full font-bold text-purple-900 bg-transparent border-b border-purple-300 focus:border-purple-500 outline-none truncate" />
                       </div>
-                      <div className="p-3 bg-blue-100 rounded">
+                      <div className="p-3 bg-blue-100 rounded overflow-hidden">
                         <span className="text-sm text-blue-700">Cíl</span>
-                        <input value={npc.goal || ''} onChange={(e) => updateNPC(npc.id, { goal: e.target.value })} placeholder="Cíl" className="w-full font-bold text-blue-900 bg-transparent border-b border-blue-300 focus:border-blue-500 outline-none" />
+                        <input value={npc.goal || ''} onChange={(e) => updateNPC(npc.id, { goal: e.target.value })} placeholder="Cíl" className="w-full font-bold text-blue-900 bg-transparent border-b border-blue-300 focus:border-blue-500 outline-none truncate" />
                       </div>
                       <div className="grid grid-cols-2 gap-3">
-                        <div className="p-3 bg-stone-100 rounded">
+                        <div className="p-3 bg-stone-100 rounded overflow-hidden">
                           <span className="text-sm text-stone-500">Role</span>
-                          <input value={npc.role || ''} onChange={(e) => updateNPC(npc.id, { role: e.target.value })} placeholder="Role/povolání" className="w-full font-bold bg-transparent border-b border-stone-300 focus:border-stone-500 outline-none" />
+                          <input value={npc.role || ''} onChange={(e) => updateNPC(npc.id, { role: e.target.value })} placeholder="Role/povolání" className="w-full font-bold bg-transparent border-b border-stone-300 focus:border-stone-500 outline-none truncate" />
                         </div>
-                        <div className="p-3 bg-stone-100 rounded">
+                        <div className="p-3 bg-stone-100 rounded overflow-hidden">
                           <span className="text-sm text-stone-500">Osada</span>
                           <Select value={npc.settlementId || ''} onChange={(v) => assignNPCToSettlement(npc.id, v || null)} options={[{ value: '', label: '— Bez domova —' }, ...settlements.map(s => ({ value: s.id, label: s.name }))]} />
                         </div>
@@ -7250,27 +7250,27 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
                     </div>
                   ) : (
                     // View mode - kompaktní
-                    <div className="cursor-pointer hover:bg-amber-50 -m-3 p-3 rounded-lg transition-colors" onClick={() => setEditingNPC(npc.id)}>
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-bold text-amber-900">{npc.name}</h3>
-                          <p className="text-sm text-stone-600">{npc.role && `${npc.role} • `}{npc.settlementId ? settlements.find(s => s.id === npc.settlementId)?.name : 'Bez domova'}</p>
+                    <div className="cursor-pointer hover:bg-amber-50 -m-3 p-3 rounded-lg transition-colors overflow-hidden" onClick={() => setEditingNPC(npc.id)}>
+                      <div className="flex justify-between items-start gap-2">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="font-bold text-amber-900 truncate">{npc.name}</h3>
+                          <p className="text-sm text-stone-600 truncate">{npc.role && `${npc.role} • `}{npc.settlementId ? settlements.find(s => s.id === npc.settlementId)?.name : 'Bez domova'}</p>
                         </div>
                         {(npc.hp || npc.str) && (
-                          <div className="text-xs font-mono text-stone-500">
+                          <div className="text-xs font-mono text-stone-500 flex-shrink-0 whitespace-nowrap">
                             BO:{npc.hp?.current}/{npc.hp?.max} SÍL:{npc.str?.max} MRŠ:{npc.dex?.max} VŮL:{npc.wil?.max}
                           </div>
                         )}
                       </div>
                       {(npc.birthsign || npc.physicalDetail || npc.quirk || npc.goal) && (
                         <div className="mt-2 text-sm text-stone-600 space-y-1">
-                          {npc.birthsign && <p>⭐ {npc.birthsign}</p>}
-                          {npc.physicalDetail && <p>👁️ {npc.physicalDetail}</p>}
-                          {npc.quirk && <p>🎭 {npc.quirk}</p>}
-                          {npc.goal && <p>🎯 {npc.goal}</p>}
+                          {npc.birthsign && <p className="truncate">⭐ {npc.birthsign}</p>}
+                          {npc.physicalDetail && <p className="truncate">👁️ {npc.physicalDetail}</p>}
+                          {npc.quirk && <p className="truncate">🎭 {npc.quirk}</p>}
+                          {npc.goal && <p className="truncate">🎯 {npc.goal}</p>}
                         </div>
                       )}
-                      {npc.notes && <p className="mt-2 text-sm italic text-stone-500">{npc.notes}</p>}
+                      {npc.notes && <p className="mt-2 text-sm italic text-stone-500 line-clamp-2">{npc.notes}</p>}
                     </div>
                   )}
                 </ResultCard>
@@ -7650,22 +7650,22 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
         <ResultCard title="📋 Vygenerováno" className="border-amber-500 border-2">
           {generated.type === 'settlement' && (
             <div className="space-y-3">
-              <h3 className="text-2xl font-bold text-amber-900">{generated.name}</h3>
+              <h3 className="text-2xl font-bold text-amber-900 truncate">{generated.name}</h3>
               <div className="grid grid-cols-2 gap-3">
-                <div className="p-3 bg-amber-100/50 rounded">
+                <div className="p-3 bg-amber-100/50 rounded overflow-hidden">
                   <span className="text-sm text-stone-500">Velikost</span>
-                  <p className="font-bold">{generated.size}</p>
+                  <p className="font-bold truncate">{generated.size}</p>
                 </div>
-                <div className="p-3 bg-amber-100/50 rounded">
+                <div className="p-3 bg-amber-100/50 rounded overflow-hidden">
                   <span className="text-sm text-stone-500">Landmark</span>
-                  <p className="font-bold">{generated.landmark}</p>
+                  <p className="font-bold truncate">{generated.landmark}</p>
                 </div>
               </div>
-              <div className="p-3 bg-green-100 rounded">
+              <div className="p-3 bg-green-100 rounded overflow-hidden">
                 <span className="text-sm text-green-700">Zajímavý rys</span>
                 <p className="font-bold text-green-900">{generated.feature}</p>
               </div>
-              <div className="p-3 bg-orange-100 rounded">
+              <div className="p-3 bg-orange-100 rounded overflow-hidden">
                 <span className="text-sm text-orange-700">Aktuální událost</span>
                 <p className="font-bold text-orange-900">{generated.event}</p>
               </div>
@@ -7677,33 +7677,33 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
 
           {generated.type === 'npc' && (
             <div className="space-y-3">
-              <h3 className="text-2xl font-bold text-amber-900">{generated.name}</h3>
+              <h3 className="text-2xl font-bold text-amber-900 truncate">{generated.name}</h3>
               {generated.role && (
-                <p className="text-center text-stone-600 font-medium">🔧 {generated.role}</p>
+                <p className="text-center text-stone-600 font-medium truncate">🔧 {generated.role}</p>
               )}
               {/* Staty NPC */}
-              <div className="flex gap-4 text-sm font-mono bg-stone-100 rounded px-3 py-2 justify-center">
+              <div className="flex flex-wrap gap-2 text-sm font-mono bg-stone-100 rounded px-3 py-2 justify-center">
                 <span>BO: <b>{generated.hp?.max}</b></span>
                 <span>SÍL: <b>{generated.str?.max}</b></span>
                 <span>MRŠ: <b>{generated.dex?.max}</b></span>
                 <span>VŮL: <b>{generated.wil?.max}</b></span>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div className="p-3 bg-amber-100/50 rounded">
+                <div className="p-3 bg-amber-100/50 rounded overflow-hidden">
                   <span className="text-sm text-stone-500">Znamení</span>
-                  <p className="font-bold">{generated.birthsign?.sign}</p>
-                  <p className="text-sm text-stone-600">{generated.birthsign?.trait}</p>
+                  <p className="font-bold truncate">{generated.birthsign?.sign}</p>
+                  <p className="text-sm text-stone-600 truncate">{generated.birthsign?.trait}</p>
                 </div>
-                <div className="p-3 bg-amber-100/50 rounded">
+                <div className="p-3 bg-amber-100/50 rounded overflow-hidden">
                   <span className="text-sm text-stone-500">Vzhled</span>
-                  <p className="font-bold">{generated.physicalDetail}</p>
+                  <p className="font-bold truncate">{generated.physicalDetail}</p>
                 </div>
               </div>
-              <div className="p-3 bg-purple-100 rounded">
+              <div className="p-3 bg-purple-100 rounded overflow-hidden">
                 <span className="text-sm text-purple-700">Zvláštnost</span>
                 <p className="font-bold text-purple-900">{generated.quirk}</p>
               </div>
-              <div className="p-3 bg-blue-100 rounded">
+              <div className="p-3 bg-blue-100 rounded overflow-hidden">
                 <span className="text-sm text-blue-700">Cíl</span>
                 <p className="font-bold text-blue-900">{generated.goal}</p>
               </div>
@@ -7907,18 +7907,18 @@ const FactionPanel = ({ factions, setFactions, onLogEntry }) => {
             <ResultCard key={faction.id} className={editingFaction === faction.id ? 'border-amber-500 border-2' : ''}>
               <div className="space-y-4">
                 {/* Header */}
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
+                <div className="flex justify-between items-start gap-2">
+                  <div className="flex-1 min-w-0">
                     {editingFaction === faction.id ? (
-                      <Input 
+                      <Input
                         value={faction.name}
                         onChange={(v) => updateFaction(faction.id, { name: v })}
                         className="text-xl font-bold"
                       />
                     ) : (
-                      <h3 className="text-xl font-bold text-amber-900">{faction.name}</h3>
+                      <h3 className="text-xl font-bold text-amber-900 truncate">{faction.name}</h3>
                     )}
-                    {faction.trait && <p className="text-stone-600 italic">{faction.trait}</p>}
+                    {faction.trait && <p className="text-stone-600 italic truncate">{faction.trait}</p>}
                   </div>
                   <div className="flex gap-2">
                     <Button 
@@ -8268,15 +8268,15 @@ const PartyPanel = ({
                 className={`${isActive ? 'border-2 border-amber-500 shadow-lg' : ''}`}
               >
                 {/* Party Header */}
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3 flex-1">
-                    <button 
+                <div className="flex items-center justify-between mb-3 gap-2">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <button
                       onClick={() => toggleExpand(party.id)}
-                      className="text-xl hover:bg-amber-100 rounded p-1"
+                      className="text-xl hover:bg-amber-100 rounded p-1 flex-shrink-0"
                     >
                       {isExpanded ? '▼' : '▶'}
                     </button>
-                    
+
                     {isEditing ? (
                       <input
                         type="text"
@@ -8285,11 +8285,11 @@ const PartyPanel = ({
                         onBlur={() => setEditingPartyId(null)}
                         onKeyDown={(e) => e.key === 'Enter' && setEditingPartyId(null)}
                         autoFocus
-                        className="flex-1 px-2 py-1 border-2 border-amber-500 rounded font-bold text-lg"
+                        className="flex-1 min-w-0 px-2 py-1 border-2 border-amber-500 rounded font-bold text-lg"
                       />
                     ) : (
-                      <h3 
-                        className="font-bold text-lg text-amber-900 cursor-pointer hover:text-amber-700"
+                      <h3
+                        className="font-bold text-lg text-amber-900 cursor-pointer hover:text-amber-700 truncate min-w-0"
                         onClick={() => setEditingPartyId(party.id)}
                         title="Klikni pro přejmenování"
                       >
@@ -8386,10 +8386,10 @@ const PartyPanel = ({
                               }
                             }}
                           >
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3">
-                                <span className="text-2xl">{isPC ? '🐭' : '🐿️'}</span>
-                                <div>
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-3 min-w-0 flex-1">
+                                <span className="text-2xl flex-shrink-0">{isPC ? '🐭' : '🐿️'}</span>
+                                <div className="min-w-0">
                                   {isCharEditing ? (
                                     <input
                                       type="text"
@@ -8399,11 +8399,11 @@ const PartyPanel = ({
                                       onKeyDown={(e) => e.key === 'Enter' && setEditingCharId(null)}
                                       onClick={(e) => e.stopPropagation()}
                                       autoFocus
-                                      className="px-2 py-1 border-2 border-amber-500 rounded font-bold"
+                                      className="px-2 py-1 border-2 border-amber-500 rounded font-bold w-full"
                                     />
                                   ) : (
-                                    <span 
-                                      className="font-bold text-stone-800 hover:text-amber-700"
+                                    <span
+                                      className="font-bold text-stone-800 hover:text-amber-700 block truncate"
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         setEditingCharId(member.id);
@@ -9342,14 +9342,14 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
         if ((entry.subtype === 'creature' || (entry.data?.type?.name && entry.data?.personality)) && entry.data) {
           const c = entry.data;
           return (
-            <div className="my-2 pl-4 border-l-2 border-amber-500 cursor-pointer hover:bg-amber-50 rounded transition-colors"
+            <div className="my-2 pl-4 border-l-2 border-amber-500 cursor-pointer hover:bg-amber-50 rounded transition-colors overflow-hidden"
                  onClick={() => startEdit(entry)}
                  title="Klikni pro úpravu">
-              <p className="font-bold text-amber-900">
+              <p className="font-bold text-amber-900 truncate">
                 {c.type?.icon || '🐭'} {c.name} <span className="font-normal text-stone-500">— {c.type?.name}</span>
               </p>
-              <p className="text-stone-600 text-sm">{c.personality}</p>
-              {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1">{entry.note}</p>}
+              <p className="text-stone-600 text-sm truncate">{c.personality}</p>
+              {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 line-clamp-2">{entry.note}</p>}
             </div>
           );
         }
@@ -9370,14 +9370,14 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
           const personality = personalityMatch ? personalityMatch[1] : '';
 
           return (
-            <div className="my-2 pl-4 border-l-2 border-amber-500 cursor-pointer hover:bg-amber-50 rounded transition-colors"
+            <div className="my-2 pl-4 border-l-2 border-amber-500 cursor-pointer hover:bg-amber-50 rounded transition-colors overflow-hidden"
                  onClick={() => startEdit(entry)}
                  title="Klikni pro úpravu">
-              <p className="font-bold text-amber-900">
+              <p className="font-bold text-amber-900 truncate">
                 🐭 {name} {typePart && <span className="font-normal text-stone-500">— {typePart}</span>}
               </p>
-              {personality && <p className="text-stone-600 text-sm">{personality}</p>}
-              {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1">{entry.note}</p>}
+              {personality && <p className="text-stone-600 text-sm truncate">{personality}</p>}
+              {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 line-clamp-2">{entry.note}</p>}
             </div>
           );
         }
@@ -9385,55 +9385,55 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
         if ((entry.subtype === 'encounter' || (entry.data?.creature && entry.data?.activity)) && entry.data) {
           const e = entry.data;
           return (
-            <div className="my-2 pl-4 border-l-2 border-red-400 cursor-pointer hover:bg-red-50 rounded transition-colors"
+            <div className="my-2 pl-4 border-l-2 border-red-400 cursor-pointer hover:bg-red-50 rounded transition-colors overflow-hidden"
                  onClick={() => startEdit(entry)}
                  title="Klikni pro úpravu">
-              <p className="font-bold text-stone-800">
+              <p className="font-bold text-stone-800 truncate">
                 {e.danger ? '⚠️' : '👁️'} {e.creature?.name}
               </p>
-              <p className="text-stone-600 text-sm">{e.activity}</p>
-              {entry.note && <p className="text-stone-700 italic text-sm mt-1">{entry.note}</p>}
+              <p className="text-stone-600 text-sm truncate">{e.activity}</p>
+              {entry.note && <p className="text-stone-700 italic text-sm mt-1 line-clamp-2">{entry.note}</p>}
             </div>
           );
         }
         // Handle narrative subtype - abstraktní slova
         if (entry.subtype === 'narrative') {
           return (
-            <div className="my-2 pl-4 border-l-2 border-purple-400 cursor-pointer hover:bg-purple-50 rounded transition-colors"
+            <div className="my-2 pl-4 border-l-2 border-purple-400 cursor-pointer hover:bg-purple-50 rounded transition-colors overflow-hidden"
                  onClick={() => startEdit(entry)}
                  title="Klikni pro úpravu">
-              <p className="font-medium text-purple-900">{entry.result}</p>
-              {entry.note && <p className="text-stone-700 italic text-sm mt-1">{entry.note}</p>}
+              <p className="font-medium text-purple-900 truncate">{entry.result}</p>
+              {entry.note && <p className="text-stone-700 italic text-sm mt-1 line-clamp-2">{entry.note}</p>}
             </div>
           );
         }
         // Handle custom_dice subtype differently
         if (entry.subtype === 'custom_dice') {
           return (
-            <div className="my-2 pl-4 border-l-2 border-stone-300 cursor-pointer hover:bg-amber-50 rounded transition-colors"
+            <div className="my-2 pl-4 border-l-2 border-stone-300 cursor-pointer hover:bg-amber-50 rounded transition-colors overflow-hidden"
                  onClick={() => startEdit(entry)}
                  title="Klikni pro úpravu">
-              {entry.reason && <p className="text-stone-700 font-medium">{entry.reason}</p>}
-              <p className="text-amber-900">
+              {entry.reason && <p className="text-stone-700 font-medium truncate">{entry.reason}</p>}
+              <p className="text-amber-900 truncate">
                 <span className="text-stone-500 text-sm">{entry.count}d{entry.sides}: </span>
                 <span className="font-bold">[{entry.dice?.join(', ')}]</span>
                 {entry.count > 1 && <span className="font-bold"> = {entry.total}</span>}
               </p>
-              {entry.note && <p className="text-stone-600 italic text-sm mt-1">{entry.note}</p>}
+              {entry.note && <p className="text-stone-600 italic text-sm mt-1 line-clamp-2">{entry.note}</p>}
             </div>
           );
         }
         // Standard oracle (yes/no, etc.)
         return (
-          <div className="my-2 pl-4 border-l-2 border-amber-400 cursor-pointer hover:bg-amber-50 rounded transition-colors"
+          <div className="my-2 pl-4 border-l-2 border-amber-400 cursor-pointer hover:bg-amber-50 rounded transition-colors overflow-hidden"
                onClick={() => startEdit(entry)}
                title="Klikni pro úpravu">
-            {entry.question && <p className="text-stone-600 text-sm">„{entry.question}"</p>}
-            <p className="font-bold text-amber-900">
+            {entry.question && <p className="text-stone-600 text-sm truncate">„{entry.question}"</p>}
+            <p className="font-bold text-amber-900 truncate">
               {entry.dice && <span className="font-normal text-stone-500 text-xs">[{entry.dice.join(', ')}] </span>}
               {entry.result}
             </p>
-            {entry.note && <p className="text-stone-700 italic text-sm mt-1">{entry.note}</p>}
+            {entry.note && <p className="text-stone-700 italic text-sm mt-1 line-clamp-2">{entry.note}</p>}
             {entry.edited && <span className="text-xs text-stone-400">✎</span>}
           </div>
         );
@@ -9460,13 +9460,13 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
       
       case 'discovery':
         return (
-          <div className="my-2 bg-amber-100/50 rounded px-3 py-2 cursor-pointer hover:bg-amber-100 transition-colors"
+          <div className="my-2 bg-amber-100/50 rounded px-3 py-2 cursor-pointer hover:bg-amber-100 transition-colors overflow-hidden"
                onClick={() => startEdit(entry)}
                title="Klikni pro úpravu">
-            <p className="font-bold text-amber-900">{entry.subtype}: {entry.data?.name}</p>
-            {entry.data?.trait && <p className="text-stone-600 text-sm italic">{entry.data.trait}</p>}
-            {entry.data?.appearance && <p className="text-stone-600 text-sm">{entry.data.appearance}</p>}
-            {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1">{entry.note}</p>}
+            <p className="font-bold text-amber-900 truncate">{entry.subtype}: {entry.data?.name}</p>
+            {entry.data?.trait && <p className="text-stone-600 text-sm italic truncate">{entry.data.trait}</p>}
+            {entry.data?.appearance && <p className="text-stone-600 text-sm truncate">{entry.data.appearance}</p>}
+            {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 line-clamp-2">{entry.note}</p>}
           </div>
         );
       
@@ -12258,7 +12258,7 @@ function MausritterSoloCompanion() {
       </nav>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-6">
+      <main className="max-w-6xl mx-auto px-4 py-6 overflow-hidden">
         {activePanel === 'howto' && (
           <HowToPlayPanel />
         )}
