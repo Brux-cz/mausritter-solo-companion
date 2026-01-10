@@ -7470,11 +7470,25 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
   };
 
   const generateNPCBehavior = (npcId) => {
+    const npc = worldNPCs.find(n => n.id === npcId);
     const mood = randomFrom(NPC_BEHAVIOR_MOODS);
     const action = randomFrom(NPC_BEHAVIOR_ACTIONS);
     const motivation = randomFrom(NPC_BEHAVIOR_MOTIVATIONS);
     const behavior = `🎭 Chová se ${mood}, ${action}, protože ${motivation}.`;
     setNpcBehaviors({ ...npcBehaviors, [npcId]: behavior });
+
+    // Zápis do deníku
+    if (npc) {
+      onLogEntry({
+        type: 'world_event',
+        subtype: 'npc_behavior',
+        timestamp: formatTimestamp(),
+        npcId: npc.id,
+        npcName: npc.name,
+        content: `**${npc.name}:** ${behavior}`,
+        data: { npc: npc.name, mood, action, motivation }
+      });
+    }
   };
 
   const generateNPCMood = (npcId) => {
@@ -7506,6 +7520,110 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
     const role = randomFrom(NPC_ROLES);
     updateNPC(npcId, { role });
     setNpcBehaviors({ ...npcBehaviors, [npcId]: `🔧 Povolání: ${role}` });
+  };
+
+  // Generátor události pro konkrétní NPC (propojení s Event Generator tabulkami)
+  const generateNPCEvent = (npcId) => {
+    const npc = worldNPCs.find(n => n.id === npcId);
+    if (!npc) return;
+
+    const settlement = settlements.find(s => s.id === npc.settlementId);
+    const focus = randomFrom(EVENT_FOCUS);
+    const action = randomFrom(EVENT_ACTIONS);
+    const subject = randomFrom(EVENT_SUBJECTS);
+    const complication = Math.random() > 0.7 ? randomFrom(EVENT_COMPLICATIONS) : null;
+
+    let narrative = `⚡ **${npc.name}**`;
+    if (npc.role) narrative += ` (${npc.role})`;
+    if (settlement) narrative += ` z **${settlement.name}**`;
+    narrative += `\n\n`;
+    narrative += `**${focus.label}:** ${focus.description}\n`;
+    narrative += `🎯 ${action} ${subject}`;
+    if (complication) {
+      narrative += `\n\n⚠️ *${complication}*`;
+    }
+
+    setNpcBehaviors({ ...npcBehaviors, [npcId]: narrative });
+
+    // Zápis do deníku
+    onLogEntry({
+      type: 'world_event',
+      subtype: 'npc_event',
+      timestamp: formatTimestamp(),
+      npcId: npc.id,
+      npcName: npc.name,
+      settlementId: settlement?.id,
+      settlementName: settlement?.name,
+      content: narrative,
+      data: {
+        npc: npc.name,
+        role: npc.role,
+        settlement: settlement?.name,
+        focus: focus.label,
+        action,
+        subject,
+        complication
+      }
+    });
+  };
+
+  // Generátor události pro konkrétní osadu
+  const generateSettlementEvent = (settlementId) => {
+    const settlement = settlements.find(s => s.id === settlementId);
+    if (!settlement) return;
+
+    const happening = randomFrom(SETTLEMENT_HAPPENINGS);
+    const complication = Math.random() > 0.7 ? randomFrom(EVENT_COMPLICATIONS) : null;
+
+    let narrative = `🏘️ **${settlement.name}**\n\n`;
+    narrative += `${happening}`;
+    if (complication) {
+      narrative += `\n\n⚠️ *${complication}*`;
+    }
+
+    // Zápis do deníku
+    onLogEntry({
+      type: 'world_event',
+      subtype: 'settlement_event',
+      timestamp: formatTimestamp(),
+      settlementId: settlement.id,
+      settlementName: settlement.name,
+      content: narrative,
+      data: {
+        settlement: settlement.name,
+        happening,
+        complication
+      }
+    });
+
+    // Vrátíme narrative pro zobrazení
+    return narrative;
+  };
+
+  // Generátor zvěsti pro konkrétní osadu
+  const generateSettlementRumor = (settlementId) => {
+    const settlement = settlements.find(s => s.id === settlementId);
+    if (!settlement) return;
+
+    const rumor = randomFrom(SETTLEMENT_RUMORS);
+
+    const narrative = `💬 **Zvěst z ${settlement.name}:**\n\n"${rumor}"`;
+
+    // Zápis do deníku
+    onLogEntry({
+      type: 'world_event',
+      subtype: 'settlement_rumor',
+      timestamp: formatTimestamp(),
+      settlementId: settlement.id,
+      settlementName: settlement.name,
+      content: narrative,
+      data: {
+        settlement: settlement.name,
+        rumor
+      }
+    });
+
+    return narrative;
   };
 
   const assignNPCToSettlement = (npcId, settlementId) => {
@@ -7983,14 +8101,33 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
                                 })}
                               </div>
                             )}
-                            <Button 
-                              variant="ghost" 
-                              size="small" 
+                            <Button
+                              variant="ghost"
+                              size="small"
                               className="mt-2"
                               onClick={(e) => { e.stopPropagation(); createEmptyNPC(settlement.id); setActiveGen('myNPCs'); }}
                             >
                               + Přidat NPC
                             </Button>
+                          </div>
+
+                          {/* Generátory událostí osady */}
+                          <div className="mt-3 pt-3 border-t border-amber-200">
+                            <p className="text-sm font-bold text-stone-700 mb-2">⚡ Generátory:</p>
+                            <div className="flex flex-wrap gap-2">
+                              <button
+                                onClick={(e) => { e.stopPropagation(); generateSettlementEvent(settlement.id); }}
+                                className="px-3 py-2 text-sm bg-orange-500 hover:bg-orange-600 text-white rounded-lg shadow transition-colors font-medium"
+                              >
+                                ⚡ Událost
+                              </button>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); generateSettlementRumor(settlement.id); }}
+                                className="px-3 py-2 text-sm bg-purple-500 hover:bg-purple-600 text-white rounded-lg shadow transition-colors font-medium"
+                              >
+                                💬 Zvěst
+                              </button>
+                            </div>
                           </div>
                         </div>
                       )}
@@ -8208,6 +8345,9 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
                           </button>
                           <button onClick={() => generateNPCRole(npc.id)} className="px-3 py-2 text-sm bg-stone-500 hover:bg-stone-600 text-white rounded-lg shadow transition-colors font-medium">
                             🔧 Povolání
+                          </button>
+                          <button onClick={() => generateNPCEvent(npc.id)} className="px-3 py-2 text-sm bg-orange-500 hover:bg-orange-600 text-white rounded-lg shadow transition-colors font-medium">
+                            ⚡ Událost
                           </button>
                         </div>
                         {npcBehaviors[npc.id] && (
