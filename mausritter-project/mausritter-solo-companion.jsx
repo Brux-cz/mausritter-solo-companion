@@ -11586,33 +11586,42 @@ const FloatingDice = ({ onLogEntry }) => {
   };
 
   return (
-    <div className={`fixed bottom-24 right-0 z-50 flex flex-col-reverse items-end gap-2 transition-transform duration-300 sm:pr-4 ${
-      isHidden && !isOpen ? 'translate-x-11 sm:translate-x-0' : 'pr-4'
-    }`}>
-      {/* Hlavní plovoucí tlačítko */}
-      <button
-        onClick={() => {
-          if (isHidden && !isOpen) {
-            // Vysunout a rovnou otevřít menu na mobilu
+    <>
+      {/* Záložka na pravém okraji - jen na mobilu když je schované */}
+      {isHidden && !isOpen && (
+        <button
+          onClick={() => {
             setIsHidden(false);
             setIsOpen(true);
-          } else if (isOpen) {
-            closeAll();
-          } else {
-            setIsOpen(true);
-          }
-        }}
-        className={`w-14 h-14 shadow-lg flex items-center justify-center text-2xl transition-all duration-300 ${
-          isHidden && !isOpen
-            ? 'rounded-l-full bg-amber-400/90 text-white'
-            : isOpen
-              ? 'rounded-full bg-amber-600 text-white'
-              : 'rounded-full bg-amber-500 hover:bg-amber-600 text-white hover:scale-110'
-        }`}
-        title="Rychlé generátory"
-      >
-        {isOpen ? '✕' : '🎲'}
-      </button>
+          }}
+          className="sm:hidden fixed bottom-32 right-0 z-50 bg-amber-500/90 text-white px-1 py-2 rounded-l-md shadow-lg text-lg"
+        >
+          🎲
+        </button>
+      )}
+
+      {/* Hlavní panel - na mobilu jen když je otevřený, na desktopu vždy */}
+      <div className={`fixed bottom-24 right-4 z-50 flex flex-col-reverse items-end gap-2 transition-all duration-300 ${
+        isHidden && !isOpen ? 'hidden sm:flex' : 'flex'
+      }`}>
+        {/* Hlavní plovoucí tlačítko */}
+        <button
+          onClick={() => {
+            if (isOpen) {
+              closeAll();
+            } else {
+              setIsOpen(true);
+            }
+          }}
+          className={`w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl transition-all duration-300 ${
+            isOpen
+              ? 'bg-amber-600 text-white'
+              : 'bg-amber-500 hover:bg-amber-600 text-white hover:scale-110'
+          }`}
+          title="Rychlé generátory"
+        >
+          {isOpen ? '✕' : '🎲'}
+        </button>
 
       {/* Vertikální menu generátorů */}
       {isOpen && (
@@ -11733,7 +11742,8 @@ const FloatingDice = ({ onLogEntry }) => {
           )}
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 };
 
