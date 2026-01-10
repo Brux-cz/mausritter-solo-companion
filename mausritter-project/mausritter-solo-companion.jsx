@@ -7303,7 +7303,7 @@ const ItemCardStudio = ({ parties, activePartyId, activeCharacterId, updateChara
 // WORLD GENERATOR PANEL
 // ============================================
 
-const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWorldNPCs, parties, activeParty, activePartyId, updateParty, pendingMentionOpen, setPendingMentionOpen }) => {
+const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWorldNPCs, parties, activeParty, activePartyId, updateParty, pendingMentionOpen, setPendingMentionOpen, onDeleteNPC, onDeleteSettlement }) => {
   const [generated, setGenerated] = useState(null);
   const [activeGen, setActiveGen] = useState('mySettlements');
   const [season, setSeason] = useState('spring');
@@ -7371,9 +7371,14 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
   };
 
   const deleteSettlement = (id) => {
-    setSettlements(settlements.filter(s => s.id !== id));
-    // Remove settlement reference from NPCs
-    setWorldNPCs(worldNPCs.map(n => n.settlementId === id ? { ...n, settlementId: null } : n));
+    // Pokud je dostupný callback, použij ho (maže i z deníku)
+    if (onDeleteSettlement) {
+      onDeleteSettlement(id);
+    } else {
+      setSettlements(settlements.filter(s => s.id !== id));
+      // Remove settlement reference from NPCs
+      setWorldNPCs(worldNPCs.map(n => n.settlementId === id ? { ...n, settlementId: null } : n));
+    }
   };
 
   // ========== NPC MANAGEMENT ==========
@@ -7432,13 +7437,18 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
   };
 
   const deleteNPC = (id) => {
-    setWorldNPCs(worldNPCs.filter(n => n.id !== id));
-    // Remove NPC from settlements
-    setSettlements(settlements.map(s => ({
-      ...s,
-      npcs: s.npcs?.filter(npcId => npcId !== id) || [],
-      ruler: s.ruler === id ? null : s.ruler
-    })));
+    // Pokud je dostupný callback, použij ho (maže i z deníku)
+    if (onDeleteNPC) {
+      onDeleteNPC(id);
+    } else {
+      setWorldNPCs(worldNPCs.filter(n => n.id !== id));
+      // Remove NPC from settlements
+      setSettlements(settlements.map(s => ({
+        ...s,
+        npcs: s.npcs?.filter(npcId => npcId !== id) || [],
+        ruler: s.ruler === id ? null : s.ruler
+      })));
+    }
   };
 
   const generateNPCBehavior = (npcId) => {
@@ -13703,6 +13713,20 @@ function MausritterSoloCompanion() {
             updateParty={updateParty}
             pendingMentionOpen={pendingMentionOpen}
             setPendingMentionOpen={setPendingMentionOpen}
+            onDeleteNPC={(npcId) => {
+              setWorldNPCs(worldNPCs.filter(n => n.id !== npcId));
+              setSettlements(settlements.map(s => ({
+                ...s,
+                npcs: s.npcs?.filter(id => id !== npcId) || [],
+                ruler: s.ruler === npcId ? null : s.ruler
+              })));
+              setJournal(journal.filter(e => e.npcId !== npcId && e.data?.id !== npcId));
+            }}
+            onDeleteSettlement={(settlementId) => {
+              setSettlements(settlements.filter(s => s.id !== settlementId));
+              setWorldNPCs(worldNPCs.map(n => n.settlementId === settlementId ? { ...n, settlementId: null } : n));
+              setJournal(journal.filter(e => e.settlementId !== settlementId && e.data?.id !== settlementId));
+            }}
           />
         )}
         
