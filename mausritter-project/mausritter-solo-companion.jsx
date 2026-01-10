@@ -9680,28 +9680,25 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
   const [encounterRollResult, setEncounterRollResult] = React.useState(null);
   const [weatherNotification, setWeatherNotification] = React.useState(null); // Notifikace o změně počasí
 
-  // Automatické generování počasí při prvním dni (pokud je v divočině a počasí není nastaveno)
-  React.useEffect(() => {
-    if (party && context === 'wilderness' && !weather) {
-      const initialWeather = generateWeather(season);
-      setGameTime({ ...gameTime, weather: initialWeather });
-      // Zobrazit notifikaci
-      setWeatherNotification({ weather: initialWeather, day: day, isInitial: true });
+  // Funkce pro ruční vygenerování počasí (první den nebo ruční hod)
+  const rollWeatherManually = () => {
+    const newWeather = generateWeather(season);
+    setGameTime({ ...gameTime, weather: newWeather });
+    setWeatherNotification({ weather: newWeather, day: day, isInitial: true });
+    onLogEntry({
+      type: 'weather',
+      timestamp: formatTimestamp(),
+      message: `${newWeather.icon} Počasí dne ${day}: ${newWeather.type} (${newWeather.dice[0]}+${newWeather.dice[1]}=${newWeather.roll})`,
+      data: newWeather
+    });
+    if (newWeather.danger && newWeather.effect) {
       onLogEntry({
-        type: 'weather',
+        type: 'weather_warning',
         timestamp: formatTimestamp(),
-        message: `${initialWeather.icon} Počasí dne ${day}: ${initialWeather.type} (${initialWeather.dice[0]}+${initialWeather.dice[1]}=${initialWeather.roll})`,
-        data: initialWeather
+        message: `⚠️ ${newWeather.effect}`
       });
-      if (initialWeather.danger && initialWeather.effect) {
-        onLogEntry({
-          type: 'weather_warning',
-          timestamp: formatTimestamp(),
-          message: `⚠️ ${initialWeather.effect}`
-        });
-      }
     }
-  }, [party, context, weather, season]);
+  };
 
   const currentSeason = TIMEBAR_SEASONS.find(s => s.id === season) || TIMEBAR_SEASONS[0];
   const currentWatch = TIMEBAR_WATCHES.find(w => w.id === watch) || TIMEBAR_WATCHES[0];
@@ -9921,20 +9918,32 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
               <div className="text-sm text-stone-600">Den</div>
             </div>
             {/* Počasí - jen v divočině */}
-            {context === 'wilderness' && (
+            {context === 'wilderness' && weather && (
               <div
                 onClick={rerollWeather}
                 className="cursor-pointer hover:scale-105 transition-transform"
                 title="Klikni pro přehození počasí"
               >
-                <div className="text-4xl mb-1">{weather?.icon || '🌤️'}</div>
-                <div className="text-sm text-stone-600">{weather?.type || 'Neznámé'}</div>
-                {weather?.roll && (
-                  <div className="text-xs text-stone-400">({weather.roll})</div>
-                )}
+                <div className="text-4xl mb-1">{weather.icon}</div>
+                <div className="text-sm text-stone-600">{weather.type}</div>
+                <div className="text-xs text-stone-400">({weather.roll})</div>
               </div>
             )}
           </div>
+
+          {/* Upozornění - počasí není nastavené */}
+          {context === 'wilderness' && !weather && (
+            <div className="bg-amber-100 border-2 border-amber-400 rounded-lg p-4 text-center">
+              <div className="text-2xl mb-2">🎲❓</div>
+              <p className="text-amber-800 font-medium mb-3">Počasí pro dnešek není nastavené</p>
+              <button
+                onClick={rollWeatherManually}
+                className="bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2 rounded-lg transition-colors"
+              >
+                🎲 Hodit na počasí
+              </button>
+            </div>
+          )}
 
           {/* Varování při špatném počasí */}
           {context === 'wilderness' && weather?.danger && weather?.effect && (
