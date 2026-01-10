@@ -90,25 +90,31 @@ Projekt: `mausritter-solo-companion`
 
 Když uživatel řekne "vytvoř PR" nebo "udělej PR":
 
-1. **Připrav kompletní PR text** - title + body s test plánem jako checklist
-2. **Dej uživateli URL** pro vytvoření PR + připravený text k nakopírování
-3. **Text formátuj jako code block** aby šel snadno zkopírovat
+1. **Pushni větev** pokud ještě není pushnutá
+2. **Vygeneruj URL s předvyplněnými parametry** - title a body zakódované v URL
+3. **Dej uživateli klikací odkaz** - stačí kliknout a pak "Create pull request"
 
-### Formát PR textu
+### URL formát (base je MASTER, ne main!)
 
 ```
-**Title:** feat: [název feature]
+https://github.com/Brux-cz/mausritter-solo-companion/compare/master...[BRANCH]?expand=1&title=[URL_ENCODED_TITLE]&body=[URL_ENCODED_BODY]
+```
 
-**Body:**
+### Body formát
+
+```
 ## Summary
-- [hlavní změny]
+- [hlavní změny jako odrážky]
 
-## Test Plan
+## Test plan
 - [ ] Test 1
 - [ ] Test 2
 ```
 
-### URL pro PR
+### Příklad kompletní URL
+
 ```
-https://github.com/Brux-cz/mausritter-solo-companion/pull/new/[BRANCH]
+https://github.com/Brux-cz/mausritter-solo-companion/compare/master...claude/feature-branch?expand=1&title=feat%3A%20N%C3%A1zev&body=%23%23%20Summary%0A-%20Zm%C4%9Bna%201%0A%0A%23%23%20Test%20plan%0A-%20%5B%20%5D%20Test
 ```
+
+Uživatel klikne na odkaz → GitHub předvyplní formulář → klikne "Create pull request" → hotovo.
