@@ -9705,12 +9705,15 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
   const [showRules, setShowRules] = React.useState(false);
   const [showEncounterReminder, setShowEncounterReminder] = React.useState(false);
   const [encounterRollResult, setEncounterRollResult] = React.useState(null);
+  const [weatherNotification, setWeatherNotification] = React.useState(null); // Notifikace o změně počasí
 
   // Automatické generování počasí při prvním dni (pokud je v divočině a počasí není nastaveno)
   React.useEffect(() => {
     if (party && context === 'wilderness' && !weather) {
       const initialWeather = generateWeather(season);
       setGameTime({ ...gameTime, weather: initialWeather });
+      // Zobrazit notifikaci
+      setWeatherNotification({ weather: initialWeather, day: day, isInitial: true });
       onLogEntry({
         type: 'weather',
         timestamp: formatTimestamp(),
@@ -9781,6 +9784,8 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
     let newWeather = weather;
     if (isNewDay && context === 'wilderness') {
       newWeather = generateWeather(season);
+      // Zobrazit notifikaci o novém počasí
+      setWeatherNotification({ weather: newWeather, day: newDay, isInitial: false });
       onLogEntry({
         type: 'weather',
         timestamp: formatTimestamp(),
@@ -10153,6 +10158,46 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
               className="bg-white/20 hover:bg-white/30 text-white font-bold px-6 py-2 rounded-lg transition-colors"
             >
               OK
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Notifikace o změně počasí - musí se odkliknout */}
+      {weatherNotification && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className={`px-8 py-6 rounded-xl shadow-2xl text-center max-w-sm ${
+            weatherNotification.weather.danger
+              ? 'bg-gradient-to-b from-red-600 to-red-800 text-white'
+              : 'bg-gradient-to-b from-amber-100 to-amber-200 text-amber-900'
+          }`}>
+            <div className="text-lg mb-2 opacity-80">
+              {weatherNotification.isInitial ? '🌅 Počasí dne' : `🌅 Nový den ${weatherNotification.day}`}
+            </div>
+            <div className="text-6xl mb-3">
+              {weatherNotification.weather.icon}
+            </div>
+            <div className="text-3xl font-bold mb-2">
+              {weatherNotification.weather.type}
+            </div>
+            <div className="text-sm mb-1 opacity-80">
+              🎲 {weatherNotification.weather.dice[0]} + {weatherNotification.weather.dice[1]} = {weatherNotification.weather.roll}
+            </div>
+            {weatherNotification.weather.danger && weatherNotification.weather.effect && (
+              <div className="bg-white/20 rounded-lg p-3 my-3 text-sm">
+                ⚠️ <strong>Nepříznivé podmínky:</strong><br/>
+                {weatherNotification.weather.effect}
+              </div>
+            )}
+            <button
+              onClick={() => setWeatherNotification(null)}
+              className={`font-bold px-6 py-2 rounded-lg transition-colors mt-2 ${
+                weatherNotification.weather.danger
+                  ? 'bg-white/20 hover:bg-white/30 text-white'
+                  : 'bg-amber-600 hover:bg-amber-700 text-white'
+              }`}
+            >
+              ✓ Rozumím
             </button>
           </div>
         </div>
