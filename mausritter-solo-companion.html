@@ -10968,6 +10968,25 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                   )}
                 </div>
 
+                {/* Historie událostí NPC z deníku */}
+                {(() => {
+                  const npcEvents = journal.filter(e => e.npcId === detailModal.data.id && e.subtype === 'npc_event');
+                  if (npcEvents.length === 0) return null;
+                  return (
+                    <div className="border-t border-amber-200 pt-3">
+                      <p className="text-xs text-stone-500 mb-2">📜 Historie událostí ({npcEvents.length})</p>
+                      <div className="space-y-2 max-h-32 overflow-y-auto">
+                        {npcEvents.slice(-5).reverse().map((event, i) => (
+                          <div key={i} className="p-2 bg-orange-50 rounded border border-orange-200 text-sm">
+                            <p className="text-orange-900">{event.content}</p>
+                            <p className="text-xs text-stone-400 mt-1">{event.timestamp}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 <div className="flex gap-2">
                   <button
                     onClick={() => {
@@ -11055,6 +11074,32 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                     <p className="text-stone-700">{detailModal.data.notes}</p>
                   </div>
                 )}
+
+                {/* Historie událostí a zvěstí osady z deníku */}
+                {(() => {
+                  const settlementLogs = journal.filter(e =>
+                    e.settlementId === detailModal.data.id &&
+                    (e.subtype === 'settlement_event' || e.subtype === 'settlement_rumor')
+                  );
+                  if (settlementLogs.length === 0) return null;
+                  return (
+                    <div className="border-t border-green-200 pt-3">
+                      <p className="text-xs text-stone-500 mb-2">📜 Historie ({settlementLogs.length})</p>
+                      <div className="space-y-2 max-h-40 overflow-y-auto">
+                        {settlementLogs.slice(-5).reverse().map((event, i) => (
+                          <div key={i} className={`p-2 rounded border text-sm ${event.subtype === 'settlement_rumor' ? 'bg-purple-50 border-purple-200' : 'bg-orange-50 border-orange-200'}`}>
+                            <div className="flex items-center gap-1 mb-1">
+                              <span className="text-xs">{event.subtype === 'settlement_rumor' ? '💬 Zvěst' : '⚡ Událost'}</span>
+                            </div>
+                            <p className={event.subtype === 'settlement_rumor' ? 'text-purple-900' : 'text-orange-900'}>{event.content}</p>
+                            <p className="text-xs text-stone-400 mt-1">{event.timestamp}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 <div className="flex gap-2">
                   <button
                     onClick={() => {
