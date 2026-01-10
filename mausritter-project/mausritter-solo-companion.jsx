@@ -1685,6 +1685,162 @@ const NPC_ROLES = [
   'Bylinkář', 'Kožešník', 'Sladovník', 'Vorař', 'Kameník', 'Mlynář'
 ];
 
+// ============================================
+// GENERÁTOR UDÁLOSTÍ - Tabulky pro myší svět
+// ============================================
+
+// Focus události - koho/čeho se týká (d20)
+const EVENT_FOCUS = [
+  { roll: 1, focus: 'pc_positive', label: 'Hráčská myš - pozitivní', description: 'Něco dobrého pro hráčskou postavu' },
+  { roll: 2, focus: 'pc_positive', label: 'Hráčská myš - pozitivní', description: 'Příležitost nebo výhoda' },
+  { roll: 3, focus: 'pc_negative', label: 'Hráčská myš - negativní', description: 'Problém nebo komplikace pro hráče' },
+  { roll: 4, focus: 'pc_negative', label: 'Hráčská myš - negativní', description: 'Nebezpečí nebo ztráta' },
+  { roll: 5, focus: 'npc_positive', label: 'NPC - pozitivní', description: 'Něco dobrého pro NPC' },
+  { roll: 6, focus: 'npc_positive', label: 'NPC - pozitivní', description: 'NPC získává výhodu' },
+  { roll: 7, focus: 'npc_negative', label: 'NPC - negativní', description: 'Problém pro NPC' },
+  { roll: 8, focus: 'npc_negative', label: 'NPC - negativní', description: 'NPC v nesnázích' },
+  { roll: 9, focus: 'npc_action', label: 'NPC jedná', description: 'NPC podniká významnou akci' },
+  { roll: 10, focus: 'npc_action', label: 'NPC jedná', description: 'NPC mění situaci' },
+  { roll: 11, focus: 'settlement', label: 'Osada', description: 'Událost ovlivňuje celou osadu' },
+  { roll: 12, focus: 'settlement', label: 'Osada', description: 'Změna v komunitě' },
+  { roll: 13, focus: 'faction', label: 'Frakce', description: 'Frakce podniká kroky' },
+  { roll: 14, focus: 'faction', label: 'Frakce', description: 'Změna v mocenské rovnováze' },
+  { roll: 15, focus: 'environment', label: 'Prostředí', description: 'Změna v přírodě nebo počasí' },
+  { roll: 16, focus: 'threat', label: 'Hrozba', description: 'Objevuje se nebezpečí' },
+  { roll: 17, focus: 'new_element', label: 'Nový prvek', description: 'Objeví se nová postava, místo nebo věc' },
+  { roll: 18, focus: 'new_element', label: 'Nový prvek', description: 'Nečekaný objev' },
+  { roll: 19, focus: 'remote', label: 'Vzdálená událost', description: 'Něco se děje jinde, ale má důsledky' },
+  { roll: 20, focus: 'current_context', label: 'Aktuální kontext', description: 'Přímo souvisí s probíhající scénou' }
+];
+
+// Akce pro generátor událostí - myší svět (d20)
+const EVENT_ACTIONS = [
+  'Hledá', 'Chrání', 'Ukrývá', 'Obchoduje', 'Opravuje',
+  'Krade', 'Prozkoumává', 'Varuje', 'Slaví', 'Truchlí',
+  'Bojuje', 'Léčí', 'Staví', 'Ničí', 'Doručuje',
+  'Prchá', 'Vyjednává', 'Špehuje', 'Učí', 'Cestuje'
+];
+
+// Subjekty pro generátor událostí - myší svět (d20)
+const EVENT_SUBJECTS = [
+  'potravu', 'úkryt', 'rodinu', 'poklad', 'tajemství',
+  'nebezpečí', 'cestu', 'nástroj', 'zbraň', 'osadu',
+  'predátora', 'artefakt', 'zprávu', 'spojence', 'nepřítele',
+  'území', 'tradici', 'vzpomínku', 'magii', 'přežití'
+];
+
+// Komplikace událostí (d12)
+const EVENT_COMPLICATIONS = [
+  'Ale je to past!',
+  'Někdo sleduje z povzdálí.',
+  'Čas se krátí - musí to být rychle.',
+  'Je to prokleté nebo nebezpečné.',
+  'Je tu konkurence - někdo jiný to chce taky.',
+  'Špatné počasí komplikuje situaci.',
+  'Zrada! Někdo není tím, za koho se vydává.',
+  'Cena je příliš vysoká.',
+  'Vyžaduje to oběť nebo těžké rozhodnutí.',
+  'Informace jsou mylné nebo neúplné.',
+  'Morální dilema - co je správné?',
+  'Nečekaný svědek viděl, co se stalo.'
+];
+
+// Zvěsti a drby v osadě (d20)
+const SETTLEMENT_RUMORS = [
+  'Prý se v lese objevil obří predátor...',
+  'Slyšel/a jsem, že starosta něco tají.',
+  'Kupec z východu prodává podivné zboží.',
+  'Zmizela další myš - už třetí tento měsíc!',
+  'V dolech prý našli něco zvláštního.',
+  'Frakce z města plánuje rozšíření území.',
+  'Stará věštkyně předpověděla neštěstí.',
+  'Objevili starou mapu k zapomenutému místu.',
+  'Ceny potravin stoupají - bude hlad?',
+  'Tajný tunel vede přímo pod hradby.',
+  'Šlechtic hledá někoho pro diskrétní práci.',
+  'V hostinci se scházejí podezřelé postavy.',
+  'Byla spatřena sova poblíž osady.',
+  'Bylinkářka umí víc, než přiznává.',
+  'Starý veterán zná cestu přes bažiny.',
+  'Kdosi krade z obecních zásob.',
+  'Přijde velká bouře - zásoby docházejí.',
+  'Rivalská osada chystá něco nekalého.',
+  'V ruinách na kopci straší.',
+  'Cestující vypravěč zná příběhy o pokladech.'
+];
+
+// Co se děje v osadě právě teď (d20)
+const SETTLEMENT_HAPPENINGS = [
+  'Trh je v plném proudu - ruch a shon.',
+  'Probíhá soudní jednání na náměstí.',
+  'Svatba! Celá osada slaví.',
+  'Pohřeb významné osobnosti.',
+  'Přijeli obchodníci z daleka.',
+  'Stráže prohledávají domy - hledají někoho.',
+  'Oprava hradeb - všichni musí pomáhat.',
+  'Festival sklizně - jídlo a tanec.',
+  'Požár! Část osady hoří.',
+  'Tajná schůzka v temné uličce.',
+  'Hádka mezi dvěma významnými rodinami.',
+  'Verbování do armády nebo stráže.',
+  'Příjezd šlechtice s doprovodem.',
+  'Nemoc se šíří osadou.',
+  'Zásoby dochází - napjatá atmosféra.',
+  'Oslava narozenin starosty.',
+  'Tajemný cizinec klade otázky.',
+  'Děti si hrají - ale našly něco divného.',
+  'Řemeslníci pracují na velkém projektu.',
+  'Klidný den - možná až příliš klidný...'
+];
+
+// Přírodní události a počasí (d12)
+const NATURE_EVENTS = [
+  'Prudký déšť - cesty jsou zatopené.',
+  'Mlha zahaluje krajinu - snížená viditelnost.',
+  'První mráz - zima přichází.',
+  'Horko a sucho - zásoby vody docházejí.',
+  'Silný vítr - létající úlomky jsou nebezpečné.',
+  'Záplava! Voda stoupá.',
+  'Krásný slunečný den - ideální pro cestování.',
+  'Bouřka s blesky - myši se schovávají.',
+  'Sněžení - cesty jsou neprůchodné.',
+  'Podzimní listí padá - krajina se mění.',
+  'Jarní tání - všude je bláto.',
+  'Noční chlad - potřeba ohně a přístřeší.'
+];
+
+// Hrozby v divočině (d12)
+const WILDERNESS_THREATS = [
+  'Stopy predátora vedou tímto směrem.',
+  'Slyšet je štěkot - lišky jsou blízko!',
+  'Pavučiny blokují cestu vpřed.',
+  'Had se vyhřívá na slunci přímo v cestě.',
+  'Ropucha číhá u potoka.',
+  'Sršní hnízdo visí nad stezkou.',
+  'Lasička prohledává okolí.',
+  'Kočičí pach je ve vzduchu.',
+  'Vrána kroužíš nad hlavou.',
+  'Jezevčí nora - teritorium je obsazeno.',
+  'Krtek vyhazuje hlínu - tunely se hroutí.',
+  'Mravenci pochodují ve válečné formaci.'
+];
+
+// Nálezy a příležitosti (d12)
+const DISCOVERIES = [
+  'Opuštěný tábor - kdo tu byl?',
+  'Ztracený náklad - zboží leží na zemi.',
+  'Vstup do neznámého tunelu.',
+  'Mrtvá myš - co se jí stalo?',
+  'Ukrytá skrýš s poklady.',
+  'Zraněný tvor potřebuje pomoc.',
+  'Zaniklá osada - jen ruiny zůstaly.',
+  'Magický předmět září ve tmě.',
+  'Mapa vyřezaná do kůry stromu.',
+  'Studánka s čistou vodou.',
+  'Houbová políčka - zásoba jídla!',
+  'Podivný monument starověké civilizace.'
+];
+
 // Barva srsti (k6)
 const FUR_COLORS = ['Čokoládová', 'Černá', 'Bílá', 'Světle hnědá', 'Šedá', 'Namodralá'];
 
@@ -2813,6 +2969,14 @@ const OraclePanel = ({ onLogEntry }) => {
     wordCount: 3
   });
 
+  // State pro generátor událostí (Event Generator)
+  const [eventResult, setEventResult] = useState(null);
+  const [eventOptions, setEventOptions] = useState({
+    mode: 'full', // 'full', 'action', 'settlement', 'wilderness', 'rumor'
+    includeComplication: false,
+    includeFocus: true
+  });
+
   // Abstraktní koncepty pro inspiraci
   const INSPIRE_WORDS = [
     'strach', 'naděje', 'ztráta', 'radost', 'smutek', 'hněv', 'klid', 'úzkost', 'odvaha', 'zoufalství',
@@ -2975,8 +3139,134 @@ const OraclePanel = ({ onLogEntry }) => {
     logEntry(entry);
   };
 
+  // ========== GENERÁTOR UDÁLOSTÍ ==========
+
+  // Plný generátor událostí (Focus + Akce + Subjekt + volitelně Komplikace)
+  const generateFullEvent = () => {
+    const focus = eventOptions.includeFocus ? EVENT_FOCUS[Math.floor(Math.random() * EVENT_FOCUS.length)] : null;
+    const action = randomFrom(EVENT_ACTIONS);
+    const subject = randomFrom(EVENT_SUBJECTS);
+    const complication = eventOptions.includeComplication ? randomFrom(EVENT_COMPLICATIONS) : null;
+
+    let narrative = '';
+    if (focus) {
+      narrative += `**${focus.label}:** ${focus.description}\n\n`;
+    }
+    narrative += `⚡ **${action}** ${subject}`;
+    if (complication) {
+      narrative += `\n\n⚠️ *${complication}*`;
+    }
+
+    const result = { focus, action, subject, complication, narrative, type: 'full' };
+    setEventResult(result);
+
+    const entry = {
+      type: 'oracle',
+      subtype: 'event',
+      timestamp: formatTimestamp(),
+      result: narrative,
+      data: result
+    };
+    setLastResult(entry);
+    logEntry(entry);
+  };
+
+  // Generátor události v osadě
+  const generateSettlementEvent = () => {
+    const happening = randomFrom(SETTLEMENT_HAPPENINGS);
+    const complication = eventOptions.includeComplication ? randomFrom(EVENT_COMPLICATIONS) : null;
+
+    let narrative = `🏘️ **V osadě:** ${happening}`;
+    if (complication) {
+      narrative += `\n\n⚠️ *${complication}*`;
+    }
+
+    const result = { happening, complication, narrative, type: 'settlement' };
+    setEventResult(result);
+
+    const entry = {
+      type: 'oracle',
+      subtype: 'event_settlement',
+      timestamp: formatTimestamp(),
+      result: narrative,
+      data: result
+    };
+    setLastResult(entry);
+    logEntry(entry);
+  };
+
+  // Generátor zvěsti
+  const generateRumor = () => {
+    const rumor = randomFrom(SETTLEMENT_RUMORS);
+
+    const narrative = `💬 **Zvěst:** "${rumor}"`;
+    const result = { rumor, narrative, type: 'rumor' };
+    setEventResult(result);
+
+    const entry = {
+      type: 'oracle',
+      subtype: 'event_rumor',
+      timestamp: formatTimestamp(),
+      result: narrative,
+      data: result
+    };
+    setLastResult(entry);
+    logEntry(entry);
+  };
+
+  // Generátor události v divočině
+  const generateWildernessEvent = () => {
+    // 50% hrozba, 50% objev
+    const isDiscovery = Math.random() > 0.5;
+    const event = isDiscovery ? randomFrom(DISCOVERIES) : randomFrom(WILDERNESS_THREATS);
+    const nature = randomFrom(NATURE_EVENTS);
+    const complication = eventOptions.includeComplication ? randomFrom(EVENT_COMPLICATIONS) : null;
+
+    let narrative = isDiscovery
+      ? `🔍 **Objev:** ${event}`
+      : `⚠️ **Hrozba:** ${event}`;
+    narrative += `\n🌿 **Počasí/prostředí:** ${nature}`;
+    if (complication) {
+      narrative += `\n\n⚠️ *${complication}*`;
+    }
+
+    const result = { event, nature, complication, isDiscovery, narrative, type: 'wilderness' };
+    setEventResult(result);
+
+    const entry = {
+      type: 'oracle',
+      subtype: 'event_wilderness',
+      timestamp: formatTimestamp(),
+      result: narrative,
+      data: result
+    };
+    setLastResult(entry);
+    logEntry(entry);
+  };
+
+  // Jednoduchý generátor akce (jen Akce + Subjekt)
+  const generateSimpleAction = () => {
+    const action = randomFrom(EVENT_ACTIONS);
+    const subject = randomFrom(EVENT_SUBJECTS);
+
+    const narrative = `⚡ **${action}** ${subject}`;
+    const result = { action, subject, narrative, type: 'action' };
+    setEventResult(result);
+
+    const entry = {
+      type: 'oracle',
+      subtype: 'event_action',
+      timestamp: formatTimestamp(),
+      result: `${action} ${subject}`,
+      data: result
+    };
+    setLastResult(entry);
+    logEntry(entry);
+  };
+
   const oracleTabs = [
     { id: 'yesno', label: 'Ano/Ne', icon: '🎲' },
+    { id: 'event', label: 'Události', icon: '⚡' },
     { id: 'narrative', label: 'Inspirace', icon: '💭' },
     { id: 'encounter', label: 'Setkání', icon: '👁️' },
     { id: 'creature', label: 'Tvor', icon: '🐭' },
@@ -3068,6 +3358,100 @@ const OraclePanel = ({ onLogEntry }) => {
             <Button onClick={rollYesNo} size="large" className="w-full">
               🎲 Hodit 2d6
             </Button>
+          </div>
+        </ResultCard>
+      )}
+
+      {/* ========== EVENT GENERATOR - GENERÁTOR UDÁLOSTÍ ========== */}
+      {activeOracle === 'event' && (
+        <ResultCard>
+          <HelpHeader
+            title="Generátor událostí"
+            icon="⚡"
+            tooltip={
+              <div>
+                <p className="font-bold mb-2">⚡ Co se děje?</p>
+                <p className="text-xs mb-2">
+                  Generátor pro náhodné události ve světě Mausritter.
+                  Inspirováno systémem Mythic GME s tabulkami přizpůsobenými myšímu světu.
+                </p>
+
+                <p className="font-bold mb-1">🎯 Typy generátorů:</p>
+                <ul className="text-xs space-y-1 mb-2">
+                  <li>• <b>Plná událost</b> - Focus + Akce + Subjekt (kdo, co, proč)</li>
+                  <li>• <b>Jen akce</b> - rychlé Akce + Subjekt</li>
+                  <li>• <b>V osadě</b> - co se děje v městě/vesnici</li>
+                  <li>• <b>Divočina</b> - hrozby a objevy v přírodě</li>
+                  <li>• <b>Zvěst</b> - drby a fámy</li>
+                </ul>
+
+                <p className="text-xs text-stone-300 italic">
+                  💡 Tip: Přidej komplikaci pro dramatičtější události!
+                </p>
+              </div>
+            }
+          />
+
+          {/* Tlačítka pro různé typy generátorů */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
+            <Button onClick={generateFullEvent} variant="primary" className="flex-1">
+              ⚡ Plná událost
+            </Button>
+            <Button onClick={generateSimpleAction} variant="secondary" className="flex-1">
+              🎯 Jen akce
+            </Button>
+            <Button onClick={generateSettlementEvent} variant="secondary" className="flex-1">
+              🏘️ V osadě
+            </Button>
+            <Button onClick={generateWildernessEvent} variant="secondary" className="flex-1">
+              🌲 Divočina
+            </Button>
+            <Button onClick={generateRumor} variant="secondary" className="flex-1">
+              💬 Zvěst
+            </Button>
+          </div>
+
+          {/* Možnosti */}
+          <div className="flex flex-wrap gap-4 justify-center mb-4 text-sm">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={eventOptions.includeFocus}
+                onChange={(e) => setEventOptions({...eventOptions, includeFocus: e.target.checked})}
+                className="w-4 h-4 rounded border-stone-300 text-amber-600 focus:ring-amber-500"
+              />
+              <span>🎯 Focus (koho se týká)</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={eventOptions.includeComplication}
+                onChange={(e) => setEventOptions({...eventOptions, includeComplication: e.target.checked})}
+                className="w-4 h-4 rounded border-stone-300 text-amber-600 focus:ring-amber-500"
+              />
+              <span>⚠️ Přidat komplikaci</span>
+            </label>
+          </div>
+
+          {/* Výsledek */}
+          {eventResult && (
+            <div className="p-4 rounded-lg bg-stone-800 text-stone-100">
+              <div className="prose prose-invert prose-sm max-w-none whitespace-pre-line">
+                {eventResult.narrative.split('\n').map((line, i) => {
+                  // Parse markdown-like formatting
+                  const formatted = line
+                    .replace(/\*\*(.+?)\*\*/g, '<strong class="text-amber-300">$1</strong>')
+                    .replace(/\*(.+?)\*/g, '<em class="text-stone-400">$1</em>');
+                  return <p key={i} className="mb-1" dangerouslySetInnerHTML={{__html: formatted}} />;
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Info o tabulkách */}
+          <div className="mt-4 text-center text-xs text-stone-500">
+            <p>📊 20 fokusů · 20 akcí · 20 subjektů · 12 komplikací</p>
+            <p>🏘️ 20 osadních událostí · 20 zvěstí · 12 hrozeb · 12 objevů · 12 počasí</p>
           </div>
         </ResultCard>
       )}
