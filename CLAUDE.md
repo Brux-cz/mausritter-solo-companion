@@ -90,35 +90,25 @@ Projekt: `mausritter-solo-companion`
 
 Když uživatel řekne "vytvoř PR" nebo "udělej PR":
 
-1. **Vytvoř PR** s popisem změn
-2. **Vytvoř GitHub Issue** s test plánem jako checklist:
-   ```
-   gh issue create --title "Test: [název feature]" --body "## Test Plan
+1. **Připrav kompletní PR text** - title + body s test plánem jako checklist
+2. **Dej uživateli URL** pro vytvoření PR + připravený text k nakopírování
+3. **Text formátuj jako code block** aby šel snadno zkopírovat
 
-   - [ ] Test 1
-   - [ ] Test 2
-   ..."
-   ```
-3. **Propoj Issue s PR** v popisu PR: `Closes #XX` nebo `Testing: #XX`
+### Formát PR textu
 
-### Šablona Test Plánu
+```
+**Title:** feat: [název feature]
 
-```markdown
-## Test Plan pro [FEATURE]
+**Body:**
+## Summary
+- [hlavní změny]
 
-### Základní funkčnost
-- [ ] Funkce X funguje
-- [ ] Funkce Y funguje
+## Test Plan
+- [ ] Test 1
+- [ ] Test 2
+```
 
-### UI/UX
-- [ ] Responzivní na mobilu
-- [ ] Tooltips se zobrazují správně
-
-### Integrace
-- [ ] Zápis do deníku funguje
-- [ ] Data se ukládají do localStorage
-
-### Edge cases
-- [ ] Prázdná data
-- [ ] Dlouhé texty
+### URL pro PR
+```
+https://github.com/Brux-cz/mausritter-solo-companion/pull/new/[BRANCH]
 ```
