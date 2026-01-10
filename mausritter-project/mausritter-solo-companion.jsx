@@ -11474,6 +11474,7 @@ const FloatingDice = ({ onLogEntry }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeGenerator, setActiveGenerator] = useState(null);
   const [lastRoll, setLastRoll] = useState(null);
+  const [isHidden, setIsHidden] = useState(true); // Na mobilu schované
 
   // Generátory - vertikální seznam
   const generators = [
@@ -11541,6 +11542,7 @@ const FloatingDice = ({ onLogEntry }) => {
     setIsOpen(false);
     setActiveGenerator(null);
     setLastRoll(null);
+    setIsHidden(true); // Schovat na mobilu
   };
 
   // Zapsat hod do deníku
@@ -11584,20 +11586,28 @@ const FloatingDice = ({ onLogEntry }) => {
   };
 
   return (
-    <div className="fixed bottom-24 right-4 z-50 flex flex-col-reverse items-end gap-2">
+    <div className={`fixed bottom-24 right-0 z-50 flex flex-col-reverse items-end gap-2 transition-transform duration-300 sm:pr-4 ${
+      isHidden && !isOpen ? 'translate-x-11 sm:translate-x-0' : 'pr-4'
+    }`}>
       {/* Hlavní plovoucí tlačítko */}
       <button
         onClick={() => {
-          if (isOpen) {
+          if (isHidden && !isOpen) {
+            // Vysunout a rovnou otevřít menu na mobilu
+            setIsHidden(false);
+            setIsOpen(true);
+          } else if (isOpen) {
             closeAll();
           } else {
             setIsOpen(true);
           }
         }}
-        className={`w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl transition-all duration-300 ${
-          isOpen
-            ? 'bg-amber-600 text-white'
-            : 'bg-amber-500 hover:bg-amber-600 text-white hover:scale-110'
+        className={`w-14 h-14 shadow-lg flex items-center justify-center text-2xl transition-all duration-300 ${
+          isHidden && !isOpen
+            ? 'rounded-l-full bg-amber-400/90 text-white'
+            : isOpen
+              ? 'rounded-full bg-amber-600 text-white'
+              : 'rounded-full bg-amber-500 hover:bg-amber-600 text-white hover:scale-110'
         }`}
         title="Rychlé generátory"
       >
