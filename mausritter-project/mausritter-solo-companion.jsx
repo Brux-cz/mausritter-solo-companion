@@ -96,11 +96,17 @@ const HIT_TABLE = {
   12: { result: 'DRTIVÝ ÚDER', effect: 'Maximum poškození', damageType: 'max' }
 };
 
+// Tabulka počasí podle pravidel Mausritter CZ (2k6)
+// Tučné položky = nepříznivé podmínky (STR save nebo Vyčerpání při cestování)
 const WEATHER_TABLE = {
-  spring: { 2: 'Bouře', 3: 'Déšť', 4: 'Déšť', 5: 'Zataženo', 6: 'Zataženo', 7: 'Mírné', 8: 'Mírné', 9: 'Mírné', 10: 'Slunečno', 11: 'Slunečno', 12: 'Nádherné' },
-  summer: { 2: 'Sucho', 3: 'Horko', 4: 'Horko', 5: 'Teplo', 6: 'Teplo', 7: 'Příjemné', 8: 'Příjemné', 9: 'Příjemné', 10: 'Slunečno', 11: 'Slunečno', 12: 'Perfektní' },
-  autumn: { 2: 'Vichřice', 3: 'Mlha', 4: 'Mlha', 5: 'Zataženo', 6: 'Zataženo', 7: 'Chladno', 8: 'Chladno', 9: 'Chladno', 10: 'Svěží', 11: 'Svěží', 12: 'Zlaté' },
-  winter: { 2: 'Vánice', 3: 'Sněžení', 4: 'Sněžení', 5: 'Zima', 6: 'Zima', 7: 'Mráz', 8: 'Mráz', 9: 'Mráz', 10: 'Jasno', 11: 'Jasno', 12: 'Klidné' }
+  // Jaro: 2=Přívalové deště*, 3-5=Mrholení, 6-8=Zataženo, 9-11=Jasno a slunečno, 12=Jasno a teplo
+  spring: { 2: 'Přívalové deště', 3: 'Mrholení', 4: 'Mrholení', 5: 'Mrholení', 6: 'Zataženo', 7: 'Zataženo', 8: 'Zataženo', 9: 'Jasno a slunečno', 10: 'Jasno a slunečno', 11: 'Jasno a slunečno', 12: 'Jasno a teplo' },
+  // Léto: 2=Bouřka*, 3-5=Úmorné vedro*, 6-8=Jasno a teplo, 9-11=Příjemně slunečno, 12=Krásně teplo
+  summer: { 2: 'Bouřka', 3: 'Úmorné vedro', 4: 'Úmorné vedro', 5: 'Úmorné vedro', 6: 'Jasno a teplo', 7: 'Jasno a teplo', 8: 'Jasno a teplo', 9: 'Příjemně slunečno', 10: 'Příjemně slunečno', 11: 'Příjemně slunečno', 12: 'Krásně teplo' },
+  // Podzim: 2=Silný vítr*, 3-5=Slejvák*, 6-8=Chladno, 9-11=Přeháňky, 12=Jasno a chladno
+  autumn: { 2: 'Silný vítr', 3: 'Slejvák', 4: 'Slejvák', 5: 'Slejvák', 6: 'Chladno', 7: 'Chladno', 8: 'Chladno', 9: 'Přeháňky', 10: 'Přeháňky', 11: 'Přeháňky', 12: 'Jasno a chladno' },
+  // Zima: 2=Vánice*, 3-5=Mrznoucí déšť*, 6-8=Třeskutá zima*, 9-11=Zataženo, 12=Jasno a chladno
+  winter: { 2: 'Vánice', 3: 'Mrznoucí déšť', 4: 'Mrznoucí déšť', 5: 'Mrznoucí déšť', 6: 'Třeskutá zima', 7: 'Třeskutá zima', 8: 'Třeskutá zima', 9: 'Zataženo', 10: 'Zataženo', 11: 'Zataženo', 12: 'Jasno a chladno' }
 };
 
 // ============================================
@@ -8728,13 +8734,12 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
             <div className="text-center space-y-4">
               <DiceDisplay dice={generated.dice} size="large" />
               <div className="text-5xl">
-                {generated.weather.includes('Bouře') || generated.weather.includes('Vánice') ? '⛈️' :
-                 generated.weather.includes('Déšť') || generated.weather.includes('Sněžení') ? '🌧️' :
-                 generated.weather.includes('Zataženo') || generated.weather.includes('Mlha') ? '☁️' :
-                 generated.weather.includes('Slunečno') || generated.weather.includes('Jasno') ? '☀️' :
-                 generated.weather.includes('Perfektní') || generated.weather.includes('Nádherné') ? '🌈' : '🌤️'}
+                {WEATHER_EFFECTS[generated.weather]?.icon || '🌤️'}
               </div>
               <p className="text-3xl font-bold text-amber-900">{generated.weather}</p>
+              {WEATHER_EFFECTS[generated.weather]?.danger && (
+                <p className="text-red-600 font-medium">⚠️ {WEATHER_EFFECTS[generated.weather]?.effect}</p>
+              )}
               <p className="text-stone-600 capitalize">{
                 generated.season === 'spring' ? 'Jaro' :
                 generated.season === 'summer' ? 'Léto' :
@@ -9532,35 +9537,31 @@ const TIMEBAR_WATCHES = [
   { id: 3, name: 'Noc', icon: '🌙' }
 ];
 
-// Efekty počasí podle typu a sezóny
+// Efekty počasí podle pravidel Mausritter CZ
+// Nepříznivé podmínky (danger: true) = při cestování STR save nebo stav Vyčerpání
 const WEATHER_EFFECTS = {
-  // Extrémní počasí (hod 2)
-  'Bouře': { icon: '⛈️', danger: true, travelMod: 2, effect: 'STR save nebo Vyčerpání. Cestování ×2.' },
-  'Vánice': { icon: '🌨️', danger: true, travelMod: 2, effect: 'STR save nebo Vyčerpání. Cestování ×2.' },
-  'Sucho': { icon: '🏜️', danger: true, travelMod: 1, effect: 'STR save bez vody nebo Vyčerpání.' },
-  'Vichřice': { icon: '🌪️', danger: true, travelMod: 2, effect: 'STR save nebo Vyčerpání. Cestování ×2.' },
-  // Špatné počasí (hod 3-4)
-  'Déšť': { icon: '🌧️', danger: false, travelMod: 1.5, effect: 'Pomalé cestování (×1.5 hlídky).' },
-  'Sněžení': { icon: '❄️', danger: false, travelMod: 1.5, effect: 'Pomalé cestování (×1.5 hlídky).' },
-  'Horko': { icon: '🥵', danger: true, travelMod: 1, effect: 'STR save bez vody nebo Vyčerpání.' },
-  'Mlha': { icon: '🌫️', danger: false, travelMod: 1.5, effect: 'Snížená viditelnost. Cestování ×1.5.' },
-  // Průměrné počasí (hod 5-6)
-  'Zataženo': { icon: '☁️', danger: false, travelMod: 1, effect: null },
-  'Zima': { icon: '🥶', danger: false, travelMod: 1, effect: 'Potřeba přístřeší v noci.' },
-  'Teplo': { icon: '🌤️', danger: false, travelMod: 1, effect: null },
-  // Normální počasí (hod 7-9)
-  'Mírné': { icon: '🌤️', danger: false, travelMod: 1, effect: null },
-  'Příjemné': { icon: '😊', danger: false, travelMod: 1, effect: null },
+  // === JARO ===
+  'Přívalové deště': { icon: '🌧️', danger: true, travelMod: 2, effect: 'STR save nebo Vyčerpání při cestování.' },
+  'Mrholení': { icon: '🌦️', danger: false, travelMod: 1, effect: null },
+  // === LÉTO ===
+  'Bouřka': { icon: '⛈️', danger: true, travelMod: 2, effect: 'STR save nebo Vyčerpání při cestování.' },
+  'Úmorné vedro': { icon: '🥵', danger: true, travelMod: 1, effect: 'STR save nebo Vyčerpání při cestování.' },
+  'Jasno a teplo': { icon: '☀️', danger: false, travelMod: 1, effect: null },
+  'Příjemně slunečno': { icon: '🌤️', danger: false, travelMod: 1, effect: null },
+  'Krásně teplo': { icon: '😊', danger: false, travelMod: 1, effect: null },
+  // === PODZIM ===
+  'Silný vítr': { icon: '🌪️', danger: true, travelMod: 2, effect: 'STR save nebo Vyčerpání při cestování.' },
+  'Slejvák': { icon: '🌧️', danger: true, travelMod: 2, effect: 'STR save nebo Vyčerpání při cestování.' },
   'Chladno': { icon: '🍃', danger: false, travelMod: 1, effect: null },
-  'Mráz': { icon: '🥶', danger: true, travelMod: 1, effect: 'STR save každou hlídku venku nebo Vyčerpání.' },
-  // Dobré počasí (hod 10-12)
-  'Slunečno': { icon: '☀️', danger: false, travelMod: 1, effect: null },
-  'Svěží': { icon: '🍂', danger: false, travelMod: 1, effect: null },
-  'Jasno': { icon: '✨', danger: false, travelMod: 1, effect: null },
-  'Nádherné': { icon: '🌈', danger: false, travelMod: 1, effect: null },
-  'Perfektní': { icon: '🌅', danger: false, travelMod: 1, effect: null },
-  'Zlaté': { icon: '🍁', danger: false, travelMod: 1, effect: null },
-  'Klidné': { icon: '❄️', danger: false, travelMod: 1, effect: null }
+  'Přeháňky': { icon: '🌦️', danger: false, travelMod: 1, effect: null },
+  'Jasno a chladno': { icon: '✨', danger: false, travelMod: 1, effect: null },
+  // === ZIMA ===
+  'Vánice': { icon: '🌨️', danger: true, travelMod: 2, effect: 'STR save nebo Vyčerpání při cestování.' },
+  'Mrznoucí déšť': { icon: '🧊', danger: true, travelMod: 2, effect: 'STR save nebo Vyčerpání při cestování.' },
+  'Třeskutá zima': { icon: '🥶', danger: true, travelMod: 2, effect: 'STR save nebo Vyčerpání při cestování.' },
+  // === SDÍLENÉ (více sezón) ===
+  'Zataženo': { icon: '☁️', danger: false, travelMod: 1, effect: null },
+  'Jasno a slunečno': { icon: '☀️', danger: false, travelMod: 1, effect: null }
 };
 
 // Generování počasí s efekty
@@ -9677,6 +9678,27 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
   const [showRules, setShowRules] = React.useState(false);
   const [showEncounterReminder, setShowEncounterReminder] = React.useState(false);
   const [encounterRollResult, setEncounterRollResult] = React.useState(null);
+
+  // Automatické generování počasí při prvním dni (pokud je v divočině a počasí není nastaveno)
+  React.useEffect(() => {
+    if (party && context === 'wilderness' && !weather) {
+      const initialWeather = generateWeather(season);
+      setGameTime({ ...gameTime, weather: initialWeather });
+      onLogEntry({
+        type: 'weather',
+        timestamp: formatTimestamp(),
+        message: `${initialWeather.icon} Počasí dne ${day}: ${initialWeather.type} (${initialWeather.dice[0]}+${initialWeather.dice[1]}=${initialWeather.roll})`,
+        data: initialWeather
+      });
+      if (initialWeather.danger && initialWeather.effect) {
+        onLogEntry({
+          type: 'weather_warning',
+          timestamp: formatTimestamp(),
+          message: `⚠️ ${initialWeather.effect}`
+        });
+      }
+    }
+  }, [party, context, weather, season]);
 
   const currentSeason = TIMEBAR_SEASONS.find(s => s.id === season) || TIMEBAR_SEASONS[0];
   const currentWatch = TIMEBAR_WATCHES.find(w => w.id === watch) || TIMEBAR_WATCHES[0];
