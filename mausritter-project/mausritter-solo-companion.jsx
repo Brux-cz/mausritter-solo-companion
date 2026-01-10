@@ -10548,7 +10548,8 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
           <p className="my-1 text-sm text-stone-600 cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
-            <span className="text-blue-600">☁️</span> Počasí: <em>{entry.weather}</em>
+            <span className="text-blue-600">{entry.data?.icon || '☁️'}</span> Počasí: <em>{entry.data?.type || entry.weather || 'neznámé'}</em>
+            {entry.data?.danger && <span className="text-red-600 ml-1">⚠️</span>}
             {entry.note && <span className="italic ml-2">— {parseMentions(entry.note, onMentionClick)}</span>}
           </p>
         );
@@ -10560,7 +10561,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
             <p className="my-1 text-sm text-stone-600 cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
                onClick={() => startEdit(entry)}
                title="Klikni pro úpravu">
-              <span className="text-blue-600">☁️</span> Počasí: <em>{entry.data?.weather || entry.weather}</em>
+              <span className="text-blue-600">{entry.data?.icon || '☁️'}</span> Počasí: <em>{entry.data?.type || entry.data?.weather || entry.weather || 'neznámé'}</em>
               {entry.note && <span className="italic ml-2">— {parseMentions(entry.note, onMentionClick)}</span>}
             </p>
           );
@@ -10672,15 +10673,6 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
           );
         }
         return null; // Hide other state changes
-
-      case 'weather':
-        return (
-          <p className="my-1 text-sm text-blue-700 cursor-pointer hover:bg-blue-50 rounded px-1 -mx-1 transition-colors"
-             onClick={() => startEdit(entry)}
-             title="Klikni pro úpravu">
-            {entry.message || `☁️ Počasí: ${entry.data?.type || 'neznámé'}`}
-          </p>
-        );
 
       case 'weather_warning':
         return (
