@@ -85,3 +85,30 @@ Projekt: `mausritter-solo-companion`
 - OAuth Client ID pro localhost:8081
 - API Key pro Picker
 - Drive API + Picker API povoleno
+
+## Workflow: Pull Request a Testování
+
+Když uživatel řekne "vytvoř PR" nebo "udělej PR":
+
+1. **Připrav kompletní PR text** - title + body s test plánem jako checklist
+2. **Dej uživateli URL** pro vytvoření PR + připravený text k nakopírování
+3. **Text formátuj jako code block** aby šel snadno zkopírovat
+
+### Formát PR textu
+
+```
+**Title:** feat: [název feature]
+
+**Body:**
+## Summary
+- [hlavní změny]
+
+## Test Plan
+- [ ] Test 1
+- [ ] Test 2
+```
+
+### URL pro PR
+```
+https://github.com/Brux-cz/mausritter-solo-companion/pull/new/[BRANCH]
+```

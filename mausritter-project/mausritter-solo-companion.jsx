@@ -2194,18 +2194,18 @@ const Button = ({ onClick, children, variant = 'primary', size = 'normal', disab
 const Tooltip = ({ children }) => {
   const [show, setShow] = useState(false);
   const timeoutRef = useRef(null);
-  
+
   const handleEnter = () => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     setShow(true);
   };
-  
+
   const handleLeave = () => {
     timeoutRef.current = setTimeout(() => setShow(false), 150);
   };
-  
+
   return (
-    <div 
+    <div
       className="relative inline-block"
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
@@ -2220,19 +2220,17 @@ const Tooltip = ({ children }) => {
         <div className="fixed inset-0 z-40 bg-transparent" onClick={() => setShow(false)} />
       )}
       {show && (
-        <div 
-          className="absolute left-0 top-full mt-2 z-50 w-72 bg-stone-800 text-stone-100 text-sm rounded-lg shadow-xl border border-stone-600"
-          style={{ maxHeight: '24rem', overflow: 'hidden' }}
+        <div
+          className="fixed left-2 right-2 sm:absolute sm:left-auto sm:right-0 top-auto sm:top-full mt-2 z-50 sm:w-72 bg-stone-800 text-stone-100 text-sm rounded-lg shadow-xl border border-stone-600"
+          style={{ maxHeight: '70vh', overflow: 'hidden' }}
           onMouseEnter={handleEnter}
           onMouseLeave={handleLeave}
         >
           {/* Scrollable content - scrollbar pushed outside visible area */}
-          <div 
-            className="p-3 overflow-y-scroll"
-            style={{ 
-              maxHeight: '24rem',
-              marginRight: '-20px',
-              paddingRight: '20px'
+          <div
+            className="p-3 overflow-y-auto"
+            style={{
+              maxHeight: '70vh'
             }}
           >
             {children}
@@ -7305,7 +7303,7 @@ const ItemCardStudio = ({ parties, activePartyId, activeCharacterId, updateChara
 // WORLD GENERATOR PANEL
 // ============================================
 
-const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWorldNPCs, parties, activeParty, activePartyId, updateParty, pendingMentionOpen, setPendingMentionOpen }) => {
+const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWorldNPCs, parties, activeParty, activePartyId, updateParty, pendingMentionOpen, setPendingMentionOpen, onDeleteNPC, onDeleteSettlement }) => {
   const [generated, setGenerated] = useState(null);
   const [activeGen, setActiveGen] = useState('mySettlements');
   const [season, setSeason] = useState('spring');
@@ -7373,9 +7371,14 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
   };
 
   const deleteSettlement = (id) => {
-    setSettlements(settlements.filter(s => s.id !== id));
-    // Remove settlement reference from NPCs
-    setWorldNPCs(worldNPCs.map(n => n.settlementId === id ? { ...n, settlementId: null } : n));
+    // Pokud je dostupný callback, použij ho (maže i z deníku)
+    if (onDeleteSettlement) {
+      onDeleteSettlement(id);
+    } else {
+      setSettlements(settlements.filter(s => s.id !== id));
+      // Remove settlement reference from NPCs
+      setWorldNPCs(worldNPCs.map(n => n.settlementId === id ? { ...n, settlementId: null } : n));
+    }
   };
 
   // ========== NPC MANAGEMENT ==========
@@ -7434,13 +7437,18 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
   };
 
   const deleteNPC = (id) => {
-    setWorldNPCs(worldNPCs.filter(n => n.id !== id));
-    // Remove NPC from settlements
-    setSettlements(settlements.map(s => ({
-      ...s,
-      npcs: s.npcs?.filter(npcId => npcId !== id) || [],
-      ruler: s.ruler === id ? null : s.ruler
-    })));
+    // Pokud je dostupný callback, použij ho (maže i z deníku)
+    if (onDeleteNPC) {
+      onDeleteNPC(id);
+    } else {
+      setWorldNPCs(worldNPCs.filter(n => n.id !== id));
+      // Remove NPC from settlements
+      setSettlements(settlements.map(s => ({
+        ...s,
+        npcs: s.npcs?.filter(npcId => npcId !== id) || [],
+        ruler: s.ruler === id ? null : s.ruler
+      })));
+    }
   };
 
   const generateNPCBehavior = (npcId) => {
@@ -10108,7 +10116,7 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
 // JOURNAL PANEL
 // ============================================
 
-const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilter, onExport, worldNPCs = [], settlements = [], timedEvents = [], gameTime, onMentionClick, onOpenEvents }) => {
+const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilter, onExport, worldNPCs = [], settlements = [], timedEvents = [], gameTime, onMentionClick, onOpenEvents, onDeleteNPC, onDeleteSettlement }) => {
   const [newEntry, setNewEntry] = useState('');
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -10933,16 +10941,32 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                   )}
                 </div>
 
-                <button
-                  onClick={() => {
-                    onMentionClick && onMentionClick('npc', detailModal.data.id);
-                    setDetailModal(null);
-                    setGeneratedBehavior(null);
-                  }}
-                  className="w-full py-2 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium"
-                >
-                  ✏️ Upravit v Osadách
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      onMentionClick && onMentionClick('npc', detailModal.data.id);
+                      setDetailModal(null);
+                      setGeneratedBehavior(null);
+                    }}
+                    className="flex-1 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium"
+                  >
+                    ✏️ Upravit
+                  </button>
+                  {onDeleteNPC && (
+                    <button
+                      onClick={() => {
+                        if (confirm(`Opravdu smazat ${detailModal.data.name}? Toto smaže NPC i všechny záznamy v deníku.`)) {
+                          onDeleteNPC(detailModal.data.id);
+                          setDetailModal(null);
+                          setGeneratedBehavior(null);
+                        }
+                      }}
+                      className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded font-medium"
+                    >
+                      🗑️
+                    </button>
+                  )}
+                </div>
               </div>
             )}
 
@@ -11004,15 +11028,30 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                     <p className="text-stone-700">{detailModal.data.notes}</p>
                   </div>
                 )}
-                <button
-                  onClick={() => {
-                    onMentionClick && onMentionClick('settlement', detailModal.data.id);
-                    setDetailModal(null);
-                  }}
-                  className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded font-medium"
-                >
-                  ✏️ Upravit v Osadách
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      onMentionClick && onMentionClick('settlement', detailModal.data.id);
+                      setDetailModal(null);
+                    }}
+                    className="flex-1 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-medium"
+                  >
+                    ✏️ Upravit
+                  </button>
+                  {onDeleteSettlement && (
+                    <button
+                      onClick={() => {
+                        if (confirm(`Opravdu smazat ${detailModal.data.name}? Toto smaže osadu i všechny záznamy v deníku.`)) {
+                          onDeleteSettlement(detailModal.data.id);
+                          setDetailModal(null);
+                        }
+                      }}
+                      className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded font-medium"
+                    >
+                      🗑️
+                    </button>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -13674,6 +13713,20 @@ function MausritterSoloCompanion() {
             updateParty={updateParty}
             pendingMentionOpen={pendingMentionOpen}
             setPendingMentionOpen={setPendingMentionOpen}
+            onDeleteNPC={(npcId) => {
+              setWorldNPCs(worldNPCs.filter(n => n.id !== npcId));
+              setSettlements(settlements.map(s => ({
+                ...s,
+                npcs: s.npcs?.filter(id => id !== npcId) || [],
+                ruler: s.ruler === npcId ? null : s.ruler
+              })));
+              setJournal(journal.filter(e => e.npcId !== npcId && e.data?.id !== npcId));
+            }}
+            onDeleteSettlement={(settlementId) => {
+              setSettlements(settlements.filter(s => s.id !== settlementId));
+              setWorldNPCs(worldNPCs.map(n => n.settlementId === settlementId ? { ...n, settlementId: null } : n));
+              setJournal(journal.filter(e => e.settlementId !== settlementId && e.data?.id !== settlementId));
+            }}
           />
         )}
         
@@ -13702,6 +13755,26 @@ function MausritterSoloCompanion() {
               setActivePanel('world');
             }}
             onOpenEvents={() => setActivePanel('events')}
+            onDeleteNPC={(npcId) => {
+              // Smazat NPC
+              setWorldNPCs(worldNPCs.filter(n => n.id !== npcId));
+              // Smazat z osad
+              setSettlements(settlements.map(s => ({
+                ...s,
+                npcs: s.npcs?.filter(id => id !== npcId) || [],
+                ruler: s.ruler === npcId ? null : s.ruler
+              })));
+              // Smazat záznamy z deníku
+              setJournal(journal.filter(e => e.npcId !== npcId && e.data?.id !== npcId));
+            }}
+            onDeleteSettlement={(settlementId) => {
+              // Smazat osadu
+              setSettlements(settlements.filter(s => s.id !== settlementId));
+              // Odstranit settlementId z NPC
+              setWorldNPCs(worldNPCs.map(n => n.settlementId === settlementId ? { ...n, settlementId: null } : n));
+              // Smazat záznamy z deníku
+              setJournal(journal.filter(e => e.settlementId !== settlementId && e.data?.id !== settlementId));
+            }}
           />
         )}
       </main>
