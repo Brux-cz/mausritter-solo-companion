@@ -7316,6 +7316,7 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
   const [viewingSettlement, setViewingSettlement] = useState(null);
   const [expandedNPCs, setExpandedNPCs] = useState({});
   const [npcBehaviors, setNpcBehaviors] = useState({});
+  const [settlementEvents, setSettlementEvents] = useState({}); // Pro zobrazení událostí osad
 
   // Handle pending mention open from journal
   useEffect(() => {
@@ -7554,6 +7555,9 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
       narrative += `\n\n⚠️ *${complication}*`;
     }
 
+    // Uložit pro zobrazení v UI
+    setSettlementEvents({ ...settlementEvents, [settlementId]: narrative });
+
     // Zápis do deníku
     onLogEntry({
       type: 'world_event',
@@ -7568,9 +7572,6 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
         complication
       }
     });
-
-    // Vrátíme narrative pro zobrazení
-    return narrative;
   };
 
   // Generátor zvěsti pro konkrétní osadu
@@ -7581,6 +7582,9 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
     const rumor = randomFrom(SETTLEMENT_RUMORS);
 
     const narrative = `💬 **Zvěst z ${settlement.name}:**\n\n"${rumor}"`;
+
+    // Uložit pro zobrazení v UI
+    setSettlementEvents({ ...settlementEvents, [settlementId]: narrative });
 
     // Zápis do deníku
     onLogEntry({
@@ -7595,8 +7599,6 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
         rumor
       }
     });
-
-    return narrative;
   };
 
   const assignNPCToSettlement = (npcId, settlementId) => {
@@ -8101,6 +8103,19 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
                                 💬 Zvěst
                               </button>
                             </div>
+                            {/* Zobrazení výsledku */}
+                            {settlementEvents[settlement.id] && (
+                              <div className="mt-3 p-4 bg-gradient-to-r from-orange-100 to-amber-100 rounded-lg border-2 border-orange-300 shadow-inner">
+                                <div className="text-sm text-stone-800 whitespace-pre-line">
+                                  {settlementEvents[settlement.id].split('\n').map((line, i) => {
+                                    const formatted = line
+                                      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                                      .replace(/\*(.+?)\*/g, '<em class="text-stone-600">$1</em>');
+                                    return <p key={i} className="mb-1" dangerouslySetInnerHTML={{__html: formatted}} />;
+                                  })}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
                       )}
