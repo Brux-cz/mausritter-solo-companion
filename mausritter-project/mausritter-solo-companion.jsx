@@ -7724,12 +7724,7 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
     };
 
     setGenerated(settlement);
-    onLogEntry({
-      type: 'discovery',
-      subtype: 'settlement',
-      timestamp: formatTimestamp(),
-      data: settlement
-    });
+    // Poznámka: Nezapisujeme do deníku při generování - záznam se vytvoří až při uložení (saved_settlement)
   };
 
   const generateNPC = () => {
@@ -7763,12 +7758,7 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
     };
 
     setGenerated(npc);
-    onLogEntry({
-      type: 'discovery',
-      subtype: 'npc',
-      timestamp: formatTimestamp(),
-      data: npc
-    });
+    // Poznámka: Nezapisujeme do deníku při generování - záznam se vytvoří až při uložení (saved_npc)
   };
 
   const generateDungeon = () => {
