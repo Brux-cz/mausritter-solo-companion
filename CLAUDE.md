@@ -85,3 +85,40 @@ Projekt: `mausritter-solo-companion`
 - OAuth Client ID pro localhost:8081
 - API Key pro Picker
 - Drive API + Picker API povoleno
+
+## Workflow: Pull Request a Testování
+
+Když uživatel řekne "vytvoř PR" nebo "udělej PR":
+
+1. **Vytvoř PR** s popisem změn
+2. **Vytvoř GitHub Issue** s test plánem jako checklist:
+   ```
+   gh issue create --title "Test: [název feature]" --body "## Test Plan
+
+   - [ ] Test 1
+   - [ ] Test 2
+   ..."
+   ```
+3. **Propoj Issue s PR** v popisu PR: `Closes #XX` nebo `Testing: #XX`
+
+### Šablona Test Plánu
+
+```markdown
+## Test Plan pro [FEATURE]
+
+### Základní funkčnost
+- [ ] Funkce X funguje
+- [ ] Funkce Y funguje
+
+### UI/UX
+- [ ] Responzivní na mobilu
+- [ ] Tooltips se zobrazují správně
+
+### Integrace
+- [ ] Zápis do deníku funguje
+- [ ] Data se ukládají do localStorage
+
+### Edge cases
+- [ ] Prázdná data
+- [ ] Dlouhé texty
+```
