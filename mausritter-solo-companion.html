@@ -11020,7 +11020,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
               <div className="p-4 space-y-3">
                 <div className="flex justify-between items-start">
                   <h3 className="text-2xl font-bold text-green-900">🏘️ {detailModal.data.name}</h3>
-                  <button onClick={() => setDetailModal(null)} className="text-stone-400 hover:text-stone-600 text-xl">✕</button>
+                  <button onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }} className="text-stone-400 hover:text-stone-600 text-xl">✕</button>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="p-3 bg-green-100 rounded">
@@ -11075,6 +11075,23 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                   </div>
                 )}
 
+                {/* Generátory pro osadu */}
+                <div className="border-t border-green-200 pt-3">
+                  <p className="text-xs text-stone-500 mb-2">🎲 Generátory (nezapisuje se)</p>
+                  <div className="flex flex-wrap gap-1">
+                    <button onClick={() => setGeneratedBehavior(`⚡ ${randomFrom(SETTLEMENT_HAPPENINGS)}`)} className="px-2 py-1 text-xs bg-orange-100 hover:bg-orange-200 rounded">Událost</button>
+                    <button onClick={() => setGeneratedBehavior(`💬 ${randomFrom(SETTLEMENT_RUMORS)}`)} className="px-2 py-1 text-xs bg-purple-100 hover:bg-purple-200 rounded">Zvěst</button>
+                    <button onClick={() => setGeneratedBehavior(`🌤️ ${randomFrom(NATURE_EVENTS)}`)} className="px-2 py-1 text-xs bg-blue-100 hover:bg-blue-200 rounded">Počasí</button>
+                    <button onClick={() => setGeneratedBehavior(`⚠️ ${randomFrom(WILDERNESS_THREATS)}`)} className="px-2 py-1 text-xs bg-red-100 hover:bg-red-200 rounded">Hrozba</button>
+                    <button onClick={() => setGeneratedBehavior(`🔍 ${randomFrom(DISCOVERIES)}`)} className="px-2 py-1 text-xs bg-green-100 hover:bg-green-200 rounded">Objev</button>
+                  </div>
+                  {generatedBehavior && (
+                    <div className="mt-2 p-2 bg-green-50 rounded border border-green-200">
+                      <p className="font-medium text-green-900">{generatedBehavior}</p>
+                    </div>
+                  )}
+                </div>
+
                 {/* Historie událostí a zvěstí osady z deníku */}
                 {(() => {
                   const settlementLogs = journal.filter(e =>
@@ -11105,6 +11122,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                     onClick={() => {
                       onMentionClick && onMentionClick('settlement', detailModal.data.id);
                       setDetailModal(null);
+                      setGeneratedBehavior(null);
                     }}
                     className="flex-1 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-medium"
                   >
@@ -11116,6 +11134,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                         if (confirm(`Opravdu smazat ${detailModal.data.name}? Toto smaže osadu i všechny záznamy v deníku.`)) {
                           onDeleteSettlement(detailModal.data.id);
                           setDetailModal(null);
+                          setGeneratedBehavior(null);
                         }
                       }}
                       className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded font-medium"
