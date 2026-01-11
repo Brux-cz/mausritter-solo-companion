@@ -13648,14 +13648,23 @@ function MausritterSoloCompanion() {
                     <button onClick={disconnectGoogleDrive} className="px-1.5 py-1 bg-blue-600/50 hover:bg-red-600 rounded text-xs transition-colors" title="Odpojit Google Drive">✕</button>
                   </>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={connectGoogleDrive}
-                    className="px-2 py-1.5 bg-blue-600 hover:bg-blue-500 rounded text-xs font-medium transition-colors cursor-pointer"
-                    title="Připojit Google Drive"
-                  >
-                    ☁️ Připojit Drive
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      onClick={connectGoogleDrive}
+                      className="px-2 py-1.5 bg-blue-600 hover:bg-blue-500 rounded text-xs font-medium transition-colors cursor-pointer"
+                      title="Připojit Google Drive"
+                    >
+                      ☁️ Připojit Drive
+                    </button>
+                    <button
+                      onClick={() => setShowNewGameDialog(true)}
+                      className="text-xs px-2 py-1.5 rounded bg-amber-600 text-amber-100 hover:bg-amber-500 cursor-pointer transition-colors"
+                      title="Nová hra - vymazat vše"
+                    >
+                      🆕 New
+                    </button>
+                  </>
                 )}
               </div>
 
