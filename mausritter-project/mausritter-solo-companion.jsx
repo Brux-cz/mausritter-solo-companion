@@ -9680,7 +9680,49 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
   const [encounterRollResult, setEncounterRollResult] = React.useState(null);
   const [weatherNotification, setWeatherNotification] = React.useState(null); // Notifikace o změně počasí
 
-  // Funkce pro ruční vygenerování počasí (první den nebo ruční hod)
+  // Funkce pro hod na období (k4) + počasí (2k6) - na začátku hry
+  const rollSeasonAndWeather = () => {
+    // Hod k4 na období
+    const seasonRoll = Math.floor(Math.random() * 4) + 1;
+    const seasons = ['spring', 'summer', 'autumn', 'winter'];
+    const seasonNames = ['Jaro', 'Léto', 'Podzim', 'Zima'];
+    const seasonIcons = ['🌸', '☀️', '🍂', '❄️'];
+    const newSeason = seasons[seasonRoll - 1];
+
+    // Hod 2k6 na počasí podle nového období
+    const newWeather = generateWeather(newSeason);
+
+    setGameTime({ ...gameTime, season: newSeason, weather: newWeather });
+    setWeatherNotification({
+      weather: newWeather,
+      day: day,
+      isInitial: true,
+      seasonRoll: seasonRoll,
+      seasonName: seasonNames[seasonRoll - 1],
+      seasonIcon: seasonIcons[seasonRoll - 1]
+    });
+
+    onLogEntry({
+      type: 'season',
+      timestamp: formatTimestamp(),
+      message: `${seasonIcons[seasonRoll - 1]} Období: ${seasonNames[seasonRoll - 1]} (k4 = ${seasonRoll})`
+    });
+    onLogEntry({
+      type: 'weather',
+      timestamp: formatTimestamp(),
+      message: `${newWeather.icon} Počasí: ${newWeather.type} (${newWeather.dice[0]}+${newWeather.dice[1]}=${newWeather.roll})`,
+      data: newWeather
+    });
+    if (newWeather.danger && newWeather.effect) {
+      onLogEntry({
+        type: 'weather_warning',
+        timestamp: formatTimestamp(),
+        message: `⚠️ ${newWeather.effect}`
+      });
+    }
+  };
+
+  // Funkce pro ruční vygenerování počasí (při novém dni)
   const rollWeatherManually = () => {
     const newWeather = generateWeather(season);
     setGameTime({ ...gameTime, weather: newWeather });
@@ -9936,12 +9978,20 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
             <div className="bg-amber-100 border-2 border-amber-400 rounded-lg p-4 text-center">
               <div className="text-2xl mb-2">🎲❓</div>
               <p className="text-amber-800 font-medium mb-3">Počasí pro dnešek není nastavené</p>
-              <button
-                onClick={rollWeatherManually}
-                className="bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2 rounded-lg transition-colors"
-              >
-                🎲 Hodit na počasí
-              </button>
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={rollSeasonAndWeather}
+                  className="bg-amber-600 hover:bg-amber-700 text-white font-bold px-4 py-3 rounded-lg transition-colors"
+                >
+                  🎲 Hodit na období (k4) + počasí (2k6)
+                </button>
+                <button
+                  onClick={rollWeatherManually}
+                  className="bg-stone-400 hover:bg-stone-500 text-white text-sm px-4 py-2 rounded-lg transition-colors"
+                >
+                  Jen počasí (už mám období)
+                </button>
+              </div>
             </div>
           )}
 
@@ -10153,8 +10203,16 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
               ? 'bg-gradient-to-b from-red-600 to-red-800 text-white'
               : 'bg-gradient-to-b from-amber-100 to-amber-200 text-amber-900'
           }`}>
+            {/* Pokud se hodilo i na období */}
+            {weatherNotification.seasonRoll && (
+              <div className="mb-4 pb-4 border-b border-current/20">
+                <div className="text-lg mb-1 opacity-80">🎲 Období (k4 = {weatherNotification.seasonRoll})</div>
+                <div className="text-5xl mb-1">{weatherNotification.seasonIcon}</div>
+                <div className="text-2xl font-bold">{weatherNotification.seasonName}</div>
+              </div>
+            )}
             <div className="text-lg mb-2 opacity-80">
-              {weatherNotification.isInitial ? '🌅 Počasí dne' : `🌅 Nový den ${weatherNotification.day}`}
+              {weatherNotification.seasonRoll ? '🎲 Počasí (2k6)' : weatherNotification.isInitial ? '🌅 Počasí dne' : `🌅 Nový den ${weatherNotification.day}`}
             </div>
             <div className="text-6xl mb-3">
               {weatherNotification.weather.icon}
