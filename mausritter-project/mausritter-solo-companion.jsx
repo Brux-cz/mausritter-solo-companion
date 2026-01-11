@@ -13754,6 +13754,17 @@ function MausritterSoloCompanion() {
                 )}
               </div>
 
+              {/* New Game button - always visible */}
+              <div className="flex items-center justify-between pt-2 border-t border-amber-700">
+                <span className="text-sm">🆕 Nová hra</span>
+                <button
+                  onClick={() => { setShowNewGameDialog(true); setMobileMenuOpen(false); }}
+                  className="px-3 py-1.5 bg-red-700 hover:bg-red-600 rounded text-xs font-medium"
+                >
+                  Vymazat vše
+                </button>
+              </div>
+
               {/* Export/Import */}
               <div className="flex gap-2 pt-2 border-t border-amber-700">
                 <button onClick={() => { handleExport(); setMobileMenuOpen(false); }} className="flex-1 px-3 py-2 bg-amber-700 hover:bg-amber-600 rounded text-sm font-medium">
