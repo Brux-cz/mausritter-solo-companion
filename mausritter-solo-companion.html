@@ -9729,24 +9729,18 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
       seasonIcon: seasonIcons[seasonRoll - 1]
     });
 
+    // Jeden záznam pro období + počasí
     onLogEntry({
-      type: 'season',
+      type: 'season_weather',
       timestamp: formatTimestamp(),
-      message: `${seasonIcons[seasonRoll - 1]} Období: ${seasonNames[seasonRoll - 1]} (k4 = ${seasonRoll})`
+      data: {
+        seasonRoll,
+        seasonName: seasonNames[seasonRoll - 1],
+        seasonIcon: seasonIcons[seasonRoll - 1],
+        seasonId: newSeason,
+        weather: newWeather
+      }
     });
-    onLogEntry({
-      type: 'weather',
-      timestamp: formatTimestamp(),
-      message: `${newWeather.icon} Počasí: ${newWeather.type} (${newWeather.dice[0]}+${newWeather.dice[1]}=${newWeather.roll})`,
-      data: newWeather
-    });
-    if (newWeather.danger && newWeather.effect) {
-      onLogEntry({
-        type: 'weather_warning',
-        timestamp: formatTimestamp(),
-        message: `⚠️ ${newWeather.effect}`
-      });
-    }
   };
 
   // Funkce pro ruční vygenerování počasí (při novém dni)
@@ -10288,6 +10282,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
   // Modal pro zobrazení detailu NPC/osady
   const [detailModal, setDetailModal] = useState(null); // { type: 'npc'|'settlement', data: ... }
   const [generatedBehavior, setGeneratedBehavior] = useState(null); // Dočasné vygenerované chování pro modal
+  const [weatherModal, setWeatherModal] = useState(null); // Modal pro detail počasí/období
 
   // Multi-select mode
   const [selectionMode, setSelectionMode] = useState(false);
@@ -10628,15 +10623,39 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
           </p>
         );
 
-      case 'weather':
+      case 'season_weather':
+        // Období + počasí (začátek hry)
         return (
-          <p className="my-1 text-sm text-stone-600 cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
-             onClick={() => startEdit(entry)}
-             title="Klikni pro úpravu">
-            <span className="text-blue-600">{entry.data?.icon || '☁️'}</span> Počasí: <em>{entry.data?.type || entry.weather || 'neznámé'}</em>
-            {entry.data?.danger && <span className="text-red-600 ml-1">⚠️</span>}
-            {entry.note && <span className="italic ml-2">— {parseMentions(entry.note, onMentionClick)}</span>}
-          </p>
+          <div
+            className="my-2 p-2 bg-gradient-to-r from-amber-50 to-amber-100 rounded-lg cursor-pointer hover:from-amber-100 hover:to-amber-200 transition-colors border border-amber-200"
+            onClick={() => setWeatherModal(entry.data)}
+            title="Klikni pro detail"
+          >
+            <div className="flex items-center gap-2 text-amber-900 font-medium">
+              <span className="text-xl">{entry.data?.seasonIcon}</span>
+              <span>{entry.data?.seasonName}</span>
+              <span className="text-stone-400">•</span>
+              <span className="text-xl">{entry.data?.weather?.icon}</span>
+              <span>{entry.data?.weather?.type}</span>
+              {entry.data?.weather?.danger && <span className="text-red-600">⚠️</span>}
+            </div>
+          </div>
+        );
+
+      case 'weather':
+        // Jen počasí (při novém dni)
+        return (
+          <div
+            className="my-1 p-2 bg-blue-50 rounded-lg cursor-pointer hover:bg-blue-100 transition-colors border border-blue-200"
+            onClick={() => setWeatherModal({ weather: entry.data })}
+            title="Klikni pro detail"
+          >
+            <div className="flex items-center gap-2 text-blue-900">
+              <span className="text-xl">{entry.data?.icon || '☁️'}</span>
+              <span className="font-medium">{entry.data?.type || entry.weather || 'neznámé'}</span>
+              {entry.data?.danger && <span className="text-red-600">⚠️</span>}
+            </div>
+          </div>
         );
 
       case 'world_event':
@@ -11271,6 +11290,58 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Modal pro detail počasí */}
+      {weatherModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setWeatherModal(null)}>
+          <div className={`rounded-xl shadow-xl max-w-sm w-full p-6 ${
+            weatherModal.weather?.danger
+              ? 'bg-gradient-to-b from-red-100 to-red-200'
+              : 'bg-gradient-to-b from-amber-50 to-amber-100'
+          }`} onClick={e => e.stopPropagation()}>
+            <button
+              onClick={() => setWeatherModal(null)}
+              className="absolute top-4 right-4 text-stone-400 hover:text-stone-600 text-xl"
+            >
+              ✕
+            </button>
+
+            {/* Období (pokud je) */}
+            {weatherModal.seasonName && (
+              <div className="text-center mb-4 pb-4 border-b border-amber-300">
+                <div className="text-5xl mb-2">{weatherModal.seasonIcon}</div>
+                <div className="text-2xl font-bold text-amber-900">{weatherModal.seasonName}</div>
+                <div className="text-sm text-amber-700">🎲 k4 = {weatherModal.seasonRoll}</div>
+              </div>
+            )}
+
+            {/* Počasí */}
+            {weatherModal.weather && (
+              <div className="text-center">
+                <div className="text-5xl mb-2">{weatherModal.weather.icon}</div>
+                <div className="text-2xl font-bold text-amber-900">{weatherModal.weather.type}</div>
+                <div className="text-sm text-amber-700 mb-3">
+                  🎲 2k6 = {weatherModal.weather.dice?.[0]} + {weatherModal.weather.dice?.[1]} = {weatherModal.weather.roll}
+                </div>
+
+                {weatherModal.weather.danger && weatherModal.weather.effect && (
+                  <div className="bg-red-200 rounded-lg p-3 text-red-800 text-sm">
+                    ⚠️ <strong>Nepříznivé podmínky:</strong><br/>
+                    {weatherModal.weather.effect}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <button
+              onClick={() => setWeatherModal(null)}
+              className="w-full mt-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-medium"
+            >
+              Zavřít
+            </button>
           </div>
         </div>
       )}
