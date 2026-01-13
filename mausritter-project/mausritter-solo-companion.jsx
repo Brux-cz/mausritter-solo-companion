@@ -2832,6 +2832,7 @@ const OraclePanel = ({ onLogEntry }) => {
   const [customDiceResult, setCustomDiceResult] = useState(null);
   const [diceReason, setDiceReason] = useState('');
   const [silentMode, setSilentMode] = useState(false); // Tichý režim - nezapisuje do deníku
+  const [frameSceneResult, setFrameSceneResult] = useState(null); // Zarámování scény
 
   // Helper pro logování (respektuje silentMode)
   const logEntry = (entry) => {
@@ -2931,6 +2932,59 @@ const OraclePanel = ({ onLogEntry }) => {
       action,
       theme
     };
+    setLastResult(entry);
+    logEntry(entry);
+  };
+
+  // Frame Scene - kombinovaný generátor pro zarámování scény
+  const rollFrameScene = () => {
+    // 1. Altered Scene (d6)
+    const alteredDie = rollD6();
+    const isAltered = alteredDie >= 5;
+
+    // 2. Narativní otevření
+    const opening = randomFrom(NARRATIVE_OPENINGS);
+
+    // 3. Prostředí
+    const setting = randomFrom(NARRATIVE_SETTINGS);
+
+    // 4. Akce + Téma pro inspiraci
+    const action = randomFrom(ACTION_ORACLE);
+    const theme = randomFrom(THEME_ORACLE);
+
+    // 5. Komplikace (jen pokud je scéna pozměněná)
+    const complication = isAltered ? SCENE_COMPLICATIONS[rollD6() - 1] : null;
+
+    // Sestav výsledek
+    const result = {
+      alteredDie,
+      isAltered,
+      opening,
+      setting,
+      action,
+      theme,
+      complication
+    };
+
+    setFrameSceneResult(result);
+
+    // Vytvoř entry pro deník
+    let narrativeText = `**${opening}** ${setting}`;
+    narrativeText += `\n\n💡 *${action} + ${theme}*`;
+    if (isAltered && complication) {
+      narrativeText += `\n\n⚡ Komplikace: ${complication}`;
+    }
+
+    const entry = {
+      type: 'oracle',
+      subtype: 'frame_scene',
+      timestamp: formatTimestamp(),
+      dice: [alteredDie],
+      result: isAltered ? 'Scéna POZMĚNĚNA' : 'Scéna dle očekávání',
+      narrative: narrativeText,
+      details: result
+    };
+
     setLastResult(entry);
     logEntry(entry);
   };
@@ -3905,10 +3959,81 @@ const OraclePanel = ({ onLogEntry }) => {
       )}
 
       {activeOracle === 'scene' && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="space-y-4">
+          {/* Hlavní tlačítko - Zarámuj scénu */}
+          <ResultCard className="bg-gradient-to-r from-amber-50 to-orange-50 border-amber-300">
+            <HelpHeader
+              title="Zarámuj scénu"
+              icon="🎬"
+              tooltip={
+                <div>
+                  <p className="font-bold mb-2">🎯 K čemu to je?</p>
+                  <p className="text-xs mb-2">Kombinovaný generátor, který najednou vytvoří kompletní rámec pro novou scénu.</p>
+
+                  <p className="font-bold mb-1">📦 Co vygeneruje:</p>
+                  <ul className="text-xs space-y-1 mb-2">
+                    <li>• <b>Altered Scene</b> - je něco jinak? (d6)</li>
+                    <li>• <b>Otevření</b> - jak scéna začíná</li>
+                    <li>• <b>Prostředí</b> - kde se to odehrává</li>
+                    <li>• <b>Akce + Téma</b> - co se děje</li>
+                    <li>• <b>Komplikace</b> - pokud je scéna pozměněná</li>
+                  </ul>
+
+                  <p className="text-xs text-stone-300 mt-2 italic">
+                    💡 Použij když začínáš novou scénu a nevíš, co se děje.
+                  </p>
+                </div>
+              }
+            />
+            <p className="text-sm text-stone-600 mb-3">Vygeneruj kompletní rámec pro novou scénu jedním kliknutím.</p>
+            <Button onClick={rollFrameScene} size="large" className="w-full bg-amber-600 hover:bg-amber-700">
+              🎬 Zarámuj scénu
+            </Button>
+
+            {/* Výsledek Frame Scene */}
+            {frameSceneResult && (
+              <div className="mt-4 p-4 bg-white rounded-lg border border-amber-200">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className={`text-lg font-bold ${frameSceneResult.isAltered ? 'text-orange-600' : 'text-green-600'}`}>
+                    🎲 {frameSceneResult.alteredDie}
+                  </span>
+                  <span className={`px-2 py-1 rounded text-xs font-medium ${frameSceneResult.isAltered ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'}`}>
+                    {frameSceneResult.isAltered ? 'POZMĚNĚNÁ SCÉNA!' : 'Dle očekávání'}
+                  </span>
+                </div>
+
+                <div className="space-y-3 text-sm">
+                  <div>
+                    <span className="text-stone-500 text-xs">📖 Otevření:</span>
+                    <p className="font-medium text-stone-800">{frameSceneResult.opening}</p>
+                  </div>
+
+                  <div>
+                    <span className="text-stone-500 text-xs">📍 Prostředí:</span>
+                    <p className="text-stone-700">{frameSceneResult.setting}</p>
+                  </div>
+
+                  <div>
+                    <span className="text-stone-500 text-xs">💡 Inspirace:</span>
+                    <p className="text-purple-700 font-medium">{frameSceneResult.action} + {frameSceneResult.theme}</p>
+                  </div>
+
+                  {frameSceneResult.isAltered && frameSceneResult.complication && (
+                    <div className="p-2 bg-orange-50 rounded border border-orange-200">
+                      <span className="text-orange-600 text-xs">⚡ Komplikace:</span>
+                      <p className="text-orange-800 font-medium">{frameSceneResult.complication}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </ResultCard>
+
+          {/* Původní grid s jednotlivými generátory */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <ResultCard>
-            <HelpHeader 
-              title="Altered Scene" 
+            <HelpHeader
+              title="Altered Scene"
               icon="📜"
               tooltip={
                 <div>
@@ -4004,6 +4129,7 @@ const OraclePanel = ({ onLogEntry }) => {
             <p className="text-sm text-stone-600 mb-3">Co se stane při neúspěchu?</p>
             <Button onClick={rollConsequence} className="w-full">Hodit d6</Button>
           </ResultCard>
+        </div>
         </div>
       )}
 
