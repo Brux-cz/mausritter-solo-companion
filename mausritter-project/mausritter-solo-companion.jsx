@@ -2091,6 +2091,137 @@ const migrateSaveData = (data) => {
 };
 
 // ============================================
+// MALÝ SVĚT - GENERÁTORY PRO PRŮZKUM
+// ============================================
+
+// 1. SENZORICKÝ PRIMING (k66)
+const SENSORY_PRIMING_TABLE = {
+  11: { smell: 'Ostrý / Chemický (Savo, Baterie)', tactile: 'Vibrující (Jemné brnění v tlapkách)', hint: 'Toxicita: Riziko poškození plic (CON save) nebo koroze vybavení', icon: '⚠️' },
+  12: { smell: 'Ostrý / Chemický (Savo, Baterie)', tactile: 'Vibrující (Jemné brnění v tlapkách)', hint: 'Toxicita: Riziko poškození plic (CON save) nebo koroze vybavení', icon: '⚠️' },
+  13: { smell: 'Ostrý / Chemický (Savo, Baterie)', tactile: 'Vibrující (Jemné brnění v tlapkách)', hint: 'Toxicita: Riziko poškození plic (CON save) nebo koroze vybavení', icon: '⚠️' },
+  14: { smell: 'Kvasící / Sladkokyselý (Ocet, Pivo)', tactile: 'Lepkavý (Zpomaluje pohyb)', hint: 'Zdroje: Pravděpodobně jídlo, ale také hmyz (mravenci)', icon: '🍔' },
+  15: { smell: 'Kvasící / Sladkokyselý (Ocet, Pivo)', tactile: 'Lepkavý (Zpomaluje pohyb)', hint: 'Zdroje: Pravděpodobně jídlo, ale také hmyz (mravenci)', icon: '🍔' },
+  16: { smell: 'Kvasící / Sladkokyselý (Ocet, Pivo)', tactile: 'Lepkavý (Zpomaluje pohyb)', hint: 'Zdroje: Pravděpodobně jídlo, ale také hmyz (mravenci)', icon: '🍔' },
+  21: { smell: 'Pižmový / Močový (Zvíře, Hnízdo)', tactile: 'Teplý / Vlhký (Jako dech)', hint: 'Teritorium: Zvyšuje šanci na Náhodné setkání o 1 z 6', icon: '⚔️' },
+  22: { smell: 'Pižmový / Močový (Zvíře, Hnízdo)', tactile: 'Teplý / Vlhký (Jako dech)', hint: 'Teritorium: Zvyšuje šanci na Náhodné setkání o 1 z 6', icon: '⚔️' },
+  23: { smell: 'Pižmový / Močový (Zvíře, Hnízdo)', tactile: 'Teplý / Vlhký (Jako dech)', hint: 'Teritorium: Zvyšuje šanci na Náhodné setkání o 1 z 6', icon: '⚔️' },
+  24: { smell: 'Zatuchlý / Prachový (Starý papír)', tactile: 'Měkký / Tlumící (Pohlcuje zvuk)', hint: 'Úkryt: Ideální pro Odpočinek, bonus k Plížení', icon: '⛺' },
+  25: { smell: 'Zatuchlý / Prachový (Starý papír)', tactile: 'Měkký / Tlumící (Pohlcuje zvuk)', hint: 'Úkryt: Ideální pro Odpočinek, bonus k Plížení', icon: '⛺' },
+  26: { smell: 'Zatuchlý / Prachový (Starý papír)', tactile: 'Měkký / Tlumící (Pohlcuje zvuk)', hint: 'Úkryt: Ideální pro Odpočinek, bonus k Plížení', icon: '⛺' },
+  31: { smell: 'Mléčný / Žluklý (Starý tuk)', tactile: 'Kluzký / Mastný (Olejový film)', hint: 'Nebezpečí pádu: Nevýhoda na DEX testy při běhu/šplhání', icon: '❗' },
+  32: { smell: 'Mléčný / Žluklý (Starý tuk)', tactile: 'Kluzký / Mastný (Olejový film)', hint: 'Nebezpečí pádu: Nevýhoda na DEX testy při běhu/šplhání', icon: '❗' },
+  33: { smell: 'Mléčný / Žluklý (Starý tuk)', tactile: 'Kluzký / Mastný (Olejový film)', hint: 'Nebezpečí pádu: Nevýhoda na DEX testy při běhu/šplhání', icon: '❗' },
+  34: { smell: 'Kovový / Krev (Rez, Měď)', tactile: 'Studený / Vodivý (Vysává teplo)', hint: 'Hazard: Elektrické výboje nebo ostré hrany (Tetanus)', icon: '⚡' },
+  35: { smell: 'Kovový / Krev (Rez, Měď)', tactile: 'Studený / Vodivý (Vysává teplo)', hint: 'Hazard: Elektrické výboje nebo ostré hrany (Tetanus)', icon: '⚡' },
+  36: { smell: 'Kovový / Krev (Rez, Měď)', tactile: 'Studený / Vodivý (Vysává teplo)', hint: 'Hazard: Elektrické výboje nebo ostré hrany (Tetanus)', icon: '⚡' },
+  41: { smell: 'Spálený / Ozon (Zkrat, Popel)', tactile: 'Statický (Srst se ježí)', hint: 'Nestabilita: Místo může začít hořet nebo dát ránu', icon: '🔥' },
+  42: { smell: 'Spálený / Ozon (Zkrat, Popel)', tactile: 'Statický (Srst se ježí)', hint: 'Nestabilita: Místo může začít hořet nebo dát ránu', icon: '🔥' },
+  43: { smell: 'Spálený / Ozon (Zkrat, Popel)', tactile: 'Statický (Srst se ježí)', hint: 'Nestabilita: Místo může začít hořet nebo dát ránu', icon: '🔥' },
+  44: { smell: 'Mýdlový / Syntetický (Prášek)', tactile: 'Práškový / Sypký (Jako sníh)', hint: 'Ztráta stopy: Zde nelze stopovat čichem. Prach dráždí oči', icon: '🌫️' },
+  45: { smell: 'Mýdlový / Syntetický (Prášek)', tactile: 'Práškový / Sypký (Jako sníh)', hint: 'Ztráta stopy: Zde nelze stopovat čichem. Prach dráždí oči', icon: '🌫️' },
+  46: { smell: 'Mýdlový / Syntetický (Prášek)', tactile: 'Práškový / Sypký (Jako sníh)', hint: 'Ztráta stopy: Zde nelze stopovat čichem. Prach dráždí oči', icon: '🌫️' },
+  51: { smell: 'Hnilobný / Masitý (Mršina)', tactile: 'Houbovitý / Poddajný', hint: 'Nemoc: Vyžaduje CON save proti nákaze. Zdroj larev', icon: '🤢' },
+  52: { smell: 'Hnilobný / Masitý (Mršina)', tactile: 'Houbovitý / Poddajný', hint: 'Nemoc: Vyžaduje CON save proti nákaze. Zdroj larev', icon: '🤢' },
+  53: { smell: 'Hnilobný / Masitý (Mršina)', tactile: 'Houbovitý / Poddajný', hint: 'Nemoc: Vyžaduje CON save proti nákaze. Zdroj larev', icon: '🤢' },
+  54: { smell: 'Dřevitý / Pryskyřičný', tactile: 'Drsný / Třískovitý', hint: 'Materiál: Dobré místo pro sběr surovin a crafting', icon: '🔨' },
+  55: { smell: 'Dřevitý / Pryskyřičný', tactile: 'Drsný / Třískovitý', hint: 'Materiál: Dobré místo pro sběr surovin a crafting', icon: '🔨' },
+  56: { smell: 'Dřevitý / Pryskyřičný', tactile: 'Drsný / Třískovitý', hint: 'Materiál: Dobré místo pro sběr surovin a crafting', icon: '🔨' },
+  61: { smell: 'Slaný / Mořský (Pot, Slzy)', tactile: 'Vlhký / Orosený', hint: 'Voda: Povrchy jsou mokré, obtížné šplhání bez vybavení', icon: '💧' },
+  62: { smell: 'Slaný / Mořský (Pot, Slzy)', tactile: 'Vlhký / Orosený', hint: 'Voda: Povrchy jsou mokré, obtížné šplhání bez vybavení', icon: '💧' },
+  63: { smell: 'Slaný / Mořský (Pot, Slzy)', tactile: 'Vlhký / Orosený', hint: 'Voda: Povrchy jsou mokré, obtížné šplhání bez vybavení', icon: '💧' },
+  64: { smell: 'Sterilní / Žádný (Sklo, Plast)', tactile: 'Hladký / Nepřilnavý', hint: 'Cizost: Nelze šplhat. Zvuky se nepřirozeně rozléhají', icon: '🧊' },
+  65: { smell: 'Sterilní / Žádný (Sklo, Plast)', tactile: 'Hladký / Nepřilnavý', hint: 'Cizost: Nelze šplhat. Zvuky se nepřirozeně rozléhají', icon: '🧊' },
+  66: { smell: 'Sterilní / Žádný (Sklo, Plast)', tactile: 'Hladký / Nepřilnavý', hint: 'Cizost: Nelze šplhat. Zvuky se nepřirozeně rozléhají', icon: '🧊' }
+};
+
+// 2. MEGA-STRUKTURY (3×k6)
+const MEGA_STRUCTURE_SHAPE = [
+  { roll: 1, name: 'Válec / Tunel', desc: 'Trubka, nohavice, láhev', examples: 'Dlouhý, úzký prostor vedoucí někam' },
+  { roll: 2, name: 'Plochá Pláň', desc: 'Stůl, kniha, podlaha', examples: 'Rozlehlá, otevřená plocha' },
+  { roll: 3, name: 'Vertikální Věž', desc: 'Noha židle, lampa', examples: 'Vysoká struktura s více úrovněmi' },
+  { roll: 4, name: 'Klenutý Dóm', desc: 'Miska, helma, vnitřek gauče', examples: 'Kupolovitý, obloukovitý prostor' },
+  { roll: 5, name: 'Labyrint / Síť', desc: 'Kabely, vnitřek stroje', examples: 'Spletité chodby a křižovatky' },
+  { roll: 6, name: 'Propast / Kráter', desc: 'Vana, krabice, bota', examples: 'Hluboká propadlina dolů' }
+];
+
+const MEGA_STRUCTURE_MATERIAL = [
+  { roll: 1, name: 'Organika / Dřevo', desc: 'Měkké, lze hlodat', hint: 'Přírodní materiál, kořeny, větve' },
+  { roll: 2, name: 'Kov', desc: 'Tvrdý, studený, hlučný', hint: 'Rezavý, studený, možná magnetický' },
+  { roll: 3, name: 'Plast / Syntetika', desc: 'Hladký, umělý', hint: 'Hladký, barevný, lidský odpad' },
+  { roll: 4, name: 'Textil / Vlákna', desc: 'Nestabilní, hořlavý', hint: 'Látka, provazy, pavučiny' },
+  { roll: 5, name: 'Sklo / Keramika', desc: 'Kluzké, křehké', hint: 'Křehké, ostré, průhledné' },
+  { roll: 6, name: 'Kompozit / Odpad', desc: 'Nepředvídatelný mix', hint: 'Mix všeho možného' }
+];
+
+const MEGA_STRUCTURE_STATE = [
+  { roll: 1, name: 'Vibrující', desc: 'Stroj běží, motor, chlazení', hint: 'Možný pád (DEX save)' },
+  { roll: 2, name: 'Zaplavený', desc: 'Voda/olej stoupá nebo klesá', hint: 'Plavání nebo obcházení' },
+  { roll: 3, name: 'Hnijící / Rozpadlý', desc: 'Strukturálně nestabilní', hint: 'STR save nebo propadnutí' },
+  { roll: 4, name: 'Hořící / Sálající', desc: 'Vysoká teplota', hint: 'd4 poškození za směnu' },
+  { roll: 5, name: 'Obydlený', desc: 'Hmyzí hnízdo nebo jiná myš', hint: 'Setkání s obyvateli' },
+  { roll: 6, name: 'Pohyblivý', desc: 'Objekt se hýbe nebo padá', hint: 'Orientace obtížná' }
+];
+
+// 3. KOMPLIKACE KOŘISTI (k20)
+const LOOT_COMPLICATIONS = [
+  { roll: 1, property: 'Nestabilní / Měkký', desc: 'Přezrálé ovoce', impact: 'Nelze táhnout po zemi. Nutno vyrobit nosítka/sáňky. Každý náraz (fail DEX) zničí 20 % kořisti' },
+  { roll: 2, property: 'Nestabilní / Měkký', desc: 'Přezrálé ovoce', impact: 'Nelze táhnout po zemi. Nutno vyrobit nosítka/sáňky. Každý náraz (fail DEX) zničí 20 % kořisti' },
+  { roll: 3, property: 'Aromatický', desc: 'Sýr, Maso', impact: 'Silně voní. Šance na Náhodné setkání se hází každou směnu (místo každé 3.)' },
+  { roll: 4, property: 'Aromatický', desc: 'Sýr, Maso', impact: 'Silně voní. Šance na Náhodné setkání se hází každou směnu (místo každé 3.)' },
+  { roll: 5, property: 'Tekoucí / Sypký', desc: 'Mouka, Voda', impact: 'Nutná vodotěsná nádoba. Pokud se obal protrhne, zanechává stopu pro predátory' },
+  { roll: 6, property: 'Tekoucí / Sypký', desc: 'Mouka, Voda', impact: 'Nutná vodotěsná nádoba. Pokud se obal protrhne, zanechává stopu pro predátory' },
+  { roll: 7, property: 'Extrémně Těžký', desc: 'Kov, Kámen', impact: 'Vyžaduje sílu 2+ myší k posunu. Rychlost pohybu je 50 %' },
+  { roll: 8, property: 'Extrémně Těžký', desc: 'Kov, Kámen', impact: 'Vyžaduje sílu 2+ myší k posunu. Rychlost pohybu je 50 %' },
+  { roll: 9, property: 'Lepkavý / Přilnavý', desc: 'Med, Lepidlo', impact: 'Kdo to nese, má nevýhodu na DEX a nemůže použít zbraň' },
+  { roll: 10, property: 'Lepkavý / Přilnavý', desc: 'Med, Lepidlo', impact: 'Kdo to nese, má nevýhodu na DEX a nemůže použít zbraň' },
+  { roll: 11, property: 'Křehký', desc: 'Vejce, Sklo', impact: 'Jakýkoliv pád nebo útok na nosiče = předmět je zničen' },
+  { roll: 12, property: 'Křehký', desc: 'Vejce, Sklo', impact: 'Jakýkoliv pád nebo útok na nosiče = předmět je zničen' },
+  { roll: 13, property: 'Hlučný', desc: 'Rolnička, Celofán', impact: 'Cinká nebo šustí. Nelze se plížit (Stealth je nemožný)' },
+  { roll: 14, property: 'Hlučný', desc: 'Rolnička, Celofán', impact: 'Cinká nebo šustí. Nelze se plížit (Stealth je nemožný)' },
+  { roll: 15, property: 'Dlouhý / Neohrabaný', desc: 'Tužka, Drát', impact: 'Nevejde se do úzkých chodeb. V zatáčkách se zasekává (test STR k uvolnění)' },
+  { roll: 16, property: 'Dlouhý / Neohrabaný', desc: 'Tužka, Drát', impact: 'Nevejde se do úzkých chodeb. V zatáčkách se zasekává (test STR k uvolnění)' },
+  { roll: 17, property: 'Nebezpečný povrch', desc: 'Třísky, Rez', impact: 'Nosič dostává 1 DMG každou hodinu transportu bez ochranných rukavic' },
+  { roll: 18, property: 'Nebezpečný povrch', desc: 'Třísky, Rez', impact: 'Nosič dostává 1 DMG každou hodinu transportu bez ochranných rukavic' },
+  { roll: 19, property: 'Živý', desc: 'Larva, Zraněný brouk', impact: 'Kořist se hýbe, kroutí a může se pokusit utéct nebo kousnout' },
+  { roll: 20, property: 'DVOJITÁ KOMPLIKACE', desc: 'Hoď dvakrát!', impact: 'Hoďte dvakrát a kombinujte oba výsledky' }
+];
+
+// 4. FYZIKÁLNÍ PASTI (k12)
+const PHYSICAL_TRAPS = [
+  { roll: 1, object: 'Statická elektřina', effect: 'Dotyk kovu dává 1k4 poškození. Vlasy se ježí (varování)' },
+  { roll: 2, object: 'Povrchové napětí vody', effect: 'Kapka vody působí jako lepidlo. Zásah vodou = sražení k zemi (Knockdown)' },
+  { roll: 3, object: 'Průvan / Vítr', effect: 'Na římsách nutný test STR, jinak odfouknutí. Pachy se rychle ztrácejí' },
+  { roll: 4, object: 'Koncentrované světlo', effect: 'Sklo/Lupa vytváří paprsek tepla. Vstup do světla = 1k6 Fire DMG' },
+  { roll: 5, object: 'Vysavač / Roomba', effect: '"Putující dungeon". Hluk, sání táhne myši dovnitř (STR save proti vtažení)' },
+  { roll: 6, object: 'Hladké stěny (Vana)', effect: 'Nelze vylézt ven bez vybavení (přísavky, lano). Smrtící past hladem' },
+  { roll: 7, object: 'Lepidlo / Páska', effect: 'Okamžité znehybnění. Vyproštění stojí čas a často i "kus inventáře" (vytržená srst/zbroj)' },
+  { roll: 8, object: 'Nestabilní hromada', effect: 'Hromada knih/krabic. Špatný krok (DEX fail) spustí lavinu (k6 DMG plošně)' },
+  { roll: 9, object: 'Chemický výpar', effect: 'Oblak Sava. Nutné zadržet dech (max CON kol). Jinak poškození plic' },
+  { roll: 10, object: 'Elastický povrch', effect: 'Guma. Při skoku odrazí myš náhodným směrem' },
+  { roll: 11, object: 'Magnetické pole', effect: 'Kovové zbraně/zbroje jsou 2x těžší nebo přimáčknuté ke stěně' },
+  { roll: 12, object: 'Extrémní teplota', effect: 'Mrazák nebo trouba. Každá směna = Exhaustion (vyčerpání), pokud nemají ochranu' }
+];
+
+// 5. ORÁKULUM "O CO JDE?" (2×k6)
+const WHAT_IS_IT_VERB = [
+  { roll: 1, verb: 'Čistit / Mýt', desc: 'Slouží k odstraňování nečistot' },
+  { roll: 2, verb: 'Hrát / Bavit', desc: 'Slouží pro zábavu nebo hru' },
+  { roll: 3, verb: 'Ukládat / Skrývat', desc: 'Slouží k uchování nebo schování' },
+  { roll: 4, verb: 'Osvětlovat / Hřát', desc: 'Produkuje světlo nebo teplo' },
+  { roll: 5, verb: 'Spojovat / Vázat', desc: 'Slouží k propojení věcí' },
+  { roll: 6, verb: 'Zaznamenávat', desc: 'Uchovává informace nebo vzpomínky' }
+];
+
+const WHAT_IS_IT_NOUN = [
+  { roll: 1, noun: 'Nádoba', desc: 'Láhev, Hrnec - něco, co drží obsah', example: 'Láhev, Hrnec, Krabice' },
+  { roll: 2, noun: 'Stroj / Mechanismus', desc: 'Něco s pohyblivými částmi', example: 'Hodinky, Mixér, Tiskárna' },
+  { roll: 3, noun: 'Textilie', desc: 'Oblečení, Koberec - látka nebo vláknitý materiál', example: 'Rukavice, Ponožka, Hadr' },
+  { roll: 4, noun: 'Odpad / Zbytek', desc: 'Vyhozená nebo rozbitá věc', example: 'Obaly, Střepy, Zbytky' },
+  { roll: 5, noun: 'Jídlo / Organika', desc: 'Biologický materiál', example: 'Ovoce, Kořeny, Kosti' },
+  { roll: 6, noun: 'Nábytek / Konstrukce', desc: 'Velká strukturální věc', example: 'Židle, Skříň, Police' }
+];
+
+// ============================================
 // UTILITY FUNCTIONS
 // ============================================
 
@@ -2103,8 +2234,15 @@ const rollDice = (count, sides) => {
 };
 
 const rollD6 = () => rollDice(1, 6)[0];
+const rollD12 = () => rollDice(1, 12)[0];
 const rollD20 = () => rollDice(1, 20)[0];
 const roll2D6 = () => { const r = rollDice(2, 6); return { dice: r, total: r[0] + r[1] }; };
+// k66 = první d6 jako desítky, druhá jako jednotky (rozsah 11-66)
+const rollK66 = () => {
+  const tens = rollD6();
+  const units = rollD6();
+  return { dice: [tens, units], result: tens * 10 + units };
+};
 
 const randomFrom = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
@@ -2416,11 +2554,16 @@ const MentionInput = ({
 };
 
 // Parsování textu s mentions - vrací React elementy
-const parseMentions = (text, onMentionClick) => {
+// Podporuje dva formáty:
+// 1. Starý: @[Jméno](typ:id) - přímé ID
+// 2. Nový: @Jméno - vyhledá podle jména v worldNPCs/settlements
+const parseMentions = (text, onMentionClick, worldNPCs = [], settlements = []) => {
   if (!text) return null;
 
-  // Regex pro @[Jméno](typ:id)
-  const mentionRegex = /@\[([^\]]+)\]\((\w+):([^)]+)\)/g;
+  // Kombinovaný regex pro oba formáty
+  // 1. @[Jméno](typ:id) - skupina 1=name, 2=type, 3=id
+  // 2. @Jméno (slovo bez mezer, nebo s diakritikou) - skupina 4=name
+  const mentionRegex = /@\[([^\]]+)\]\((\w+):([^)]+)\)|@([\wáčďéěíňóřšťúůýžÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ]+(?:\s+[\wáčďéěíňóřšťúůýžÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ]+)?)/gi;
   const parts = [];
   let lastIndex = 0;
   let match;
@@ -2431,18 +2574,67 @@ const parseMentions = (text, onMentionClick) => {
       parts.push(text.slice(lastIndex, match.index));
     }
 
-    // Mention jako klikatelný element
-    const [, name, type, id] = match;
-    parts.push(
-      <button
-        key={`${type}-${id}-${match.index}`}
-        onClick={() => onMentionClick && onMentionClick(type, id)}
-        className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded font-medium transition-colors"
-      >
-        {type === 'npc' ? '🐭' : '🏘️'}
-        {name}
-      </button>
-    );
+    let name, type, id, found = false;
+
+    if (match[1]) {
+      // Starý formát @[Jméno](typ:id)
+      name = match[1];
+      type = match[2];
+      id = match[3];
+      found = true;
+    } else if (match[4]) {
+      // Nový formát @Jméno - vyhledej podle jména
+      const searchName = match[4];
+
+      // Hledej v NPC
+      const npc = worldNPCs.find(n => n.name.toLowerCase() === searchName.toLowerCase());
+      if (npc) {
+        name = npc.name;
+        type = 'npc';
+        id = npc.id;
+        found = true;
+      } else {
+        // Hledej v osadách
+        const settlement = settlements.find(s => s.name.toLowerCase() === searchName.toLowerCase());
+        if (settlement) {
+          name = settlement.name;
+          type = 'settlement';
+          id = settlement.id;
+          found = true;
+        }
+      }
+
+      // Pokud nenalezeno, zobraz jen jako text
+      if (!found) {
+        parts.push(text.slice(match.index, match.index + match[0].length));
+        lastIndex = match.index + match[0].length;
+        continue;
+      }
+    }
+
+    if (found) {
+      // Mention jako klikatelný element
+      parts.push(
+        <span
+          key={`${type}-${id}-${match.index}`}
+          onMouseDown={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            if (onMentionClick) onMentionClick(type, id);
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+          role="button"
+          tabIndex={0}
+          className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded font-medium transition-colors cursor-pointer select-none"
+        >
+          {type === 'npc' ? '🐭' : '🏘️'}
+          {name}
+        </span>
+      );
+    }
 
     lastIndex = match.index + match[0].length;
   }
@@ -10409,9 +10601,68 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
   const [draggedId, setDraggedId] = useState(null);
   const [dropTargetId, setDropTargetId] = useState(null);
 
+  // Touch drag & drop pro mobilní zařízení
+  const [touchDragId, setTouchDragId] = useState(null);
+
   // Vkládání poznámek mezi záznamy
   const [insertAfterIndex, setInsertAfterIndex] = useState(null); // Index záznamu, ZA který vložíme nový
   const [insertText, setInsertText] = useState('');
+
+  // @ mentions
+  const [showMentions, setShowMentions] = useState(false);
+  const [mentionFilter, setMentionFilter] = useState('');
+  const [mentionIndex, setMentionIndex] = useState(0);
+  const [mentionTarget, setMentionTarget] = useState(null); // 'newEntry' | 'insert'
+  const newEntryRef = useRef(null);
+
+  // Všechny dostupné zmínky
+  const allMentions = [
+    ...worldNPCs.map(n => ({ type: 'npc', id: n.id, name: n.name, icon: '🐭' })),
+    ...settlements.map(s => ({ type: 'settlement', id: s.id, name: s.name, icon: '🏘️' })),
+    ...(parties?.flatMap(p => p.characters?.map(c => ({ type: 'character', id: c.id, name: c.name, icon: '⚔️' })) || []) || [])
+  ];
+
+  const filteredMentions = mentionFilter
+    ? allMentions.filter(m => m.name.toLowerCase().includes(mentionFilter.toLowerCase())).slice(0, 6)
+    : allMentions.slice(0, 6);
+
+  // Detekce @ v textu
+  const handleMentionInput = (text, target, inputRef) => {
+    const pos = inputRef?.selectionStart || text.length;
+    const textBefore = text.slice(0, pos);
+    const atMatch = textBefore.match(/@([\wáčďéěíňóřšťúůýžÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ]*)$/i);
+
+    if (atMatch) {
+      setMentionFilter(atMatch[1]);
+      setShowMentions(true);
+      setMentionIndex(0);
+      setMentionTarget(target);
+    } else {
+      setShowMentions(false);
+    }
+  };
+
+  // Vložení mention ve formátu @Jméno (jednoduchý formát)
+  const insertMention = (mention, text, setText, inputRef) => {
+    const pos = inputRef?.selectionStart || text.length;
+    const textBefore = text.slice(0, pos);
+    const textAfter = text.slice(pos);
+    const atIndex = textBefore.lastIndexOf('@');
+    const before = textBefore.slice(0, atIndex);
+    const mentionText = `@${mention.name}`;
+    const newText = before + mentionText + ' ' + textAfter;
+    setText(newText);
+    setShowMentions(false);
+    setMentionFilter('');
+    setTimeout(() => {
+      if (inputRef) {
+        const newPos = before.length + mentionText.length + 1;
+        inputRef.selectionStart = newPos;
+        inputRef.selectionEnd = newPos;
+        inputRef.focus();
+      }
+    }, 0);
+  };
 
   // Long press handler
   const handleTouchStart = (entryId) => {
@@ -10474,6 +10725,28 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
   };
 
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+
+  // Esc pro zavření modalů a editace
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') {
+        if (detailModal) {
+          setDetailModal(null);
+          setGeneratedBehavior(null);
+        } else if (weatherModal) {
+          setWeatherModal(null);
+        } else if (editingId) {
+          setEditingId(null);
+          setConfirmDeleteId(null);
+        } else if (selectionMode) {
+          setSelectionMode(false);
+          setSelectedIds(new Set());
+        }
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [detailModal, weatherModal, editingId, selectionMode]);
 
   const deleteEntry = (id) => {
     setJournal(journal.filter(e => e.id !== id));
@@ -10562,6 +10835,54 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
     setDropTargetId(null);
   };
 
+  // Touch drag handlers pro mobilní zařízení
+  const handleTouchDragStart = (e, entryId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setTouchDragId(entryId);
+    setDropTargetId(null);
+    // Zruš long press timer pokud běží
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  };
+
+  const handleTouchDragMove = (e) => {
+    if (!touchDragId) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+
+    // Najdi element pod prstem
+    const elements = document.elementsFromPoint(touch.clientX, touch.clientY);
+    const entryElement = elements.find(el => el.dataset && el.dataset.entryId);
+
+    if (entryElement && entryElement.dataset.entryId !== touchDragId) {
+      setDropTargetId(entryElement.dataset.entryId);
+    }
+  };
+
+  const handleTouchDragEnd = () => {
+    if (!touchDragId) return;
+
+    if (dropTargetId && dropTargetId !== touchDragId) {
+      // Proveď přesun
+      const draggedIndex = journal.findIndex(j => j.id === touchDragId);
+      const targetIndex = journal.findIndex(j => j.id === dropTargetId);
+
+      if (draggedIndex !== -1 && targetIndex !== -1) {
+        const newJournal = [...journal];
+        const [draggedEntry] = newJournal.splice(draggedIndex, 1);
+        const insertIndex = draggedIndex < targetIndex ? targetIndex : targetIndex + 1;
+        newJournal.splice(insertIndex, 0, draggedEntry);
+        setJournal(newJournal);
+      }
+    }
+
+    setTouchDragId(null);
+    setDropTargetId(null);
+  };
+
   // Vložení nové poznámky mezi záznamy
   const insertNoteAfter = (afterEntryId) => {
     if (!insertText.trim()) {
@@ -10616,50 +10937,88 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
   const formatEntry = (entry) => {
     if (editingId === entry.id) {
       return (
-        <div className="my-2 bg-white rounded-lg border border-amber-300 p-3">
-          <p className="text-xs text-stone-500 mb-2">
-            {entry.type === 'narrative' ? '📝 Upravit text:' : '📝 Přidat/upravit poznámku:'}
-          </p>
-          <textarea
-            value={editText}
-            onChange={(e) => setEditText(e.target.value)}
-            className="w-full h-24 p-3 border border-stone-200 rounded-lg bg-amber-50/50 focus:outline-none focus:border-amber-400 font-serif text-stone-800"
-            placeholder={entry.type === 'narrative' ? 'Tvůj příběh...' : 'Přidej poznámku k tomuto záznamu...'}
-            autoFocus
-          />
-          <div className="flex justify-between mt-2">
-            <div className="flex gap-2">
-              <button onClick={() => saveEdit(entry.id)} className="px-3 py-1 bg-amber-600 text-white rounded text-sm hover:bg-amber-700">
-                ✓ Uložit
-              </button>
-              <button onClick={() => { setEditingId(null); setConfirmDeleteId(null); }} className="px-3 py-1 text-stone-500 hover:text-stone-700 text-sm">
-                Zrušit
-              </button>
-            </div>
-            {confirmDeleteId === entry.id ? (
-              <div className="flex gap-2">
-                <button 
-                  onClick={() => deleteEntry(entry.id)} 
-                  className="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600"
-                >
-                  Ano, smazat
-                </button>
-                <button 
-                  onClick={() => setConfirmDeleteId(null)} 
-                  className="px-3 py-1 text-stone-500 hover:text-stone-700 text-sm"
-                >
-                  Ne
-                </button>
+        <div className="flex items-start gap-2">
+          <div className="flex-1 relative">
+            <textarea
+              value={editText}
+              onChange={(e) => {
+                setEditText(e.target.value);
+                e.target.style.height = 'auto';
+                e.target.style.height = e.target.scrollHeight + 'px';
+                handleMentionInput(e.target.value, 'edit', e.target);
+              }}
+              onKeyDown={(e) => {
+                if (showMentions && mentionTarget === 'edit') {
+                  if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    setMentionIndex(i => Math.min(i + 1, filteredMentions.length - 1));
+                  } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    setMentionIndex(i => Math.max(i - 1, 0));
+                  } else if (e.key === 'Enter' && filteredMentions[mentionIndex]) {
+                    e.preventDefault();
+                    insertMention(filteredMentions[mentionIndex], editText, setEditText, e.target);
+                  } else if (e.key === 'Escape') {
+                    setShowMentions(false);
+                  }
+                } else if (e.key === 'Escape') {
+                  setEditingId(null);
+                  setConfirmDeleteId(null);
+                }
+              }}
+              onBlur={() => {
+                setTimeout(() => {
+                  if (mentionTarget === 'edit') setShowMentions(false);
+                  if (editText.trim()) {
+                    saveEdit(entry.id);
+                  }
+                }, 150);
+              }}
+              className="w-full px-2 py-1 text-sm font-serif text-stone-700 bg-transparent border-b border-amber-400 focus:outline-none focus:border-amber-600 placeholder:text-stone-400 resize-none overflow-hidden"
+              placeholder={entry.type === 'narrative' ? 'Tvůj příběh... (@ pro zmínku)' : 'Poznámka... (@ pro zmínku)'}
+              autoFocus
+              rows={1}
+              ref={(el) => {
+                if (el) {
+                  el.style.height = 'auto';
+                  el.style.height = el.scrollHeight + 'px';
+                }
+              }}
+            />
+            {/* Mention dropdown pro edit */}
+            {showMentions && mentionTarget === 'edit' && filteredMentions.length > 0 && (
+              <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-stone-200 rounded shadow-lg z-50 max-h-48 overflow-y-auto">
+                {filteredMentions.map((m, i) => (
+                  <button
+                    key={`edit-${m.type}-${m.id}`}
+                    type="button"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      insertMention(m, editText, setEditText, document.activeElement);
+                    }}
+                    className={`w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-amber-50 ${i === mentionIndex ? 'bg-amber-100' : ''}`}
+                  >
+                    <span>{m.icon}</span>
+                    <span className="font-medium">{m.name}</span>
+                  </button>
+                ))}
               </div>
-            ) : (
-              <button 
-                onClick={() => setConfirmDeleteId(entry.id)} 
-                className="px-3 py-1 text-red-400 hover:text-red-600 text-sm"
-              >
-                Smazat
-              </button>
             )}
           </div>
+          {confirmDeleteId === entry.id ? (
+            <div className="flex gap-1 text-xs whitespace-nowrap">
+              <button onMouseDown={(e) => { e.preventDefault(); deleteEntry(entry.id); }} className="text-red-500 hover:text-red-700">Smazat?</button>
+              <button onMouseDown={(e) => { e.preventDefault(); setConfirmDeleteId(null); }} className="text-stone-400 hover:text-stone-600">Ne</button>
+            </div>
+          ) : (
+            <button
+              onMouseDown={(e) => { e.preventDefault(); setConfirmDeleteId(entry.id); }}
+              className="text-stone-300 hover:text-red-400 text-sm"
+              title="Smazat"
+            >
+              ×
+            </button>
+          )}
         </div>
       );
     }
@@ -10670,7 +11029,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
           <p className="text-stone-800 italic leading-relaxed my-3 cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
-            {parseMentions(entry.content, onMentionClick)}
+            {parseMentions(entry.content, onMentionClick, worldNPCs, settlements)}
             {entry.edited && <span className="text-xs text-stone-400 ml-1">✎</span>}
           </p>
         );
@@ -10687,7 +11046,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                 {c.type?.icon || '🐭'} {c.name} <span className="font-normal text-stone-500">— {c.type?.name}</span>
               </p>
               <p className="text-stone-600 text-sm truncate">Je {c.personality}</p>
-              {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick)}</p>}
+              {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
             </div>
           );
         }
@@ -10715,7 +11074,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                 🐭 {name} {typePart && <span className="font-normal text-stone-500">— {typePart}</span>}
               </p>
               {personality && <p className="text-stone-600 text-sm truncate">{personality}</p>}
-              {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick)}</p>}
+              {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
             </div>
           );
         }
@@ -10730,7 +11089,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                 {e.danger ? '⚠️' : '👁️'} {e.creature?.name}
               </p>
               <p className="text-stone-600 text-sm truncate">{e.activity}</p>
-              {entry.note && <p className="text-stone-700 italic text-sm mt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick)}</p>}
+              {entry.note && <p className="text-stone-700 italic text-sm mt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
             </div>
           );
         }
@@ -10741,7 +11100,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                  onClick={() => startEdit(entry)}
                  title="Klikni pro úpravu">
               <p className="font-medium text-purple-900 truncate">{entry.result}</p>
-              {entry.note && <p className="text-stone-700 italic text-sm mt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick)}</p>}
+              {entry.note && <p className="text-stone-700 italic text-sm mt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
             </div>
           );
         }
@@ -10766,7 +11125,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                 {d.isAltered && d.complication && (
                   <p className="text-orange-700 text-sm font-medium"><span className="text-stone-500">⚡</span> {d.complication}</p>
                 )}
-                {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1">{parseMentions(entry.note, onMentionClick)}</p>}
+                {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
               </div>
             );
           }
@@ -10784,7 +11143,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
               {entry.narrative && (
                 <div className="text-stone-700 text-sm whitespace-pre-line">{entry.narrative}</div>
               )}
-              {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1">{parseMentions(entry.note, onMentionClick)}</p>}
+              {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
             </div>
           );
         }
@@ -10800,7 +11159,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                 <span className="font-bold">[{entry.dice?.join(', ')}]</span>
                 {entry.count > 1 && <span className="font-bold"> = {entry.total}</span>}
               </p>
-              {entry.note && <p className="text-stone-600 italic text-sm mt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick)}</p>}
+              {entry.note && <p className="text-stone-600 italic text-sm mt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
             </div>
           );
         }
@@ -10814,7 +11173,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
               {entry.dice && <span className="font-normal text-stone-500 text-xs">[{entry.dice.join(', ')}] </span>}
               {entry.result}
             </p>
-            {entry.note && <p className="text-stone-700 italic text-sm mt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick)}</p>}
+            {entry.note && <p className="text-stone-700 italic text-sm mt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
             {entry.edited && <span className="text-xs text-stone-400">✎</span>}
           </div>
         );
@@ -10825,7 +11184,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
             ⚔️ <strong>{entry.attacker}</strong> → <strong>{entry.target}</strong>: {entry.hitResult}, {entry.damage} dmg
-            {entry.note && <span className="font-normal italic text-stone-600 ml-2">{parseMentions(entry.note, onMentionClick)}</span>}
+            {entry.note && <span className="font-normal italic text-stone-600 ml-2">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</span>}
           </p>
         );
 
@@ -10835,7 +11194,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
             🏁 Boj skončil
-            {entry.note && <span className="font-normal italic ml-2">{parseMentions(entry.note, onMentionClick)}</span>}
+            {entry.note && <span className="font-normal italic ml-2">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</span>}
           </p>
         );
       
@@ -10847,7 +11206,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
             <p className="font-bold text-amber-900 truncate">{entry.subtype}: {entry.data?.name}</p>
             {entry.data?.trait && <p className="text-stone-600 text-sm italic truncate">{entry.data.trait}</p>}
             {entry.data?.appearance && <p className="text-stone-600 text-sm truncate">{entry.data.appearance}</p>}
-            {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick)}</p>}
+            {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
           </div>
         );
       
@@ -10858,7 +11217,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
              title="Klikni pro úpravu">
             <span className="font-medium text-stone-700">{entry.faction}</span>: {entry.success ? '✓ pokrok' : '– beze změny'} 
             <span className="opacity-60"> (d6={entry.roll}+{entry.bonus})</span>
-            {entry.note && <span className="italic text-stone-600 ml-2">{parseMentions(entry.note, onMentionClick)}</span>}
+            {entry.note && <span className="italic text-stone-600 ml-2">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</span>}
           </p>
         );
 
@@ -10870,7 +11229,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
             ☀️ {['Ráno', 'Odpoledne', 'Večer', 'Noc'][entry.to?.watch || 0]}
             {entry.events?.includes('new_day') && ' — Nový den'}
             {entry.events?.includes('new_week') && ' — Nový týden'}
-            {entry.note && <span className="normal-case font-normal text-stone-600 ml-2">• {parseMentions(entry.note, onMentionClick)}</span>}
+            {entry.note && <span className="normal-case font-normal text-stone-600 ml-2">• {parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</span>}
           </p>
         );
 
@@ -10917,7 +11276,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                onClick={() => startEdit(entry)}
                title="Klikni pro úpravu">
               <span className="text-blue-600">{entry.data?.icon || '☁️'}</span> Počasí: <em>{entry.data?.type || entry.data?.weather || entry.weather || 'neznámé'}</em>
-              {entry.note && <span className="italic ml-2">— {parseMentions(entry.note, onMentionClick)}</span>}
+              {entry.note && <span className="italic ml-2">— {parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</span>}
             </p>
           );
         }
@@ -10927,7 +11286,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
             🌍 {entry.data?.name || entry.content || JSON.stringify(entry.data)}
-            {entry.note && <span className="italic ml-2">— {parseMentions(entry.note, onMentionClick)}</span>}
+            {entry.note && <span className="italic ml-2">— {parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</span>}
           </p>
         );
 
@@ -10937,7 +11296,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
             {entry.subtype === 'short' ? '☕ Krátký odpočinek' : '🏕️ Dlouhý odpočinek v bezpečí'}
-            {entry.note && <span className="italic text-stone-600 ml-2">— {parseMentions(entry.note, onMentionClick)}</span>}
+            {entry.note && <span className="italic text-stone-600 ml-2">— {parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</span>}
           </p>
         );
 
@@ -10947,7 +11306,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
             📦 {entry.item}: {entry.consumed ? <span className="text-orange-600">spotřebováno!</span> : <span className="text-green-600">OK</span>}
-            {entry.note && <span className="italic text-stone-600 ml-2">— {parseMentions(entry.note, onMentionClick)}</span>}
+            {entry.note && <span className="italic text-stone-600 ml-2">— {parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</span>}
           </p>
         );
 
@@ -10957,7 +11316,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                onClick={() => startEdit(entry)}
                title="Klikni pro úpravu">
             <p className="text-red-700 font-bold">⚠️ Náhodné setkání!</p>
-            {entry.note && <p className="italic text-stone-700 text-sm">{parseMentions(entry.note, onMentionClick)}</p>}
+            {entry.note && <p className="italic text-stone-700 text-sm">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
           </div>
         );
 
@@ -10967,7 +11326,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
             ⛏️ Tah {entry.turn} — pochodeň: {6 - entry.torchTurns}/6
-            {entry.note && <span className="normal-case ml-2">• {parseMentions(entry.note, onMentionClick)}</span>}
+            {entry.note && <span className="normal-case ml-2">• {parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</span>}
           </p>
         );
 
@@ -10978,7 +11337,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                onClick={() => startEdit(entry)}
                title="Klikni pro úpravu">
             <p className="text-red-700 font-bold">👹 Něco se blíží!</p>
-            {entry.note && <p className="italic text-stone-700 text-sm">{parseMentions(entry.note, onMentionClick)}</p>}
+            {entry.note && <p className="italic text-stone-700 text-sm">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
           </div>
         );
 
@@ -10988,7 +11347,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
             🔥 Nová pochodeň
-            {entry.note && <span className="text-stone-600 ml-2">— {parseMentions(entry.note, onMentionClick)}</span>}
+            {entry.note && <span className="text-stone-600 ml-2">— {parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</span>}
           </p>
         );
 
@@ -11000,7 +11359,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
             🤝 Test loajality ({entry.hireling}): {entry.success 
               ? <span className="text-green-700">zůstává věrný</span> 
               : <span className="text-red-700 font-bold">ZRADA!</span>}
-            {entry.note && <span className="italic text-stone-600 ml-2">— {parseMentions(entry.note, onMentionClick)}</span>}
+            {entry.note && <span className="italic text-stone-600 ml-2">— {parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</span>}
           </p>
         );
 
@@ -11010,7 +11369,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
             🐭 Na scénu vstupuje <strong>{entry.character}</strong>
-            {entry.note && <span className="font-normal italic text-stone-600 ml-2">— {parseMentions(entry.note, onMentionClick)}</span>}
+            {entry.note && <span className="font-normal italic text-stone-600 ml-2">— {parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</span>}
           </p>
         );
 
@@ -11023,7 +11382,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                   onClick={() => startEdit(entry)}
                   title="Klikni pro úpravu">
               {entry.change > 0 ? '💚' : '💔'} {sign}{entry.change} HP
-              {entry.note && <span className="italic ml-1">({parseMentions(entry.note, onMentionClick)})</span>}
+              {entry.note && <span className="italic ml-1">({parseMentions(entry.note, onMentionClick, worldNPCs, settlements)})</span>}
             </span>
           );
         }
@@ -11053,7 +11412,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
             💰 {entry.description}
-            {entry.note && <span className="italic ml-1">({parseMentions(entry.note, onMentionClick)})</span>}
+            {entry.note && <span className="italic ml-1">({parseMentions(entry.note, onMentionClick, worldNPCs, settlements)})</span>}
           </p>
         );
 
@@ -11075,7 +11434,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
             </p>
             {!npcIsDead && entry.data?.birthsign && <p className="text-stone-600 text-sm truncate">{entry.data.birthsign}</p>}
             {!npcIsDead && entry.data?.physicalDetail && <p className="text-stone-500 text-sm truncate">{entry.data.physicalDetail}</p>}
-            {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick)}</p>}
+            {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
           </div>
         );
 
@@ -11101,7 +11460,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
             <p className="text-xs text-stone-500 font-mono">
               {typeof content === 'string' ? content : JSON.stringify(content)}
             </p>
-            {entry.note && <p className="text-sm text-stone-700 italic mt-1">{parseMentions(entry.note, onMentionClick)}</p>}
+            {entry.note && <p className="text-sm text-stone-700 italic mt-1">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
           </div>
         );
     }
@@ -11113,29 +11472,6 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
       <div className="text-center mb-8 pt-4">
         <h1 className="text-3xl font-serif text-amber-900 mb-2">Kronika dobrodružství</h1>
         <p className="text-stone-500 text-sm">{journal.length} záznamů</p>
-      </div>
-
-      {/* New Entry - Expandable with @mentions */}
-      <div className="mb-8">
-        <MentionInput
-          value={newEntry}
-          onChange={setNewEntry}
-          placeholder="Pokračuj v příběhu... (napiš @ pro vložení NPC nebo osady)"
-          npcs={worldNPCs}
-          settlements={settlements}
-          rows={3}
-          className="bg-white border-amber-200 focus:border-amber-400 text-stone-800 font-serif italic shadow-sm"
-        />
-        {newEntry.trim() && (
-          <div className="flex justify-end mt-2">
-            <button
-              onClick={addNarrativeEntry}
-              className="px-4 py-2 bg-amber-700 text-white rounded-lg hover:bg-amber-800 transition-colors text-sm"
-            >
-              Přidat zápis
-            </button>
-          </div>
-        )}
       </div>
 
       {/* Widget nadcházejících událostí */}
@@ -11213,13 +11549,121 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
       {/* Journal Content - Book Style */}
       <div className="bg-gradient-to-b from-amber-50/50 to-white rounded-lg shadow-sm border border-amber-100">
         {filteredJournal.length === 0 ? (
-          <div className="text-center py-16 text-stone-400 font-serif italic">
-            {journal.length === 0
-              ? 'Příběh ještě nezačal...'
-              : 'Žádné záznamy neodpovídají filtru'}
+          <div className="px-6 py-8 font-serif">
+            {journal.length === 0 ? (
+              <div className="relative">
+                <textarea
+                  ref={newEntryRef}
+                  value={newEntry}
+                  onChange={(e) => {
+                    setNewEntry(e.target.value);
+                    handleMentionInput(e.target.value, 'newEntry', e.target);
+                  }}
+                  onKeyDown={(e) => {
+                    if (showMentions && mentionTarget === 'newEntry') {
+                      if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        setMentionIndex(i => Math.min(i + 1, filteredMentions.length - 1));
+                      } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        setMentionIndex(i => Math.max(i - 1, 0));
+                      } else if (e.key === 'Enter' && filteredMentions[mentionIndex]) {
+                        e.preventDefault();
+                        insertMention(filteredMentions[mentionIndex], newEntry, setNewEntry, newEntryRef.current);
+                      } else if (e.key === 'Escape') {
+                        setShowMentions(false);
+                      }
+                    } else if (e.key === 'Enter' && !e.shiftKey && newEntry.trim()) {
+                      e.preventDefault();
+                      addNarrativeEntry();
+                    }
+                  }}
+                  onBlur={() => setTimeout(() => setShowMentions(false), 150)}
+                  rows={3}
+                  className="w-full px-3 py-2 text-sm text-stone-700 bg-white/50 border border-stone-200 rounded-lg resize-none focus:outline-none focus:border-amber-500 placeholder:text-stone-400 italic"
+                  placeholder="Začni psát příběh... (@ pro zmínku, Shift+Enter = nový řádek)"
+                />
+                {showMentions && mentionTarget === 'newEntry' && filteredMentions.length > 0 && (
+                  <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-stone-200 rounded shadow-lg z-50 max-h-48 overflow-y-auto">
+                    {filteredMentions.map((m, i) => (
+                      <button
+                        key={`${m.type}-${m.id}`}
+                        type="button"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          insertMention(m, newEntry, setNewEntry, newEntryRef.current);
+                        }}
+                        className={`w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-amber-50 ${i === mentionIndex ? 'bg-amber-100' : ''}`}
+                      >
+                        <span>{m.icon}</span>
+                        <span className="font-medium">{m.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-stone-400 italic">
+                Žádné záznamy neodpovídají filtru
+              </div>
+            )}
           </div>
         ) : (
           <div className="px-6 py-8 font-serif">
+            {/* Vstup pro nový záznam nahoře s @ mentions */}
+            <div className="relative mb-4">
+              <textarea
+                ref={newEntryRef}
+                value={newEntry}
+                onChange={(e) => {
+                  setNewEntry(e.target.value);
+                  handleMentionInput(e.target.value, 'newEntry', e.target);
+                }}
+                onKeyDown={(e) => {
+                  if (showMentions && mentionTarget === 'newEntry') {
+                    if (e.key === 'ArrowDown') {
+                      e.preventDefault();
+                      setMentionIndex(i => Math.min(i + 1, filteredMentions.length - 1));
+                    } else if (e.key === 'ArrowUp') {
+                      e.preventDefault();
+                      setMentionIndex(i => Math.max(i - 1, 0));
+                    } else if (e.key === 'Enter' && filteredMentions[mentionIndex]) {
+                      e.preventDefault();
+                      insertMention(filteredMentions[mentionIndex], newEntry, setNewEntry, newEntryRef.current);
+                    } else if (e.key === 'Escape') {
+                      setShowMentions(false);
+                    }
+                  } else if (e.key === 'Enter' && !e.shiftKey && newEntry.trim()) {
+                    e.preventDefault();
+                    addNarrativeEntry();
+                  }
+                }}
+                onBlur={() => setTimeout(() => setShowMentions(false), 150)}
+                rows={3}
+                className="w-full px-3 py-2 text-sm text-stone-700 bg-white/50 border border-stone-200 rounded-lg resize-none focus:outline-none focus:border-amber-500 placeholder:text-stone-400 italic"
+                placeholder="Pokračuj v příběhu... (@ pro zmínku, Shift+Enter = nový řádek)"
+              />
+              {/* Mention suggestions */}
+              {showMentions && mentionTarget === 'newEntry' && filteredMentions.length > 0 && (
+                <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-stone-200 rounded shadow-lg z-50 max-h-48 overflow-y-auto">
+                  {filteredMentions.map((m, i) => (
+                    <button
+                      key={`${m.type}-${m.id}`}
+                      type="button"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        insertMention(m, newEntry, setNewEntry, newEntryRef.current);
+                      }}
+                      className={`w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-amber-50 ${i === mentionIndex ? 'bg-amber-100' : ''}`}
+                    >
+                      <span>{m.icon}</span>
+                      <span className="font-medium">{m.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Flat list s date headers */}
             {filteredJournal.map((entry, i) => {
               const content = formatEntry(entry);
@@ -11242,11 +11686,11 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                   {/* Date separator - nenápadný, jen tečky s datem při hoveru */}
                   {showDateHeader && i > 0 && (
                     <div className="group flex items-center justify-center my-3 gap-2" title={entryDate}>
-                      <div className="flex-1 h-px bg-stone-200/50"></div>
-                      <span className="text-[10px] text-stone-300 group-hover:text-stone-400 transition-colors cursor-default">
+                      <div className="flex-1 h-px bg-stone-200/30"></div>
+                      <span className="text-[10px] text-stone-300/40 group-hover:text-stone-400 transition-colors cursor-default">
                         {entryDate}
                       </span>
-                      <div className="flex-1 h-px bg-stone-200/50"></div>
+                      <div className="flex-1 h-px bg-stone-200/30"></div>
                     </div>
                   )}
 
@@ -11283,9 +11727,10 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
 
                   {/* Záznam s drag handle */}
                   <div
+                    data-entry-id={entry.id}
                     className={`group flex items-start gap-1 transition-all ${
                       isSelected ? 'bg-amber-100 rounded -mx-2 px-2' : ''
-                    } ${isDragging ? 'opacity-50' : ''} ${
+                    } ${isDragging || touchDragId === entry.id ? 'opacity-50 bg-amber-50' : ''} ${
                       isDropTarget ? 'border-b-2 border-amber-500' : ''
                     }`}
                     draggable={!selectionMode && editingId !== entry.id}
@@ -11294,7 +11739,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                     onDragLeave={handleDragLeave}
                     onDrop={(e) => handleDrop(e, entry.id)}
                     onDragEnd={handleDragEnd}
-                    onTouchStart={() => !selectionMode && handleTouchStart(entry.id)}
+                    onTouchStart={() => !selectionMode && !touchDragId && handleTouchStart(entry.id)}
                     onTouchEnd={handleTouchEnd}
                     onTouchMove={handleTouchEnd}
                     onContextMenu={(e) => {
@@ -11306,8 +11751,11 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                     {/* Drag handle */}
                     {!selectionMode && editingId !== entry.id && (
                       <div
-                        className="opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing text-stone-400 hover:text-stone-600 pt-2 px-1 select-none transition-opacity"
+                        className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 cursor-grab active:cursor-grabbing text-stone-400 hover:text-stone-600 pt-2 px-1 select-none transition-opacity touch-none"
                         title="Přetáhni pro přesun"
+                        onTouchStart={(e) => handleTouchDragStart(e, entry.id)}
+                        onTouchMove={handleTouchDragMove}
+                        onTouchEnd={handleTouchDragEnd}
                       >
                         ⋮⋮
                       </div>
@@ -11333,7 +11781,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                     {!selectionMode && editingId !== entry.id && (
                       <button
                         onClick={() => setInsertAfterIndex(insertAfterIndex === entry.id ? null : entry.id)}
-                        className="opacity-0 group-hover:opacity-100 text-stone-400 hover:text-amber-600 pt-2 px-1 transition-opacity"
+                        className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 text-stone-400 hover:text-amber-600 pt-2 px-1 transition-opacity"
                         title="Vložit poznámku pod"
                       >
                         +
@@ -11341,32 +11789,70 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                     )}
                   </div>
 
-                  {/* Formulář pro vložení poznámky ZA tento záznam */}
+                  {/* Inline vstup pro poznámku s @mentions */}
                   {insertAfterIndex === entry.id && (
-                    <div className="my-2 ml-6 bg-white rounded-lg border border-amber-300 p-3 shadow-sm">
-                      <p className="text-xs text-stone-500 mb-2">📝 Vložit poznámku:</p>
+                    <div className="relative ml-5">
                       <textarea
                         value={insertText}
-                        onChange={(e) => setInsertText(e.target.value)}
-                        className="w-full h-20 p-2 border border-stone-200 rounded bg-amber-50/50 focus:outline-none focus:border-amber-400 font-serif text-stone-800 text-sm"
-                        placeholder="Napiš poznámku..."
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setInsertText(val);
+                          handleMentionInput(val, 'insert', e.target);
+                        }}
+                        onKeyDown={(e) => {
+                          if (showMentions && mentionTarget === 'insert') {
+                            if (e.key === 'ArrowDown') {
+                              e.preventDefault();
+                              setMentionIndex(i => Math.min(i + 1, filteredMentions.length - 1));
+                            } else if (e.key === 'ArrowUp') {
+                              e.preventDefault();
+                              setMentionIndex(i => Math.max(i - 1, 0));
+                            } else if (e.key === 'Enter' && filteredMentions[mentionIndex]) {
+                              e.preventDefault();
+                              insertMention(filteredMentions[mentionIndex], insertText, setInsertText, e.target);
+                            } else if (e.key === 'Escape') {
+                              setShowMentions(false);
+                            }
+                          } else if (e.key === 'Enter' && !e.shiftKey && insertText.trim()) {
+                            e.preventDefault();
+                            insertNoteAfter(entry.id);
+                          } else if (e.key === 'Escape') {
+                            setInsertAfterIndex(null);
+                            setInsertText('');
+                          }
+                        }}
+                        onBlur={() => {
+                          setTimeout(() => {
+                            if (mentionTarget === 'insert') setShowMentions(false);
+                            if (!insertText.trim()) {
+                              setInsertAfterIndex(null);
+                            }
+                          }, 150);
+                        }}
+                        rows={2}
+                        className="w-full px-3 py-2 text-sm font-serif text-stone-700 bg-white border border-stone-300 rounded-lg resize-none focus:outline-none focus:border-amber-500 placeholder:text-stone-400"
+                        placeholder="Poznámka... (@ pro zmínku, Enter ↵)"
                         autoFocus
                       />
-                      <div className="flex justify-end gap-2 mt-2">
-                        <button
-                          onClick={() => { setInsertAfterIndex(null); setInsertText(''); }}
-                          className="px-3 py-1 text-stone-500 hover:text-stone-700 text-sm"
-                        >
-                          Zrušit
-                        </button>
-                        <button
-                          onClick={() => insertNoteAfter(entry.id)}
-                          className="px-3 py-1 bg-amber-600 text-white rounded text-sm hover:bg-amber-700"
-                          disabled={!insertText.trim()}
-                        >
-                          Vložit
-                        </button>
-                      </div>
+                      {/* Mention dropdown pro insert */}
+                      {showMentions && mentionTarget === 'insert' && filteredMentions.length > 0 && (
+                        <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-stone-200 rounded shadow-lg z-50 max-h-48 overflow-y-auto">
+                          {filteredMentions.map((m, i) => (
+                            <button
+                              key={`insert-${m.type}-${m.id}`}
+                              type="button"
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                insertMention(m, insertText, setInsertText, document.activeElement);
+                              }}
+                              className={`w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-amber-50 ${i === mentionIndex ? 'bg-amber-100' : ''}`}
+                            >
+                              <span>{m.icon}</span>
+                              <span className="font-medium">{m.name}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
                 </React.Fragment>
@@ -12474,6 +12960,348 @@ const FloatingDice = ({ onLogEntry }) => {
       )}
       </div>
     </>
+  );
+};
+
+// ============================================
+// SMALL WORLD PANEL - Malý Svět Generátory
+// ============================================
+
+const SmallWorldPanel = ({ onLogEntry }) => {
+  const [activeGenerator, setActiveGenerator] = useState('sensory');
+  const [lastResult, setLastResult] = useState(null);
+  const [logToJournal, setLogToJournal] = useState(true);
+
+  const generators = [
+    { id: 'sensory', label: 'Smysly', icon: '👃' },
+    { id: 'megastructure', label: 'Mega-Struktura', icon: '🏗️' },
+    { id: 'loot', label: 'Kořist', icon: '💎' },
+    { id: 'traps', label: 'Pasti', icon: '⚠️' },
+    { id: 'whatis', label: 'Co je to?', icon: '❓' }
+  ];
+
+  const logEntry = (entry) => {
+    if (logToJournal && onLogEntry) {
+      onLogEntry(entry);
+    }
+  };
+
+  // 1. Senzorický Priming (k66)
+  const rollSensory = () => {
+    const { dice, result } = rollK66();
+    const data = SENSORY_PRIMING_TABLE[result];
+    const entry = {
+      type: 'smallworld',
+      subtype: 'sensory_priming',
+      timestamp: formatTimestamp(),
+      dice,
+      diceResult: result,
+      result: data
+    };
+    setLastResult(entry);
+    logEntry(entry);
+  };
+
+  // 2. Mega-Struktura (3×d6)
+  const rollMegaStructure = () => {
+    const shapeRoll = rollD6();
+    const materialRoll = rollD6();
+    const stateRoll = rollD6();
+
+    const shape = MEGA_STRUCTURE_SHAPE.find(s => s.roll === shapeRoll);
+    const material = MEGA_STRUCTURE_MATERIAL.find(m => m.roll === materialRoll);
+    const state = MEGA_STRUCTURE_STATE.find(s => s.roll === stateRoll);
+
+    const entry = {
+      type: 'smallworld',
+      subtype: 'mega_structure',
+      timestamp: formatTimestamp(),
+      dice: [shapeRoll, materialRoll, stateRoll],
+      result: { shape, material, state }
+    };
+    setLastResult(entry);
+    logEntry(entry);
+  };
+
+  // 3. Komplikace Kořisti (d20)
+  const rollLootComplication = () => {
+    const results = [];
+    let roll = rollD20();
+    results.push(roll);
+
+    // Dvojitá komplikace na 20
+    if (roll === 20) {
+      let roll1 = rollD20();
+      while (roll1 === 20) roll1 = rollD20();
+      let roll2 = rollD20();
+      while (roll2 === 20) roll2 = rollD20();
+      results.push(roll1, roll2);
+    }
+
+    const complications = results.map(r =>
+      LOOT_COMPLICATIONS.find(c => c.roll === r)
+    ).filter(c => c && c.roll !== 20);
+
+    const entry = {
+      type: 'smallworld',
+      subtype: 'loot_complication',
+      timestamp: formatTimestamp(),
+      dice: results,
+      result: complications,
+      isDouble: results[0] === 20
+    };
+    setLastResult(entry);
+    logEntry(entry);
+  };
+
+  // 4. Fyzikální Pasti (d12)
+  const rollTrap = () => {
+    const roll = rollD12();
+    const trap = PHYSICAL_TRAPS.find(t => t.roll === roll);
+    const entry = {
+      type: 'smallworld',
+      subtype: 'physical_trap',
+      timestamp: formatTimestamp(),
+      dice: [roll],
+      result: trap
+    };
+    setLastResult(entry);
+    logEntry(entry);
+  };
+
+  // 5. Co je to? (2×d6)
+  const rollWhatIsIt = () => {
+    const verbRoll = rollD6();
+    const nounRoll = rollD6();
+    const verb = WHAT_IS_IT_VERB.find(v => v.roll === verbRoll);
+    const noun = WHAT_IS_IT_NOUN.find(n => n.roll === nounRoll);
+    const entry = {
+      type: 'smallworld',
+      subtype: 'what_is_it',
+      timestamp: formatTimestamp(),
+      dice: [verbRoll, nounRoll],
+      result: { verb, noun }
+    };
+    setLastResult(entry);
+    logEntry(entry);
+  };
+
+  return (
+    <div className="space-y-6">
+      <SectionHeader
+        icon="🏠"
+        title="Malý Svět"
+        subtitle="Generátory pro průzkum a detaily prostředí z pohledu myši"
+      />
+
+      {/* Tab navigace */}
+      <div className="flex flex-wrap gap-2 border-b border-amber-200 pb-3">
+        {generators.map(gen => (
+          <button
+            key={gen.id}
+            onClick={() => setActiveGenerator(gen.id)}
+            className={`px-3 py-2 rounded-t-lg font-medium transition-colors ${
+              activeGenerator === gen.id
+                ? 'bg-amber-600 text-white'
+                : 'bg-amber-100 text-amber-800 hover:bg-amber-200'
+            }`}
+          >
+            {gen.icon} {gen.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Toggle pro logování */}
+      <div className="flex items-center justify-end gap-2 -mt-2 mb-2">
+        <label className="flex items-center gap-2 cursor-pointer text-sm text-stone-600 hover:text-stone-800 transition-colors">
+          <input
+            type="checkbox"
+            checked={logToJournal}
+            onChange={(e) => setLogToJournal(e.target.checked)}
+            className="w-4 h-4 rounded border-stone-300 text-amber-600 focus:ring-amber-500"
+          />
+          <span className={!logToJournal ? 'text-amber-700 font-medium' : ''}>
+            📝 Zapisovat do deníku {!logToJournal && '(vypnuto)'}
+          </span>
+        </label>
+      </div>
+
+      {/* SENZORICKÝ PRIMING */}
+      {activeGenerator === 'sensory' && (
+        <div className="bg-white rounded-xl p-6 shadow-md border border-amber-200">
+          <h4 className="font-bold text-amber-900 mb-3 text-lg">👃 Senzorický Priming (k66)</h4>
+          <p className="text-sm text-stone-600 mb-4">
+            Generuje smyslové detaily prostředí - vůně, hmatové vjemy a jejich herní implikace. Použij na začátku scény.
+          </p>
+          <button
+            onClick={rollSensory}
+            className="w-full py-3 px-4 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-lg transition-colors"
+          >
+            🎲 Hodit k66
+          </button>
+          {lastResult?.subtype === 'sensory_priming' && lastResult.result && (
+            <div className="mt-4 p-4 bg-stone-800 text-stone-100 rounded-lg">
+              <DiceDisplay dice={lastResult.dice} />
+              <div className="text-center text-sm text-stone-400 mt-1 mb-3">
+                k66 = {lastResult.diceResult}
+              </div>
+              <div className="space-y-3 mt-4">
+                <div className="flex items-start gap-2">
+                  <span className="text-amber-400 font-bold">👃 Vůně:</span>
+                  <span>{lastResult.result.smell}</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-amber-400 font-bold">🖐️ Hmat:</span>
+                  <span>{lastResult.result.tactile}</span>
+                </div>
+                <div className="flex items-start gap-2 p-2 bg-stone-700 rounded">
+                  <span className="text-amber-400 font-bold">{lastResult.result.icon}</span>
+                  <span>{lastResult.result.hint}</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* MEGA-STRUKTURA */}
+      {activeGenerator === 'megastructure' && (
+        <div className="bg-white rounded-xl p-6 shadow-md border border-amber-200">
+          <h4 className="font-bold text-amber-900 mb-3 text-lg">🏗️ Generátor Mega-Struktur (3×k6)</h4>
+          <p className="text-sm text-stone-600 mb-4">
+            Vytvoří náhodný velký lidský předmět jako "dungeon" - kombinace tvaru, materiálu a stavu.
+          </p>
+          <button
+            onClick={rollMegaStructure}
+            className="w-full py-3 px-4 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-lg transition-colors"
+          >
+            🎲 Hodit 3×k6
+          </button>
+          {lastResult?.subtype === 'mega_structure' && lastResult.result && (
+            <div className="mt-4 p-4 bg-stone-800 text-stone-100 rounded-lg">
+              <DiceDisplay dice={lastResult.dice} />
+              <div className="text-center text-sm text-stone-400 mt-1 mb-3">
+                Tvar: {lastResult.dice[0]} | Materiál: {lastResult.dice[1]} | Stav: {lastResult.dice[2]}
+              </div>
+              <div className="space-y-4 mt-4">
+                <div className="p-3 bg-stone-700 rounded">
+                  <div className="text-amber-400 font-bold mb-1">🔷 Tvar: {lastResult.result.shape.name}</div>
+                  <div className="text-sm text-stone-300">{lastResult.result.shape.desc}</div>
+                  <div className="text-xs text-stone-400 mt-1">{lastResult.result.shape.examples}</div>
+                </div>
+                <div className="p-3 bg-stone-700 rounded">
+                  <div className="text-amber-400 font-bold mb-1">🧱 Materiál: {lastResult.result.material.name}</div>
+                  <div className="text-sm text-stone-300">{lastResult.result.material.desc}</div>
+                  <div className="text-xs text-stone-400 mt-1">{lastResult.result.material.hint}</div>
+                </div>
+                <div className="p-3 bg-stone-700 rounded">
+                  <div className="text-amber-400 font-bold mb-1">⚡ Stav: {lastResult.result.state.name}</div>
+                  <div className="text-sm text-stone-300">{lastResult.result.state.desc}</div>
+                  <div className="text-xs text-amber-300 mt-1">⚠️ {lastResult.result.state.hint}</div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* KOMPLIKACE KOŘISTI */}
+      {activeGenerator === 'loot' && (
+        <div className="bg-white rounded-xl p-6 shadow-md border border-amber-200">
+          <h4 className="font-bold text-amber-900 mb-3 text-lg">💎 Komplikace Kořisti (k20)</h4>
+          <p className="text-sm text-stone-600 mb-4">
+            Když myši najdou kořist větší než mince - co komplikuje její transport? Hod 20 = dvojitá komplikace!
+          </p>
+          <button
+            onClick={rollLootComplication}
+            className="w-full py-3 px-4 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-lg transition-colors"
+          >
+            🎲 Hodit k20
+          </button>
+          {lastResult?.subtype === 'loot_complication' && lastResult.result && (
+            <div className="mt-4 p-4 bg-stone-800 text-stone-100 rounded-lg">
+              <DiceDisplay dice={lastResult.dice} />
+              {lastResult.isDouble && (
+                <div className="text-center text-amber-400 font-bold mt-2 mb-2">
+                  ⚠️ DVOJITÁ KOMPLIKACE! ⚠️
+                </div>
+              )}
+              {lastResult.result.map((comp, i) => (
+                <div key={i} className="mt-4 p-3 bg-stone-700 rounded">
+                  <div className="text-amber-400 font-bold mb-1">
+                    {comp.property} <span className="text-stone-400 font-normal">({comp.desc})</span>
+                  </div>
+                  <div className="text-sm text-stone-300 mt-2">{comp.impact}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* FYZIKÁLNÍ PASTI */}
+      {activeGenerator === 'traps' && (
+        <div className="bg-white rounded-xl p-6 shadow-md border border-amber-200">
+          <h4 className="font-bold text-amber-900 mb-3 text-lg">⚠️ Fyzikální Pasti (k12)</h4>
+          <p className="text-sm text-stone-600 mb-4">
+            Prostředí, které je smrtící svou fyzikou - ne mechanickými pastmi. Věci nebezpečné pro malé tvory.
+          </p>
+          <button
+            onClick={rollTrap}
+            className="w-full py-3 px-4 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-lg transition-colors"
+          >
+            🎲 Hodit k12
+          </button>
+          {lastResult?.subtype === 'physical_trap' && lastResult.result && (
+            <div className="mt-4 p-4 bg-stone-800 text-stone-100 rounded-lg">
+              <DiceDisplay dice={lastResult.dice} />
+              <div className="mt-4 p-3 bg-stone-700 rounded">
+                <div className="text-amber-400 font-bold text-lg mb-2">
+                  {lastResult.result.object}
+                </div>
+                <div className="text-stone-300">{lastResult.result.effect}</div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* CO JE TO? */}
+      {activeGenerator === 'whatis' && (
+        <div className="bg-white rounded-xl p-6 shadow-md border border-amber-200">
+          <h4 className="font-bold text-amber-900 mb-3 text-lg">❓ Orákulum: Co je to? (2×k6)</h4>
+          <p className="text-sm text-stone-600 mb-4">
+            Když se ztratíte v abstrakci - co "doopravdy" je ten neznámý lidský předmět? Kombinace funkce + formy.
+          </p>
+          <button
+            onClick={rollWhatIsIt}
+            className="w-full py-3 px-4 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-lg transition-colors"
+          >
+            🎲 Hodit 2×k6
+          </button>
+          {lastResult?.subtype === 'what_is_it' && lastResult.result && (
+            <div className="mt-4 p-4 bg-stone-800 text-stone-100 rounded-lg">
+              <DiceDisplay dice={lastResult.dice} />
+              <div className="text-center text-sm text-stone-400 mt-1 mb-3">
+                Sloveso: {lastResult.dice[0]} | Podst. jméno: {lastResult.dice[1]}
+              </div>
+              <div className="mt-4 text-center">
+                <div className="text-2xl font-bold text-amber-400 mb-2">
+                  "{lastResult.result.verb.verb}" + "{lastResult.result.noun.noun}"
+                </div>
+                <div className="text-stone-300 mb-4">
+                  {lastResult.result.verb.desc} → {lastResult.result.noun.desc}
+                </div>
+                <div className="p-3 bg-stone-700 rounded text-left">
+                  <div className="text-amber-300 font-bold mb-1">💡 Příklady:</div>
+                  <div className="text-stone-300 text-sm">{lastResult.result.noun.example}</div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -13758,6 +14586,7 @@ function MausritterSoloCompanion() {
     { id: 'events', label: 'Události', icon: '📅' },
     { id: 'world', label: 'Svět', icon: '🌍' },
     { id: 'factions', label: 'Frakce', icon: '🏰' },
+    { id: 'smallworld', label: 'Malý Svět', icon: '🏠' },
     { id: 'studio', label: 'Kartičky', icon: '🎴' },
     { id: 'howto', label: 'Jak hrát', icon: '📚' }
   ];
@@ -14546,13 +15375,19 @@ function MausritterSoloCompanion() {
         )}
         
         {activePanel === 'factions' && (
-          <FactionPanel 
+          <FactionPanel
             factions={factions}
             setFactions={setFactions}
             onLogEntry={handleLogEntry}
           />
         )}
-        
+
+        {activePanel === 'smallworld' && (
+          <SmallWorldPanel
+            onLogEntry={handleLogEntry}
+          />
+        )}
+
         {activePanel === 'journal' && (
           <JournalPanel
             journal={journal}
