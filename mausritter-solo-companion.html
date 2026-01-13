@@ -10663,6 +10663,29 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
             </div>
           );
         }
+        // Handle frame_scene subtype - zarámování scény
+        if (entry.subtype === 'frame_scene' && entry.details) {
+          const d = entry.details;
+          return (
+            <div className="my-2 pl-4 border-l-2 border-amber-500 cursor-pointer hover:bg-amber-50 rounded transition-colors"
+                 onClick={() => startEdit(entry)}
+                 title="Klikni pro úpravu">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-lg">🎬</span>
+                <span className={`text-sm font-bold ${d.isAltered ? 'text-orange-600' : 'text-green-700'}`}>
+                  [{d.alteredDie}] {d.isAltered ? 'Pozměněná scéna!' : 'Scéna dle očekávání'}
+                </span>
+              </div>
+              <p className="text-stone-800 text-sm"><span className="text-stone-500">📖</span> {d.opening}</p>
+              <p className="text-stone-700 text-sm"><span className="text-stone-500">📍</span> {d.setting}</p>
+              <p className="text-purple-700 text-sm font-medium"><span className="text-stone-500">💡</span> {d.action} + {d.theme}</p>
+              {d.isAltered && d.complication && (
+                <p className="text-orange-700 text-sm font-medium"><span className="text-stone-500">⚡</span> {d.complication}</p>
+              )}
+              {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1">{parseMentions(entry.note, onMentionClick)}</p>}
+            </div>
+          );
+        }
         // Handle custom_dice subtype differently
         if (entry.subtype === 'custom_dice') {
           return (
