@@ -3825,9 +3825,9 @@ const OraclePanel = ({ onLogEntry }) => {
                 </div>
               )}
 
-              {/* Meta info */}
-              <div className="mt-4 pt-3 border-t border-stone-200 flex flex-wrap gap-2 text-xs text-stone-500">
-                <span className="px-2 py-1 bg-stone-100 rounded">
+              {/* Meta info + Save button */}
+              <div className="mt-4 pt-3 border-t border-stone-200 flex flex-wrap items-center justify-between gap-2">
+                <span className="px-2 py-1 bg-stone-100 rounded text-xs text-stone-500">
                   {creatureResult.type.category === 'mouse' ? '🐭 Myš' :
                    creatureResult.type.category === 'rat' ? '🐀 Krysa' :
                    creatureResult.type.category === 'insect' ? '🐛 Hmyz' :
@@ -3836,6 +3836,23 @@ const OraclePanel = ({ onLogEntry }) => {
                    creatureResult.type.category === 'construct' ? '⚙️ Konstrukt' :
                    creatureResult.type.category === 'predator' ? '🦉 Predátor' : '🐸 Tvor'}
                 </span>
+                {silentMode && (
+                  <button
+                    onClick={() => {
+                      const entry = {
+                        type: 'oracle',
+                        subtype: 'creature',
+                        timestamp: formatTimestamp(),
+                        result: creatureResult.narrative,
+                        data: creatureResult
+                      };
+                      onLogEntry(entry);
+                    }}
+                    className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded text-sm font-medium transition-colors"
+                  >
+                    📥 Uložit do deníku
+                  </button>
+                )}
               </div>
             </div>
           )}
@@ -10370,7 +10387,7 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
 // JOURNAL PANEL
 // ============================================
 
-const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilter, onExport, worldNPCs = [], settlements = [], timedEvents = [], gameTime, onMentionClick, onOpenEvents, onDeleteNPC, onDeleteSettlement }) => {
+const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilter, onExport, worldNPCs = [], settlements = [], timedEvents = [], gameTime, onMentionClick, onOpenEvents, onDeleteNPC, onDeleteSettlement, onPromoteToNPC, onUpdateNPC }) => {
   const [newEntry, setNewEntry] = useState('');
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -10387,6 +10404,14 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState(new Set());
   const longPressTimer = useRef(null);
+
+  // Drag & drop pro přesouvání záznamů
+  const [draggedId, setDraggedId] = useState(null);
+  const [dropTargetId, setDropTargetId] = useState(null);
+
+  // Vkládání poznámek mezi záznamy
+  const [insertAfterIndex, setInsertAfterIndex] = useState(null); // Index záznamu, ZA který vložíme nový
+  const [insertText, setInsertText] = useState('');
 
   // Long press handler
   const handleTouchStart = (entryId) => {
@@ -10482,6 +10507,90 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
     setEditText('');
   };
 
+  // Drag & drop handlers
+  const handleDragStart = (e, entryId) => {
+    setDraggedId(entryId);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', entryId);
+  };
+
+  const handleDragOver = (e, entryId) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (entryId !== draggedId) {
+      setDropTargetId(entryId);
+    }
+  };
+
+  const handleDragLeave = () => {
+    setDropTargetId(null);
+  };
+
+  const handleDrop = (e, targetEntryId) => {
+    e.preventDefault();
+    if (!draggedId || draggedId === targetEntryId) {
+      setDraggedId(null);
+      setDropTargetId(null);
+      return;
+    }
+
+    // Najdi indexy v původním (nefiltrovaném) journalu
+    const draggedIndex = journal.findIndex(e => e.id === draggedId);
+    const targetIndex = journal.findIndex(e => e.id === targetEntryId);
+
+    if (draggedIndex === -1 || targetIndex === -1) {
+      setDraggedId(null);
+      setDropTargetId(null);
+      return;
+    }
+
+    // Přesuň záznam
+    const newJournal = [...journal];
+    const [draggedEntry] = newJournal.splice(draggedIndex, 1);
+
+    // Vloží ZA cílový záznam
+    const insertIndex = draggedIndex < targetIndex ? targetIndex : targetIndex + 1;
+    newJournal.splice(insertIndex, 0, draggedEntry);
+
+    setJournal(newJournal);
+    setDraggedId(null);
+    setDropTargetId(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedId(null);
+    setDropTargetId(null);
+  };
+
+  // Vložení nové poznámky mezi záznamy
+  const insertNoteAfter = (afterEntryId) => {
+    if (!insertText.trim()) {
+      setInsertAfterIndex(null);
+      return;
+    }
+
+    const targetIndex = journal.findIndex(e => e.id === afterEntryId);
+    if (targetIndex === -1) return;
+
+    // Použij timestamp z cílového záznamu (aby zůstala ve stejné skupině)
+    const targetEntry = journal[targetIndex];
+
+    const newEntry = {
+      id: generateId(),
+      type: 'narrative',
+      timestamp: targetEntry.timestamp,
+      content: insertText,
+      partyId: partyFilter !== 'all' ? partyFilter : targetEntry.partyId
+    };
+
+    const newJournal = [...journal];
+    newJournal.splice(targetIndex + 1, 0, newEntry);
+
+    setJournal(newJournal);
+    setInsertText('');
+    setInsertAfterIndex(null);
+  };
+
   const filteredJournal = journal.filter(entry => {
     if (partyFilter !== 'all' && entry.partyId && entry.partyId !== partyFilter) return false;
     if (filter !== 'all' && entry.type !== filter) return false;
@@ -10572,12 +10681,12 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
           const c = entry.data;
           return (
             <div className="my-2 pl-4 border-l-2 border-amber-500 cursor-pointer hover:bg-amber-50 rounded transition-colors overflow-hidden"
-                 onClick={() => startEdit(entry)}
-                 title="Klikni pro úpravu">
+                 onClick={() => setDetailModal({ type: 'creature', data: c, note: entry.note })}
+                 title="Klikni pro detail">
               <p className="font-bold text-amber-900 truncate">
                 {c.type?.icon || '🐭'} {c.name} <span className="font-normal text-stone-500">— {c.type?.name}</span>
               </p>
-              <p className="text-stone-600 text-sm truncate">{c.personality}</p>
+              <p className="text-stone-600 text-sm truncate">Je {c.personality}</p>
               {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick)}</p>}
             </div>
           );
@@ -10949,15 +11058,25 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
         );
 
       case 'saved_npc':
+        // Získej aktuální stav NPC z worldNPCs (pro isDead atd.)
+        const currentNPC = worldNPCs.find(n => n.id === entry.data?.id) || entry.data;
+        const npcIsDead = currentNPC?.isDead;
         return (
-          <p
-            className="my-1 text-sm cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors truncate"
-            onClick={() => setDetailModal({ type: 'npc', data: entry.data })}
+          <div
+            className={`my-2 pl-4 border-l-2 cursor-pointer hover:bg-amber-50 rounded transition-colors overflow-hidden ${
+              npcIsDead ? 'border-stone-400 bg-stone-100/50' : 'border-amber-500'
+            }`}
+            onClick={() => setDetailModal({ type: 'npc', data: currentNPC })}
             title="Klikni pro detail"
           >
-            🐭 <span className="font-medium text-amber-900">{entry.data?.name}</span>
-            {entry.data?.role && <span className="text-stone-500 ml-1">— {entry.data.role}</span>}
-          </p>
+            <p className={`font-bold truncate ${npcIsDead ? 'text-stone-500 line-through' : 'text-amber-900'}`}>
+              {npcIsDead ? '💀' : '🐭'} {entry.data?.name} {entry.data?.role && <span className="font-normal text-stone-500">— {entry.data.role}</span>}
+              {npcIsDead && <span className="ml-2 text-xs text-red-600 font-normal no-underline">† mrtvý</span>}
+            </p>
+            {!npcIsDead && entry.data?.birthsign && <p className="text-stone-600 text-sm truncate">{entry.data.birthsign}</p>}
+            {!npcIsDead && entry.data?.physicalDetail && <p className="text-stone-500 text-sm truncate">{entry.data.physicalDetail}</p>}
+            {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick)}</p>}
+          </div>
         );
 
       case 'saved_settlement':
@@ -11095,56 +11214,164 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
       <div className="bg-gradient-to-b from-amber-50/50 to-white rounded-lg shadow-sm border border-amber-100">
         {filteredJournal.length === 0 ? (
           <div className="text-center py-16 text-stone-400 font-serif italic">
-            {journal.length === 0 
+            {journal.length === 0
               ? 'Příběh ještě nezačal...'
               : 'Žádné záznamy neodpovídají filtru'}
           </div>
         ) : (
           <div className="px-6 py-8 font-serif">
-            {Object.entries(groupedByDate).map(([date, entries], dateIndex) => (
-              <div key={date} className={dateIndex > 0 ? 'mt-8 pt-6 border-t border-amber-100' : ''}>
-                {/* Date header - subtle */}
-                <p className="text-xs text-stone-400 mb-4 font-sans tracking-wider uppercase">{date}</p>
-                
-                {/* Entries for this date */}
-                {entries.map((entry, i) => {
-                  const content = formatEntry(entry);
-                  if (!content) return null; // Skip entries that return null
-                  const isSelected = selectedIds.has(entry.id);
+            {/* Flat list s date headers */}
+            {filteredJournal.map((entry, i) => {
+              const content = formatEntry(entry);
+              if (!content) return null;
 
-                  return (
+              const isSelected = selectedIds.has(entry.id);
+              const isDragging = draggedId === entry.id;
+              const isDropTarget = dropTargetId === entry.id;
+
+              // Zjisti datum pro header
+              const parts = entry.timestamp?.split(' ') || [];
+              const entryDate = parts.length >= 3 ? `${parts[0]} ${parts[1]} ${parts[2]}` : (entry.timestamp || 'Neznámé datum');
+              const prevEntry = filteredJournal[i - 1];
+              const prevParts = prevEntry?.timestamp?.split(' ') || [];
+              const prevDate = prevParts.length >= 3 ? `${prevParts[0]} ${prevParts[1]} ${prevParts[2]}` : (prevEntry?.timestamp || '');
+              const showDateHeader = i === 0 || entryDate !== prevDate;
+
+              return (
+                <React.Fragment key={entry.id}>
+                  {/* Date separator - nenápadný, jen tečky s datem při hoveru */}
+                  {showDateHeader && i > 0 && (
+                    <div className="group flex items-center justify-center my-3 gap-2" title={entryDate}>
+                      <div className="flex-1 h-px bg-stone-200/50"></div>
+                      <span className="text-[10px] text-stone-300 group-hover:text-stone-400 transition-colors cursor-default">
+                        {entryDate}
+                      </span>
+                      <div className="flex-1 h-px bg-stone-200/50"></div>
+                    </div>
+                  )}
+
+                  {/* Drop zone PŘED záznamem */}
+                  {draggedId && draggedId !== entry.id && (
                     <div
-                      key={entry.id}
-                      className={`flex items-start gap-2 ${isSelected ? 'bg-amber-100 rounded -mx-2 px-2' : ''}`}
-                      onTouchStart={() => !selectionMode && handleTouchStart(entry.id)}
-                      onTouchEnd={handleTouchEnd}
-                      onTouchMove={handleTouchEnd}
-                      onContextMenu={(e) => {
+                      className={`h-1 rounded my-1 transition-all ${
+                        dropTargetId === `before-${entry.id}` ? 'bg-amber-500 h-2' : 'bg-transparent hover:bg-amber-300'
+                      }`}
+                      onDragOver={(e) => {
                         e.preventDefault();
-                        setSelectionMode(true);
-                        setSelectedIds(new Set([entry.id]));
+                        e.stopPropagation();
+                        setDropTargetId(`before-${entry.id}`);
                       }}
-                    >
-                      {selectionMode && (
+                      onDragLeave={() => setDropTargetId(null)}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const draggedIndex = journal.findIndex(j => j.id === draggedId);
+                        const targetIndex = journal.findIndex(j => j.id === entry.id);
+                        if (draggedIndex !== -1 && targetIndex !== -1 && draggedIndex !== targetIndex) {
+                          const newJournal = [...journal];
+                          const [draggedEntry] = newJournal.splice(draggedIndex, 1);
+                          // Vložit PŘED cílový záznam
+                          const insertAt = draggedIndex < targetIndex ? targetIndex - 1 : targetIndex;
+                          newJournal.splice(insertAt, 0, draggedEntry);
+                          setJournal(newJournal);
+                        }
+                        setDraggedId(null);
+                        setDropTargetId(null);
+                      }}
+                    />
+                  )}
+
+                  {/* Záznam s drag handle */}
+                  <div
+                    className={`group flex items-start gap-1 transition-all ${
+                      isSelected ? 'bg-amber-100 rounded -mx-2 px-2' : ''
+                    } ${isDragging ? 'opacity-50' : ''} ${
+                      isDropTarget ? 'border-b-2 border-amber-500' : ''
+                    }`}
+                    draggable={!selectionMode && editingId !== entry.id}
+                    onDragStart={(e) => handleDragStart(e, entry.id)}
+                    onDragOver={(e) => handleDragOver(e, entry.id)}
+                    onDragLeave={handleDragLeave}
+                    onDrop={(e) => handleDrop(e, entry.id)}
+                    onDragEnd={handleDragEnd}
+                    onTouchStart={() => !selectionMode && handleTouchStart(entry.id)}
+                    onTouchEnd={handleTouchEnd}
+                    onTouchMove={handleTouchEnd}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      setSelectionMode(true);
+                      setSelectedIds(new Set([entry.id]));
+                    }}
+                  >
+                    {/* Drag handle */}
+                    {!selectionMode && editingId !== entry.id && (
+                      <div
+                        className="opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing text-stone-400 hover:text-stone-600 pt-2 px-1 select-none transition-opacity"
+                        title="Přetáhni pro přesun"
+                      >
+                        ⋮⋮
+                      </div>
+                    )}
+
+                    {selectionMode && (
+                      <button
+                        onClick={() => toggleSelect(entry.id)}
+                        className={`mt-2 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
+                          isSelected
+                            ? 'bg-amber-500 border-amber-500 text-white'
+                            : 'border-stone-300 hover:border-amber-400'
+                        }`}
+                      >
+                        {isSelected && '✓'}
+                      </button>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      {content}
+                    </div>
+
+                    {/* Tlačítko pro vložení poznámky ZA tento záznam */}
+                    {!selectionMode && editingId !== entry.id && (
+                      <button
+                        onClick={() => setInsertAfterIndex(insertAfterIndex === entry.id ? null : entry.id)}
+                        className="opacity-0 group-hover:opacity-100 text-stone-400 hover:text-amber-600 pt-2 px-1 transition-opacity"
+                        title="Vložit poznámku pod"
+                      >
+                        +
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Formulář pro vložení poznámky ZA tento záznam */}
+                  {insertAfterIndex === entry.id && (
+                    <div className="my-2 ml-6 bg-white rounded-lg border border-amber-300 p-3 shadow-sm">
+                      <p className="text-xs text-stone-500 mb-2">📝 Vložit poznámku:</p>
+                      <textarea
+                        value={insertText}
+                        onChange={(e) => setInsertText(e.target.value)}
+                        className="w-full h-20 p-2 border border-stone-200 rounded bg-amber-50/50 focus:outline-none focus:border-amber-400 font-serif text-stone-800 text-sm"
+                        placeholder="Napiš poznámku..."
+                        autoFocus
+                      />
+                      <div className="flex justify-end gap-2 mt-2">
                         <button
-                          onClick={() => toggleSelect(entry.id)}
-                          className={`mt-2 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
-                            isSelected
-                              ? 'bg-amber-500 border-amber-500 text-white'
-                              : 'border-stone-300 hover:border-amber-400'
-                          }`}
+                          onClick={() => { setInsertAfterIndex(null); setInsertText(''); }}
+                          className="px-3 py-1 text-stone-500 hover:text-stone-700 text-sm"
                         >
-                          {isSelected && '✓'}
+                          Zrušit
                         </button>
-                      )}
-                      <div className="flex-1">
-                        {content}
+                        <button
+                          onClick={() => insertNoteAfter(entry.id)}
+                          className="px-3 py-1 bg-amber-600 text-white rounded text-sm hover:bg-amber-700"
+                          disabled={!insertText.trim()}
+                        >
+                          Vložit
+                        </button>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            ))}
+                  )}
+                </React.Fragment>
+              );
+            })}
           </div>
         )}
       </div>
@@ -11152,7 +11379,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
       {/* Reading tip */}
       {!selectionMode && (
         <p className="text-center text-xs text-stone-400 mt-6 font-sans">
-          💡 Klikni pro úpravu • Dlouze podrž pro výběr více
+          💡 Klikni pro úpravu • Přetáhni ⋮⋮ pro přesun • + vloží poznámku • Dlouze podrž pro výběr více
         </p>
       )}
 
@@ -11194,13 +11421,20 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }}>
           <div className="bg-amber-50 rounded-lg shadow-xl max-w-md w-full max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             {detailModal.type === 'npc' && detailModal.data && (
-              <div className="p-4 space-y-3">
+              <div className={`p-4 space-y-3 ${detailModal.data.isDead ? 'bg-stone-200' : ''}`}>
                 <div className="flex justify-between items-start">
-                  <h3 className="text-2xl font-bold text-amber-900">🐭 {detailModal.data.name}</h3>
+                  <div>
+                    <h3 className={`text-2xl font-bold ${detailModal.data.isDead ? 'text-stone-500 line-through' : 'text-amber-900'}`}>
+                      {detailModal.data.isDead ? '💀' : '🐭'} {detailModal.data.name}
+                    </h3>
+                    {detailModal.data.isDead && (
+                      <span className="text-sm text-red-600 font-medium">† Mrtvý</span>
+                    )}
+                  </div>
                   <button onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }} className="text-stone-400 hover:text-stone-600 text-xl">✕</button>
                 </div>
                 {detailModal.data.role && (
-                  <p className="text-stone-600 font-medium">🔧 {detailModal.data.role}</p>
+                  <p className={`font-medium ${detailModal.data.isDead ? 'text-stone-400' : 'text-stone-600'}`}>🔧 {detailModal.data.role}</p>
                 )}
                 <div className="flex flex-wrap gap-2 text-sm font-mono bg-stone-100 rounded px-3 py-2 justify-center">
                   <span>BO: <b>{detailModal.data.hp?.max || detailModal.data.hp}</b></span>
@@ -11285,6 +11519,23 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                   >
                     ✏️ Upravit
                   </button>
+                  {onUpdateNPC && (
+                    <button
+                      onClick={() => {
+                        const newDeadState = !detailModal.data.isDead;
+                        onUpdateNPC(detailModal.data.id, { isDead: newDeadState });
+                        setDetailModal({ ...detailModal, data: { ...detailModal.data, isDead: newDeadState } });
+                      }}
+                      className={`px-4 py-2 rounded font-medium ${
+                        detailModal.data.isDead
+                          ? 'bg-green-500 hover:bg-green-600 text-white'
+                          : 'bg-stone-500 hover:bg-stone-600 text-white'
+                      }`}
+                      title={detailModal.data.isDead ? 'Oživit NPC' : 'Označit jako mrtvého'}
+                    >
+                      {detailModal.data.isDead ? '💚' : '💀'}
+                    </button>
+                  )}
                   {onDeleteNPC && (
                     <button
                       onClick={() => {
@@ -11430,6 +11681,100 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                     </button>
                   )}
                 </div>
+              </div>
+            )}
+
+            {/* Modal pro detail tvora */}
+            {detailModal.type === 'creature' && detailModal.data && (
+              <div className="p-4 space-y-3">
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-2">
+                    <span className="text-3xl">{detailModal.data.type?.icon || '🐭'}</span>
+                    <div>
+                      <h3 className="text-2xl font-bold text-amber-900">{detailModal.data.name}</h3>
+                      <p className="text-sm text-stone-600">{detailModal.data.type?.name}</p>
+                    </div>
+                  </div>
+                  <button onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }} className="text-stone-400 hover:text-stone-600 text-xl">✕</button>
+                </div>
+
+                {/* Aktivita a nálada */}
+                <div className="p-3 bg-amber-100/50 rounded">
+                  <p className="text-stone-700">
+                    {detailModal.data.name} {detailModal.data.doing}.
+                    <span className="text-stone-600 ml-1">Je {detailModal.data.personality}.</span>
+                  </p>
+                  {detailModal.data.mood && (
+                    <p className="text-stone-500 italic mt-1">{detailModal.data.mood.charAt(0).toUpperCase() + detailModal.data.mood.slice(1)}.</p>
+                  )}
+                </div>
+
+                {/* Vzhled */}
+                <div className="p-3 bg-white/50 rounded border-l-4 border-amber-400">
+                  <span className="text-xs text-amber-700 font-medium block mb-1">👁️ VZHLED</span>
+                  <p className="text-stone-700">{detailModal.data.appearance?.charAt(0).toUpperCase() + detailModal.data.appearance?.slice(1)}.</p>
+                </div>
+
+                {/* Cíl */}
+                <div className="p-3 bg-white/50 rounded border-l-4 border-blue-400">
+                  <span className="text-xs text-blue-600 font-medium block mb-1">🎯 CÍL</span>
+                  <p className="text-stone-700">{detailModal.data.goal?.charAt(0).toUpperCase() + detailModal.data.goal?.slice(1)}.</p>
+                </div>
+
+                {/* Zvláštnost */}
+                {detailModal.data.quirk && (
+                  <div className="p-3 bg-white/50 rounded border-l-4 border-purple-400">
+                    <span className="text-xs text-purple-600 font-medium block mb-1">✨ ZVLÁŠTNOST</span>
+                    <p className="text-stone-700">{detailModal.data.quirk.charAt(0).toUpperCase() + detailModal.data.quirk.slice(1)}.</p>
+                  </div>
+                )}
+
+                {/* Tajemství - pouze pro GM */}
+                {detailModal.data.secret && (
+                  <div className="p-3 bg-stone-800 rounded border-l-4 border-stone-600">
+                    <span className="text-xs text-stone-400 font-medium block mb-1">🔒 TAJEMSTVÍ (pouze GM)</span>
+                    <p className="text-stone-300 italic">{detailModal.data.secret.charAt(0).toUpperCase() + detailModal.data.secret.slice(1)}.</p>
+                  </div>
+                )}
+
+                {/* Kategorie */}
+                <div className="pt-3 border-t border-stone-200">
+                  <span className="px-2 py-1 bg-stone-100 rounded text-xs text-stone-500">
+                    {detailModal.data.type?.category === 'mouse' ? '🐭 Myš' :
+                     detailModal.data.type?.category === 'rat' ? '🐀 Krysa' :
+                     detailModal.data.type?.category === 'insect' ? '🐛 Hmyz' :
+                     detailModal.data.type?.category === 'spirit' ? '👻 Duch' :
+                     detailModal.data.type?.category === 'fae' ? '🧚 Víla' :
+                     detailModal.data.type?.category === 'construct' ? '⚙️ Konstrukt' :
+                     detailModal.data.type?.category === 'predator' ? '🦉 Predátor' : '🐸 Tvor'}
+                  </span>
+                </div>
+
+                {/* Poznámka ze záznamu */}
+                {detailModal.note && (
+                  <div className="p-3 bg-stone-100 rounded">
+                    <span className="text-sm text-stone-500">Poznámka</span>
+                    <p className="text-stone-700 italic">{detailModal.note}</p>
+                  </div>
+                )}
+
+                {/* Tlačítko pro povýšení na NPC */}
+                {onPromoteToNPC && (
+                  <div className="pt-3 border-t border-amber-200">
+                    <button
+                      onClick={() => {
+                        const newNPC = onPromoteToNPC(detailModal.data);
+                        if (newNPC) {
+                          setDetailModal({ type: 'npc', data: newNPC });
+                        }
+                      }}
+                      className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded font-medium transition-colors"
+                    >
+                      ⭐ Povýšit na NPC
+                    </button>
+                    <p className="text-xs text-stone-500 text-center mt-1">Vytvoří plnohodnotné NPC se statistikami</p>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -14081,7 +14426,7 @@ function MausritterSoloCompanion() {
       {/* Navigation */}
       <nav className="bg-amber-800/90 backdrop-blur-sm shadow-lg sticky top-[76px] z-40">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="flex gap-1 overflow-x-auto py-2 scrollbar-hide">
+          <div className="flex gap-1 overflow-x-auto lg:overflow-visible py-2 scrollbar-hide">
             {panels.map(panel => (
               <button
                 key={panel.id}
@@ -14244,6 +14589,40 @@ function MausritterSoloCompanion() {
               setWorldNPCs(worldNPCs.map(n => n.settlementId === settlementId ? { ...n, settlementId: null } : n));
               // Smazat záznamy z deníku
               setJournal(journal.filter(e => e.settlementId !== settlementId && e.data?.id !== settlementId));
+            }}
+            onPromoteToNPC={(creatureData) => {
+              // Vytvoř NPC z tvora
+              const roll = () => Math.floor(Math.random() * 6) + 1;
+              const newNPC = {
+                id: generateId(),
+                name: creatureData.name,
+                role: creatureData.type?.name || '',
+                birthsign: creatureData.personality || '',
+                physicalDetail: creatureData.appearance || '',
+                quirk: creatureData.quirk || '',
+                goal: creatureData.goal || '',
+                notes: creatureData.secret ? `Tajemství: ${creatureData.secret}` : '',
+                hp: { current: roll() + roll(), max: roll() + roll() },
+                str: { current: roll() + roll() + roll(), max: roll() + roll() + roll() },
+                dex: { current: roll() + roll() + roll(), max: roll() + roll() + roll() },
+                wil: { current: roll() + roll() + roll(), max: roll() + roll() + roll() },
+                settlementId: null,
+                createdAt: new Date().toISOString()
+              };
+              setWorldNPCs([...worldNPCs, newNPC]);
+              // Přidej záznam do deníku
+              setJournal([{
+                id: generateId(),
+                type: 'saved_npc',
+                timestamp: formatTimestamp(),
+                data: newNPC
+              }, ...journal]);
+              return newNPC;
+            }}
+            onUpdateNPC={(npcId, updates) => {
+              setWorldNPCs(worldNPCs.map(n => n.id === npcId ? { ...n, ...updates } : n));
+              // Vrátit aktualizované NPC
+              return worldNPCs.find(n => n.id === npcId);
             }}
           />
         )}
