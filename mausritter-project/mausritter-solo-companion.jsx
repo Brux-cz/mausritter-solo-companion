@@ -11093,8 +11093,8 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
           const e = entry.data;
           return (
             <div className="my-2 pl-4 border-l-2 border-red-400 cursor-pointer hover:bg-red-50 rounded transition-colors overflow-hidden"
-                 onClick={() => startEdit(entry)}
-                 title="Klikni pro úpravu">
+                 onClick={() => setDetailModal({ type: 'encounter', data: { creature: e.creature?.name || e.creature, activity: e.activity, danger: e.danger }, note: entry.note })}
+                 title="Klikni pro detail">
               <p className="font-bold text-stone-800 truncate">
                 {e.danger ? '⚠️' : '👁️'} {e.creature?.name}
               </p>
@@ -11121,8 +11121,8 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
           if (d) {
             return (
               <div className="my-2 pl-4 border-l-2 border-amber-500 cursor-pointer hover:bg-amber-50 rounded transition-colors"
-                   onClick={() => startEdit(entry)}
-                   title="Klikni pro úpravu">
+                   onClick={() => setDetailModal({ type: 'frame_scene', data: d, note: entry.note })}
+                   title="Klikni pro detail">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-lg">🎬</span>
                   <span className={`text-sm font-bold ${d.isAltered ? 'text-orange-600' : 'text-green-700'}`}>
@@ -11139,11 +11139,11 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
               </div>
             );
           }
-          // Fallback pro starší záznamy bez details - zobrazíme narrative
+          // Fallback pro starší záznamy bez details - jen editace
           return (
             <div className="my-2 pl-4 border-l-2 border-amber-500 cursor-pointer hover:bg-amber-50 rounded transition-colors"
                  onClick={() => startEdit(entry)}
-                 title="Klikni pro úpravu">
+                 title="Klikni pro úpravu (starý formát)">
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-lg">🎬</span>
                 <span className="text-sm font-bold text-amber-700">
@@ -11373,15 +11373,21 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
           </p>
         );
 
-      case 'character_created':
+      case 'character_created': {
+        // Najdi postavu v parties podle jména
+        const foundChar = parties?.flatMap(p => p.characters || []).find(c => c.name === entry.character);
         return (
           <p className="my-2 text-amber-800 font-medium cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
-             onClick={() => startEdit(entry)}
-             title="Klikni pro úpravu">
+             onClick={() => foundChar
+               ? setDetailModal({ type: 'character_entry', data: { ...foundChar, timestamp: entry.timestamp }, note: entry.note })
+               : startEdit(entry)
+             }
+             title={foundChar ? "Klikni pro detail" : "Klikni pro úpravu"}>
             🐭 Na scénu vstupuje <strong>{entry.character}</strong>
             {entry.note && <span className="font-normal italic text-stone-600 ml-2">— {parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</span>}
           </p>
         );
+      }
 
       case 'state_change':
         // HP/stat changes - very subtle, or hide completely
@@ -12280,6 +12286,151 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                     </button>
                     <p className="text-xs text-stone-500 text-center mt-1">Vytvoří plnohodnotné NPC se statistikami</p>
                   </div>
+                )}
+              </div>
+            )}
+
+            {/* Modal pro detail scény (frame_scene) */}
+            {detailModal.type === 'frame_scene' && detailModal.data && (
+              <div className="p-4 space-y-3">
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-2">
+                    <span className="text-3xl">🎬</span>
+                    <div>
+                      <h3 className={`text-xl font-bold ${detailModal.data.isAltered ? 'text-orange-700' : 'text-green-700'}`}>
+                        [{detailModal.data.alteredDie}] {detailModal.data.isAltered ? 'Pozměněná scéna!' : 'Scéna dle očekávání'}
+                      </h3>
+                    </div>
+                  </div>
+                  <button onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }} className="text-stone-400 hover:text-stone-600 text-xl">✕</button>
+                </div>
+
+                {/* Úvodní situace */}
+                <div className="p-3 bg-amber-100/50 rounded border-l-4 border-amber-400">
+                  <span className="text-xs text-amber-700 font-medium block mb-1">📖 ÚVOD</span>
+                  <p className="text-stone-700">{detailModal.data.opening}</p>
+                </div>
+
+                {/* Místo */}
+                <div className="p-3 bg-green-100/50 rounded border-l-4 border-green-400">
+                  <span className="text-xs text-green-700 font-medium block mb-1">📍 MÍSTO</span>
+                  <p className="text-stone-700">{detailModal.data.setting}</p>
+                </div>
+
+                {/* Akce + Téma */}
+                <div className="p-3 bg-purple-100/50 rounded border-l-4 border-purple-400">
+                  <span className="text-xs text-purple-700 font-medium block mb-1">💡 AKCE + TÉMA</span>
+                  <p className="text-stone-700 font-medium">{detailModal.data.action} + {detailModal.data.theme}</p>
+                </div>
+
+                {/* Komplikace (pokud je pozměněná) */}
+                {detailModal.data.isAltered && detailModal.data.complication && (
+                  <div className="p-3 bg-orange-100 rounded border-l-4 border-orange-500">
+                    <span className="text-xs text-orange-700 font-medium block mb-1">⚡ KOMPLIKACE</span>
+                    <p className="text-orange-900 font-medium">{detailModal.data.complication}</p>
+                  </div>
+                )}
+
+                {/* Poznámka */}
+                {detailModal.note && (
+                  <div className="p-3 bg-stone-100 rounded">
+                    <span className="text-sm text-stone-500">Poznámka</span>
+                    <p className="text-stone-700 italic">{detailModal.note}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Modal pro detail setkání (encounter) */}
+            {detailModal.type === 'encounter' && detailModal.data && (
+              <div className="p-4 space-y-3">
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-2">
+                    <span className="text-3xl">🎭</span>
+                    <h3 className="text-xl font-bold text-amber-900">Setkání</h3>
+                  </div>
+                  <button onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }} className="text-stone-400 hover:text-stone-600 text-xl">✕</button>
+                </div>
+
+                {/* Tvor */}
+                <div className="p-3 bg-amber-100/50 rounded border-l-4 border-amber-400">
+                  <span className="text-xs text-amber-700 font-medium block mb-1">🐭 TVOR</span>
+                  <p className="text-stone-700 font-medium">{detailModal.data.creature}</p>
+                </div>
+
+                {/* Aktivita */}
+                <div className="p-3 bg-blue-100/50 rounded border-l-4 border-blue-400">
+                  <span className="text-xs text-blue-700 font-medium block mb-1">🎬 AKTIVITA</span>
+                  <p className="text-stone-700">{detailModal.data.activity}</p>
+                </div>
+
+                {/* Poznámka */}
+                {detailModal.note && (
+                  <div className="p-3 bg-stone-100 rounded">
+                    <span className="text-sm text-stone-500">Poznámka</span>
+                    <p className="text-stone-700 italic">{detailModal.note}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Modal pro detail postavy vstupující na scénu */}
+            {detailModal.type === 'character_entry' && detailModal.data && (
+              <div className="p-4 space-y-3">
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-2">
+                    <span className="text-3xl">🐭</span>
+                    <div>
+                      <h3 className="text-xl font-bold text-amber-900">{detailModal.data.name}</h3>
+                      <p className="text-sm text-stone-500">Vstup na scénu</p>
+                    </div>
+                  </div>
+                  <button onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }} className="text-stone-400 hover:text-stone-600 text-xl">✕</button>
+                </div>
+
+                {/* Statistiky */}
+                <div className="flex flex-wrap gap-2 text-sm font-mono bg-stone-100 rounded px-3 py-2 justify-center">
+                  <span>BO: <b>{detailModal.data.hp?.current ?? detailModal.data.hp?.max ?? detailModal.data.hp}</b></span>
+                  <span>SÍL: <b>{detailModal.data.str?.current ?? detailModal.data.str?.max ?? detailModal.data.str}</b></span>
+                  <span>MRŠ: <b>{detailModal.data.dex?.current ?? detailModal.data.dex?.max ?? detailModal.data.dex}</b></span>
+                  <span>VŮL: <b>{detailModal.data.wil?.current ?? detailModal.data.wil?.max ?? detailModal.data.wil}</b></span>
+                </div>
+
+                {/* Znamení */}
+                {detailModal.data.birthsign && (
+                  <div className="p-3 bg-amber-100/50 rounded border-l-4 border-amber-400">
+                    <span className="text-xs text-amber-700 font-medium block mb-1">⭐ ZNAMENÍ</span>
+                    <p className="text-stone-700">{detailModal.data.birthsign}</p>
+                  </div>
+                )}
+
+                {/* Vzhled */}
+                {detailModal.data.physicalDetail && (
+                  <div className="p-3 bg-purple-100/50 rounded border-l-4 border-purple-400">
+                    <span className="text-xs text-purple-700 font-medium block mb-1">👁️ VZHLED</span>
+                    <p className="text-stone-700">{detailModal.data.physicalDetail}</p>
+                  </div>
+                )}
+
+                {/* Zázemí */}
+                {detailModal.data.background && (
+                  <div className="p-3 bg-blue-100/50 rounded border-l-4 border-blue-400">
+                    <span className="text-xs text-blue-700 font-medium block mb-1">📜 ZÁZEMÍ</span>
+                    <p className="text-stone-700">{detailModal.data.background}</p>
+                  </div>
+                )}
+
+                {/* Poznámka */}
+                {detailModal.note && (
+                  <div className="p-3 bg-stone-100 rounded">
+                    <span className="text-sm text-stone-500">Poznámka</span>
+                    <p className="text-stone-700 italic">{detailModal.note}</p>
+                  </div>
+                )}
+
+                {/* Čas vstupu */}
+                {detailModal.data.timestamp && (
+                  <p className="text-xs text-stone-400 text-center">{detailModal.data.timestamp}</p>
                 )}
               </div>
             )}
