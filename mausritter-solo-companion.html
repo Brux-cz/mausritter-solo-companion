@@ -11400,39 +11400,15 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
           </p>
         );
 
-      case 'character_created': {
+      case 'character_created':
         return (
           <p className="my-2 text-amber-800 font-medium cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
-             onClick={() => {
-               try {
-                 // Najdi postavu v parties podle jména (postavy jsou v p.members)
-                 const allMembers = (parties || []).flatMap(p => (p && p.members) || []);
-                 const foundChar = allMembers.find(c => c && c.name === entry.character);
-                 const charData = foundChar
-                   ? {
-                       name: foundChar.name,
-                       hp: foundChar.hp,
-                       STR: foundChar.STR,
-                       DEX: foundChar.DEX,
-                       WIL: foundChar.WIL,
-                       birthsign: foundChar.birthsign,
-                       physicalDetail: foundChar.physicalDetail,
-                       background: foundChar.background,
-                       timestamp: entry.timestamp
-                     }
-                   : { name: entry.character, timestamp: entry.timestamp };
-                 setDetailModal({ type: 'character_entry', data: charData, note: entry.note });
-               } catch (err) {
-                 console.error('Error opening character modal:', err);
-                 setDetailModal({ type: 'character_entry', data: { name: entry.character, timestamp: entry.timestamp }, note: entry.note });
-               }
-             }}
-             title="Klikni pro detail">
+             onClick={() => startEdit(entry)}
+             title="Klikni pro úpravu">
             🐭 Na scénu vstupuje <strong>{entry.character}</strong>
             {entry.note && <span className="font-normal italic text-stone-600 ml-2">— {parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</span>}
           </p>
         );
-      }
 
       case 'state_change':
         // HP/stat changes - very subtle, or hide completely
@@ -12419,81 +12395,6 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
               </div>
             )}
 
-            {/* Modal pro detail postavy vstupující na scénu */}
-            {detailModal.type === 'character_entry' && detailModal.data && (() => {
-              const d = detailModal.data;
-              const hp = d.hp ? (typeof d.hp === 'object' ? (d.hp.current ?? d.hp.max) : d.hp) : null;
-              const str = d.STR ? (typeof d.STR === 'object' ? (d.STR.current ?? d.STR.max) : d.STR) : null;
-              const dex = d.DEX ? (typeof d.DEX === 'object' ? (d.DEX.current ?? d.DEX.max) : d.DEX) : null;
-              const wil = d.WIL ? (typeof d.WIL === 'object' ? (d.WIL.current ?? d.WIL.max) : d.WIL) : null;
-              const hasStats = hp !== null || str !== null;
-              return (
-                <div className="p-4 space-y-3">
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-center gap-2">
-                      <span className="text-3xl">🐭</span>
-                      <div>
-                        <h3 className="text-xl font-bold text-amber-900">{d.name || 'Neznámá postava'}</h3>
-                        <p className="text-sm text-stone-500">Vstup na scénu</p>
-                      </div>
-                    </div>
-                    <button onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }} className="text-stone-400 hover:text-stone-600 text-xl">✕</button>
-                  </div>
-
-                  {/* Statistiky */}
-                  {hasStats && (
-                    <div className="flex flex-wrap gap-2 text-sm font-mono bg-stone-100 rounded px-3 py-2 justify-center">
-                      <span>BO: <b>{hp ?? '?'}</b></span>
-                      <span>SÍL: <b>{str ?? '?'}</b></span>
-                      <span>MRŠ: <b>{dex ?? '?'}</b></span>
-                      <span>VŮL: <b>{wil ?? '?'}</b></span>
-                    </div>
-                  )}
-
-                  {/* Pokud nejsou žádná data */}
-                  {!hasStats && !d.birthsign && !d.physicalDetail && (
-                    <p className="text-center text-stone-500 italic py-4">Podrobnosti postavy nejsou k dispozici</p>
-                  )}
-
-                  {/* Znamení */}
-                  {d.birthsign && (
-                    <div className="p-3 bg-amber-100/50 rounded border-l-4 border-amber-400">
-                      <span className="text-xs text-amber-700 font-medium block mb-1">⭐ ZNAMENÍ</span>
-                      <p className="text-stone-700">{d.birthsign}</p>
-                    </div>
-                  )}
-
-                  {/* Vzhled */}
-                  {d.physicalDetail && (
-                    <div className="p-3 bg-purple-100/50 rounded border-l-4 border-purple-400">
-                      <span className="text-xs text-purple-700 font-medium block mb-1">👁️ VZHLED</span>
-                      <p className="text-stone-700">{d.physicalDetail}</p>
-                    </div>
-                  )}
-
-                  {/* Zázemí */}
-                  {d.background && (
-                    <div className="p-3 bg-blue-100/50 rounded border-l-4 border-blue-400">
-                      <span className="text-xs text-blue-700 font-medium block mb-1">📜 ZÁZEMÍ</span>
-                      <p className="text-stone-700">{d.background}</p>
-                    </div>
-                  )}
-
-                  {/* Poznámka */}
-                  {detailModal.note && (
-                    <div className="p-3 bg-stone-100 rounded">
-                      <span className="text-sm text-stone-500">Poznámka</span>
-                      <p className="text-stone-700 italic">{detailModal.note}</p>
-                    </div>
-                  )}
-
-                  {/* Čas vstupu */}
-                  {d.timestamp && (
-                    <p className="text-xs text-stone-400 text-center">{d.timestamp}</p>
-                  )}
-                </div>
-              );
-            })()}
           </div>
         </div>
       )}
