@@ -11374,8 +11374,8 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
         );
 
       case 'character_created': {
-        // Najdi postavu v parties podle jména
-        const foundChar = parties?.flatMap(p => p.characters || []).find(c => c.name === entry.character);
+        // Najdi postavu v parties podle jména (postavy jsou v p.members)
+        const foundChar = parties?.flatMap(p => p.members || []).find(c => c.name === entry.character);
         return (
           <p className="my-2 text-amber-800 font-medium cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
              onClick={() => {
@@ -12390,18 +12390,18 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                   <button onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }} className="text-stone-400 hover:text-stone-600 text-xl">✕</button>
                 </div>
 
-                {/* Statistiky - jen pokud jsou dostupné */}
-                {(detailModal.data.hp || detailModal.data.str || detailModal.data.dex || detailModal.data.wil) && (
+                {/* Statistiky - jen pokud jsou dostupné (STR/DEX/WIL jsou velkými písmeny) */}
+                {(detailModal.data.hp || detailModal.data.STR || detailModal.data.DEX || detailModal.data.WIL) && (
                   <div className="flex flex-wrap gap-2 text-sm font-mono bg-stone-100 rounded px-3 py-2 justify-center">
                     <span>BO: <b>{detailModal.data.hp?.current ?? detailModal.data.hp?.max ?? detailModal.data.hp ?? '?'}</b></span>
-                    <span>SÍL: <b>{detailModal.data.str?.current ?? detailModal.data.str?.max ?? detailModal.data.str ?? '?'}</b></span>
-                    <span>MRŠ: <b>{detailModal.data.dex?.current ?? detailModal.data.dex?.max ?? detailModal.data.dex ?? '?'}</b></span>
-                    <span>VŮL: <b>{detailModal.data.wil?.current ?? detailModal.data.wil?.max ?? detailModal.data.wil ?? '?'}</b></span>
+                    <span>SÍL: <b>{detailModal.data.STR?.current ?? detailModal.data.STR?.max ?? detailModal.data.STR ?? '?'}</b></span>
+                    <span>MRŠ: <b>{detailModal.data.DEX?.current ?? detailModal.data.DEX?.max ?? detailModal.data.DEX ?? '?'}</b></span>
+                    <span>VŮL: <b>{detailModal.data.WIL?.current ?? detailModal.data.WIL?.max ?? detailModal.data.WIL ?? '?'}</b></span>
                   </div>
                 )}
 
                 {/* Pokud nejsou žádná data - informační text */}
-                {!detailModal.data.hp && !detailModal.data.birthsign && !detailModal.data.physicalDetail && !detailModal.data.background && (
+                {!detailModal.data.hp && !detailModal.data.STR && !detailModal.data.birthsign && !detailModal.data.physicalDetail && (
                   <p className="text-center text-stone-500 italic py-4">Podrobnosti postavy nejsou k dispozici</p>
                 )}
 
