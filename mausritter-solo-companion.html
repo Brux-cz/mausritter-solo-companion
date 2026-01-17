@@ -12420,72 +12420,80 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
             )}
 
             {/* Modal pro detail postavy vstupující na scénu */}
-            {detailModal.type === 'character_entry' && detailModal.data && (
-              <div className="p-4 space-y-3">
-                <div className="flex justify-between items-start">
-                  <div className="flex items-center gap-2">
-                    <span className="text-3xl">🐭</span>
-                    <div>
-                      <h3 className="text-xl font-bold text-amber-900">{detailModal.data.name}</h3>
-                      <p className="text-sm text-stone-500">Vstup na scénu</p>
+            {detailModal.type === 'character_entry' && detailModal.data && (() => {
+              const d = detailModal.data;
+              const hp = d.hp ? (typeof d.hp === 'object' ? (d.hp.current ?? d.hp.max) : d.hp) : null;
+              const str = d.STR ? (typeof d.STR === 'object' ? (d.STR.current ?? d.STR.max) : d.STR) : null;
+              const dex = d.DEX ? (typeof d.DEX === 'object' ? (d.DEX.current ?? d.DEX.max) : d.DEX) : null;
+              const wil = d.WIL ? (typeof d.WIL === 'object' ? (d.WIL.current ?? d.WIL.max) : d.WIL) : null;
+              const hasStats = hp !== null || str !== null;
+              return (
+                <div className="p-4 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-2">
+                      <span className="text-3xl">🐭</span>
+                      <div>
+                        <h3 className="text-xl font-bold text-amber-900">{d.name || 'Neznámá postava'}</h3>
+                        <p className="text-sm text-stone-500">Vstup na scénu</p>
+                      </div>
                     </div>
+                    <button onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }} className="text-stone-400 hover:text-stone-600 text-xl">✕</button>
                   </div>
-                  <button onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }} className="text-stone-400 hover:text-stone-600 text-xl">✕</button>
+
+                  {/* Statistiky */}
+                  {hasStats && (
+                    <div className="flex flex-wrap gap-2 text-sm font-mono bg-stone-100 rounded px-3 py-2 justify-center">
+                      <span>BO: <b>{hp ?? '?'}</b></span>
+                      <span>SÍL: <b>{str ?? '?'}</b></span>
+                      <span>MRŠ: <b>{dex ?? '?'}</b></span>
+                      <span>VŮL: <b>{wil ?? '?'}</b></span>
+                    </div>
+                  )}
+
+                  {/* Pokud nejsou žádná data */}
+                  {!hasStats && !d.birthsign && !d.physicalDetail && (
+                    <p className="text-center text-stone-500 italic py-4">Podrobnosti postavy nejsou k dispozici</p>
+                  )}
+
+                  {/* Znamení */}
+                  {d.birthsign && (
+                    <div className="p-3 bg-amber-100/50 rounded border-l-4 border-amber-400">
+                      <span className="text-xs text-amber-700 font-medium block mb-1">⭐ ZNAMENÍ</span>
+                      <p className="text-stone-700">{d.birthsign}</p>
+                    </div>
+                  )}
+
+                  {/* Vzhled */}
+                  {d.physicalDetail && (
+                    <div className="p-3 bg-purple-100/50 rounded border-l-4 border-purple-400">
+                      <span className="text-xs text-purple-700 font-medium block mb-1">👁️ VZHLED</span>
+                      <p className="text-stone-700">{d.physicalDetail}</p>
+                    </div>
+                  )}
+
+                  {/* Zázemí */}
+                  {d.background && (
+                    <div className="p-3 bg-blue-100/50 rounded border-l-4 border-blue-400">
+                      <span className="text-xs text-blue-700 font-medium block mb-1">📜 ZÁZEMÍ</span>
+                      <p className="text-stone-700">{d.background}</p>
+                    </div>
+                  )}
+
+                  {/* Poznámka */}
+                  {detailModal.note && (
+                    <div className="p-3 bg-stone-100 rounded">
+                      <span className="text-sm text-stone-500">Poznámka</span>
+                      <p className="text-stone-700 italic">{detailModal.note}</p>
+                    </div>
+                  )}
+
+                  {/* Čas vstupu */}
+                  {d.timestamp && (
+                    <p className="text-xs text-stone-400 text-center">{d.timestamp}</p>
+                  )}
                 </div>
-
-                {/* Statistiky - jen pokud jsou dostupné (STR/DEX/WIL jsou velkými písmeny) */}
-                {(detailModal.data.hp || detailModal.data.STR || detailModal.data.DEX || detailModal.data.WIL) && (
-                  <div className="flex flex-wrap gap-2 text-sm font-mono bg-stone-100 rounded px-3 py-2 justify-center">
-                    <span>BO: <b>{detailModal.data.hp?.current ?? detailModal.data.hp?.max ?? detailModal.data.hp ?? '?'}</b></span>
-                    <span>SÍL: <b>{detailModal.data.STR?.current ?? detailModal.data.STR?.max ?? detailModal.data.STR ?? '?'}</b></span>
-                    <span>MRŠ: <b>{detailModal.data.DEX?.current ?? detailModal.data.DEX?.max ?? detailModal.data.DEX ?? '?'}</b></span>
-                    <span>VŮL: <b>{detailModal.data.WIL?.current ?? detailModal.data.WIL?.max ?? detailModal.data.WIL ?? '?'}</b></span>
-                  </div>
-                )}
-
-                {/* Pokud nejsou žádná data - informační text */}
-                {!detailModal.data.hp && !detailModal.data.STR && !detailModal.data.birthsign && !detailModal.data.physicalDetail && (
-                  <p className="text-center text-stone-500 italic py-4">Podrobnosti postavy nejsou k dispozici</p>
-                )}
-
-                {/* Znamení */}
-                {detailModal.data.birthsign && (
-                  <div className="p-3 bg-amber-100/50 rounded border-l-4 border-amber-400">
-                    <span className="text-xs text-amber-700 font-medium block mb-1">⭐ ZNAMENÍ</span>
-                    <p className="text-stone-700">{detailModal.data.birthsign}</p>
-                  </div>
-                )}
-
-                {/* Vzhled */}
-                {detailModal.data.physicalDetail && (
-                  <div className="p-3 bg-purple-100/50 rounded border-l-4 border-purple-400">
-                    <span className="text-xs text-purple-700 font-medium block mb-1">👁️ VZHLED</span>
-                    <p className="text-stone-700">{detailModal.data.physicalDetail}</p>
-                  </div>
-                )}
-
-                {/* Zázemí */}
-                {detailModal.data.background && (
-                  <div className="p-3 bg-blue-100/50 rounded border-l-4 border-blue-400">
-                    <span className="text-xs text-blue-700 font-medium block mb-1">📜 ZÁZEMÍ</span>
-                    <p className="text-stone-700">{detailModal.data.background}</p>
-                  </div>
-                )}
-
-                {/* Poznámka */}
-                {detailModal.note && (
-                  <div className="p-3 bg-stone-100 rounded">
-                    <span className="text-sm text-stone-500">Poznámka</span>
-                    <p className="text-stone-700 italic">{detailModal.note}</p>
-                  </div>
-                )}
-
-                {/* Čas vstupu */}
-                {detailModal.data.timestamp && (
-                  <p className="text-xs text-stone-400 text-center">{detailModal.data.timestamp}</p>
-                )}
-              </div>
-            )}
+              );
+            })()}
           </div>
         </div>
       )}
