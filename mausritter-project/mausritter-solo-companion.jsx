@@ -11374,11 +11374,11 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
         );
 
       case 'character_created': {
-        // Najdi postavu v parties podle jména (postavy jsou v p.members)
-        const foundChar = parties?.flatMap(p => p.members || []).find(c => c.name === entry.character);
         return (
           <p className="my-2 text-amber-800 font-medium cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
              onClick={() => {
+               // Najdi postavu v parties podle jména (postavy jsou v p.members)
+               const foundChar = parties?.flatMap(p => p.members || []).find(c => c.name === entry.character);
                const charData = foundChar
                  ? { ...foundChar, timestamp: entry.timestamp }
                  : { name: entry.character, timestamp: entry.timestamp };
