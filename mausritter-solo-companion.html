@@ -4949,6 +4949,387 @@ const CombatPanel = ({ party, updateCharacterInParty, onLogEntry }) => {
 };
 
 // ============================================
+// CHARACTER SHEET - Kompaktní zobrazení postavy
+// Použito v bočním panelu i v hlavním menu
+// ============================================
+
+const CharacterSheet = ({
+  character,
+  updateCharacter,
+  onClose,
+  compact = false,
+  showInventory = true
+}) => {
+  const [openSection, setOpenSection] = useState(null);
+  const [selectedSlot, setSelectedSlot] = useState(null);
+  const [popupItem, setPopupItem] = useState(null);
+  const inventoryRef = useRef(null);
+  const slotSize = useSlotSize(inventoryRef);
+
+  if (!character) return null;
+
+  // Helper functions
+  const updateHP = (delta) => {
+    const newHP = Math.max(0, Math.min(character.hp?.max || 6, (character.hp?.current || 0) + delta));
+    updateCharacter({ hp: { ...character.hp, current: newHP } });
+  };
+
+  const updatePips = (delta) => {
+    updateCharacter({ pips: Math.max(0, (character.pips || 0) + delta) });
+  };
+
+  const updateAttribute = (attr, field, value) => {
+    const parsed = parseInt(value) || 0;
+    updateCharacter({
+      [attr]: { ...character[attr], [field]: Math.max(1, Math.min(18, parsed)) }
+    });
+  };
+
+  const moveInventoryItem = (fromSlot, toSlot) => {
+    if (fromSlot === toSlot) return;
+    const slots = { ...(character.inventorySlots || {}) };
+    const item = slots[fromSlot];
+    if (!item) return;
+
+    const belowMap = { mainPaw: 'offPaw', body1: 'body2', pack1: 'pack4', pack2: 'pack5', pack3: 'pack6' };
+    const aboveMap = { offPaw: 'mainPaw', body2: 'body1', pack4: 'pack1', pack5: 'pack2', pack6: 'pack3' };
+
+    const aboveSlot = aboveMap[toSlot];
+    if (aboveSlot && slots[aboveSlot]?.height === 2) return;
+
+    if (item.height === 2) {
+      const belowSlot = belowMap[toSlot];
+      if (!belowSlot) return;
+      if (slots[belowSlot] && belowSlot !== fromSlot) {
+        alert('Potřebuješ 2 volné sloty pod sebou!');
+        return;
+      }
+    }
+
+    const targetItem = slots[toSlot];
+    slots[toSlot] = item;
+    slots[fromSlot] = targetItem || null;
+
+    updateCharacter({ inventorySlots: slots });
+  };
+
+  const updateSlotItem = (slotId, field, value) => {
+    const slots = { ...(character.inventorySlots || {}) };
+    if (slots[slotId]) {
+      slots[slotId] = { ...slots[slotId], [field]: value };
+      updateCharacter({ inventorySlots: slots });
+    }
+  };
+
+  const removeSlotItem = (slotId) => {
+    const slots = { ...(character.inventorySlots || {}) };
+    if (slots[slotId]?.isCondition && slots[slotId]?.conditionId) {
+      updateCharacter({
+        inventorySlots: { ...slots, [slotId]: null },
+        conditions: (character.conditions || []).filter(c => c !== slots[slotId].conditionId)
+      });
+    } else {
+      slots[slotId] = null;
+      updateCharacter({ inventorySlots: slots });
+    }
+  };
+
+  const hpPercent = character.hp ? (character.hp.current / character.hp.max) * 100 : 100;
+  const hpColor = hpPercent > 50 ? 'bg-green-500' : hpPercent > 25 ? 'bg-yellow-500' : 'bg-red-500';
+
+  return (
+    <div className="flex flex-col h-full bg-amber-50">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-amber-700 to-amber-600 text-white p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">{character.type === 'pc' ? '🐭' : '🐿️'}</span>
+            <div>
+              <h2 className="text-xl font-bold">{character.name}</h2>
+              <p className="text-amber-200 text-sm">
+                {character.type === 'pc'
+                  ? (character.background || `Level ${character.level || 1}`)
+                  : 'Pomocník'}
+              </p>
+            </div>
+          </div>
+          {onClose && (
+            <button onClick={onClose} className="p-2 hover:bg-amber-600 rounded-lg text-xl">✕</button>
+          )}
+        </div>
+        {/* HP Bar pod jménem */}
+        <div className="mt-3 bg-amber-800/50 rounded-full h-2 overflow-hidden">
+          <div className={`h-full ${hpColor} transition-all`} style={{ width: `${hpPercent}%` }} />
+        </div>
+      </div>
+
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {/* HP & Pips Row */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-white rounded-xl p-3 shadow-sm">
+            <div className="text-xs text-stone-500 text-center mb-1">❤️ HP</div>
+            <div className="flex items-center justify-center gap-2">
+              <button onClick={() => updateHP(-1)} className="w-8 h-8 bg-red-100 text-red-700 rounded-lg font-bold">−</button>
+              <span className="text-xl font-bold text-red-700 min-w-[50px] text-center">
+                {character.hp?.current || 0}/{character.hp?.max || 6}
+              </span>
+              <button onClick={() => updateHP(1)} className="w-8 h-8 bg-green-100 text-green-700 rounded-lg font-bold">+</button>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl p-3 shadow-sm">
+            <div className="text-xs text-stone-500 text-center mb-1">💰 Pips</div>
+            <div className="flex items-center justify-center gap-2">
+              <button onClick={() => updatePips(-1)} className="w-8 h-8 bg-stone-100 text-stone-700 rounded-lg font-bold">−</button>
+              <span className="text-xl font-bold text-amber-600 min-w-[50px] text-center">{character.pips || 0}</span>
+              <button onClick={() => updatePips(1)} className="w-8 h-8 bg-stone-100 text-stone-700 rounded-lg font-bold">+</button>
+            </div>
+          </div>
+        </div>
+
+        {/* Attributes - jen pro PC */}
+        {character.type === 'pc' && (
+          <div className="bg-white rounded-xl p-3 shadow-sm">
+            <div className="grid grid-cols-3 gap-2 text-center">
+              {[
+                { key: 'STR', label: 'SÍL', color: 'red' },
+                { key: 'DEX', label: 'MRŠ', color: 'green' },
+                { key: 'WIL', label: 'VŮL', color: 'purple' }
+              ].map(attr => (
+                <div key={attr.key} className={`p-2 bg-${attr.color}-50 rounded-lg`}>
+                  <div className={`text-xs font-bold text-${attr.color}-700 mb-1`}>{attr.label}</div>
+                  <div className="flex items-center justify-center gap-1">
+                    <span className={`text-lg font-bold text-${attr.color}-900`}>
+                      {character[attr.key]?.current || 10}
+                    </span>
+                    <span className="text-stone-400 text-sm">/{character[attr.key]?.max || 10}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Inventory */}
+        {showInventory && (
+          <div className="bg-white rounded-xl p-3 shadow-sm">
+            <div className="text-xs font-bold text-stone-600 mb-2">🎒 Inventář</div>
+
+            {popupItem && (
+              <ItemPopup
+                item={popupItem.item}
+                slotId={popupItem.slotId}
+                onUpdate={updateSlotItem}
+                onRemove={removeSlotItem}
+                onMove={(slotId) => setSelectedSlot(slotId)}
+                onClose={() => setPopupItem(null)}
+              />
+            )}
+
+            {selectedSlot && (
+              <div className="mb-2 p-1 bg-amber-100 rounded text-xs text-amber-800 flex justify-between items-center">
+                <span>Vyber cílový slot</span>
+                <button onClick={() => setSelectedSlot(null)} className="text-amber-600 hover:text-amber-800">✕</button>
+              </div>
+            )}
+
+            <div ref={inventoryRef} className="flex gap-2 items-start justify-center">
+              {/* Paws */}
+              <div className="text-center">
+                <div className="text-amber-600 text-xs mb-1">🐾</div>
+                <div className="flex flex-col gap-1">
+                  <InvSlot id="mainPaw" slots={character.inventorySlots} color="amber"
+                    onMove={moveInventoryItem} onUpdate={updateSlotItem} onRemove={removeSlotItem}
+                    updateChar={updateCharacter} belowId="offPaw" slotSize={Math.min(slotSize, 50)}
+                    selectedSlot={selectedSlot} setSelectedSlot={setSelectedSlot} setPopupItem={setPopupItem} />
+                  <InvSlot id="offPaw" slots={character.inventorySlots} color="amber"
+                    onMove={moveInventoryItem} onUpdate={updateSlotItem} onRemove={removeSlotItem}
+                    updateChar={updateCharacter} aboveId="mainPaw" slotSize={Math.min(slotSize, 50)}
+                    selectedSlot={selectedSlot} setSelectedSlot={setSelectedSlot} setPopupItem={setPopupItem} />
+                </div>
+              </div>
+
+              {/* Body */}
+              <div className="text-center">
+                <div className="text-blue-600 text-xs mb-1">👕</div>
+                <div className="flex flex-col gap-1">
+                  <InvSlot id="body1" slots={character.inventorySlots} color="blue"
+                    onMove={moveInventoryItem} onUpdate={updateSlotItem} onRemove={removeSlotItem}
+                    updateChar={updateCharacter} belowId="body2" slotSize={Math.min(slotSize, 50)}
+                    selectedSlot={selectedSlot} setSelectedSlot={setSelectedSlot} setPopupItem={setPopupItem} />
+                  <InvSlot id="body2" slots={character.inventorySlots} color="blue"
+                    onMove={moveInventoryItem} onUpdate={updateSlotItem} onRemove={removeSlotItem}
+                    updateChar={updateCharacter} aboveId="body1" slotSize={Math.min(slotSize, 50)}
+                    selectedSlot={selectedSlot} setSelectedSlot={setSelectedSlot} setPopupItem={setPopupItem} />
+                </div>
+              </div>
+
+              {/* Pack */}
+              <div className="text-center flex-1">
+                <div className="text-stone-500 text-xs mb-1">🎒</div>
+                <div className="grid grid-cols-3 gap-1">
+                  {['pack1', 'pack2', 'pack3', 'pack4', 'pack5', 'pack6'].map(packId => (
+                    <InvSlot key={packId} id={packId} slots={character.inventorySlots} color="stone"
+                      onMove={moveInventoryItem} onUpdate={updateSlotItem} onRemove={removeSlotItem}
+                      updateChar={updateCharacter}
+                      belowId={packId.endsWith('1') ? 'pack4' : packId.endsWith('2') ? 'pack5' : packId.endsWith('3') ? 'pack6' : null}
+                      aboveId={packId.endsWith('4') ? 'pack1' : packId.endsWith('5') ? 'pack2' : packId.endsWith('6') ? 'pack3' : null}
+                      slotSize={Math.min(slotSize, 50)}
+                      selectedSlot={selectedSlot} setSelectedSlot={setSelectedSlot} setPopupItem={setPopupItem} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* O postavě - collapsible */}
+        {character.type === 'pc' && (character.birthsign || character.physicalDetail) && (
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <button
+              onClick={() => setOpenSection(openSection === 'about' ? null : 'about')}
+              className="w-full p-3 flex items-center justify-between text-left hover:bg-stone-50"
+            >
+              <span className="text-sm font-bold text-stone-600">📜 O postavě</span>
+              <span className="text-stone-400">{openSection === 'about' ? '▼' : '▶'}</span>
+            </button>
+            {openSection === 'about' && (
+              <div className="px-3 pb-3 space-y-2 text-sm">
+                {character.birthsign && (
+                  <div className="flex gap-2">
+                    <span className="text-stone-500">⭐ Znamení:</span>
+                    <span className="text-stone-700">{character.birthsign}</span>
+                  </div>
+                )}
+                {character.physicalDetail && (
+                  <div className="flex gap-2">
+                    <span className="text-stone-500">👁️ Vzhled:</span>
+                    <span className="text-stone-700">{character.physicalDetail}</span>
+                  </div>
+                )}
+                {character.background && (
+                  <div className="flex gap-2">
+                    <span className="text-stone-500">📖 Původ:</span>
+                    <span className="text-stone-700">{character.background}</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ============================================
+// CHARACTER SIDE PANEL - Vysouvací panel zleva
+// ============================================
+
+const CharacterSidePanel = ({
+  isOpen,
+  onClose,
+  character,
+  updateCharacter
+}) => {
+  const panelRef = useRef(null);
+
+  // Zavření při kliknutí mimo
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (isOpen && panelRef.current && !panelRef.current.contains(e.target)) {
+        onClose();
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [isOpen, onClose]);
+
+  // Zavření Escape klávesou
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === 'Escape' && isOpen) onClose();
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [isOpen, onClose]);
+
+  return (
+    <>
+      {/* Overlay */}
+      <div
+        className={`fixed inset-0 bg-black/50 z-[60] transition-opacity duration-300 ${
+          isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+      />
+
+      {/* Panel */}
+      <div
+        ref={panelRef}
+        className={`fixed top-0 left-0 h-full w-[85vw] max-w-md bg-amber-50 shadow-2xl z-[70] transform transition-transform duration-300 ease-out ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        {character && (
+          <CharacterSheet
+            character={character}
+            updateCharacter={updateCharacter}
+            onClose={onClose}
+          />
+        )}
+      </div>
+    </>
+  );
+};
+
+// ============================================
+// CHARACTER TABS - Záložky na levé straně (mobil)
+// ============================================
+
+const CharacterTabs = ({
+  party,
+  activeCharacterId,
+  onCharacterClick
+}) => {
+  if (!party?.members || party.members.length === 0) return null;
+
+  return (
+    <div className="fixed left-0 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-1 sm:hidden">
+      {party.members.map((member) => {
+        const isActive = member.id === activeCharacterId;
+        const hpPercent = member.hp ? (member.hp.current / member.hp.max) * 100 : 100;
+        const hpColor = hpPercent > 50 ? 'bg-green-500' : hpPercent > 25 ? 'bg-yellow-500' : 'bg-red-500';
+
+        return (
+          <button
+            key={member.id}
+            onClick={() => onCharacterClick(member)}
+            className={`relative w-12 h-14 rounded-r-lg shadow-lg flex flex-col items-center justify-center transition-all ${
+              isActive
+                ? 'bg-amber-500 text-white translate-x-1'
+                : 'bg-white text-stone-700 hover:bg-amber-100'
+            }`}
+          >
+            <span className="text-lg">{member.type === 'pc' ? '🐭' : '🐿️'}</span>
+            <span className="text-[10px] font-bold truncate w-full text-center px-1">
+              {member.name.split(' ')[0].slice(0, 4)}
+            </span>
+            {/* HP indikátor */}
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-stone-200 rounded-b-lg overflow-hidden">
+              <div className={`h-full ${hpColor}`} style={{ width: `${hpPercent}%` }} />
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  );
+};
+
+// ============================================
 // CHARACTER PANEL
 // ============================================
 
@@ -13479,7 +13860,8 @@ function MausritterSoloCompanion() {
   const [parties, setParties] = useState([]);
   const [activePartyId, setActivePartyId] = useState(null);
   const [activeCharacterId, setActiveCharacterId] = useState(null);
-  
+  const [sidePanelCharacter, setSidePanelCharacter] = useState(null); // Character for mobile side panel
+
   const [journal, setJournal] = useState([]);
   const [factions, setFactions] = useState([]);
   const [settlements, setSettlements] = useState([]);
@@ -15405,6 +15787,29 @@ function MausritterSoloCompanion() {
           </div>
         </div>
       </nav>
+
+      {/* Character Tabs - Mobile only */}
+      {activeParty && (
+        <CharacterTabs
+          party={activeParty}
+          activeCharacterId={sidePanelCharacter?.id}
+          onCharacterClick={(character) => setSidePanelCharacter(character)}
+        />
+      )}
+
+      {/* Character Side Panel - Mobile slide-out */}
+      <CharacterSidePanel
+        isOpen={!!sidePanelCharacter}
+        onClose={() => setSidePanelCharacter(null)}
+        character={sidePanelCharacter}
+        updateCharacter={(updates) => {
+          if (sidePanelCharacter && activePartyId) {
+            updateCharacterInParty(activePartyId, sidePanelCharacter.id, updates);
+            // Update local state to reflect changes
+            setSidePanelCharacter(prev => prev ? { ...prev, ...updates } : null);
+          }
+        }}
+      />
 
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 py-6 overflow-hidden">
