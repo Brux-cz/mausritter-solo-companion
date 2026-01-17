@@ -11377,12 +11377,28 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
         return (
           <p className="my-2 text-amber-800 font-medium cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
              onClick={() => {
-               // Najdi postavu v parties podle jména (postavy jsou v p.members)
-               const foundChar = parties?.flatMap(p => p.members || []).find(c => c.name === entry.character);
-               const charData = foundChar
-                 ? { ...foundChar, timestamp: entry.timestamp }
-                 : { name: entry.character, timestamp: entry.timestamp };
-               setDetailModal({ type: 'character_entry', data: charData, note: entry.note });
+               try {
+                 // Najdi postavu v parties podle jména (postavy jsou v p.members)
+                 const allMembers = (parties || []).flatMap(p => (p && p.members) || []);
+                 const foundChar = allMembers.find(c => c && c.name === entry.character);
+                 const charData = foundChar
+                   ? {
+                       name: foundChar.name,
+                       hp: foundChar.hp,
+                       STR: foundChar.STR,
+                       DEX: foundChar.DEX,
+                       WIL: foundChar.WIL,
+                       birthsign: foundChar.birthsign,
+                       physicalDetail: foundChar.physicalDetail,
+                       background: foundChar.background,
+                       timestamp: entry.timestamp
+                     }
+                   : { name: entry.character, timestamp: entry.timestamp };
+                 setDetailModal({ type: 'character_entry', data: charData, note: entry.note });
+               } catch (err) {
+                 console.error('Error opening character modal:', err);
+                 setDetailModal({ type: 'character_entry', data: { name: entry.character, timestamp: entry.timestamp }, note: entry.note });
+               }
              }}
              title="Klikni pro detail">
             🐭 Na scénu vstupuje <strong>{entry.character}</strong>
