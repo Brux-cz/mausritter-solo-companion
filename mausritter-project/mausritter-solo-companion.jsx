@@ -11457,7 +11457,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                 {c.type?.icon || '🐭'} {c.name} <span className="font-normal text-stone-500">— {c.type?.name}</span>
               </p>
               <p className="text-stone-600 text-sm truncate">Je {c.personality}</p>
-              {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
+              {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
             </div>
           );
         }
@@ -11485,7 +11485,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                 🐭 {name} {typePart && <span className="font-normal text-stone-500">— {typePart}</span>}
               </p>
               {personality && <p className="text-stone-600 text-sm truncate">{personality}</p>}
-              {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
+              {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
             </div>
           );
         }
@@ -11500,7 +11500,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                 {e.danger ? '⚠️' : '👁️'} {e.creature?.name}
               </p>
               <p className="text-stone-600 text-sm truncate">{e.activity}</p>
-              {entry.note && <p className="text-stone-700 italic text-sm mt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
+              {entry.note && <p className="text-stone-700 italic text-sm mt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
             </div>
           );
         }
@@ -11511,7 +11511,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                  onClick={() => startEdit(entry)}
                  title="Klikni pro úpravu">
               <p className="font-medium text-purple-900 truncate">{entry.result}</p>
-              {entry.note && <p className="text-stone-700 italic text-sm mt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
+              {entry.note && <p className="text-stone-700 italic text-sm mt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
             </div>
           );
         }
@@ -11536,7 +11536,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                 {d.isAltered && d.complication && (
                   <p className="text-orange-700 text-sm font-medium"><span className="text-stone-500">⚡</span> {d.complication}</p>
                 )}
-                {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
+                {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
               </div>
             );
           }
@@ -11554,7 +11554,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
               {entry.narrative && (
                 <div className="text-stone-700 text-sm whitespace-pre-line">{entry.narrative}</div>
               )}
-              {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
+              {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
             </div>
           );
         }
@@ -11570,7 +11570,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                 <span className="font-bold">[{entry.dice?.join(', ')}]</span>
                 {entry.count > 1 && <span className="font-bold"> = {entry.total}</span>}
               </p>
-              {entry.note && <p className="text-stone-600 italic text-sm mt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
+              {entry.note && <p className="text-stone-600 italic text-sm mt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
             </div>
           );
         }
@@ -11584,7 +11584,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
               {entry.dice && <span className="font-normal text-stone-500 text-xs">[{entry.dice.join(', ')}] </span>}
               {entry.result}
             </p>
-            {entry.note && <p className="text-stone-700 italic text-sm mt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
+            {entry.note && <p className="text-stone-700 italic text-sm mt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
             {entry.edited && <span className="text-xs text-stone-400">✎</span>}
           </div>
         );
@@ -11617,7 +11617,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
             <p className="font-bold text-amber-900 truncate">{entry.subtype}: {entry.data?.name}</p>
             {entry.data?.trait && <p className="text-stone-600 text-sm italic truncate">{entry.data.trait}</p>}
             {entry.data?.appearance && <p className="text-stone-600 text-sm truncate">{entry.data.appearance}</p>}
-            {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
+            {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
           </div>
         );
       
@@ -11727,7 +11727,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                onClick={() => startEdit(entry)}
                title="Klikni pro úpravu">
             <p className="text-red-700 font-bold">⚠️ Náhodné setkání!</p>
-            {entry.note && <p className="italic text-stone-700 text-sm">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
+            {entry.note && <p className="italic text-stone-700 text-sm whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
           </div>
         );
 
@@ -11748,7 +11748,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                onClick={() => startEdit(entry)}
                title="Klikni pro úpravu">
             <p className="text-red-700 font-bold">👹 Něco se blíží!</p>
-            {entry.note && <p className="italic text-stone-700 text-sm">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
+            {entry.note && <p className="italic text-stone-700 text-sm whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
           </div>
         );
 
@@ -11845,7 +11845,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
             </p>
             {!npcIsDead && entry.data?.birthsign && <p className="text-stone-600 text-sm truncate">{entry.data.birthsign}</p>}
             {!npcIsDead && entry.data?.physicalDetail && <p className="text-stone-500 text-sm truncate">{entry.data.physicalDetail}</p>}
-            {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 line-clamp-2">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
+            {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
           </div>
         );
 
@@ -11871,7 +11871,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
             <p className="text-xs text-stone-500 font-mono">
               {typeof content === 'string' ? content : JSON.stringify(content)}
             </p>
-            {entry.note && <p className="text-sm text-stone-700 italic mt-1">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
+            {entry.note && <p className="text-sm text-stone-700 italic mt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements)}</p>}
           </div>
         );
     }
