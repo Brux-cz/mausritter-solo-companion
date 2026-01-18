@@ -2587,6 +2587,17 @@ const MentionInput = ({
 const parseMentions = (text, onMentionClick, worldNPCs = [], settlements = []) => {
   if (!text) return null;
 
+  // Helper pro převod textu s newliny na React elementy
+  const textWithBreaks = (str, keyPrefix) => {
+    if (!str.includes('\n')) return str;
+    return str.split('\n').map((line, i, arr) => (
+      <React.Fragment key={`${keyPrefix}-${i}`}>
+        {line}
+        {i < arr.length - 1 && <br />}
+      </React.Fragment>
+    ));
+  };
+
   // Kombinovaný regex pro oba formáty
   // 1. @[Jméno](typ:id) - skupina 1=name, 2=type, 3=id
   // 2. @Jméno (slovo bez mezer, nebo s diakritikou) - skupina 4=name
@@ -2598,7 +2609,7 @@ const parseMentions = (text, onMentionClick, worldNPCs = [], settlements = []) =
   while ((match = mentionRegex.exec(text)) !== null) {
     // Text před mention
     if (match.index > lastIndex) {
-      parts.push(text.slice(lastIndex, match.index));
+      parts.push(textWithBreaks(text.slice(lastIndex, match.index), `pre-${match.index}`));
     }
 
     let name, type, id, found = false;
@@ -2668,10 +2679,15 @@ const parseMentions = (text, onMentionClick, worldNPCs = [], settlements = []) =
 
   // Zbytek textu
   if (lastIndex < text.length) {
-    parts.push(text.slice(lastIndex));
+    parts.push(textWithBreaks(text.slice(lastIndex), `post-${lastIndex}`));
   }
 
-  return parts.length > 0 ? parts : text;
+  // Pokud nejsou žádné mentions, zpracuj celý text pro newliny
+  if (parts.length === 0) {
+    return textWithBreaks(text, 'full');
+  }
+
+  return parts;
 };
 
 // ============================================
@@ -5286,12 +5302,12 @@ const CharacterSidePanel = ({
         }`}
       />
 
-      {/* Panel */}
+      {/* Panel - vysouvá se zprava */}
       <div
         ref={panelRef}
         onClick={(e) => e.stopPropagation()}
-        className={`fixed top-0 left-0 h-full w-[85vw] max-w-md bg-amber-50 shadow-2xl z-[70] transform transition-transform duration-300 ease-out ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed top-0 right-0 h-full w-[85vw] max-w-md bg-amber-50 shadow-2xl z-[70] transform transition-transform duration-300 ease-out ${
+          isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         {character && (
@@ -5307,7 +5323,7 @@ const CharacterSidePanel = ({
 };
 
 // ============================================
-// CHARACTER TABS - Záložky na levé straně (mobil)
+// CHARACTER TABS - Záložky na pravé straně (mobil)
 // ============================================
 
 const CharacterTabs = ({
@@ -5318,7 +5334,7 @@ const CharacterTabs = ({
   if (!party?.members || party.members.length === 0) return null;
 
   return (
-    <div className="fixed left-0 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-1 sm:hidden">
+    <div className="fixed right-0 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-1 sm:hidden">
       {party.members.map((member) => {
         const isActive = member.id === activeCharacterId;
         const hpPercent = member.hp ? (member.hp.current / member.hp.max) * 100 : 100;
@@ -5328,9 +5344,9 @@ const CharacterTabs = ({
           <button
             key={member.id}
             onClick={() => onCharacterClick(member)}
-            className={`relative w-12 h-14 rounded-r-lg shadow-lg flex flex-col items-center justify-center transition-all ${
+            className={`relative w-12 h-14 rounded-l-lg shadow-lg flex flex-col items-center justify-center transition-all ${
               isActive
-                ? 'bg-amber-500 text-white translate-x-1'
+                ? 'bg-amber-500 text-white -translate-x-1'
                 : 'bg-white text-stone-700 hover:bg-amber-100'
             }`}
           >
