@@ -11443,11 +11443,6 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
   const [editText, setEditText] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
-  // Scény - sbalené scény
-  const [collapsedScenes, setCollapsedScenes] = useState(new Set());
-  const [activeSceneId, setActiveSceneId] = useState(null); // Aktuální otevřená scéna pro nové záznamy
-  const [editingSceneName, setEditingSceneName] = useState(null);
-
   // Modal pro zobrazení detailu NPC/osady
   const [detailModal, setDetailModal] = useState(null); // { type: 'npc'|'settlement', data: ... }
   const [generatedBehavior, setGeneratedBehavior] = useState(null); // Dočasné vygenerované chování pro modal
@@ -11585,60 +11580,6 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
     setNewEntry('');
   };
 
-  // === SCÉNY ===
-
-  // Vytvoření nové scény
-  const addScene = (name = 'Nová scéna') => {
-    const sceneEntry = {
-      id: generateId(),
-      type: 'scene',
-      timestamp: formatTimestamp(),
-      name: name,
-      collapsed: false,
-      partyId: partyFilter !== 'all' ? partyFilter : null
-    };
-    setJournal([sceneEntry, ...journal]);
-    setActiveSceneId(sceneEntry.id);
-    setEditingSceneName(sceneEntry.id);
-  };
-
-  // Toggle sbalení scény
-  const toggleSceneCollapse = (sceneId) => {
-    setCollapsedScenes(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(sceneId)) {
-        newSet.delete(sceneId);
-      } else {
-        newSet.add(sceneId);
-      }
-      return newSet;
-    });
-  };
-
-  // Přiřazení záznamu do scény
-  const assignToScene = (entryId, sceneId) => {
-    setJournal(journal.map(e =>
-      e.id === entryId ? { ...e, sceneId: sceneId } : e
-    ));
-  };
-
-  // Získej záznamy patřící do scény (ty co mají sceneId = dané ID)
-  const getSceneEntries = (sceneId) => {
-    return journal.filter(e => e.sceneId === sceneId && e.type !== 'scene');
-  };
-
-  // Zjistit zda je záznam součástí nějaké scény
-  const isEntryInScene = (entry) => {
-    return entry.sceneId != null;
-  };
-
-  // Aktualizovat název scény
-  const updateSceneName = (sceneId, newName) => {
-    setJournal(journal.map(e =>
-      e.id === sceneId ? { ...e, name: newName } : e
-    ));
-  };
-
   // Extrakce a vytvoření lore tagů z textu
   const extractAndCreateLoreTags = (text, sourceEntryId = null) => {
     if (!text || !setLexicon || !lexicon) return;
@@ -11678,7 +11619,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
     }
   };
 
-  // Přepsat addNarrativeEntry aby přiřazovala do aktivní scény
+  // Přidání narativního záznamu s extrakcí lore tagů
   const addNarrativeEntryWithScene = () => {
     if (!newEntry.trim()) return;
 
@@ -11688,8 +11629,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
       type: 'narrative',
       timestamp: formatTimestamp(),
       content: newEntry,
-      partyId: partyFilter !== 'all' ? partyFilter : null,
-      sceneId: activeSceneId // Přiřadit do aktivní scény
+      partyId: partyFilter !== 'all' ? partyFilter : null
     };
 
     // Extrahuj a vytvoř lore tagy z textu
@@ -11888,11 +11828,6 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
   };
 
   const filteredJournal = journal.filter(entry => {
-    // Záznamy uvnitř scény nezobrazovat na hlavní úrovni (zobrazí se uvnitř scény)
-    if (entry.sceneId && entry.type !== 'scene') {
-      // Pokud je vyhledávání aktivní, zobraz i záznamy ze scén
-      if (!searchTerm) return false;
-    }
     if (partyFilter !== 'all' && entry.partyId && entry.partyId !== partyFilter) return false;
     if (filter !== 'all' && entry.type !== filter) return false;
     if (searchTerm) {
@@ -12014,83 +11949,6 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
     }
 
     switch (entry.type) {
-      case 'scene':
-        const isCollapsed = collapsedScenes.has(entry.id);
-        const sceneEntries = getSceneEntries(entry.id);
-        const isActive = activeSceneId === entry.id;
-        return (
-          <div className={`my-4 rounded-lg border-2 ${isActive ? 'border-purple-400 bg-purple-50/30' : 'border-amber-300 bg-amber-50/30'}`}>
-            {/* Hlavička scény */}
-            <div
-              className="flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-amber-100/50 rounded-t-lg"
-              onClick={() => toggleSceneCollapse(entry.id)}
-            >
-              <div className="flex items-center gap-2">
-                <span className="text-lg">{isCollapsed ? '▶' : '▼'}</span>
-                <span className="text-xl">📖</span>
-                {editingSceneName === entry.id ? (
-                  <input
-                    value={entry.name}
-                    onChange={(e) => updateSceneName(entry.id, e.target.value)}
-                    onBlur={() => setEditingSceneName(null)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') setEditingSceneName(null); }}
-                    onClick={(e) => e.stopPropagation()}
-                    className="px-2 py-1 text-lg font-bold text-purple-900 bg-white border border-purple-300 rounded"
-                    autoFocus
-                  />
-                ) : (
-                  <span
-                    className="text-lg font-bold text-purple-900"
-                    onDoubleClick={(e) => { e.stopPropagation(); setEditingSceneName(entry.id); }}
-                    title="Dvojklik pro přejmenování"
-                  >
-                    {entry.name}
-                  </span>
-                )}
-                {isActive && (
-                  <span className="px-2 py-0.5 text-xs bg-purple-200 text-purple-700 rounded">aktivní</span>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-stone-500">
-                  {sceneEntries.length} {sceneEntries.length === 1 ? 'záznam' : sceneEntries.length < 5 ? 'záznamy' : 'záznamů'}
-                </span>
-                {!isActive && (
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setActiveSceneId(entry.id); }}
-                    className="px-2 py-1 text-xs bg-purple-100 hover:bg-purple-200 text-purple-700 rounded"
-                    title="Nastavit jako aktivní scénu"
-                  >
-                    📍 Aktivovat
-                  </button>
-                )}
-                <button
-                  onClick={(e) => { e.stopPropagation(); deleteEntry(entry.id); }}
-                  className="text-stone-400 hover:text-red-500 text-sm"
-                  title="Smazat scénu"
-                >
-                  ×
-                </button>
-              </div>
-            </div>
-            {/* Obsah scény - záznamy uvnitř */}
-            {!isCollapsed && sceneEntries.length > 0 && (
-              <div className="px-4 py-2 border-t border-amber-200">
-                {sceneEntries.map(childEntry => (
-                  <div key={childEntry.id} className="ml-2 border-l-2 border-purple-200 pl-3">
-                    {formatEntry(childEntry)}
-                  </div>
-                ))}
-              </div>
-            )}
-            {!isCollapsed && sceneEntries.length === 0 && (
-              <div className="px-4 py-3 text-center text-stone-400 italic border-t border-amber-200">
-                Scéna je prázdná. Přidej záznamy když je scéna aktivní.
-              </div>
-            )}
-          </div>
-        );
-
       case 'narrative':
         return (
           <p className="text-stone-800 italic leading-relaxed my-3 cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
@@ -12677,31 +12535,6 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
           </div>
         ) : (
           <div className="px-6 py-8 font-serif">
-            {/* Scény - indikátor aktivní scény a tlačítko pro novou */}
-            <div className="flex items-center gap-2 mb-3">
-              <button
-                onClick={() => addScene()}
-                className="flex items-center gap-1 px-3 py-1.5 text-sm bg-purple-100 hover:bg-purple-200 text-purple-800 rounded-lg transition-colors"
-              >
-                📖 Nová scéna
-              </button>
-              {activeSceneId && (
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-purple-50 text-purple-700 rounded-lg text-sm">
-                  <span>📍 Aktivní:</span>
-                  <span className="font-medium">
-                    {journal.find(e => e.id === activeSceneId)?.name || 'Scéna'}
-                  </span>
-                  <button
-                    onClick={() => setActiveSceneId(null)}
-                    className="text-purple-500 hover:text-purple-700 ml-1"
-                    title="Ukončit scénu"
-                  >
-                    ✕
-                  </button>
-                </div>
-              )}
-            </div>
-
             {/* Vstup pro nový záznam nahoře s @ mentions */}
             <div className="relative mb-4">
               <textarea
