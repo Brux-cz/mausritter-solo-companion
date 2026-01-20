@@ -5424,6 +5424,10 @@ const CharacterPanel = ({
   removeParty,
   onLogEntry 
 }) => {
+  // Defensive null checks for props that may be undefined from Firebase
+  const safeParties = parties || [];
+  const safeParty = party || null;
+
   const [editMode, setEditMode] = useState(false);
   const [editingName, setEditingName] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -5827,15 +5831,15 @@ const CharacterPanel = ({
   };
 
   const updateInventoryItem = (id, field, value) => {
-    if (!character) return;
+    if (!character?.inventory) return;
     updateCharacter({
-      inventory: character.inventory.map(item => item.id === id ? { ...item, [field]: value } : item)
+      inventory: (character.inventory || []).map(item => item.id === id ? { ...item, [field]: value } : item)
     });
   };
 
   const removeInventoryItem = (id) => {
-    if (!character) return;
-    updateCharacter({ inventory: character.inventory.filter(item => item.id !== id) });
+    if (!character?.inventory) return;
+    updateCharacter({ inventory: (character.inventory || []).filter(item => item.id !== id) });
   };
 
   // Slot-based inventory functions
@@ -5959,7 +5963,7 @@ const CharacterPanel = ({
   }, [character?.id]);
 
   // ========== NO PARTIES ==========
-  if (!parties || parties.length === 0) {
+  if (!safeParties || safeParties.length === 0) {
     return (
       <div className="space-y-6">
         <SectionHeader icon="🐭" title="Postavy" subtitle="Začni vytvořením družiny" />
@@ -6447,13 +6451,13 @@ const CharacterPanel = ({
             value={activePartyId || ''}
             onChange={(e) => {
               setActivePartyId(e.target.value);
-              const p = parties.find(p => p.id === e.target.value);
+              const p = safeParties.find(p => p.id === e.target.value);
               if (p?.members?.length > 0) setActiveCharacterId(p.members[0].id);
               else setActiveCharacterId(null);
             }}
             className="flex-1 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg font-medium"
           >
-            {(parties || []).map(p => (
+            {safeParties.map(p => (
               <option key={p.id} value={p.id}>{p.name} ({p.members?.length || 0})</option>
             ))}
           </select>
@@ -6490,11 +6494,11 @@ const CharacterPanel = ({
               </div>
             </div>
             
-            {party.members?.length === 0 ? (
+            {!party?.members || party.members.length === 0 ? (
               <p className="text-stone-400 text-center py-4">Prázdná družina - přidej postavu!</p>
             ) : (
               <div className="flex flex-wrap gap-2">
-                {party.members.map(member => (
+                {(party.members || []).map(member => (
                   <button
                     key={member.id}
                     onClick={() => setActiveCharacterId(member.id)}
@@ -6944,16 +6948,18 @@ const PCSheet = ({ character, updateCharacter, editMode, setEditMode, onLogEntry
   };
 
   const updateInventoryItem = (id, field, value) => {
+    if (!character?.inventory) return;
     updateCharacter({
-      inventory: character.inventory.map(item =>
+      inventory: (character.inventory || []).map(item =>
         item.id === id ? { ...item, [field]: value } : item
       )
     });
   };
 
   const removeInventoryItem = (id) => {
+    if (!character?.inventory) return;
     updateCharacter({
-      inventory: character.inventory.filter(item => item.id !== id)
+      inventory: (character.inventory || []).filter(item => item.id !== id)
     });
   };
 
@@ -10240,7 +10246,7 @@ const PartyPanel = ({
     setExpandedParties(prev => ({ ...prev, [partyId]: !prev[partyId] }));
   };
 
-  const activeParty = parties.find(p => p.id === activePartyId);
+  const activeParty = (parties || []).find(p => p.id === activePartyId);
 
   // Handle delete confirmation
   const handleDeleteConfirm = () => {
@@ -10397,7 +10403,7 @@ const PartyPanel = ({
       </ResultCard>
 
       {/* Party list */}
-      {parties.length === 0 ? (
+      {!parties || parties.length === 0 ? (
         <ResultCard>
           <div className="text-center py-8 text-stone-500">
             <p className="text-4xl mb-3">🐭</p>
@@ -10510,12 +10516,12 @@ const PartyPanel = ({
                 {/* Members List */}
                 {isExpanded && (
                   <div className="space-y-2">
-                    {party.members.length === 0 ? (
+                    {!party.members || party.members.length === 0 ? (
                       <p className="text-stone-400 text-sm text-center py-3">
                         Družina je prázdná. Přidej postavy níže.
                       </p>
                     ) : (
-                      party.members.map(member => {
+                      (party.members || []).map(member => {
                         const isPC = member.type === 'pc';
                         const isCharEditing = editingCharId === member.id;
                         const isSelected = activeCharacterId === member.id && isActive;
@@ -10584,7 +10590,7 @@ const PartyPanel = ({
                                   </div>
                                   {!isPC && member.skills?.length > 0 && (
                                     <div className="flex gap-1 mt-1">
-                                      {member.skills.map((skill, i) => (
+                                      {(member.skills || []).map((skill, i) => (
                                         <span key={i} className="px-2 py-0.5 bg-blue-200 text-blue-800 text-xs rounded">
                                           {skill}
                                         </span>
@@ -14382,7 +14388,7 @@ function MausritterSoloCompanion() {
   const [journalPartyFilter, setJournalPartyFilter] = useState('all');
 
   // Helper: Get active party
-  const activeParty = parties.find(p => p.id === activePartyId) || null;
+  const activeParty = (parties || []).find(p => p.id === activePartyId) || null;
   
   // Helper: Get active character (for detail view)
   const activeCharacter = activeParty?.members?.find(m => m.id === activeCharacterId) || null;
@@ -14394,7 +14400,7 @@ function MausritterSoloCompanion() {
 
   // Helper: Update character within party
   const updateCharacterInParty = (partyId, charId, updates) => {
-    setParties(parties.map(p => {
+    setParties((parties || []).map(p => {
       if (p.id !== partyId) return p;
       return {
         ...p,
@@ -14406,7 +14412,7 @@ function MausritterSoloCompanion() {
   // Helper: Update gameTime for active party
   const updateGameTime = (newGameTime) => {
     if (!activePartyId) return;
-    setParties(parties.map(p =>
+    setParties((parties || []).map(p =>
       p.id === activePartyId ? { ...p, gameTime: newGameTime } : p
     ));
   };
@@ -14454,7 +14460,7 @@ function MausritterSoloCompanion() {
     if (!newChar.id) newChar.id = generateId();
     if (!newChar.type) newChar.type = 'pc';
     
-    setParties(parties.map(p => {
+    setParties((parties || []).map(p => {
       if (p.id !== partyId) return p;
       return { ...p, members: [...p.members, newChar] };
     }));
@@ -14495,7 +14501,7 @@ function MausritterSoloCompanion() {
       physicalDetail: randomFrom(PHYSICAL_DETAILS)
     };
 
-    setParties(parties.map(p => {
+    setParties((parties || []).map(p => {
       if (p.id !== partyId) return p;
       return { ...p, members: [...p.members, newHireling] };
     }));
@@ -14505,7 +14511,7 @@ function MausritterSoloCompanion() {
   // Helper: Add multiple pre-created hirelings to party
   const addHirelingsToParty = (partyId, hirelings) => {
     if (!hirelings || hirelings.length === 0) return;
-    setParties(parties.map(p => {
+    setParties((parties || []).map(p => {
       if (p.id !== partyId) return p;
       return { ...p, members: [...p.members, ...hirelings] };
     }));
@@ -14513,7 +14519,7 @@ function MausritterSoloCompanion() {
 
   // Helper: Remove character from party
   const removeCharacter = (partyId, charId) => {
-    setParties(parties.map(p => {
+    setParties((parties || []).map(p => {
       if (p.id !== partyId) return p;
       return { ...p, members: p.members.filter(m => m.id !== charId) };
     }));
@@ -14524,9 +14530,9 @@ function MausritterSoloCompanion() {
 
   // Helper: Remove party
   const removeParty = (partyId) => {
-    setParties(parties.filter(p => p.id !== partyId));
+    setParties((parties || []).filter(p => p.id !== partyId));
     if (activePartyId === partyId) {
-      const remaining = parties.filter(p => p.id !== partyId);
+      const remaining = (parties || []).filter(p => p.id !== partyId);
       setActivePartyId(remaining.length > 0 ? remaining[0].id : null);
       setActiveCharacterId(null);
     }
@@ -14754,7 +14760,8 @@ function MausritterSoloCompanion() {
     // Don't apply our own changes
     if (fromUserId === myUserId) return;
 
-    if (state.parties) setParties(state.parties);
+    // Ensure parties is always an array (Firebase may store empty array as null)
+    if (state.parties !== undefined) setParties(Array.isArray(state.parties) ? state.parties : []);
     if (state.activePartyId !== undefined) setActivePartyId(state.activePartyId);
     if (state.activeCharacterId !== undefined) setActiveCharacterId(state.activeCharacterId);
     if (state.journal) setJournal(state.journal);
