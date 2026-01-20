@@ -14349,6 +14349,7 @@ function MausritterSoloCompanion() {
 
   // --- MULTIPLAYER STATE (Firebase) ---
   const [roomCode, setRoomCode] = useState(null);
+  const [roomName, setRoomName] = useState(null); // Custom room name
   const [roomConnected, setRoomConnected] = useState(false);
   const [roomPlayers, setRoomPlayers] = useState([]); // [{ oderId, name, isGM, online }]
   const [isGM, setIsGM] = useState(false);
@@ -14364,6 +14365,7 @@ function MausritterSoloCompanion() {
   const roomListenerRef = useRef(null);
   const playersListenerRef = useRef(null);
   const presenceRef = useRef(null);
+  const lastSyncTimestampRef = useRef(null); // Track last sync to avoid duplicate toasts
 
   // NEW: Parties system - replaces single character
   const [parties, setParties] = useState([]);
@@ -14789,7 +14791,7 @@ function MausritterSoloCompanion() {
   }, [roomConnected, roomCode, myUserId, parties, activePartyId, activeCharacterId, journal, factions, settlements, worldNPCs, timedEvents, lexicon]);
 
   // Create a new room as GM
-  const createRoom = async (playerName, playerPin) => {
+  const createRoom = async (playerName, playerPin, roomTitle = '') => {
     const db = initFirebase();
     if (!db) {
       showMultiplayerToast('Firebase není dostupný', 'error');
@@ -14811,6 +14813,7 @@ function MausritterSoloCompanion() {
         meta: {
           createdAt: firebase.database.ServerValue.TIMESTAMP,
           createdBy: playerId,
+          name: roomTitle || null, // Custom room name
           players: {
             [playerId]: {
               name: playerName,
@@ -14836,11 +14839,16 @@ function MausritterSoloCompanion() {
 
       // Listen for state changes from others
       const stateRef = db.ref(`rooms/${code}/state`);
+      lastSyncTimestampRef.current = Date.now(); // Initialize timestamp
       stateRef.on('value', (snapshot) => {
         const state = snapshot.val();
         if (state && state._lastModifiedBy !== playerId) {
-          applyGameState(state, state._lastModifiedBy);
-          showMultiplayerToast('Změna od hráče', 'info');
+          // Only show toast if timestamp actually changed (not duplicate event)
+          if (state._lastModified && state._lastModified !== lastSyncTimestampRef.current) {
+            lastSyncTimestampRef.current = state._lastModified;
+            applyGameState(state, state._lastModifiedBy);
+            // Don't show toast - it's annoying. Just silently sync.
+          }
         }
       });
       roomListenerRef.current = stateRef;
@@ -14858,6 +14866,7 @@ function MausritterSoloCompanion() {
       playersListenerRef.current = playersRef;
 
       setRoomCode(code);
+      setRoomName(roomTitle || null);
       setCurrentGmPin(playerPin);
       setRoomConnected(true);
       setIsGM(true);
@@ -14868,6 +14877,7 @@ function MausritterSoloCompanion() {
       // Save credentials for auto-reconnect
       localStorage.setItem('mausritter-room-credentials', JSON.stringify({
         roomCode: code,
+        roomName: roomTitle || null,
         playerName,
         playerPin,
         isGM: true
@@ -14946,12 +14956,16 @@ function MausritterSoloCompanion() {
 
       // Listen for state changes
       const stateRef = db.ref(`rooms/${normalizedCode}/state`);
+      lastSyncTimestampRef.current = roomData.state?._lastModified || Date.now();
       stateRef.on('value', (snapshot) => {
         const state = snapshot.val();
         if (state && state._lastModifiedBy !== playerId) {
-          applyGameState(state, state._lastModifiedBy);
-          const modifierName = players[state._lastModifiedBy]?.name || 'Někdo';
-          showMultiplayerToast(`${modifierName} aktualizoval hru`, 'info');
+          // Only sync if timestamp actually changed (not duplicate event)
+          if (state._lastModified && state._lastModified !== lastSyncTimestampRef.current) {
+            lastSyncTimestampRef.current = state._lastModified;
+            applyGameState(state, state._lastModifiedBy);
+            // Don't show toast - it's annoying. Just silently sync.
+          }
         }
       });
       roomListenerRef.current = stateRef;
@@ -14968,7 +14982,9 @@ function MausritterSoloCompanion() {
       });
       playersListenerRef.current = playersRef;
 
+      const fetchedRoomName = roomData.meta?.name || null;
       setRoomCode(normalizedCode);
+      setRoomName(fetchedRoomName);
       setCurrentGmPin(playerPin);
       setRoomConnected(true);
       setIsGM(amIGM);
@@ -14978,6 +14994,7 @@ function MausritterSoloCompanion() {
       // Save credentials for auto-reconnect
       localStorage.setItem('mausritter-room-credentials', JSON.stringify({
         roomCode: normalizedCode,
+        roomName: fetchedRoomName,
         playerName,
         playerPin,
         isGM: amIGM
@@ -15015,10 +15032,12 @@ function MausritterSoloCompanion() {
     }
 
     setRoomCode(null);
+    setRoomName(null);
     setRoomConnected(false);
     setRoomPlayers([]);
     setIsGM(false);
     setMultiplayerStatus('disconnected');
+    lastSyncTimestampRef.current = null;
     localStorage.removeItem('mausritter-room-credentials');
     showMultiplayerToast('Odpojeno z místnosti', 'info');
   };
@@ -16470,6 +16489,16 @@ function MausritterSoloCompanion() {
               Vytvoř multiplayer místnost a pozvi kamaráda.
             </p>
             <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Název místnosti</label>
+              <input
+                type="text"
+                id="create-room-title"
+                className="w-full px-3 py-2 bg-stone-700 border border-stone-600 rounded text-stone-100 focus:border-purple-500 focus:outline-none"
+                placeholder="např. Sobotní sešlost"
+              />
+              <p className="text-stone-400 text-xs mt-1">Pro lepší zapamatování</p>
+            </div>
+            <div className="mb-4">
               <label className="block text-sm font-medium mb-1">Tvoje jméno</label>
               <input
                 type="text"
@@ -16499,15 +16528,17 @@ function MausritterSoloCompanion() {
               </button>
               <button
                 onClick={() => {
+                  const titleInput = document.getElementById('create-room-title');
                   const nameInput = document.getElementById('create-room-name');
                   const pinInput = document.getElementById('create-room-pin');
+                  const title = titleInput?.value?.trim() || '';
                   const name = nameInput?.value?.trim() || 'GM';
                   const pin = pinInput?.value?.trim() || '';
                   if (pin.length !== 4 || !/^\d{4}$/.test(pin)) {
                     showMultiplayerToast('PIN musí být 4 číslice!', 'error');
                     return;
                   }
-                  createRoom(name, pin);
+                  createRoom(name, pin, title);
                 }}
                 className="flex-1 px-4 py-3 bg-purple-600 hover:bg-purple-500 rounded font-medium transition-colors"
               >
@@ -16613,10 +16644,10 @@ function MausritterSoloCompanion() {
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100]">
           <div className="bg-stone-800 text-stone-100 p-6 rounded-lg max-w-sm w-full mx-4 shadow-2xl border border-green-500">
             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-green-400">
-              <span>✓</span> Místnost vytvořena!
+              <span>✓</span> {roomName ? `"${roomName}" vytvořena!` : 'Místnost vytvořena!'}
             </h3>
             <div className="mb-6">
-              <label className="block text-sm font-medium mb-1 text-stone-400">Kód místnosti</label>
+              <label className="block text-sm font-medium mb-1 text-stone-400">Kód pro připojení</label>
               <div className="flex items-center gap-2">
                 <div className="flex-1 px-4 py-3 bg-stone-700 rounded text-2xl font-mono tracking-widest text-center">
                   {roomCode}
@@ -16651,8 +16682,8 @@ function MausritterSoloCompanion() {
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100]">
           <div className="bg-stone-800 text-stone-100 p-6 rounded-lg max-w-md w-full mx-4 shadow-2xl border border-purple-500">
             <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-              <span>👥</span> Hráči v místnosti
-              <span className="ml-auto text-sm font-normal text-purple-300">
+              <span>👥</span> {roomName ? roomName : 'Hráči v místnosti'}
+              <span className="ml-auto text-sm font-normal text-purple-300" title={`Kód: ${roomCode}`}>
                 🎮 {roomCode}
               </span>
             </h3>
@@ -16861,8 +16892,8 @@ function MausritterSoloCompanion() {
               <div className="flex items-center gap-1 border-l border-amber-700 pl-2 ml-1">
                 {roomConnected ? (
                   <>
-                    <span className="text-xs px-2 py-1 rounded bg-purple-600 text-purple-100" title={`Místnost: ${roomCode}`}>
-                      🎮 {roomCode}
+                    <span className="text-xs px-2 py-1 rounded bg-purple-600 text-purple-100" title={`Kód: ${roomCode}`}>
+                      🎮 {roomName || roomCode}
                     </span>
                     <button
                       onClick={() => setShowPlayersDialog(true)}
@@ -16899,7 +16930,7 @@ function MausritterSoloCompanion() {
                             className="px-2 py-1.5 bg-green-600 hover:bg-green-500 rounded text-xs font-medium transition-colors"
                             title={`Rychlé připojení: ${creds.roomCode} jako ${creds.playerName}`}
                           >
-                            ⚡ {creds.roomCode}
+                            ⚡ {creds.roomName || creds.roomCode}
                           </button>
                         );
                       }
