@@ -14349,6 +14349,7 @@ function MausritterSoloCompanion() {
 
   // --- MULTIPLAYER STATE (Firebase) ---
   const [roomCode, setRoomCode] = useState(null);
+  const [roomName, setRoomName] = useState(null); // Custom room name
   const [roomConnected, setRoomConnected] = useState(false);
   const [roomPlayers, setRoomPlayers] = useState([]); // [{ oderId, name, isGM, online }]
   const [isGM, setIsGM] = useState(false);
@@ -14362,7 +14363,9 @@ function MausritterSoloCompanion() {
   const [multiplayerToast, setMultiplayerToast] = useState(null); // { message, type: 'info'|'success'|'error' }
   const firebaseDbRef = useRef(null);
   const roomListenerRef = useRef(null);
+  const playersListenerRef = useRef(null);
   const presenceRef = useRef(null);
+  const lastSyncTimestampRef = useRef(null); // Track last sync to avoid duplicate toasts
 
   // NEW: Parties system - replaces single character
   const [parties, setParties] = useState([]);
@@ -14670,6 +14673,19 @@ function MausritterSoloCompanion() {
     return Math.floor(1000 + Math.random() * 9000).toString();
   };
 
+  // Generate player ID from name+PIN (unique per player, not per device)
+  const generatePlayerId = (name, pin) => {
+    // Create a simple hash to avoid special characters in Firebase paths
+    const str = `${name}_${pin}`;
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return `p_${Math.abs(hash).toString(36)}`;
+  };
+
   // Generate unique user ID (stored in localStorage for persistence)
   const getOrCreateUserId = () => {
     // Migrate from sessionStorage to localStorage
@@ -14775,7 +14791,7 @@ function MausritterSoloCompanion() {
   }, [roomConnected, roomCode, myUserId, parties, activePartyId, activeCharacterId, journal, factions, settlements, worldNPCs, timedEvents, lexicon]);
 
   // Create a new room as GM
-  const createRoom = async (playerName, playerPin) => {
+  const createRoom = async (playerName, playerPin, roomTitle = '') => {
     const db = initFirebase();
     if (!db) {
       showMultiplayerToast('Firebase není dostupný', 'error');
@@ -14786,7 +14802,8 @@ function MausritterSoloCompanion() {
 
     const code = generateRoomCode();
     const oderId = getOrCreateUserId();
-    setMyUserId(oderId);
+    const playerId = generatePlayerId(playerName, playerPin);
+    setMyUserId(playerId);
 
     try {
       const roomRef = db.ref(`rooms/${code}`);
@@ -14795,12 +14812,14 @@ function MausritterSoloCompanion() {
       await roomRef.set({
         meta: {
           createdAt: firebase.database.ServerValue.TIMESTAMP,
-          createdBy: oderId,
+          createdBy: playerId,
+          name: roomTitle || null, // Custom room name
           players: {
-            [oderId]: {
+            [playerId]: {
               name: playerName,
               pin: playerPin,
               isGM: true,
+              deviceId: oderId,
               joinedAt: firebase.database.ServerValue.TIMESTAMP
             }
           }
@@ -14808,23 +14827,28 @@ function MausritterSoloCompanion() {
         state: {
           ...getGameState(),
           _lastModified: firebase.database.ServerValue.TIMESTAMP,
-          _lastModifiedBy: oderId
+          _lastModifiedBy: playerId
         }
       });
 
       // Setup presence
-      const presenceRefPath = db.ref(`rooms/${code}/presence/${oderId}`);
+      const presenceRefPath = db.ref(`rooms/${code}/presence/${playerId}`);
       presenceRefPath.set({ online: true, lastSeen: firebase.database.ServerValue.TIMESTAMP });
       presenceRefPath.onDisconnect().set({ online: false, lastSeen: firebase.database.ServerValue.TIMESTAMP });
       presenceRef.current = presenceRefPath;
 
       // Listen for state changes from others
       const stateRef = db.ref(`rooms/${code}/state`);
+      lastSyncTimestampRef.current = Date.now(); // Initialize timestamp
       stateRef.on('value', (snapshot) => {
         const state = snapshot.val();
-        if (state && state._lastModifiedBy !== oderId) {
-          applyGameState(state, state._lastModifiedBy);
-          showMultiplayerToast('Změna od hráče', 'info');
+        if (state && state._lastModifiedBy !== playerId) {
+          // Only show toast if timestamp actually changed (not duplicate event)
+          if (state._lastModified && state._lastModified !== lastSyncTimestampRef.current) {
+            lastSyncTimestampRef.current = state._lastModified;
+            applyGameState(state, state._lastModifiedBy);
+            // Don't show toast - it's annoying. Just silently sync.
+          }
         }
       });
       roomListenerRef.current = stateRef;
@@ -14833,20 +14857,31 @@ function MausritterSoloCompanion() {
       const playersRef = db.ref(`rooms/${code}/meta/players`);
       playersRef.on('value', (snapshot) => {
         const players = snapshot.val() || {};
-        const playerList = Object.entries(players).map(([oderId, p]) => ({
-          oderId,
+        const playerList = Object.entries(players).map(([id, p]) => ({
+          oderId: id,
           ...p
         }));
         setRoomPlayers(playerList);
       });
+      playersListenerRef.current = playersRef;
 
       setRoomCode(code);
+      setRoomName(roomTitle || null);
       setCurrentGmPin(playerPin);
       setRoomConnected(true);
       setIsGM(true);
       setMultiplayerStatus('connected');
       setShowCreateRoomDialog(false);
       setShowRoomCreatedDialog(true); // Show dialog with code
+
+      // Save credentials for auto-reconnect
+      localStorage.setItem('mausritter-room-credentials', JSON.stringify({
+        roomCode: code,
+        roomName: roomTitle || null,
+        playerName,
+        playerPin,
+        isGM: true
+      }));
 
       return code;
     } catch (err) {
@@ -14868,7 +14903,8 @@ function MausritterSoloCompanion() {
     setMultiplayerStatus('connecting');
     const normalizedCode = code.toUpperCase().trim();
     const oderId = getOrCreateUserId();
-    setMyUserId(oderId);
+    const playerId = generatePlayerId(playerName, playerPin);
+    setMyUserId(playerId);
 
     try {
       const roomRef = db.ref(`rooms/${normalizedCode}`);
@@ -14883,20 +14919,12 @@ function MausritterSoloCompanion() {
       const roomData = snapshot.val();
       const players = roomData.meta?.players || {};
 
-      // Find existing player with same name+PIN
-      let existingPlayerId = null;
-      let existingPlayer = null;
-      for (const [id, player] of Object.entries(players)) {
-        if (player.name === playerName && player.pin === playerPin) {
-          existingPlayerId = id;
-          existingPlayer = player;
-          break;
-        }
-      }
+      // Find existing player with same name+PIN (should match our generated playerId)
+      const existingPlayer = players[playerId];
 
       // Check if name is taken with different PIN
-      const nameTaken = Object.values(players).some(p =>
-        p.name === playerName && p.pin !== playerPin
+      const nameTaken = Object.entries(players).some(([id, p]) =>
+        p.name === playerName && id !== playerId
       );
       if (nameTaken && !existingPlayer) {
         setMultiplayerStatus('disconnected');
@@ -14905,19 +14933,18 @@ function MausritterSoloCompanion() {
       }
 
       const amIGM = existingPlayer?.isGM || false;
-      const usePlayerId = existingPlayerId || oderId;
 
       // Update or create player record
-      await db.ref(`rooms/${normalizedCode}/meta/players/${usePlayerId}`).update({
+      await db.ref(`rooms/${normalizedCode}/meta/players/${playerId}`).update({
         name: playerName,
         pin: playerPin,
         isGM: amIGM,
-        lastDeviceId: oderId,
+        deviceId: oderId,
         joinedAt: existingPlayer?.joinedAt || firebase.database.ServerValue.TIMESTAMP
       });
 
       // Setup presence
-      const presenceRefPath = db.ref(`rooms/${normalizedCode}/presence/${usePlayerId}`);
+      const presenceRefPath = db.ref(`rooms/${normalizedCode}/presence/${playerId}`);
       presenceRefPath.set({ online: true, lastSeen: firebase.database.ServerValue.TIMESTAMP });
       presenceRefPath.onDisconnect().set({ online: false, lastSeen: firebase.database.ServerValue.TIMESTAMP });
       presenceRef.current = presenceRefPath;
@@ -14929,12 +14956,16 @@ function MausritterSoloCompanion() {
 
       // Listen for state changes
       const stateRef = db.ref(`rooms/${normalizedCode}/state`);
+      lastSyncTimestampRef.current = roomData.state?._lastModified || Date.now();
       stateRef.on('value', (snapshot) => {
         const state = snapshot.val();
-        if (state && state._lastModifiedBy !== usePlayerId) {
-          applyGameState(state, state._lastModifiedBy);
-          const modifierName = players[state._lastModifiedBy]?.name || 'Někdo';
-          showMultiplayerToast(`${modifierName} aktualizoval hru`, 'info');
+        if (state && state._lastModifiedBy !== playerId) {
+          // Only sync if timestamp actually changed (not duplicate event)
+          if (state._lastModified && state._lastModified !== lastSyncTimestampRef.current) {
+            lastSyncTimestampRef.current = state._lastModified;
+            applyGameState(state, state._lastModifiedBy);
+            // Don't show toast - it's annoying. Just silently sync.
+          }
         }
       });
       roomListenerRef.current = stateRef;
@@ -14943,19 +14974,31 @@ function MausritterSoloCompanion() {
       const playersRef = db.ref(`rooms/${normalizedCode}/meta/players`);
       playersRef.on('value', (snapshot) => {
         const playersData = snapshot.val() || {};
-        const playerList = Object.entries(playersData).map(([oderId, p]) => ({
-          oderId,
+        const playerList = Object.entries(playersData).map(([id, p]) => ({
+          oderId: id,
           ...p
         }));
         setRoomPlayers(playerList);
       });
+      playersListenerRef.current = playersRef;
 
+      const fetchedRoomName = roomData.meta?.name || null;
       setRoomCode(normalizedCode);
+      setRoomName(fetchedRoomName);
       setCurrentGmPin(playerPin);
       setRoomConnected(true);
       setIsGM(amIGM);
       setMultiplayerStatus('connected');
       setShowJoinRoomDialog(false);
+
+      // Save credentials for auto-reconnect
+      localStorage.setItem('mausritter-room-credentials', JSON.stringify({
+        roomCode: normalizedCode,
+        roomName: fetchedRoomName,
+        playerName,
+        playerPin,
+        isGM: amIGM
+      }));
 
       const statusMsg = existingPlayer
         ? (amIGM ? 'Připojeno jako GM!' : `Vítej zpět, ${playerName}!`)
@@ -14978,17 +15021,44 @@ function MausritterSoloCompanion() {
       roomListenerRef.current = null;
     }
 
+    if (playersListenerRef.current) {
+      playersListenerRef.current.off();
+      playersListenerRef.current = null;
+    }
+
     if (presenceRef.current) {
       presenceRef.current.set({ online: false, lastSeen: firebase.database.ServerValue.TIMESTAMP });
       presenceRef.current = null;
     }
 
     setRoomCode(null);
+    setRoomName(null);
     setRoomConnected(false);
     setRoomPlayers([]);
     setIsGM(false);
     setMultiplayerStatus('disconnected');
+    lastSyncTimestampRef.current = null;
+    localStorage.removeItem('mausritter-room-credentials');
     showMultiplayerToast('Odpojeno z místnosti', 'info');
+  };
+
+  // Kick player from room (GM only)
+  const kickPlayer = async (playerId, playerName) => {
+    if (!isGM || !roomCode) return;
+
+    const db = initFirebase();
+    if (!db) return;
+
+    try {
+      // Remove player from players list
+      await db.ref(`rooms/${roomCode}/meta/players/${playerId}`).remove();
+      // Remove player presence
+      await db.ref(`rooms/${roomCode}/presence/${playerId}`).remove();
+      showMultiplayerToast(`${playerName} byl vyhozen z místnosti`, 'success');
+    } catch (err) {
+      console.error('Kick player error:', err);
+      showMultiplayerToast('Chyba při vyhazování hráče', 'error');
+    }
   };
 
   // Copy room link to clipboard
@@ -16419,6 +16489,16 @@ function MausritterSoloCompanion() {
               Vytvoř multiplayer místnost a pozvi kamaráda.
             </p>
             <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Název místnosti</label>
+              <input
+                type="text"
+                id="create-room-title"
+                className="w-full px-3 py-2 bg-stone-700 border border-stone-600 rounded text-stone-100 focus:border-purple-500 focus:outline-none"
+                placeholder="např. Sobotní sešlost"
+              />
+              <p className="text-stone-400 text-xs mt-1">Pro lepší zapamatování</p>
+            </div>
+            <div className="mb-4">
               <label className="block text-sm font-medium mb-1">Tvoje jméno</label>
               <input
                 type="text"
@@ -16448,15 +16528,17 @@ function MausritterSoloCompanion() {
               </button>
               <button
                 onClick={() => {
+                  const titleInput = document.getElementById('create-room-title');
                   const nameInput = document.getElementById('create-room-name');
                   const pinInput = document.getElementById('create-room-pin');
+                  const title = titleInput?.value?.trim() || '';
                   const name = nameInput?.value?.trim() || 'GM';
                   const pin = pinInput?.value?.trim() || '';
                   if (pin.length !== 4 || !/^\d{4}$/.test(pin)) {
                     showMultiplayerToast('PIN musí být 4 číslice!', 'error');
                     return;
                   }
-                  createRoom(name, pin);
+                  createRoom(name, pin, title);
                 }}
                 className="flex-1 px-4 py-3 bg-purple-600 hover:bg-purple-500 rounded font-medium transition-colors"
               >
@@ -16468,7 +16550,9 @@ function MausritterSoloCompanion() {
       )}
 
       {/* Join Room Dialog */}
-      {showJoinRoomDialog && (
+      {showJoinRoomDialog && (() => {
+        const savedCreds = JSON.parse(localStorage.getItem('mausritter-room-credentials') || 'null');
+        return (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100]">
           <div className="bg-stone-800 text-stone-100 p-6 rounded-lg max-w-sm w-full mx-4 shadow-2xl border border-purple-500">
             <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
@@ -16485,7 +16569,7 @@ function MausritterSoloCompanion() {
                 className="w-full px-3 py-2 bg-stone-700 border border-stone-600 rounded text-stone-100 focus:border-purple-500 focus:outline-none uppercase tracking-widest text-center text-lg font-mono"
                 placeholder="ABC123"
                 maxLength={6}
-                defaultValue={window._pendingRoomCode || ''}
+                defaultValue={window._pendingRoomCode || savedCreds?.roomCode || ''}
               />
             </div>
             <div className="mb-4">
@@ -16495,6 +16579,7 @@ function MausritterSoloCompanion() {
                 id="join-room-name"
                 className="w-full px-3 py-2 bg-stone-700 border border-stone-600 rounded text-stone-100 focus:border-purple-500 focus:outline-none"
                 placeholder="Zadej své jméno..."
+                defaultValue={savedCreds?.playerName || ''}
               />
             </div>
             <div className="mb-4">
@@ -16505,6 +16590,7 @@ function MausritterSoloCompanion() {
                 className="w-full px-3 py-2 bg-stone-700 border border-stone-600 rounded text-stone-100 focus:border-purple-500 focus:outline-none tracking-widest text-center text-lg font-mono"
                 placeholder="1234"
                 maxLength={4}
+                defaultValue={savedCreds?.playerPin || ''}
               />
               <p className="text-stone-400 text-xs mt-1">Zvol si nebo zadej stejný jako minule</p>
             </div>
@@ -16550,17 +16636,18 @@ function MausritterSoloCompanion() {
             </div>
           </div>
         </div>
-      )}
+        );
+      })()}
 
       {/* Room Created Dialog - shows room code */}
       {showRoomCreatedDialog && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100]">
           <div className="bg-stone-800 text-stone-100 p-6 rounded-lg max-w-sm w-full mx-4 shadow-2xl border border-green-500">
             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-green-400">
-              <span>✓</span> Místnost vytvořena!
+              <span>✓</span> {roomName ? `"${roomName}" vytvořena!` : 'Místnost vytvořena!'}
             </h3>
             <div className="mb-6">
-              <label className="block text-sm font-medium mb-1 text-stone-400">Kód místnosti</label>
+              <label className="block text-sm font-medium mb-1 text-stone-400">Kód pro připojení</label>
               <div className="flex items-center gap-2">
                 <div className="flex-1 px-4 py-3 bg-stone-700 rounded text-2xl font-mono tracking-widest text-center">
                   {roomCode}
@@ -16595,8 +16682,8 @@ function MausritterSoloCompanion() {
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100]">
           <div className="bg-stone-800 text-stone-100 p-6 rounded-lg max-w-md w-full mx-4 shadow-2xl border border-purple-500">
             <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-              <span>👥</span> Hráči v místnosti
-              <span className="ml-auto text-sm font-normal text-purple-300">
+              <span>👥</span> {roomName ? roomName : 'Hráči v místnosti'}
+              <span className="ml-auto text-sm font-normal text-purple-300" title={`Kód: ${roomCode}`}>
                 🎮 {roomCode}
               </span>
             </h3>
@@ -16622,6 +16709,16 @@ function MausritterSoloCompanion() {
                       PIN: ****
                     </div>
                   </div>
+                  {/* Kick button - only for GM, not for self */}
+                  {isGM && !player.isGM && (
+                    <button
+                      onClick={() => kickPlayer(player.oderId, player.name)}
+                      className="px-2 py-1 bg-red-600/50 hover:bg-red-600 rounded text-xs transition-colors"
+                      title="Vyhodit hráče"
+                    >
+                      ✕
+                    </button>
+                  )}
                 </div>
               ))}
               {roomPlayers.length === 0 && (
@@ -16795,8 +16892,8 @@ function MausritterSoloCompanion() {
               <div className="flex items-center gap-1 border-l border-amber-700 pl-2 ml-1">
                 {roomConnected ? (
                   <>
-                    <span className="text-xs px-2 py-1 rounded bg-purple-600 text-purple-100" title={`Místnost: ${roomCode}`}>
-                      🎮 {roomCode}
+                    <span className="text-xs px-2 py-1 rounded bg-purple-600 text-purple-100" title={`Kód: ${roomCode}`}>
+                      🎮 {roomName || roomCode}
                     </span>
                     <button
                       onClick={() => setShowPlayersDialog(true)}
@@ -16822,6 +16919,23 @@ function MausritterSoloCompanion() {
                   </>
                 ) : (
                   <>
+                    {/* Quick reconnect button if credentials saved */}
+                    {(() => {
+                      const saved = localStorage.getItem('mausritter-room-credentials');
+                      if (saved) {
+                        const creds = JSON.parse(saved);
+                        return (
+                          <button
+                            onClick={() => joinRoom(creds.roomCode, creds.playerName, creds.playerPin)}
+                            className="px-2 py-1.5 bg-green-600 hover:bg-green-500 rounded text-xs font-medium transition-colors"
+                            title={`Rychlé připojení: ${creds.roomCode} jako ${creds.playerName}`}
+                          >
+                            ⚡ {creds.roomName || creds.roomCode}
+                          </button>
+                        );
+                      }
+                      return null;
+                    })()}
                     <button
                       onClick={() => setShowCreateRoomDialog(true)}
                       className="px-2 py-1.5 bg-purple-600 hover:bg-purple-500 rounded text-xs font-medium transition-colors"
