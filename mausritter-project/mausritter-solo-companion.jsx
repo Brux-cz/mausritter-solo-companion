@@ -10378,7 +10378,7 @@ const PartyPanel = ({
       <SectionHeader 
         icon="🏕️" 
         title="Družiny a postavy" 
-        subtitle={`${parties.length} družin, ${parties.reduce((acc, p) => acc + p.members.length, 0)} postav celkem`}
+        subtitle={`${(parties || []).length} družin, ${(parties || []).reduce((acc, p) => acc + (p.members || []).length, 0)} postav celkem`}
       />
 
       {/* Create new party */}
@@ -14404,7 +14404,7 @@ function MausritterSoloCompanion() {
       if (p.id !== partyId) return p;
       return {
         ...p,
-        members: p.members.map(m => m.id === charId ? { ...m, ...updates } : m)
+        members: (p.members || []).map(m => m.id === charId ? { ...m, ...updates } : m)
       };
     }));
   };
@@ -14432,7 +14432,7 @@ function MausritterSoloCompanion() {
       },
       createdAt: new Date().toISOString()
     };
-    setParties([...parties, newParty]);
+    setParties([...(parties || []), newParty]);
     setActivePartyId(newParty.id);
     return newParty;
   };
@@ -14513,7 +14513,7 @@ function MausritterSoloCompanion() {
     if (!hirelings || hirelings.length === 0) return;
     setParties((parties || []).map(p => {
       if (p.id !== partyId) return p;
-      return { ...p, members: [...p.members, ...hirelings] };
+      return { ...p, members: [...(p.members || []), ...hirelings] };
     }));
   };
 
@@ -14521,7 +14521,7 @@ function MausritterSoloCompanion() {
   const removeCharacter = (partyId, charId) => {
     setParties((parties || []).map(p => {
       if (p.id !== partyId) return p;
-      return { ...p, members: p.members.filter(m => m.id !== charId) };
+      return { ...p, members: (p.members || []).filter(m => m.id !== charId) };
     }));
     if (activeCharacterId === charId) {
       setActiveCharacterId(null);
