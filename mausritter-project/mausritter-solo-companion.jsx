@@ -11425,7 +11425,10 @@ const TimePanel = ({ party, updateParty, onLogEntry }) => {
 // JOURNAL PANEL
 // ============================================
 
-const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilter, onExport, worldNPCs = [], settlements = [], timedEvents = [], gameTime, onMentionClick, onOpenEvents, onDeleteNPC, onDeleteSettlement, onPromoteToNPC, onUpdateNPC, lexicon, setLexicon }) => {
+const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilter, onExport, worldNPCs = [], settlements = [], timedEvents = [], gameTime, onMentionClick, onOpenEvents, onDeleteNPC, onDeleteSettlement, onPromoteToNPC, onUpdateNPC, lexicon, setLexicon, myUserId, roomPlayers = [], roomConnected }) => {
+  // Get current player name for authoring entries
+  const myPlayer = roomPlayers.find(p => p.oderId === myUserId);
+  const myAuthorName = myPlayer?.name || null;
   const [newEntry, setNewEntry] = useState('');
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -11557,15 +11560,18 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
 
   const addNarrativeEntry = () => {
     if (!newEntry.trim()) return;
-    
+
     const entry = {
       id: generateId(),
       type: 'narrative',
       timestamp: formatTimestamp(),
       content: newEntry,
-      partyId: partyFilter !== 'all' ? partyFilter : null
+      partyId: partyFilter !== 'all' ? partyFilter : null,
+      // Author info for multiplayer
+      authorId: roomConnected ? myUserId : null,
+      authorName: roomConnected ? myAuthorName : null
     };
-    
+
     setJournal([entry, ...journal]);
     setNewEntry('');
   };
@@ -11619,7 +11625,10 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
       type: 'narrative',
       timestamp: formatTimestamp(),
       content: newEntry,
-      partyId: partyFilter !== 'all' ? partyFilter : null
+      partyId: partyFilter !== 'all' ? partyFilter : null,
+      // Author info for multiplayer
+      authorId: roomConnected ? myUserId : null,
+      authorName: roomConnected ? myAuthorName : null
     };
 
     // Extrahuj a vytvoř lore tagy z textu
@@ -11806,7 +11815,10 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
       type: 'narrative',
       timestamp: targetEntry.timestamp,
       content: insertText,
-      partyId: partyFilter !== 'all' ? partyFilter : targetEntry.partyId
+      partyId: partyFilter !== 'all' ? partyFilter : targetEntry.partyId,
+      // Author info for multiplayer
+      authorId: roomConnected ? myUserId : null,
+      authorName: roomConnected ? myAuthorName : null
     };
 
     const newJournal = [...journal];
@@ -11941,12 +11953,19 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
     switch (entry.type) {
       case 'narrative':
         return (
-          <p className="text-stone-800 italic leading-relaxed my-3 cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
-             onClick={() => startEdit(entry)}
-             title="Klikni pro úpravu">
-            {parseMentions(entry.content, onMentionClick, worldNPCs, settlements, lexicon)}
+          <div className="my-3 cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
+               onClick={() => startEdit(entry)}
+               title="Klikni pro úpravu">
+            {entry.authorName && (
+              <span className="text-xs font-medium text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded mr-2">
+                {entry.authorName}
+              </span>
+            )}
+            <span className="text-stone-800 italic leading-relaxed">
+              {parseMentions(entry.content, onMentionClick, worldNPCs, settlements, lexicon)}
+            </span>
             {entry.edited && <span className="text-xs text-stone-400 ml-1">✎</span>}
-          </p>
+          </div>
         );
 
       case 'oracle':
@@ -17405,6 +17424,9 @@ function MausritterSoloCompanion() {
               // Vrátit aktualizované NPC
               return worldNPCs.find(n => n.id === npcId);
             }}
+            myUserId={myUserId}
+            roomPlayers={roomPlayers}
+            roomConnected={roomConnected}
           />
         )}
       </main>
