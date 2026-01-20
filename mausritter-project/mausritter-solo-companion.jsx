@@ -6453,7 +6453,7 @@ const CharacterPanel = ({
             }}
             className="flex-1 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg font-medium"
           >
-            {parties.map(p => (
+            {(parties || []).map(p => (
               <option key={p.id} value={p.id}>{p.name} ({p.members?.length || 0})</option>
             ))}
           </select>
@@ -10407,7 +10407,7 @@ const PartyPanel = ({
         </ResultCard>
       ) : (
         <div className="space-y-4">
-          {parties.map(party => {
+          {(parties || []).map(party => {
             const isActive = party.id === activePartyId;
             const isExpanded = expandedParties[party.id] !== false; // Default expanded
             const isEditing = editingPartyId === party.id;
@@ -12434,7 +12434,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                 className="px-2 py-1 border border-stone-200 rounded text-sm"
               >
                 <option value="all">Všechny družiny</option>
-                {parties.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                {(parties || []).map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
               </select>
             )}
             <select 
