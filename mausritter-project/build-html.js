@@ -67,6 +67,8 @@ const html = `<!DOCTYPE html>
   <script>tailwind.config = { corePlugins: { preflight: true } }<\/script>
   <script src="https://apis.google.com/js/api.js"><\/script>
   <script src="https://accounts.google.com/gsi/client"><\/script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"><\/script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"><\/script>
   <style>
     * { -webkit-tap-highlight-color: transparent; }
     body { overscroll-behavior: none; }

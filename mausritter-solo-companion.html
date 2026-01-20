@@ -12,6 +12,8 @@
   <script>tailwind.config = { corePlugins: { preflight: true } }</script>
   <script src="https://apis.google.com/js/api.js"></script>
   <script src="https://accounts.google.com/gsi/client"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
   <style>
     * { -webkit-tap-highlight-color: transparent; }
     body { overscroll-behavior: none; }
@@ -36,6 +38,17 @@ const { useState, useEffect, useCallback, useRef } = React;
 const GOOGLE_CLIENT_ID = '948855876248-acfbvk4k4ud5fmciocfk5o8qldfcdi29.apps.googleusercontent.com';
 const GOOGLE_API_KEY = 'AIzaSyDorqiiGhrfkdg_fO6dqjjHsnpeioNSL-s';
 const GOOGLE_SCOPES = 'https://www.googleapis.com/auth/drive.file';
+
+// --- FIREBASE MULTIPLAYER CONFIG ---
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDxk-SZtGHH4-TvKN9lhcS7pyqr93uGmGQ",
+  authDomain: "mausritter-solo-companio-e766c.firebaseapp.com",
+  databaseURL: "https://mausritter-solo-companio-e766c-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "mausritter-solo-companio-e766c",
+  storageBucket: "mausritter-solo-companio-e766c.firebasestorage.app",
+  messagingSenderId: "120737105348",
+  appId: "1:120737105348:web:5c57b811d446d19020d091"
+};
 
 // --- DATA CONSTANTS ---
 
@@ -14363,6 +14376,20 @@ function MausritterSoloCompanion() {
   const [pendingToken, setPendingToken] = useState(null); // Token for pending folder choice
   const googleTokenClientRef = useRef(null);
 
+  // --- MULTIPLAYER STATE (Firebase) ---
+  const [roomCode, setRoomCode] = useState(null);
+  const [roomConnected, setRoomConnected] = useState(false);
+  const [roomPlayers, setRoomPlayers] = useState([]); // [{ oderId, name, isGM, online }]
+  const [isGM, setIsGM] = useState(false);
+  const [myUserId, setMyUserId] = useState(null);
+  const [multiplayerStatus, setMultiplayerStatus] = useState('disconnected'); // 'disconnected' | 'connecting' | 'connected'
+  const [showCreateRoomDialog, setShowCreateRoomDialog] = useState(false);
+  const [showJoinRoomDialog, setShowJoinRoomDialog] = useState(false);
+  const [multiplayerToast, setMultiplayerToast] = useState(null); // { message, type: 'info'|'success'|'error' }
+  const firebaseDbRef = useRef(null);
+  const roomListenerRef = useRef(null);
+  const presenceRef = useRef(null);
+
   // NEW: Parties system - replaces single character
   const [parties, setParties] = useState([]);
   const [activePartyId, setActivePartyId] = useState(null);
@@ -14649,6 +14676,334 @@ function MausritterSoloCompanion() {
     reader.readAsText(file);
     event.target.value = ''; // Reset input
   };
+
+  // ============================================
+  // MULTIPLAYER (Firebase Realtime Database)
+  // ============================================
+
+  // Generate 6-character room code (no confusing chars like 0/O, 1/I)
+  const generateRoomCode = () => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code = '';
+    for (let i = 0; i < 6; i++) {
+      code += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return code;
+  };
+
+  // Generate unique user ID (stored in sessionStorage)
+  const getOrCreateUserId = () => {
+    let oderId = sessionStorage.getItem('mausritter-user-id');
+    if (!oderId) {
+      oderId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      sessionStorage.setItem('mausritter-user-id', oderId);
+    }
+    return oderId;
+  };
+
+  // Initialize Firebase
+  const initFirebase = () => {
+    if (firebaseDbRef.current) return firebaseDbRef.current;
+
+    try {
+      if (typeof firebase === 'undefined') {
+        console.error('Firebase SDK not loaded');
+        return null;
+      }
+
+      // Check if already initialized
+      if (!firebase.apps.length) {
+        firebase.initializeApp(FIREBASE_CONFIG);
+      }
+
+      firebaseDbRef.current = firebase.database();
+      return firebaseDbRef.current;
+    } catch (err) {
+      console.error('Firebase init error:', err);
+      return null;
+    }
+  };
+
+  // Show toast notification
+  const showMultiplayerToast = (message, type = 'info') => {
+    setMultiplayerToast({ message, type });
+    setTimeout(() => setMultiplayerToast(null), 3000);
+  };
+
+  // Get current game state for sync
+  const getGameState = () => ({
+    version: SAVE_VERSION,
+    parties,
+    activePartyId,
+    activeCharacterId,
+    journal,
+    factions,
+    settlements,
+    worldNPCs,
+    timedEvents,
+    lexicon
+  });
+
+  // Apply game state from Firebase
+  const applyGameState = (state, fromUserId) => {
+    if (!state) return;
+
+    // Don't apply our own changes
+    if (fromUserId === myUserId) return;
+
+    if (state.parties) setParties(state.parties);
+    if (state.activePartyId !== undefined) setActivePartyId(state.activePartyId);
+    if (state.activeCharacterId !== undefined) setActiveCharacterId(state.activeCharacterId);
+    if (state.journal) setJournal(state.journal);
+    if (state.factions) setFactions(state.factions);
+    if (state.settlements) setSettlements(state.settlements);
+    if (state.worldNPCs) setWorldNPCs(state.worldNPCs);
+    if (state.timedEvents) setTimedEvents(state.timedEvents);
+    if (state.lexicon) setLexicon(state.lexicon);
+  };
+
+  // Upload state to Firebase (debounced)
+  const syncToFirebaseRef = useRef(null);
+  const syncToFirebase = useCallback(() => {
+    if (!roomConnected || !roomCode || !firebaseDbRef.current) return;
+
+    // Cancel previous timeout
+    if (syncToFirebaseRef.current) {
+      clearTimeout(syncToFirebaseRef.current);
+    }
+
+    // Debounce: wait 500ms before syncing
+    syncToFirebaseRef.current = setTimeout(() => {
+      const db = firebaseDbRef.current;
+      const stateRef = db.ref(`rooms/${roomCode}/state`);
+
+      const state = getGameState();
+      state._lastModified = firebase.database.ServerValue.TIMESTAMP;
+      state._lastModifiedBy = myUserId;
+
+      stateRef.set(state).catch(err => {
+        console.error('Sync to Firebase failed:', err);
+      });
+    }, 500);
+  }, [roomConnected, roomCode, myUserId, parties, activePartyId, activeCharacterId, journal, factions, settlements, worldNPCs, timedEvents, lexicon]);
+
+  // Create a new room as GM
+  const createRoom = async (playerName) => {
+    const db = initFirebase();
+    if (!db) {
+      showMultiplayerToast('Firebase není dostupný', 'error');
+      return null;
+    }
+
+    setMultiplayerStatus('connecting');
+
+    const code = generateRoomCode();
+    const oderId = getOrCreateUserId();
+    setMyUserId(oderId);
+
+    try {
+      const roomRef = db.ref(`rooms/${code}`);
+
+      // Create room with current state
+      await roomRef.set({
+        meta: {
+          createdAt: firebase.database.ServerValue.TIMESTAMP,
+          gmId: oderId,
+          gmName: playerName,
+          players: {
+            [oderId]: {
+              name: playerName,
+              isGM: true,
+              joinedAt: firebase.database.ServerValue.TIMESTAMP
+            }
+          }
+        },
+        state: {
+          ...getGameState(),
+          _lastModified: firebase.database.ServerValue.TIMESTAMP,
+          _lastModifiedBy: oderId
+        }
+      });
+
+      // Setup presence
+      const presenceRefPath = db.ref(`rooms/${code}/presence/${oderId}`);
+      presenceRefPath.set({ online: true, lastSeen: firebase.database.ServerValue.TIMESTAMP });
+      presenceRefPath.onDisconnect().set({ online: false, lastSeen: firebase.database.ServerValue.TIMESTAMP });
+      presenceRef.current = presenceRefPath;
+
+      // Listen for state changes from others
+      const stateRef = db.ref(`rooms/${code}/state`);
+      stateRef.on('value', (snapshot) => {
+        const state = snapshot.val();
+        if (state && state._lastModifiedBy !== oderId) {
+          applyGameState(state, state._lastModifiedBy);
+          showMultiplayerToast('Změna od hráče', 'info');
+        }
+      });
+      roomListenerRef.current = stateRef;
+
+      // Listen for players
+      const playersRef = db.ref(`rooms/${code}/meta/players`);
+      playersRef.on('value', (snapshot) => {
+        const players = snapshot.val() || {};
+        const playerList = Object.entries(players).map(([oderId, p]) => ({
+          oderId,
+          ...p
+        }));
+        setRoomPlayers(playerList);
+      });
+
+      setRoomCode(code);
+      setRoomConnected(true);
+      setIsGM(true);
+      setMultiplayerStatus('connected');
+      setShowCreateRoomDialog(false);
+      showMultiplayerToast(`Místnost ${code} vytvořena!`, 'success');
+
+      return code;
+    } catch (err) {
+      console.error('Create room error:', err);
+      setMultiplayerStatus('disconnected');
+      showMultiplayerToast('Chyba při vytváření místnosti', 'error');
+      return null;
+    }
+  };
+
+  // Join existing room as player
+  const joinRoom = async (code, playerName) => {
+    const db = initFirebase();
+    if (!db) {
+      showMultiplayerToast('Firebase není dostupný', 'error');
+      return false;
+    }
+
+    setMultiplayerStatus('connecting');
+    const normalizedCode = code.toUpperCase().trim();
+    const oderId = getOrCreateUserId();
+    setMyUserId(oderId);
+
+    try {
+      const roomRef = db.ref(`rooms/${normalizedCode}`);
+      const snapshot = await roomRef.get();
+
+      if (!snapshot.exists()) {
+        setMultiplayerStatus('disconnected');
+        showMultiplayerToast('Místnost neexistuje', 'error');
+        return false;
+      }
+
+      const roomData = snapshot.val();
+
+      // Add player to room
+      await db.ref(`rooms/${normalizedCode}/meta/players/${oderId}`).set({
+        name: playerName,
+        isGM: false,
+        joinedAt: firebase.database.ServerValue.TIMESTAMP
+      });
+
+      // Setup presence
+      const presenceRefPath = db.ref(`rooms/${normalizedCode}/presence/${oderId}`);
+      presenceRefPath.set({ online: true, lastSeen: firebase.database.ServerValue.TIMESTAMP });
+      presenceRefPath.onDisconnect().set({ online: false, lastSeen: firebase.database.ServerValue.TIMESTAMP });
+      presenceRef.current = presenceRefPath;
+
+      // Load current state
+      if (roomData.state) {
+        applyGameState(roomData.state, null);
+      }
+
+      // Listen for state changes
+      const stateRef = db.ref(`rooms/${normalizedCode}/state`);
+      stateRef.on('value', (snapshot) => {
+        const state = snapshot.val();
+        if (state && state._lastModifiedBy !== oderId) {
+          applyGameState(state, state._lastModifiedBy);
+          showMultiplayerToast('GM aktualizoval hru', 'info');
+        }
+      });
+      roomListenerRef.current = stateRef;
+
+      // Listen for players
+      const playersRef = db.ref(`rooms/${normalizedCode}/meta/players`);
+      playersRef.on('value', (snapshot) => {
+        const players = snapshot.val() || {};
+        const playerList = Object.entries(players).map(([oderId, p]) => ({
+          oderId,
+          ...p
+        }));
+        setRoomPlayers(playerList);
+      });
+
+      setRoomCode(normalizedCode);
+      setRoomConnected(true);
+      setIsGM(false);
+      setMultiplayerStatus('connected');
+      setShowJoinRoomDialog(false);
+      showMultiplayerToast(`Připojeno k místnosti ${normalizedCode}!`, 'success');
+
+      return true;
+    } catch (err) {
+      console.error('Join room error:', err);
+      setMultiplayerStatus('disconnected');
+      showMultiplayerToast('Chyba při připojování', 'error');
+      return false;
+    }
+  };
+
+  // Leave room
+  const leaveRoom = () => {
+    if (roomListenerRef.current) {
+      roomListenerRef.current.off();
+      roomListenerRef.current = null;
+    }
+
+    if (presenceRef.current) {
+      presenceRef.current.set({ online: false, lastSeen: firebase.database.ServerValue.TIMESTAMP });
+      presenceRef.current = null;
+    }
+
+    setRoomCode(null);
+    setRoomConnected(false);
+    setRoomPlayers([]);
+    setIsGM(false);
+    setMultiplayerStatus('disconnected');
+    showMultiplayerToast('Odpojeno z místnosti', 'info');
+  };
+
+  // Copy room link to clipboard
+  const copyRoomLink = () => {
+    const url = `${window.location.origin}${window.location.pathname}#room=${roomCode}`;
+    navigator.clipboard.writeText(url).then(() => {
+      showMultiplayerToast('Odkaz zkopírován!', 'success');
+    });
+  };
+
+  // Copy room code to clipboard
+  const copyRoomCode = () => {
+    navigator.clipboard.writeText(roomCode).then(() => {
+      showMultiplayerToast('Kód zkopírován!', 'success');
+    });
+  };
+
+  // Sync to Firebase when state changes
+  useEffect(() => {
+    if (roomConnected) {
+      syncToFirebase();
+    }
+  }, [roomConnected, parties, activePartyId, journal, factions, settlements, worldNPCs, timedEvents, lexicon]);
+
+  // Check URL for room code on mount
+  useEffect(() => {
+    const hash = window.location.hash;
+    const match = hash.match(/room=([A-Z0-9]{6})/i);
+    if (match) {
+      const code = match[1].toUpperCase();
+      // Show join dialog with pre-filled code
+      setShowJoinRoomDialog(true);
+      // Store code for the dialog
+      window._pendingRoomCode = code;
+    }
+  }, []);
 
   // ============================================
   // CLOUD SYNC (File System Access API)
@@ -16021,6 +16376,119 @@ function MausritterSoloCompanion() {
         </div>
       )}
 
+      {/* Multiplayer Toast */}
+      {multiplayerToast && (
+        <div className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-[200] animate-pulse ${
+          multiplayerToast.type === 'success' ? 'bg-green-600 text-green-100' :
+          multiplayerToast.type === 'error' ? 'bg-red-600 text-red-100' :
+          'bg-purple-600 text-purple-100'
+        }`}>
+          {multiplayerToast.message}
+        </div>
+      )}
+
+      {/* Create Room Dialog */}
+      {showCreateRoomDialog && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100]">
+          <div className="bg-stone-800 text-stone-100 p-6 rounded-lg max-w-sm w-full mx-4 shadow-2xl border border-purple-500">
+            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <span>🎮</span> Vytvořit místnost
+            </h3>
+            <p className="text-stone-300 mb-4 text-sm">
+              Vytvoř multiplayer místnost a pozvi kamaráda. Aktuální stav hry se synchronizuje.
+            </p>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Tvoje jméno (GM)</label>
+              <input
+                type="text"
+                id="create-room-name"
+                className="w-full px-3 py-2 bg-stone-700 border border-stone-600 rounded text-stone-100 focus:border-purple-500 focus:outline-none"
+                placeholder="Zadej své jméno..."
+                defaultValue={activeParty?.name || 'GM'}
+              />
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowCreateRoomDialog(false)}
+                className="flex-1 px-4 py-3 bg-stone-600 hover:bg-stone-500 rounded font-medium transition-colors"
+              >
+                Zrušit
+              </button>
+              <button
+                onClick={() => {
+                  const nameInput = document.getElementById('create-room-name');
+                  const name = nameInput?.value?.trim() || 'GM';
+                  createRoom(name);
+                }}
+                className="flex-1 px-4 py-3 bg-purple-600 hover:bg-purple-500 rounded font-medium transition-colors"
+              >
+                Vytvořit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Join Room Dialog */}
+      {showJoinRoomDialog && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100]">
+          <div className="bg-stone-800 text-stone-100 p-6 rounded-lg max-w-sm w-full mx-4 shadow-2xl border border-purple-500">
+            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <span>🚪</span> Připojit se k místnosti
+            </h3>
+            <p className="text-stone-300 mb-4 text-sm">
+              Zadej kód místnosti od GM a připoj se ke hře.
+            </p>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Kód místnosti</label>
+              <input
+                type="text"
+                id="join-room-code"
+                className="w-full px-3 py-2 bg-stone-700 border border-stone-600 rounded text-stone-100 focus:border-purple-500 focus:outline-none uppercase tracking-widest text-center text-lg font-mono"
+                placeholder="ABC123"
+                maxLength={6}
+                defaultValue={window._pendingRoomCode || ''}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Tvoje jméno</label>
+              <input
+                type="text"
+                id="join-room-name"
+                className="w-full px-3 py-2 bg-stone-700 border border-stone-600 rounded text-stone-100 focus:border-purple-500 focus:outline-none"
+                placeholder="Zadej své jméno..."
+              />
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowJoinRoomDialog(false);
+                  window._pendingRoomCode = null;
+                }}
+                className="flex-1 px-4 py-3 bg-stone-600 hover:bg-stone-500 rounded font-medium transition-colors"
+              >
+                Zrušit
+              </button>
+              <button
+                onClick={() => {
+                  const codeInput = document.getElementById('join-room-code');
+                  const nameInput = document.getElementById('join-room-name');
+                  const code = codeInput?.value?.trim() || '';
+                  const name = nameInput?.value?.trim() || 'Hráč';
+                  if (code.length === 6) {
+                    joinRoom(code, name);
+                    window._pendingRoomCode = null;
+                  }
+                }}
+                className="flex-1 px-4 py-3 bg-purple-600 hover:bg-purple-500 rounded font-medium transition-colors"
+              >
+                Připojit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* New Game Confirmation Dialog */}
       {showNewGameDialog && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100]">
@@ -16167,6 +16635,51 @@ function MausritterSoloCompanion() {
                 )}
               </div>
 
+              {/* Multiplayer */}
+              <div className="flex items-center gap-1 border-l border-amber-700 pl-2 ml-1">
+                {roomConnected ? (
+                  <>
+                    <span className="text-xs px-2 py-1 rounded bg-purple-600 text-purple-100" title={`Místnost: ${roomCode}\nHráči: ${roomPlayers.length}`}>
+                      🎮 {roomCode}
+                    </span>
+                    <span className="text-xs text-purple-200">
+                      👥{roomPlayers.length}
+                    </span>
+                    <button
+                      onClick={copyRoomLink}
+                      className="px-1.5 py-1 bg-purple-600/70 hover:bg-purple-500 rounded text-xs transition-colors"
+                      title="Kopírovat odkaz na místnost"
+                    >
+                      📋
+                    </button>
+                    <button
+                      onClick={leaveRoom}
+                      className="px-1.5 py-1 bg-purple-600/50 hover:bg-red-600 rounded text-xs transition-colors"
+                      title="Opustit místnost"
+                    >
+                      ✕
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => setShowCreateRoomDialog(true)}
+                      className="px-2 py-1.5 bg-purple-600 hover:bg-purple-500 rounded text-xs font-medium transition-colors"
+                      title="Vytvořit multiplayer místnost (jako GM)"
+                    >
+                      🎮 Místnost
+                    </button>
+                    <button
+                      onClick={() => setShowJoinRoomDialog(true)}
+                      className="px-2 py-1.5 bg-purple-600/70 hover:bg-purple-500 rounded text-xs font-medium transition-colors"
+                      title="Připojit se k místnosti (jako hráč)"
+                    >
+                      🚪
+                    </button>
+                  </>
+                )}
+              </div>
+
               <button onClick={handleExport} className="px-3 py-1.5 bg-amber-700 hover:bg-amber-600 rounded text-sm font-medium transition-colors" title="Exportovat save">📤</button>
               <label className="px-3 py-1.5 bg-amber-700 hover:bg-amber-600 rounded text-sm font-medium cursor-pointer transition-colors" title="Importovat save">
                 📥
@@ -16250,6 +16763,45 @@ function MausritterSoloCompanion() {
                   >
                     Připojit
                   </button>
+                )}
+              </div>
+
+              {/* Multiplayer */}
+              <div className="flex items-center justify-between pt-2 border-t border-amber-700">
+                <span className="text-sm">🎮 Multiplayer</span>
+                {roomConnected ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs px-2 py-1 rounded bg-purple-600">
+                      {roomCode} • 👥{roomPlayers.length}
+                    </span>
+                    <button
+                      onClick={() => { copyRoomLink(); setMobileMenuOpen(false); }}
+                      className="px-2 py-1 bg-purple-600 hover:bg-purple-500 rounded text-xs"
+                    >
+                      📋
+                    </button>
+                    <button
+                      onClick={() => { leaveRoom(); setMobileMenuOpen(false); }}
+                      className="px-2 py-1 bg-red-600 hover:bg-red-500 rounded text-xs"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => { setShowCreateRoomDialog(true); setMobileMenuOpen(false); }}
+                      className="px-2 py-1.5 bg-purple-600 hover:bg-purple-500 rounded text-xs font-medium"
+                    >
+                      Vytvořit
+                    </button>
+                    <button
+                      onClick={() => { setShowJoinRoomDialog(true); setMobileMenuOpen(false); }}
+                      className="px-2 py-1.5 bg-purple-600/70 hover:bg-purple-500 rounded text-xs font-medium"
+                    >
+                      Připojit
+                    </button>
+                  </div>
                 )}
               </div>
 
