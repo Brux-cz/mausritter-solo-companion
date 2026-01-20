@@ -16729,7 +16729,8 @@ function MausritterSoloCompanion() {
                     </button>
                   )}
                 </div>
-              )})}
+              );
+              })}
               {roomPlayers.length === 0 && (
                 <div className="text-center text-stone-400 py-4">
                   Žádní hráči
