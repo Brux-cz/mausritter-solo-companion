@@ -14691,12 +14691,20 @@ function MausritterSoloCompanion() {
     return code;
   };
 
-  // Generate unique user ID (stored in sessionStorage)
+  // Generate unique user ID (stored in localStorage for persistence)
   const getOrCreateUserId = () => {
-    let oderId = sessionStorage.getItem('mausritter-user-id');
+    // Migrate from sessionStorage to localStorage
+    let oderId = localStorage.getItem('mausritter-user-id');
+    if (!oderId) {
+      oderId = sessionStorage.getItem('mausritter-user-id');
+      if (oderId) {
+        localStorage.setItem('mausritter-user-id', oderId);
+        sessionStorage.removeItem('mausritter-user-id');
+      }
+    }
     if (!oderId) {
       oderId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-      sessionStorage.setItem('mausritter-user-id', oderId);
+      localStorage.setItem('mausritter-user-id', oderId);
     }
     return oderId;
   };
