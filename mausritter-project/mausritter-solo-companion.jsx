@@ -14780,10 +14780,10 @@ function MausritterSoloCompanion() {
     if (state.lexicon) setLexicon(state.lexicon);
   };
 
-  // Upload state to Firebase (debounced) - only GM can sync
+  // Upload state to Firebase (debounced)
   const syncToFirebaseRef = useRef(null);
   const syncToFirebase = useCallback(() => {
-    if (!roomConnected || !roomCode || !firebaseDbRef.current || !isGM) return;
+    if (!roomConnected || !roomCode || !firebaseDbRef.current) return;
 
     // Cancel previous timeout
     if (syncToFirebaseRef.current) {
@@ -14803,7 +14803,7 @@ function MausritterSoloCompanion() {
         console.error('Sync to Firebase failed:', err);
       });
     }, 500);
-  }, [roomConnected, roomCode, myUserId, isGM, parties, activePartyId, activeCharacterId, journal, factions, settlements, worldNPCs, timedEvents, lexicon]);
+  }, [roomConnected, roomCode, myUserId, parties, activePartyId, activeCharacterId, journal, factions, settlements, worldNPCs, timedEvents, lexicon]);
 
   // Create a new room as GM
   const createRoom = async (playerName, playerPin, roomTitle = '') => {
