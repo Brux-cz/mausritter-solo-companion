@@ -14385,8 +14385,9 @@ function MausritterSoloCompanion() {
   const [multiplayerStatus, setMultiplayerStatus] = useState('disconnected'); // 'disconnected' | 'connecting' | 'connected'
   const [showCreateRoomDialog, setShowCreateRoomDialog] = useState(false);
   const [showJoinRoomDialog, setShowJoinRoomDialog] = useState(false);
-  const [showRoomCreatedDialog, setShowRoomCreatedDialog] = useState(false); // Shows room code + GM PIN
-  const [currentGmPin, setCurrentGmPin] = useState(null); // GM PIN for current room
+  const [showRoomCreatedDialog, setShowRoomCreatedDialog] = useState(false); // Shows room code
+  const [showPlayersDialog, setShowPlayersDialog] = useState(false); // Shows players list
+  const [currentGmPin, setCurrentGmPin] = useState(null); // My PIN for reconnecting
   const [multiplayerToast, setMultiplayerToast] = useState(null); // { message, type: 'info'|'success'|'error' }
   const firebaseDbRef = useRef(null);
   const roomListenerRef = useRef(null);
@@ -14803,7 +14804,7 @@ function MausritterSoloCompanion() {
   }, [roomConnected, roomCode, myUserId, parties, activePartyId, activeCharacterId, journal, factions, settlements, worldNPCs, timedEvents, lexicon]);
 
   // Create a new room as GM
-  const createRoom = async (playerName) => {
+  const createRoom = async (playerName, playerPin) => {
     const db = initFirebase();
     if (!db) {
       showMultiplayerToast('Firebase není dostupný', 'error');
@@ -14813,7 +14814,6 @@ function MausritterSoloCompanion() {
     setMultiplayerStatus('connecting');
 
     const code = generateRoomCode();
-    const gmPin = generateGMPin();
     const oderId = getOrCreateUserId();
     setMyUserId(oderId);
 
@@ -14824,12 +14824,11 @@ function MausritterSoloCompanion() {
       await roomRef.set({
         meta: {
           createdAt: firebase.database.ServerValue.TIMESTAMP,
-          gmId: oderId,
-          gmPin: gmPin,
-          gmName: playerName,
+          createdBy: oderId,
           players: {
             [oderId]: {
               name: playerName,
+              pin: playerPin,
               isGM: true,
               joinedAt: firebase.database.ServerValue.TIMESTAMP
             }
@@ -14871,12 +14870,12 @@ function MausritterSoloCompanion() {
       });
 
       setRoomCode(code);
-      setCurrentGmPin(gmPin);
+      setCurrentGmPin(playerPin);
       setRoomConnected(true);
       setIsGM(true);
       setMultiplayerStatus('connected');
       setShowCreateRoomDialog(false);
-      setShowRoomCreatedDialog(true); // Show dialog with code + PIN
+      setShowRoomCreatedDialog(true); // Show dialog with code
 
       return code;
     } catch (err) {
@@ -14887,8 +14886,8 @@ function MausritterSoloCompanion() {
     }
   };
 
-  // Join existing room as player
-  const joinRoom = async (code, playerName, gmPin = null) => {
+  // Join existing room - find player by name+PIN or create new
+  const joinRoom = async (code, playerName, playerPin) => {
     const db = initFirebase();
     if (!db) {
       showMultiplayerToast('Firebase není dostupný', 'error');
@@ -14911,31 +14910,43 @@ function MausritterSoloCompanion() {
       }
 
       const roomData = snapshot.val();
+      const players = roomData.meta?.players || {};
 
-      // Check if this user is the GM: same device OR correct PIN
-      const sameDevice = roomData.meta?.gmId === oderId;
-      const correctPin = gmPin && roomData.meta?.gmPin === gmPin;
-      const amIGM = sameDevice || correctPin;
+      // Find existing player with same name+PIN
+      let existingPlayerId = null;
+      let existingPlayer = null;
+      for (const [id, player] of Object.entries(players)) {
+        if (player.name === playerName && player.pin === playerPin) {
+          existingPlayerId = id;
+          existingPlayer = player;
+          break;
+        }
+      }
 
-      // If PIN was provided but wrong, reject
-      if (gmPin && !correctPin) {
+      // Check if name is taken with different PIN
+      const nameTaken = Object.values(players).some(p =>
+        p.name === playerName && p.pin !== playerPin
+      );
+      if (nameTaken && !existingPlayer) {
         setMultiplayerStatus('disconnected');
-        showMultiplayerToast('Nesprávný GM PIN!', 'error');
+        showMultiplayerToast('Toto jméno je již použito s jiným PINem!', 'error');
         return false;
       }
 
-      // Use GM name if rejoining as GM, otherwise use provided name
-      const finalName = amIGM ? roomData.meta?.gmName : playerName;
+      const amIGM = existingPlayer?.isGM || false;
+      const usePlayerId = existingPlayerId || oderId;
 
-      // Add player to room
-      await db.ref(`rooms/${normalizedCode}/meta/players/${oderId}`).set({
-        name: finalName,
+      // Update or create player record
+      await db.ref(`rooms/${normalizedCode}/meta/players/${usePlayerId}`).update({
+        name: playerName,
+        pin: playerPin,
         isGM: amIGM,
-        joinedAt: firebase.database.ServerValue.TIMESTAMP
+        lastDeviceId: oderId,
+        joinedAt: existingPlayer?.joinedAt || firebase.database.ServerValue.TIMESTAMP
       });
 
       // Setup presence
-      const presenceRefPath = db.ref(`rooms/${normalizedCode}/presence/${oderId}`);
+      const presenceRefPath = db.ref(`rooms/${normalizedCode}/presence/${usePlayerId}`);
       presenceRefPath.set({ online: true, lastSeen: firebase.database.ServerValue.TIMESTAMP });
       presenceRefPath.onDisconnect().set({ online: false, lastSeen: firebase.database.ServerValue.TIMESTAMP });
       presenceRef.current = presenceRefPath;
@@ -14949,9 +14960,10 @@ function MausritterSoloCompanion() {
       const stateRef = db.ref(`rooms/${normalizedCode}/state`);
       stateRef.on('value', (snapshot) => {
         const state = snapshot.val();
-        if (state && state._lastModifiedBy !== oderId) {
+        if (state && state._lastModifiedBy !== usePlayerId) {
           applyGameState(state, state._lastModifiedBy);
-          showMultiplayerToast('GM aktualizoval hru', 'info');
+          const modifierName = players[state._lastModifiedBy]?.name || 'Někdo';
+          showMultiplayerToast(`${modifierName} aktualizoval hru`, 'info');
         }
       });
       roomListenerRef.current = stateRef;
@@ -14959,8 +14971,8 @@ function MausritterSoloCompanion() {
       // Listen for players
       const playersRef = db.ref(`rooms/${normalizedCode}/meta/players`);
       playersRef.on('value', (snapshot) => {
-        const players = snapshot.val() || {};
-        const playerList = Object.entries(players).map(([oderId, p]) => ({
+        const playersData = snapshot.val() || {};
+        const playerList = Object.entries(playersData).map(([oderId, p]) => ({
           oderId,
           ...p
         }));
@@ -14968,14 +14980,16 @@ function MausritterSoloCompanion() {
       });
 
       setRoomCode(normalizedCode);
+      setCurrentGmPin(playerPin);
       setRoomConnected(true);
       setIsGM(amIGM);
-      if (amIGM) {
-        setCurrentGmPin(roomData.meta?.gmPin || null);
-      }
       setMultiplayerStatus('connected');
       setShowJoinRoomDialog(false);
-      showMultiplayerToast(amIGM ? `Připojeno jako GM!` : `Připojeno k místnosti ${normalizedCode}!`, 'success');
+
+      const statusMsg = existingPlayer
+        ? (amIGM ? 'Připojeno jako GM!' : `Vítej zpět, ${playerName}!`)
+        : `Připojeno jako nový hráč!`;
+      showMultiplayerToast(statusMsg, 'success');
 
       return true;
     } catch (err) {
@@ -16431,10 +16445,10 @@ function MausritterSoloCompanion() {
               <span>🎮</span> Vytvořit místnost
             </h3>
             <p className="text-stone-300 mb-4 text-sm">
-              Vytvoř multiplayer místnost a pozvi kamaráda. Aktuální stav hry se synchronizuje.
+              Vytvoř multiplayer místnost a pozvi kamaráda.
             </p>
             <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Tvoje jméno (GM)</label>
+              <label className="block text-sm font-medium mb-1">Tvoje jméno</label>
               <input
                 type="text"
                 id="create-room-name"
@@ -16442,6 +16456,17 @@ function MausritterSoloCompanion() {
                 placeholder="Zadej své jméno..."
                 defaultValue={activeParty?.name || 'GM'}
               />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Tvůj PIN (4 číslice)</label>
+              <input
+                type="text"
+                id="create-room-pin"
+                className="w-full px-3 py-2 bg-stone-700 border border-stone-600 rounded text-stone-100 focus:border-purple-500 focus:outline-none tracking-widest text-center text-lg font-mono"
+                placeholder="1234"
+                maxLength={4}
+              />
+              <p className="text-stone-400 text-xs mt-1">Pro přihlášení z jiného zařízení</p>
             </div>
             <div className="flex gap-3">
               <button
@@ -16453,8 +16478,14 @@ function MausritterSoloCompanion() {
               <button
                 onClick={() => {
                   const nameInput = document.getElementById('create-room-name');
+                  const pinInput = document.getElementById('create-room-pin');
                   const name = nameInput?.value?.trim() || 'GM';
-                  createRoom(name);
+                  const pin = pinInput?.value?.trim() || '';
+                  if (pin.length !== 4 || !/^\d{4}$/.test(pin)) {
+                    showMultiplayerToast('PIN musí být 4 číslice!', 'error');
+                    return;
+                  }
+                  createRoom(name, pin);
                 }}
                 className="flex-1 px-4 py-3 bg-purple-600 hover:bg-purple-500 rounded font-medium transition-colors"
               >
@@ -16473,7 +16504,7 @@ function MausritterSoloCompanion() {
               <span>🚪</span> Připojit se k místnosti
             </h3>
             <p className="text-stone-300 mb-4 text-sm">
-              Zadej kód místnosti od GM a připoj se ke hře.
+              Zadej kód místnosti a svoje přihlašovací údaje.
             </p>
             <div className="mb-4">
               <label className="block text-sm font-medium mb-1">Kód místnosti</label>
@@ -16487,32 +16518,6 @@ function MausritterSoloCompanion() {
               />
             </div>
             <div className="mb-4">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  id="join-as-gm"
-                  className="w-4 h-4 rounded border-stone-600 bg-stone-700 text-purple-600 focus:ring-purple-500"
-                  onChange={(e) => {
-                    const pinField = document.getElementById('join-gm-pin-field');
-                    const nameField = document.getElementById('join-name-field');
-                    if (pinField) pinField.style.display = e.target.checked ? 'block' : 'none';
-                    if (nameField) nameField.style.display = e.target.checked ? 'none' : 'block';
-                  }}
-                />
-                <span className="text-sm">Jsem GM (mám PIN)</span>
-              </label>
-            </div>
-            <div id="join-gm-pin-field" className="mb-4" style={{ display: 'none' }}>
-              <label className="block text-sm font-medium mb-1">GM PIN</label>
-              <input
-                type="text"
-                id="join-room-pin"
-                className="w-full px-3 py-2 bg-stone-700 border border-stone-600 rounded text-stone-100 focus:border-purple-500 focus:outline-none tracking-widest text-center text-lg font-mono"
-                placeholder="1234"
-                maxLength={4}
-              />
-            </div>
-            <div id="join-name-field" className="mb-4">
               <label className="block text-sm font-medium mb-1">Tvoje jméno</label>
               <input
                 type="text"
@@ -16520,6 +16525,17 @@ function MausritterSoloCompanion() {
                 className="w-full px-3 py-2 bg-stone-700 border border-stone-600 rounded text-stone-100 focus:border-purple-500 focus:outline-none"
                 placeholder="Zadej své jméno..."
               />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Tvůj PIN (4 číslice)</label>
+              <input
+                type="text"
+                id="join-room-pin"
+                className="w-full px-3 py-2 bg-stone-700 border border-stone-600 rounded text-stone-100 focus:border-purple-500 focus:outline-none tracking-widest text-center text-lg font-mono"
+                placeholder="1234"
+                maxLength={4}
+              />
+              <p className="text-stone-400 text-xs mt-1">Zvol si nebo zadej stejný jako minule</p>
             </div>
             <div className="flex gap-3">
               <button
@@ -16536,10 +16552,21 @@ function MausritterSoloCompanion() {
                   const codeInput = document.getElementById('join-room-code');
                   const nameInput = document.getElementById('join-room-name');
                   const pinInput = document.getElementById('join-room-pin');
-                  const isGMCheckbox = document.getElementById('join-as-gm');
                   const code = codeInput?.value?.trim() || '';
-                  const name = nameInput?.value?.trim() || 'Hráč';
-                  const pin = isGMCheckbox?.checked ? (pinInput?.value?.trim() || null) : null;
+                  const name = nameInput?.value?.trim() || '';
+                  const pin = pinInput?.value?.trim() || '';
+                  if (code.length !== 6) {
+                    showMultiplayerToast('Kód místnosti musí mít 6 znaků!', 'error');
+                    return;
+                  }
+                  if (!name) {
+                    showMultiplayerToast('Zadej svoje jméno!', 'error');
+                    return;
+                  }
+                  if (pin.length !== 4 || !/^\d{4}$/.test(pin)) {
+                    showMultiplayerToast('PIN musí být 4 číslice!', 'error');
+                    return;
+                  }
                   if (code.length === 6) {
                     joinRoom(code, name, pin);
                     window._pendingRoomCode = null;
@@ -16554,59 +16581,94 @@ function MausritterSoloCompanion() {
         </div>
       )}
 
-      {/* Room Created Dialog - shows room code and GM PIN */}
+      {/* Room Created Dialog - shows room code */}
       {showRoomCreatedDialog && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100]">
           <div className="bg-stone-800 text-stone-100 p-6 rounded-lg max-w-sm w-full mx-4 shadow-2xl border border-green-500">
             <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-green-400">
               <span>✓</span> Místnost vytvořena!
             </h3>
-            <div className="space-y-4 mb-6">
-              <div>
-                <label className="block text-sm font-medium mb-1 text-stone-400">Kód místnosti (pro hráče)</label>
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 px-4 py-3 bg-stone-700 rounded text-2xl font-mono tracking-widest text-center">
-                    {roomCode}
-                  </div>
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(roomCode);
-                      showMultiplayerToast('Kód zkopírován!', 'success');
-                    }}
-                    className="px-3 py-3 bg-stone-600 hover:bg-stone-500 rounded transition-colors"
-                    title="Kopírovat"
-                  >
-                    📋
-                  </button>
+            <div className="mb-6">
+              <label className="block text-sm font-medium mb-1 text-stone-400">Kód místnosti</label>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 px-4 py-3 bg-stone-700 rounded text-2xl font-mono tracking-widest text-center">
+                  {roomCode}
                 </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1 text-stone-400">GM PIN (jen pro tebe)</label>
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 px-4 py-3 bg-purple-900/50 border border-purple-500 rounded text-2xl font-mono tracking-widest text-center text-purple-300">
-                    {currentGmPin}
-                  </div>
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(currentGmPin);
-                      showMultiplayerToast('PIN zkopírován!', 'success');
-                    }}
-                    className="px-3 py-3 bg-stone-600 hover:bg-stone-500 rounded transition-colors"
-                    title="Kopírovat"
-                  >
-                    📋
-                  </button>
-                </div>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(roomCode);
+                    showMultiplayerToast('Kód zkopírován!', 'success');
+                  }}
+                  className="px-3 py-3 bg-stone-600 hover:bg-stone-500 rounded transition-colors"
+                  title="Kopírovat"
+                >
+                  📋
+                </button>
               </div>
             </div>
-            <div className="bg-amber-900/30 border border-amber-600/50 rounded p-3 mb-4 text-sm text-amber-200">
-              <strong>⚠️ PIN si ulož!</strong> Budeš ho potřebovat, pokud se připojíš z jiného zařízení (mobil, tablet).
+            <div className="bg-stone-700/50 rounded p-3 mb-4 text-sm text-stone-300">
+              <strong>💡 Tip:</strong> Pošli tento kód hráčům. Každý si zvolí svoje jméno a PIN pro přihlášení.
             </div>
             <button
               onClick={() => setShowRoomCreatedDialog(false)}
               className="w-full px-4 py-3 bg-green-600 hover:bg-green-500 rounded font-medium transition-colors"
             >
               Rozumím, zavřít
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Players List Dialog */}
+      {showPlayersDialog && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100]">
+          <div className="bg-stone-800 text-stone-100 p-6 rounded-lg max-w-md w-full mx-4 shadow-2xl border border-purple-500">
+            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <span>👥</span> Hráči v místnosti
+              <span className="ml-auto text-sm font-normal text-purple-300">
+                🎮 {roomCode}
+              </span>
+            </h3>
+            <div className="space-y-2 mb-4 max-h-64 overflow-y-auto">
+              {roomPlayers.map((player) => (
+                <div
+                  key={player.oderId}
+                  className={`flex items-center gap-3 p-3 rounded ${
+                    player.isGM ? 'bg-purple-900/40 border border-purple-500' : 'bg-stone-700'
+                  }`}
+                >
+                  <span className="text-2xl">
+                    {player.isGM ? '👑' : '🐭'}
+                  </span>
+                  <div className="flex-1">
+                    <div className="font-medium flex items-center gap-2">
+                      {player.name}
+                      {player.isGM && (
+                        <span className="text-xs px-1.5 py-0.5 bg-purple-600 rounded text-purple-100">GM</span>
+                      )}
+                    </div>
+                    <div className="text-xs text-stone-400">
+                      PIN: ****
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {roomPlayers.length === 0 && (
+                <div className="text-center text-stone-400 py-4">
+                  Žádní hráči
+                </div>
+              )}
+            </div>
+            <div className="bg-stone-700/50 rounded p-3 mb-4 text-sm text-stone-300">
+              <strong>💡</strong> Kód místnosti: <span className="font-mono text-purple-300">{roomCode}</span>
+              <br />
+              Hráči se připojí zadáním kódu + svého jména a PINu.
+            </div>
+            <button
+              onClick={() => setShowPlayersDialog(false)}
+              className="w-full px-4 py-3 bg-purple-600 hover:bg-purple-500 rounded font-medium transition-colors"
+            >
+              Zavřít
             </button>
           </div>
         </div>
@@ -16762,12 +16824,16 @@ function MausritterSoloCompanion() {
               <div className="flex items-center gap-1 border-l border-amber-700 pl-2 ml-1">
                 {roomConnected ? (
                   <>
-                    <span className="text-xs px-2 py-1 rounded bg-purple-600 text-purple-100" title={`Místnost: ${roomCode}\nHráči: ${roomPlayers.length}`}>
+                    <span className="text-xs px-2 py-1 rounded bg-purple-600 text-purple-100" title={`Místnost: ${roomCode}`}>
                       🎮 {roomCode}
                     </span>
-                    <span className="text-xs text-purple-200">
+                    <button
+                      onClick={() => setShowPlayersDialog(true)}
+                      className="text-xs px-1.5 py-1 bg-purple-600/70 hover:bg-purple-500 rounded transition-colors"
+                      title="Zobrazit hráče"
+                    >
                       👥{roomPlayers.length}
-                    </span>
+                    </button>
                     <button
                       onClick={copyRoomLink}
                       className="px-1.5 py-1 bg-purple-600/70 hover:bg-purple-500 rounded text-xs transition-colors"
