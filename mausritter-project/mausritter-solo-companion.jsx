@@ -14362,6 +14362,7 @@ function MausritterSoloCompanion() {
   const [multiplayerToast, setMultiplayerToast] = useState(null); // { message, type: 'info'|'success'|'error' }
   const firebaseDbRef = useRef(null);
   const roomListenerRef = useRef(null);
+  const playersListenerRef = useRef(null);
   const presenceRef = useRef(null);
 
   // NEW: Parties system - replaces single character
@@ -14670,6 +14671,19 @@ function MausritterSoloCompanion() {
     return Math.floor(1000 + Math.random() * 9000).toString();
   };
 
+  // Generate player ID from name+PIN (unique per player, not per device)
+  const generatePlayerId = (name, pin) => {
+    // Create a simple hash to avoid special characters in Firebase paths
+    const str = `${name}_${pin}`;
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return `p_${Math.abs(hash).toString(36)}`;
+  };
+
   // Generate unique user ID (stored in localStorage for persistence)
   const getOrCreateUserId = () => {
     // Migrate from sessionStorage to localStorage
@@ -14786,7 +14800,8 @@ function MausritterSoloCompanion() {
 
     const code = generateRoomCode();
     const oderId = getOrCreateUserId();
-    setMyUserId(oderId);
+    const playerId = generatePlayerId(playerName, playerPin);
+    setMyUserId(playerId);
 
     try {
       const roomRef = db.ref(`rooms/${code}`);
@@ -14795,12 +14810,13 @@ function MausritterSoloCompanion() {
       await roomRef.set({
         meta: {
           createdAt: firebase.database.ServerValue.TIMESTAMP,
-          createdBy: oderId,
+          createdBy: playerId,
           players: {
-            [oderId]: {
+            [playerId]: {
               name: playerName,
               pin: playerPin,
               isGM: true,
+              deviceId: oderId,
               joinedAt: firebase.database.ServerValue.TIMESTAMP
             }
           }
@@ -14808,12 +14824,12 @@ function MausritterSoloCompanion() {
         state: {
           ...getGameState(),
           _lastModified: firebase.database.ServerValue.TIMESTAMP,
-          _lastModifiedBy: oderId
+          _lastModifiedBy: playerId
         }
       });
 
       // Setup presence
-      const presenceRefPath = db.ref(`rooms/${code}/presence/${oderId}`);
+      const presenceRefPath = db.ref(`rooms/${code}/presence/${playerId}`);
       presenceRefPath.set({ online: true, lastSeen: firebase.database.ServerValue.TIMESTAMP });
       presenceRefPath.onDisconnect().set({ online: false, lastSeen: firebase.database.ServerValue.TIMESTAMP });
       presenceRef.current = presenceRefPath;
@@ -14822,7 +14838,7 @@ function MausritterSoloCompanion() {
       const stateRef = db.ref(`rooms/${code}/state`);
       stateRef.on('value', (snapshot) => {
         const state = snapshot.val();
-        if (state && state._lastModifiedBy !== oderId) {
+        if (state && state._lastModifiedBy !== playerId) {
           applyGameState(state, state._lastModifiedBy);
           showMultiplayerToast('Změna od hráče', 'info');
         }
@@ -14833,12 +14849,13 @@ function MausritterSoloCompanion() {
       const playersRef = db.ref(`rooms/${code}/meta/players`);
       playersRef.on('value', (snapshot) => {
         const players = snapshot.val() || {};
-        const playerList = Object.entries(players).map(([oderId, p]) => ({
-          oderId,
+        const playerList = Object.entries(players).map(([id, p]) => ({
+          oderId: id,
           ...p
         }));
         setRoomPlayers(playerList);
       });
+      playersListenerRef.current = playersRef;
 
       setRoomCode(code);
       setCurrentGmPin(playerPin);
@@ -14876,7 +14893,8 @@ function MausritterSoloCompanion() {
     setMultiplayerStatus('connecting');
     const normalizedCode = code.toUpperCase().trim();
     const oderId = getOrCreateUserId();
-    setMyUserId(oderId);
+    const playerId = generatePlayerId(playerName, playerPin);
+    setMyUserId(playerId);
 
     try {
       const roomRef = db.ref(`rooms/${normalizedCode}`);
@@ -14891,20 +14909,12 @@ function MausritterSoloCompanion() {
       const roomData = snapshot.val();
       const players = roomData.meta?.players || {};
 
-      // Find existing player with same name+PIN
-      let existingPlayerId = null;
-      let existingPlayer = null;
-      for (const [id, player] of Object.entries(players)) {
-        if (player.name === playerName && player.pin === playerPin) {
-          existingPlayerId = id;
-          existingPlayer = player;
-          break;
-        }
-      }
+      // Find existing player with same name+PIN (should match our generated playerId)
+      const existingPlayer = players[playerId];
 
       // Check if name is taken with different PIN
-      const nameTaken = Object.values(players).some(p =>
-        p.name === playerName && p.pin !== playerPin
+      const nameTaken = Object.entries(players).some(([id, p]) =>
+        p.name === playerName && id !== playerId
       );
       if (nameTaken && !existingPlayer) {
         setMultiplayerStatus('disconnected');
@@ -14913,19 +14923,18 @@ function MausritterSoloCompanion() {
       }
 
       const amIGM = existingPlayer?.isGM || false;
-      const usePlayerId = existingPlayerId || oderId;
 
       // Update or create player record
-      await db.ref(`rooms/${normalizedCode}/meta/players/${usePlayerId}`).update({
+      await db.ref(`rooms/${normalizedCode}/meta/players/${playerId}`).update({
         name: playerName,
         pin: playerPin,
         isGM: amIGM,
-        lastDeviceId: oderId,
+        deviceId: oderId,
         joinedAt: existingPlayer?.joinedAt || firebase.database.ServerValue.TIMESTAMP
       });
 
       // Setup presence
-      const presenceRefPath = db.ref(`rooms/${normalizedCode}/presence/${usePlayerId}`);
+      const presenceRefPath = db.ref(`rooms/${normalizedCode}/presence/${playerId}`);
       presenceRefPath.set({ online: true, lastSeen: firebase.database.ServerValue.TIMESTAMP });
       presenceRefPath.onDisconnect().set({ online: false, lastSeen: firebase.database.ServerValue.TIMESTAMP });
       presenceRef.current = presenceRefPath;
@@ -14939,7 +14948,7 @@ function MausritterSoloCompanion() {
       const stateRef = db.ref(`rooms/${normalizedCode}/state`);
       stateRef.on('value', (snapshot) => {
         const state = snapshot.val();
-        if (state && state._lastModifiedBy !== usePlayerId) {
+        if (state && state._lastModifiedBy !== playerId) {
           applyGameState(state, state._lastModifiedBy);
           const modifierName = players[state._lastModifiedBy]?.name || 'Někdo';
           showMultiplayerToast(`${modifierName} aktualizoval hru`, 'info');
@@ -14951,12 +14960,13 @@ function MausritterSoloCompanion() {
       const playersRef = db.ref(`rooms/${normalizedCode}/meta/players`);
       playersRef.on('value', (snapshot) => {
         const playersData = snapshot.val() || {};
-        const playerList = Object.entries(playersData).map(([oderId, p]) => ({
-          oderId,
+        const playerList = Object.entries(playersData).map(([id, p]) => ({
+          oderId: id,
           ...p
         }));
         setRoomPlayers(playerList);
       });
+      playersListenerRef.current = playersRef;
 
       setRoomCode(normalizedCode);
       setCurrentGmPin(playerPin);
@@ -14992,6 +15002,11 @@ function MausritterSoloCompanion() {
     if (roomListenerRef.current) {
       roomListenerRef.current.off();
       roomListenerRef.current = null;
+    }
+
+    if (playersListenerRef.current) {
+      playersListenerRef.current.off();
+      playersListenerRef.current = null;
     }
 
     if (presenceRef.current) {
