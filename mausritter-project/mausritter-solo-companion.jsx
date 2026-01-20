@@ -14865,10 +14865,13 @@ function MausritterSoloCompanion() {
 
       const roomData = snapshot.val();
 
+      // Check if this user is the GM (reconnecting)
+      const amIGM = roomData.meta?.gmId === oderId;
+
       // Add player to room
       await db.ref(`rooms/${normalizedCode}/meta/players/${oderId}`).set({
         name: playerName,
-        isGM: false,
+        isGM: amIGM,
         joinedAt: firebase.database.ServerValue.TIMESTAMP
       });
 
@@ -14907,10 +14910,10 @@ function MausritterSoloCompanion() {
 
       setRoomCode(normalizedCode);
       setRoomConnected(true);
-      setIsGM(false);
+      setIsGM(amIGM);
       setMultiplayerStatus('connected');
       setShowJoinRoomDialog(false);
-      showMultiplayerToast(`Připojeno k místnosti ${normalizedCode}!`, 'success');
+      showMultiplayerToast(amIGM ? `Znovu připojeno jako GM!` : `Připojeno k místnosti ${normalizedCode}!`, 'success');
 
       return true;
     } catch (err) {

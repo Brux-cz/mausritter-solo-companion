@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git pull:*)",
+      "Bash(python:*)",
+      "Bash(start http://localhost:8081/mausritter-solo-companion.html)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}
