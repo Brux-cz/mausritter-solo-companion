@@ -16717,11 +16717,17 @@ function MausritterSoloCompanion() {
               </span>
             </h3>
             <div className="space-y-2 mb-4 max-h-64 overflow-y-auto">
-              {roomPlayers.map((player) => (
+              {roomPlayers.map((player) => {
+                const isMe = player.oderId === myUserId;
+                return (
                 <div
                   key={player.oderId}
                   className={`flex items-center gap-3 p-3 rounded ${
-                    player.isGM ? 'bg-purple-900/40 border border-purple-500' : 'bg-stone-700'
+                    isMe
+                      ? 'bg-green-900/40 border-2 border-green-500'
+                      : player.isGM
+                        ? 'bg-purple-900/40 border border-purple-500'
+                        : 'bg-stone-700'
                   }`}
                 >
                   <span className="text-2xl">
@@ -16730,6 +16736,9 @@ function MausritterSoloCompanion() {
                   <div className="flex-1">
                     <div className="font-medium flex items-center gap-2">
                       {player.name}
+                      {isMe && (
+                        <span className="text-xs px-1.5 py-0.5 bg-green-600 rounded text-green-100">ty</span>
+                      )}
                       {player.isGM && (
                         <span className="text-xs px-1.5 py-0.5 bg-purple-600 rounded text-purple-100">GM</span>
                       )}
@@ -16749,7 +16758,7 @@ function MausritterSoloCompanion() {
                     </button>
                   )}
                 </div>
-              ))}
+              )})}
               {roomPlayers.length === 0 && (
                 <div className="text-center text-stone-400 py-4">
                   Žádní hráči
@@ -16919,9 +16928,17 @@ function MausritterSoloCompanion() {
 
               {/* Multiplayer */}
               <div className="flex items-center gap-1 border-l border-amber-700 pl-2 ml-1">
-                {roomConnected ? (
+                {roomConnected ? (() => {
+                  const myPlayer = roomPlayers.find(p => p.oderId === myUserId);
+                  return (
                   <>
-                    <span className="text-xs px-2 py-1 rounded bg-purple-600 text-purple-100" title={`Kód: ${roomCode}`}>
+                    <span
+                      className={`text-xs px-2 py-1 rounded ${isGM ? 'bg-purple-600 text-purple-100' : 'bg-green-600 text-green-100'}`}
+                      title={myPlayer ? `Přihlášen jako: ${myPlayer.name} (${isGM ? 'GM' : 'hráč'})` : ''}
+                    >
+                      {isGM ? '👑' : '🐭'} {myPlayer?.name || (isGM ? 'GM' : 'Hráč')}
+                    </span>
+                    <span className="text-xs px-2 py-1 rounded bg-stone-600 text-stone-300" title={`Kód: ${roomCode}`}>
                       🎮 {roomName || roomCode}
                     </span>
                     <button
@@ -16946,7 +16963,7 @@ function MausritterSoloCompanion() {
                       ✕
                     </button>
                   </>
-                ) : (
+                );})() : (
                   <>
                     {/* Quick reconnect button if credentials saved */}
                     {(() => {
