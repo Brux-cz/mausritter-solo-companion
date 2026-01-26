@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Playwright
+playwright-report/
+test-results/
+.playwright-mcp/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local settings (optional - můžeš odkomentovat pokud nechceš sdílet)
+# .claude/settings.local.json

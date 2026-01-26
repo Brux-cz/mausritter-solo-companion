@@ -1,0 +1,36 @@
+{
+  "character": {
+    "id": "test-char-v1",
+    "name": "Testovací Myš v1",
+    "level": 1,
+    "STR": { "current": 10, "max": 10 },
+    "DEX": { "current": 9, "max": 9 },
+    "WIL": { "current": 8, "max": 8 },
+    "hp": { "current": 5, "max": 5 },
+    "birthsign": "Star",
+    "coat": "Hnědá",
+    "disposition": "Odvážná",
+    "inventorySlots": {
+      "paw1": { "item": "Hůl", "condition": null },
+      "paw2": null,
+      "body1": { "item": "Zásoby", "condition": null },
+      "body2": { "item": "Pochodně", "condition": null },
+      "pack1": null,
+      "pack2": null
+    }
+  },
+  "gameTime": {
+    "watch": 0,
+    "day": 1,
+    "week": 1,
+    "season": "spring",
+    "totalWatches": 0
+  },
+  "journal": [
+    {
+      "type": "oracle",
+      "timestamp": "2025-01-01T12:00:00.000Z",
+      "result": "Test entry z v1"
+    }
+  ]
+}
