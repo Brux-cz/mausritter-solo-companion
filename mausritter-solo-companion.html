@@ -11618,8 +11618,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
       authorId: roomConnected ? myUserId : null,
       authorName: roomConnected ? myAuthorName : null
     };
-
-    setJournal([entry, ...journal]);
+    setJournal([...journal, entry]);
     setNewEntry('');
   };
 
@@ -11681,7 +11680,7 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
     // Extrahuj a vytvoř lore tagy z textu
     extractAndCreateLoreTags(newEntry, entryId);
 
-    setJournal([entry, ...journal]);
+    setJournal([...journal, entry]);
     setNewEntry('');
   };
 
@@ -12590,60 +12589,6 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
           </div>
         ) : (
           <div className="px-6 py-8 font-serif">
-            {/* Vstup pro nový záznam nahoře s @ mentions */}
-            <div className="relative mb-4">
-              <textarea
-                ref={newEntryRef}
-                value={newEntry}
-                onChange={(e) => {
-                  setNewEntry(e.target.value);
-                  handleMentionInput(e.target.value, 'newEntry', e.target);
-                }}
-                onKeyDown={(e) => {
-                  if (showMentions && mentionTarget === 'newEntry') {
-                    if (e.key === 'ArrowDown') {
-                      e.preventDefault();
-                      setMentionIndex(i => Math.min(i + 1, filteredMentions.length - 1));
-                    } else if (e.key === 'ArrowUp') {
-                      e.preventDefault();
-                      setMentionIndex(i => Math.max(i - 1, 0));
-                    } else if (e.key === 'Enter' && filteredMentions[mentionIndex]) {
-                      e.preventDefault();
-                      insertMention(filteredMentions[mentionIndex], newEntry, setNewEntry, newEntryRef.current);
-                    } else if (e.key === 'Escape') {
-                      setShowMentions(false);
-                    }
-                  } else if (e.key === 'Enter' && !e.shiftKey && newEntry.trim()) {
-                    e.preventDefault();
-                    addNarrativeEntryWithScene();
-                  }
-                }}
-                onBlur={() => setTimeout(() => setShowMentions(false), 150)}
-                rows={3}
-                className="w-full px-3 py-2 text-sm text-stone-700 bg-white/50 border border-stone-200 rounded-lg resize-none focus:outline-none focus:border-amber-500 placeholder:text-stone-400 italic"
-                placeholder="Pokračuj v příběhu... (@ pro zmínku, Shift+Enter = nový řádek)"
-              />
-              {/* Mention suggestions */}
-              {showMentions && mentionTarget === 'newEntry' && filteredMentions.length > 0 && (
-                <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-stone-200 rounded shadow-lg z-50 max-h-48 overflow-y-auto">
-                  {filteredMentions.map((m, i) => (
-                    <button
-                      key={`${m.type}-${m.id}`}
-                      type="button"
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        insertMention(m, newEntry, setNewEntry, newEntryRef.current);
-                      }}
-                      className={`w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-amber-50 ${i === mentionIndex ? 'bg-amber-100' : ''}`}
-                    >
-                      <span>{m.icon}</span>
-                      <span className="font-medium">{m.name}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
             {/* Flat list s date headers */}
             {filteredJournal.map((entry, i) => {
               const content = formatEntry(entry);
@@ -12846,6 +12791,60 @@ const JournalPanel = ({ journal, setJournal, parties, partyFilter, setPartyFilte
                 </React.Fragment>
               );
             })}
+
+            {/* Vstup pro nový záznam dole s @ mentions */}
+            <div className="relative mt-4 sticky bottom-0 bg-gradient-to-t from-amber-50 via-amber-50 to-transparent pt-4">
+              <textarea
+                ref={newEntryRef}
+                value={newEntry}
+                onChange={(e) => {
+                  setNewEntry(e.target.value);
+                  handleMentionInput(e.target.value, 'newEntry', e.target);
+                }}
+                onKeyDown={(e) => {
+                  if (showMentions && mentionTarget === 'newEntry') {
+                    if (e.key === 'ArrowDown') {
+                      e.preventDefault();
+                      setMentionIndex(i => Math.min(i + 1, filteredMentions.length - 1));
+                    } else if (e.key === 'ArrowUp') {
+                      e.preventDefault();
+                      setMentionIndex(i => Math.max(i - 1, 0));
+                    } else if (e.key === 'Enter' && filteredMentions[mentionIndex]) {
+                      e.preventDefault();
+                      insertMention(filteredMentions[mentionIndex], newEntry, setNewEntry, newEntryRef.current);
+                    } else if (e.key === 'Escape') {
+                      setShowMentions(false);
+                    }
+                  } else if (e.key === 'Enter' && !e.shiftKey && newEntry.trim()) {
+                    e.preventDefault();
+                    addNarrativeEntryWithScene();
+                  }
+                }}
+                onBlur={() => setTimeout(() => setShowMentions(false), 150)}
+                rows={3}
+                className="w-full px-3 py-2 text-sm text-stone-700 bg-white/50 border border-stone-200 rounded-lg resize-none focus:outline-none focus:border-amber-500 placeholder:text-stone-400 italic"
+                placeholder="Pokračuj v příběhu... (@ pro zmínku, Shift+Enter = nový řádek)"
+              />
+              {/* Mention suggestions - zobrazí se NAD textareou */}
+              {showMentions && mentionTarget === 'newEntry' && filteredMentions.length > 0 && (
+                <div className="absolute left-0 right-0 bottom-full mb-1 bg-white border border-stone-200 rounded shadow-lg z-50 max-h-48 overflow-y-auto">
+                  {filteredMentions.map((m, i) => (
+                    <button
+                      key={`${m.type}-${m.id}`}
+                      type="button"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        insertMention(m, newEntry, setNewEntry, newEntryRef.current);
+                      }}
+                      className={`w-full px-3 py-2 text-left text-sm flex items-center gap-2 hover:bg-amber-50 ${i === mentionIndex ? 'bg-amber-100' : ''}`}
+                    >
+                      <span>{m.icon}</span>
+                      <span className="font-medium">{m.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
