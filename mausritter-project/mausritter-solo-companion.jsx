@@ -14392,6 +14392,7 @@ function MausritterSoloCompanion() {
   const presenceRef = useRef(null);
   const lastSyncTimestampRef = useRef(null); // Track last sync to avoid duplicate toasts
   const isLoadingFromFirebaseRef = useRef(false); // Prevent auto-save during Firebase load
+  const isSyncingFromRemoteRef = useRef(false); // Prevent echo sync back to Firebase
 
   // NEW: Parties system - replaces single character
   const [parties, setParties] = useState([]);
@@ -14673,7 +14674,9 @@ function MausritterSoloCompanion() {
         setFactions(data.factions);
         setSettlements(data.settlements);
         setWorldNPCs(data.worldNPCs);
-        
+        if (data.timedEvents) setTimedEvents(data.timedEvents);
+        if (data.lexicon) setLexicon(data.lexicon);
+
         if (oldVersion < SAVE_VERSION) {
           alert(`✅ Save úspěšně nahrán!\n\n📦 Save byl automaticky aktualizován z verze ${oldVersion} na ${SAVE_VERSION}.`);
         } else {
@@ -14803,6 +14806,7 @@ function MausritterSoloCompanion() {
   const syncToFirebaseRef = useRef(null);
   const syncToFirebase = useCallback(() => {
     if (!roomConnected || !roomCode || !firebaseDbRef.current) return;
+    if (isSyncingFromRemoteRef.current) return; // Prevent echo
 
     // Cancel previous timeout
     if (syncToFirebaseRef.current) {
@@ -14818,7 +14822,7 @@ function MausritterSoloCompanion() {
       state._lastModified = firebase.database.ServerValue.TIMESTAMP;
       state._lastModifiedBy = myUserId;
 
-      stateRef.set(state).catch(err => {
+      stateRef.update(state).catch(err => {
         console.error('Sync to Firebase failed:', err);
       });
     }, 500);
@@ -14880,7 +14884,9 @@ function MausritterSoloCompanion() {
           // Only show toast if timestamp actually changed (not duplicate event)
           if (state._lastModified && state._lastModified !== lastSyncTimestampRef.current) {
             lastSyncTimestampRef.current = state._lastModified;
+            isSyncingFromRemoteRef.current = true;
             applyGameState(state, state._lastModifiedBy);
+            setTimeout(() => { isSyncingFromRemoteRef.current = false; }, 500);
             // Don't show toast - it's annoying. Just silently sync.
           }
         }
@@ -15003,7 +15009,9 @@ function MausritterSoloCompanion() {
           // Only sync if timestamp actually changed (not duplicate event)
           if (state._lastModified && state._lastModified !== lastSyncTimestampRef.current) {
             lastSyncTimestampRef.current = state._lastModified;
+            isSyncingFromRemoteRef.current = true;
             applyGameState(state, state._lastModifiedBy);
+            setTimeout(() => { isSyncingFromRemoteRef.current = false; }, 500);
             // Don't show toast - it's annoying. Just silently sync.
           }
         }
@@ -15174,8 +15182,10 @@ function MausritterSoloCompanion() {
     factions,
     settlements,
     worldNPCs,
+    timedEvents,
+    lexicon,
     lastModified: new Date().toISOString()
-  }), [parties, activePartyId, activeCharacterId, journal, factions, settlements, worldNPCs]);
+  }), [parties, activePartyId, activeCharacterId, journal, factions, settlements, worldNPCs, timedEvents, lexicon]);
 
   // Save to connected file
   const saveToFile = useCallback(async () => {
@@ -15210,7 +15220,9 @@ function MausritterSoloCompanion() {
       setFactions(data.factions);
       setSettlements(data.settlements);
       setWorldNPCs(data.worldNPCs);
-      
+      if (data.timedEvents) setTimedEvents(data.timedEvents);
+      if (data.lexicon) setLexicon(data.lexicon);
+
       return true;
     } catch (err) {
       console.error('Failed to load from file:', err);
@@ -16075,6 +16087,8 @@ function MausritterSoloCompanion() {
       setFactions(data.factions);
       setSettlements(data.settlements);
       setWorldNPCs(data.worldNPCs);
+      if (data.timedEvents) setTimedEvents(data.timedEvents);
+      if (data.lexicon) setLexicon(data.lexicon);
 
       return true;
     } catch (err) {
