@@ -1,0 +1,58 @@
+{
+  "version": 4,
+  "parties": [
+    {
+      "id": "party-v4-test",
+      "name": "Testovací družina v4",
+      "members": [
+        {
+          "id": "char-v4-test",
+          "name": "Testovací Myš v4",
+          "level": 3,
+          "STR": { "current": 12, "max": 12 },
+          "DEX": { "current": 11, "max": 11 },
+          "WIL": { "current": 10, "max": 10 },
+          "hp": { "current": 10, "max": 10 },
+          "birthsign": "Acorn",
+          "coat": "Rezavá s bílým břichem",
+          "inventorySlots": {}
+        }
+      ],
+      "gameTime": {
+        "day": 10,
+        "season": "spring",
+        "watch": 2,
+        "turn": 5,
+        "restedToday": false
+      },
+      "treasury": []
+    }
+  ],
+  "activePartyId": "party-v4-test",
+  "activeCharacterId": "char-v4-test",
+  "journal": [
+    {
+      "id": "j1",
+      "type": "text",
+      "timestamp": "2026-03-10T16:00:00.000Z",
+      "text": "Záznam z v4 - aktuální verze"
+    }
+  ],
+  "settlements": [
+    {
+      "id": "settlement-v4",
+      "name": "Moderní Osada",
+      "size": "Vesnice"
+    }
+  ],
+  "worldNPCs": [
+    {
+      "id": "npc-v4",
+      "name": "Moderní NPC",
+      "role": "Kovář"
+    }
+  ],
+  "factions": [],
+  "timedEvents": [],
+  "lexicon": []
+}

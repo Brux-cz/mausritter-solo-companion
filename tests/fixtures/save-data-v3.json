@@ -1,0 +1,56 @@
+{
+  "version": 3,
+  "parties": [
+    {
+      "id": "party-v3-test",
+      "name": "Testovací družina v3",
+      "members": [
+        {
+          "id": "char-v3-test",
+          "name": "Testovací Myš v3",
+          "level": 2,
+          "STR": { "current": 11, "max": 11 },
+          "DEX": { "current": 10, "max": 10 },
+          "WIL": { "current": 9, "max": 9 },
+          "hp": { "current": 8, "max": 8 },
+          "birthsign": "Mother",
+          "coat": "Bílá s černými skvrnami",
+          "inventorySlots": {}
+        }
+      ],
+      "gameTime": {
+        "watch": 2,
+        "day": 5,
+        "season": "winter",
+        "totalWatches": 10
+      },
+      "treasury": []
+    }
+  ],
+  "activePartyId": "party-v3-test",
+  "activeCharacterId": "char-v3-test",
+  "journal": [
+    {
+      "id": "j1",
+      "type": "text",
+      "timestamp": "2025-12-20T14:00:00.000Z",
+      "text": "Záznam z v3"
+    }
+  ],
+  "settlements": [
+    {
+      "id": "settlement-v3",
+      "name": "Testovací Osada",
+      "size": "Město",
+      "ruler": "Starosta Pepík"
+    }
+  ],
+  "worldNPCs": [
+    {
+      "id": "npc-v3",
+      "name": "Testovací NPC",
+      "role": "Obchodník",
+      "location": "settlement-v3"
+    }
+  ]
+}

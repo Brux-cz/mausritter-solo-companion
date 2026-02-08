@@ -5,7 +5,16 @@
       "Bash(python:*)",
       "Bash(start http://localhost:8081/mausritter-solo-companion.html)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "WebSearch",
+      "Bash(gh pr merge:*)",
+      "Bash(dir:*)",
+      "Bash(findstr:*)",
+      "Bash(test:*)",
+      "Bash(npm --version:*)",
+      "Bash(npm install:*)",
+      "Bash(npx playwright install chromium)",
+      "Bash(npm test:*)"
     ]
   }
 }

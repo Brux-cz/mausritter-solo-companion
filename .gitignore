@@ -1,5 +1,21 @@
+# Dependencies
 node_modules/
+
+# Build output
 dist/
-.playwright-mcp/
-test-results/
+
+# Playwright
 playwright-report/
+test-results/
+.playwright-mcp/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local settings (optional)
+# .claude/settings.local.json

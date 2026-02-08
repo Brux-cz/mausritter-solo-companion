@@ -1,0 +1,41 @@
+{
+  "version": 2,
+  "parties": [
+    {
+      "id": "party-v2-test",
+      "name": "Testovací družina v2",
+      "members": [
+        {
+          "id": "char-v2-test",
+          "name": "Testovací Myš v2",
+          "level": 1,
+          "STR": { "current": 10, "max": 10 },
+          "DEX": { "current": 9, "max": 9 },
+          "WIL": { "current": 8, "max": 8 },
+          "hp": { "current": 6, "max": 6 },
+          "birthsign": "Wheel",
+          "coat": "Šedá",
+          "inventorySlots": {}
+        }
+      ],
+      "gameTime": {
+        "watch": 2,
+        "day": 3,
+        "week": 1,
+        "season": "summer",
+        "totalWatches": 6
+      },
+      "treasury": []
+    }
+  ],
+  "activePartyId": "party-v2-test",
+  "activeCharacterId": "char-v2-test",
+  "journal": [
+    {
+      "id": "j1",
+      "type": "text",
+      "timestamp": "2025-06-15T10:00:00.000Z",
+      "text": "Záznam z v2"
+    }
+  ]
+}
