@@ -35,7 +35,7 @@ const TIMEBAR_WATCHES = [
 
 // Efekty počasí podle pravidel Mausritter CZ
 // Nepříznivé podmínky (danger: true) = při cestování STR save nebo stav Vyčerpání
-const WEATHER_EFFECTS = {
+export const WEATHER_EFFECTS = {
   // === JARO ===
   'Přívalové deště': { icon: '🌧️', danger: true, travelMod: 2, effect: 'STR save nebo Vyčerpání při cestování.' },
   'Mrholení': { icon: '🌦️', danger: false, travelMod: 1, effect: null },
