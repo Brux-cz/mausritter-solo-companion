@@ -134,6 +134,46 @@ export interface GameTime {
   weather?: Weather | null;
 }
 
+// --- Scenes (Mythic GME style) ---
+
+export type SceneType = 'combat' | 'exploration' | 'social' | 'rest' | 'other';
+export type SceneCheckResult = 'normal' | 'altered' | 'interrupted';
+export type SceneOutcome = 'in_control' | 'out_of_control';
+
+export interface SceneThread {
+  id: string;
+  description: string;
+  resolved: boolean;
+}
+
+export interface SceneNPC {
+  id: string;
+  name: string;
+  worldNpcId?: string | null;
+}
+
+export interface Scene {
+  id: string;
+  number: number;
+  title: string;
+  type: SceneType;
+  checkResult: SceneCheckResult;
+  checkDie: number;
+  chaosAtStart: number;
+  outcome?: SceneOutcome;
+  startedAt: string;
+  endedAt?: string;
+}
+
+export interface SceneState {
+  chaosFactor: number;
+  currentScene: Scene | null;
+  sceneHistory: Scene[];
+  threads: SceneThread[];
+  sceneNPCs: SceneNPC[];
+  sceneCount: number;
+}
+
 // --- Party ---
 
 export interface TreasuryItem {
@@ -149,6 +189,7 @@ export interface Party {
   gameTime: GameTime;
   createdAt: string;
   treasuryItems?: TreasuryItem[];
+  sceneState?: SceneState;
 }
 
 // --- World ---
@@ -314,6 +355,35 @@ export interface OracleEntry extends BaseJournalEntry {
   result: string;
 }
 
+export interface SceneStartEntry extends BaseJournalEntry {
+  type: 'scene_start';
+  sceneNumber: number;
+  sceneTitle: string;
+  sceneType: SceneType;
+  checkResult: SceneCheckResult;
+  checkDie: number;
+  chaosFactor: number;
+  content: string;
+}
+
+export interface SceneEndEntry extends BaseJournalEntry {
+  type: 'scene_end';
+  sceneNumber: number;
+  sceneTitle: string;
+  outcome: SceneOutcome;
+  chaosChange: number;
+  chaosBefore: number;
+  chaosAfter: number;
+  content: string;
+}
+
+export interface ChaosAdjustEntry extends BaseJournalEntry {
+  type: 'chaos_adjust';
+  chaosBefore: number;
+  chaosAfter: number;
+  content: string;
+}
+
 export type JournalEntry =
   | NarrativeEntry
   | CharacterCreatedEntry
@@ -324,6 +394,9 @@ export type JournalEntry =
   | FactionProgressEntry
   | TreasuryEntry
   | OracleEntry
+  | SceneStartEntry
+  | SceneEndEntry
+  | ChaosAdjustEntry
   | (BaseJournalEntry & { type: string; [key: string]: unknown });
 
 // --- Game State ---

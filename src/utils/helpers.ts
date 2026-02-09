@@ -11,6 +11,7 @@ export const rollDice = (count: number, sides: number): number[] => {
 };
 
 export const rollD6 = (): number => rollDice(1, 6)[0];
+export const rollD10 = (): number => rollDice(1, 10)[0];
 export const rollD12 = (): number => rollDice(1, 12)[0];
 export const rollD20 = (): number => rollDice(1, 20)[0];
 export const roll2D6 = (): { dice: number[]; total: number } => { const r = rollDice(2, 6); return { dice: r, total: r[0] + r[1] }; };

@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { SAVE_VERSION, migrations, migrateSaveData } from './constants';
 
 describe('SAVE_VERSION', () => {
-  it('je 4', () => {
-    expect(SAVE_VERSION).toBe(4);
+  it('je 5', () => {
+    expect(SAVE_VERSION).toBe(5);
   });
 });
 
@@ -101,27 +101,66 @@ describe('migrations', () => {
       expect(result.parties[0].gameTime.watch).toBe(0);
     });
   });
+
+  describe('4→5: sceneState', () => {
+    it('party bez sceneState dostane DEFAULT_SCENE_STATE', () => {
+      const data = {
+        version: 4,
+        parties: [{ id: 'p1', name: 'Test', members: [], gameTime: { day: 1, season: 'spring', watch: 1, turn: 0, restedToday: false }, createdAt: '2025-01-01' }]
+      };
+      const result = migrations[4](data);
+      expect(result.version).toBe(5);
+      expect(result.parties[0].sceneState).toBeDefined();
+      expect(result.parties[0].sceneState.chaosFactor).toBe(5);
+      expect(result.parties[0].sceneState.currentScene).toBeNull();
+      expect(result.parties[0].sceneState.sceneHistory).toEqual([]);
+      expect(result.parties[0].sceneState.threads).toEqual([]);
+      expect(result.parties[0].sceneState.sceneNPCs).toEqual([]);
+      expect(result.parties[0].sceneState.sceneCount).toBe(0);
+    });
+
+    it('party s existujícím sceneState zachová data', () => {
+      const existing = {
+        chaosFactor: 7,
+        currentScene: null,
+        sceneHistory: [],
+        threads: [{ id: 't1', description: 'Test thread', resolved: false }],
+        sceneNPCs: [],
+        sceneCount: 3
+      };
+      const data = {
+        version: 4,
+        parties: [{ id: 'p1', sceneState: existing }]
+      };
+      const result = migrations[4](data);
+      expect(result.parties[0].sceneState.chaosFactor).toBe(7);
+      expect(result.parties[0].sceneState.threads).toHaveLength(1);
+      expect(result.parties[0].sceneState.sceneCount).toBe(3);
+    });
+  });
 });
 
 describe('migrateSaveData', () => {
-  it('migruje v1 → v4 kompletně', () => {
+  it('migruje v1 → v5 kompletně', () => {
     const v1 = {
       version: 1,
       character: { name: 'Old Mouse', id: 'c1' },
       journal: [{ id: 'j1', type: 'narrative', content: 'test' }],
     };
     const result = migrateSaveData(v1);
-    expect(result.version).toBe(4);
+    expect(result.version).toBe(5);
     expect(result.parties).toHaveLength(1);
     expect(result.parties[0].members[0].name).toBe('Old Mouse');
     expect(result.settlements).toEqual([]);
     expect(result.worldNPCs).toEqual([]);
     expect(result.parties[0].gameTime.turn).toBe(0);
+    expect(result.parties[0].sceneState).toBeDefined();
+    expect(result.parties[0].sceneState.chaosFactor).toBe(5);
   });
 
   it('prázdný objekt → defaults pro všechna pole', () => {
     const result = migrateSaveData({});
-    expect(result.version).toBe(4);
+    expect(result.version).toBe(5);
     expect(result.parties).toEqual([]);
     expect(result.activePartyId).toBeNull();
     expect(result.activeCharacterId).toBeNull();
@@ -131,10 +170,10 @@ describe('migrateSaveData', () => {
     expect(result.worldNPCs).toEqual([]);
   });
 
-  it('v4 data projdou beze změn (passthrough)', () => {
-    const v4 = {
-      version: 4,
-      parties: [{ id: 'p1', name: 'Party', members: [], gameTime: { day: 1, season: 'spring', watch: 1, turn: 0, restedToday: false }, createdAt: '2025-01-01' }],
+  it('v5 data projdou beze změn (passthrough)', () => {
+    const v5 = {
+      version: 5,
+      parties: [{ id: 'p1', name: 'Party', members: [], gameTime: { day: 1, season: 'spring', watch: 1, turn: 0, restedToday: false }, createdAt: '2025-01-01', sceneState: { chaosFactor: 5, currentScene: null, sceneHistory: [], threads: [], sceneNPCs: [], sceneCount: 0 } }],
       activePartyId: 'p1',
       activeCharacterId: null,
       journal: [],
@@ -142,15 +181,15 @@ describe('migrateSaveData', () => {
       settlements: [],
       worldNPCs: [],
     };
-    const result = migrateSaveData(v4);
-    expect(result.version).toBe(4);
-    expect(result.parties).toEqual(v4.parties);
+    const result = migrateSaveData(v5);
+    expect(result.version).toBe(5);
+    expect(result.parties).toEqual(v5.parties);
     expect(result.activePartyId).toBe('p1');
   });
 
   it('extra pole zachována v _extra', () => {
     const data = {
-      version: 4,
+      version: 5,
       parties: [],
       customField: 'hello',
     };
@@ -161,7 +200,7 @@ describe('migrateSaveData', () => {
 
   it('known pole nejsou v _extra', () => {
     const data = {
-      version: 4,
+      version: 5,
       parties: [{ id: 'p1' }],
       journal: [{ id: 'j1' }],
     };

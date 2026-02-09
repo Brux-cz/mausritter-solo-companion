@@ -607,6 +607,57 @@ const JournalPanel = ({ onExport }) => {
           </div>
         );
       
+      case 'scene_start': {
+        const checkColors: Record<string, string> = {
+          normal: 'border-green-400 bg-green-50',
+          altered: 'border-orange-400 bg-orange-50',
+          interrupted: 'border-red-400 bg-red-50'
+        };
+        const checkLabels: Record<string, string> = {
+          normal: 'Normalni',
+          altered: 'Pozmenena',
+          interrupted: 'Prerusena'
+        };
+        const checkBadge: Record<string, string> = {
+          normal: 'bg-green-100 text-green-700',
+          altered: 'bg-orange-100 text-orange-700',
+          interrupted: 'bg-red-100 text-red-700'
+        };
+        return (
+          <div className={`my-2 pl-4 border-l-4 ${checkColors[entry.checkResult] || 'border-blue-400 bg-blue-50'} rounded-r py-2 pr-2`}>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-lg">🎬</span>
+              <span className="font-bold text-stone-800">Scena #{entry.sceneNumber}: {entry.sceneTitle}</span>
+              <span className={`text-xs px-2 py-0.5 rounded font-bold ${checkBadge[entry.checkResult] || ''}`}>
+                [{entry.checkDie}] {checkLabels[entry.checkResult] || entry.checkResult}
+              </span>
+              <span className="text-xs text-stone-400">CF {entry.chaosFactor}</span>
+            </div>
+          </div>
+        );
+      }
+
+      case 'scene_end': {
+        const outcomeColor = entry.outcome === 'in_control' ? 'border-green-400 bg-green-50' : 'border-red-400 bg-red-50';
+        const outcomeLabel = entry.outcome === 'in_control' ? '✅ Pod kontrolou' : '💀 Mimo kontrolu';
+        return (
+          <div className={`my-2 pl-4 border-l-4 ${outcomeColor} rounded-r py-2 pr-2`}>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-bold text-stone-800">Scena #{entry.sceneNumber} ukoncena</span>
+              <span className="text-sm">{outcomeLabel}</span>
+              <span className="text-xs text-stone-500">Chaos: {entry.chaosBefore} → {entry.chaosAfter}</span>
+            </div>
+          </div>
+        );
+      }
+
+      case 'chaos_adjust':
+        return (
+          <p className="my-1 text-xs text-purple-600 font-medium">
+            ⚡ Chaos: {entry.chaosBefore} → {entry.chaosAfter}
+          </p>
+        );
+
       case 'combat_action':
         return (
           <p className="my-1 text-sm text-stone-700 font-medium cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"

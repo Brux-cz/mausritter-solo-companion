@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useGameStore } from './gameStore';
-import type { Party, GameState, WorldNPC, Settlement, JournalEntry } from '../types';
+import type { Party, GameState, WorldNPC, Settlement, JournalEntry, SceneState } from '../types';
+import { DEFAULT_SCENE_STATE } from '../data/constants';
 
 // Reset store data (merge mode — preserves actions/selectors)
 const resetData = {
@@ -317,5 +318,183 @@ describe('Selectors', () => {
     const pc = useGameStore.getState().createPC(party.id);
     useGameStore.setState({ activeCharacterId: pc.id });
     expect(useGameStore.getState().getActiveCharacter()?.id).toBe(pc.id);
+  });
+});
+
+describe('Scene management', () => {
+  let partyId: string;
+
+  beforeEach(() => {
+    const party = useGameStore.getState().createParty('Scene Test');
+    partyId = party.id;
+  });
+
+  it('getSceneState — vrátí DEFAULT_SCENE_STATE pro novou party', () => {
+    const sceneState = useGameStore.getState().getSceneState();
+    expect(sceneState.chaosFactor).toBe(5);
+    expect(sceneState.currentScene).toBeNull();
+    expect(sceneState.sceneHistory).toEqual([]);
+    expect(sceneState.threads).toEqual([]);
+    expect(sceneState.sceneNPCs).toEqual([]);
+    expect(sceneState.sceneCount).toBe(0);
+  });
+
+  it('getSceneState — vrátí DEFAULT_SCENE_STATE bez aktivní party', () => {
+    useGameStore.setState({ activePartyId: null });
+    const sceneState = useGameStore.getState().getSceneState();
+    expect(sceneState.chaosFactor).toBe(5);
+  });
+
+  it('updateSceneState — partial update', () => {
+    useGameStore.getState().updateSceneState({ chaosFactor: 7 });
+    const sceneState = useGameStore.getState().getSceneState();
+    expect(sceneState.chaosFactor).toBe(7);
+    expect(sceneState.sceneCount).toBe(0); // ostatní zachovány
+  });
+
+  it('startScene — vytvoří scénu, inkrementuje sceneCount, loguje', () => {
+    const result = useGameStore.getState().startScene('Průzkum mlýna', 'exploration');
+    expect(result.scene.number).toBe(1);
+    expect(result.scene.title).toBe('Průzkum mlýna');
+    expect(result.scene.type).toBe('exploration');
+    expect(result.scene.checkDie).toBeGreaterThanOrEqual(1);
+    expect(result.scene.checkDie).toBeLessThanOrEqual(10);
+    expect(['normal', 'altered', 'interrupted']).toContain(result.checkResult);
+
+    const sceneState = useGameStore.getState().getSceneState();
+    expect(sceneState.currentScene).not.toBeNull();
+    expect(sceneState.currentScene?.number).toBe(1);
+    expect(sceneState.sceneCount).toBe(1);
+
+    // Journal entry
+    const journal = useGameStore.getState().journal;
+    expect(journal).toHaveLength(1);
+    expect(journal[0].type).toBe('scene_start');
+  });
+
+  it('startScene — d10 check mechanika: die > CF = normal', () => {
+    // Nastavíme CF na 1, takže d10 (2-10) > 1 = skoro vždy normální
+    useGameStore.getState().updateSceneState({ chaosFactor: 1 });
+    // Spustíme 20x a alespoň 1x by mělo být normální
+    let normalCount = 0;
+    for (let i = 0; i < 20; i++) {
+      useGameStore.getState().updateSceneState({ currentScene: null, sceneCount: 0 });
+      const result = useGameStore.getState().startScene('Test', 'other');
+      if (result.checkResult === 'normal') normalCount++;
+    }
+    expect(normalCount).toBeGreaterThan(0);
+  });
+
+  it('endScene — pod kontrolou snižuje CF, loguje', () => {
+    useGameStore.getState().startScene('Test', 'combat');
+    useGameStore.getState().endScene('in_control');
+
+    const sceneState = useGameStore.getState().getSceneState();
+    expect(sceneState.currentScene).toBeNull();
+    expect(sceneState.chaosFactor).toBe(4); // 5 - 1
+    expect(sceneState.sceneHistory).toHaveLength(1);
+    expect(sceneState.sceneHistory[0].outcome).toBe('in_control');
+
+    const journal = useGameStore.getState().journal;
+    expect(journal[0].type).toBe('scene_end');
+  });
+
+  it('endScene — mimo kontrolu zvyšuje CF', () => {
+    useGameStore.getState().startScene('Test', 'combat');
+    useGameStore.getState().endScene('out_of_control');
+
+    const sceneState = useGameStore.getState().getSceneState();
+    expect(sceneState.chaosFactor).toBe(6); // 5 + 1
+  });
+
+  it('endScene — CF clamped 1-9', () => {
+    useGameStore.getState().updateSceneState({ chaosFactor: 9 });
+    useGameStore.getState().startScene('Test', 'combat');
+    useGameStore.getState().endScene('out_of_control');
+    expect(useGameStore.getState().getSceneState().chaosFactor).toBe(9); // max
+
+    useGameStore.getState().updateSceneState({ chaosFactor: 1 });
+    useGameStore.getState().startScene('Test2', 'combat');
+    useGameStore.getState().endScene('in_control');
+    expect(useGameStore.getState().getSceneState().chaosFactor).toBe(1); // min
+  });
+
+  it('adjustChaosFactor — manuální úprava, clamp, log', () => {
+    useGameStore.getState().adjustChaosFactor(2);
+    expect(useGameStore.getState().getSceneState().chaosFactor).toBe(7);
+
+    useGameStore.getState().adjustChaosFactor(-3);
+    expect(useGameStore.getState().getSceneState().chaosFactor).toBe(4);
+
+    // Clamp min
+    useGameStore.getState().adjustChaosFactor(-10);
+    expect(useGameStore.getState().getSceneState().chaosFactor).toBe(1);
+
+    // Clamp max
+    useGameStore.getState().adjustChaosFactor(20);
+    expect(useGameStore.getState().getSceneState().chaosFactor).toBe(9);
+  });
+
+  it('adjustChaosFactor — no-op pokud beze změny', () => {
+    useGameStore.getState().updateSceneState({ chaosFactor: 9 });
+    const journalBefore = useGameStore.getState().journal.length;
+    useGameStore.getState().adjustChaosFactor(1); // 9+1=10→clamped 9, no change
+    expect(useGameStore.getState().journal.length).toBe(journalBefore);
+  });
+
+  it('addThread + removeThread', () => {
+    useGameStore.getState().addThread('Najít ztracený artefakt');
+    const threads = useGameStore.getState().getSceneState().threads;
+    expect(threads).toHaveLength(1);
+    expect(threads[0].description).toBe('Najít ztracený artefakt');
+    expect(threads[0].resolved).toBe(false);
+
+    useGameStore.getState().removeThread(threads[0].id);
+    expect(useGameStore.getState().getSceneState().threads).toHaveLength(0);
+  });
+
+  it('toggleThreadResolved', () => {
+    useGameStore.getState().addThread('Test thread');
+    const threadId = useGameStore.getState().getSceneState().threads[0].id;
+
+    useGameStore.getState().toggleThreadResolved(threadId);
+    expect(useGameStore.getState().getSceneState().threads[0].resolved).toBe(true);
+
+    useGameStore.getState().toggleThreadResolved(threadId);
+    expect(useGameStore.getState().getSceneState().threads[0].resolved).toBe(false);
+  });
+
+  it('addSceneNPC + removeSceneNPC', () => {
+    useGameStore.getState().addSceneNPC('Alkoun', 'npc123');
+    const npcs = useGameStore.getState().getSceneState().sceneNPCs;
+    expect(npcs).toHaveLength(1);
+    expect(npcs[0].name).toBe('Alkoun');
+    expect(npcs[0].worldNpcId).toBe('npc123');
+
+    useGameStore.getState().addSceneNPC('Tajemný posel');
+    expect(useGameStore.getState().getSceneState().sceneNPCs).toHaveLength(2);
+
+    useGameStore.getState().removeSceneNPC(npcs[0].id);
+    expect(useGameStore.getState().getSceneState().sceneNPCs).toHaveLength(1);
+    expect(useGameStore.getState().getSceneState().sceneNPCs[0].name).toBe('Tajemný posel');
+  });
+
+  it('startScene + endScene — kompletní lifecycle', () => {
+    // Start scene 1
+    useGameStore.getState().startScene('Výprava', 'exploration');
+    expect(useGameStore.getState().getSceneState().currentScene).not.toBeNull();
+
+    // End scene 1
+    useGameStore.getState().endScene('in_control');
+    expect(useGameStore.getState().getSceneState().currentScene).toBeNull();
+    expect(useGameStore.getState().getSceneState().sceneHistory).toHaveLength(1);
+
+    // Start scene 2
+    useGameStore.getState().startScene('Boj', 'combat');
+    expect(useGameStore.getState().getSceneState().currentScene?.number).toBe(2);
+
+    // End scene 2
+    useGameStore.getState().endScene('out_of_control');
+    expect(useGameStore.getState().getSceneState().sceneHistory).toHaveLength(2);
   });
 });

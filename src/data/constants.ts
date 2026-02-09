@@ -3,6 +3,8 @@
 // Extracted from monolith for modular imports
 // ============================================
 
+import type { SceneState } from '../types';
+
 export const GOOGLE_CLIENT_ID = '948855876248-acfbvk4k4ud5fmciocfk5o8qldfcdi29.apps.googleusercontent.com';
 export const GOOGLE_API_KEY = 'AIzaSyDorqiiGhrfkdg_fO6dqjjHsnpeioNSL-s';
 export const GOOGLE_SCOPES = 'https://www.googleapis.com/auth/drive.file';
@@ -43,6 +45,43 @@ export const FAILURE_CONSEQUENCES = [
   'Odhal nepříjemnou pravdu',
   'Odděl skupinu'
 ];
+
+// --- SCENE MANAGEMENT (Mythic GME style) ---
+
+export const DEFAULT_SCENE_STATE: SceneState = {
+  chaosFactor: 5,
+  currentScene: null,
+  sceneHistory: [],
+  threads: [],
+  sceneNPCs: [],
+  sceneCount: 0
+};
+
+export const SCENE_ALTERATION_TABLE = [
+  'Pozměněné prostředí — místo vypadá jinak, než jsi čekal',
+  'Pozměněný cíl — důvod proč jsi tu, se změnil',
+  'Pozměněné NPC — někdo tu chybí nebo tu je někdo navíc',
+  'Pozměněná akce — něco se tu děje, co jsi nečekal',
+  'Pozměněný čas — přišel jsi moc brzy nebo pozdě',
+  'Pozměněná nálada — atmosféra je jiná, než jsi předpokládal'
+];
+
+export const INTERRUPTED_SCENE_FOCUS = [
+  'Nový NPC se zapojí do příběhu',
+  'Nová zápletková linka se objeví',
+  'Stávající zápletka eskaluje',
+  'Stávající NPC udělá něco nečekaného',
+  'Hráčská postava je konfrontována s minulostí',
+  'Vnější síla zasáhne do situace'
+];
+
+export const SCENE_TYPE_LABELS: Record<string, string> = {
+  combat: 'Souboj',
+  exploration: 'Průzkum',
+  social: 'Sociální',
+  rest: 'Odpočinek',
+  other: 'Jiné'
+};
 
 export const ACTION_ORACLE = [
   'Opustit', 'Získat', 'Postoupit', 'Ovlivnit', 'Pomoci', 'Přijít', 'Útočit', 'Pomstít', 'Začít', 'Zradit',
@@ -2019,7 +2058,7 @@ export const SPELLS = [
 // SAVE VERSION & MIGRATION SYSTEM
 // ============================================
 // Increment this when save format changes!
-export const SAVE_VERSION = 4;
+export const SAVE_VERSION = 5;
 
 // Migration functions - each upgrades from version N to N+1
 export const migrations = {
@@ -2072,10 +2111,20 @@ export const migrations = {
       version: 4,
       parties: migratedParties
     };
-  }
+  },
 
-  // Future migrations go here:
-  // 4: (data) => { ... return { ...data, version: 5, newField: [] }; }
+  // v4 -> v5: Added sceneState to parties (Mythic GME style scenes)
+  4: (data) => {
+    const migratedParties = (data.parties || []).map(party => ({
+      ...party,
+      sceneState: party.sceneState || { ...DEFAULT_SCENE_STATE }
+    }));
+    return {
+      ...data,
+      version: 5,
+      parties: migratedParties
+    };
+  }
 };
 
 // Main migration function - applies all needed migrations

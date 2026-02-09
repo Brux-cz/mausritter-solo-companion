@@ -1,11 +1,13 @@
 import { create } from 'zustand';
-import { generateId, formatTimestamp, rollD6, randomFrom } from '../utils/helpers';
+import { generateId, formatTimestamp, rollD6, rollD10, randomFrom } from '../utils/helpers';
 import {
-  FIRST_NAMES, LAST_NAMES, BIRTHSIGNS, PHYSICAL_DETAILS, HIRELING_TYPES
+  FIRST_NAMES, LAST_NAMES, BIRTHSIGNS, PHYSICAL_DETAILS, HIRELING_TYPES,
+  DEFAULT_SCENE_STATE, SCENE_ALTERATION_TABLE, INTERRUPTED_SCENE_FOCUS, SCENE_TYPE_LABELS
 } from '../data/constants';
 import type {
   Party, Character, PC, Hireling, GameTime, GameState,
-  JournalEntry, Faction, Settlement, WorldNPC, TimedEvent, LexiconEntry
+  JournalEntry, Faction, Settlement, WorldNPC, TimedEvent, LexiconEntry,
+  SceneState, SceneType, SceneCheckResult, SceneOutcome, Scene
 } from '../types';
 
 interface CreatureData {
@@ -57,6 +59,18 @@ interface GameStoreState extends GameState {
   deleteSettlement: (settlementId: string) => void;
   promoteToNPC: (creatureData: CreatureData) => WorldNPC;
   updateNPC: (npcId: string, updates: Partial<WorldNPC>) => WorldNPC | undefined;
+
+  // --- Scene actions ---
+  getSceneState: () => SceneState;
+  updateSceneState: (updates: Partial<SceneState>) => void;
+  startScene: (title: string, type: SceneType) => { scene: Scene; checkResult: SceneCheckResult; alteration?: string; focus?: string };
+  endScene: (outcome: SceneOutcome) => void;
+  adjustChaosFactor: (delta: number) => void;
+  addThread: (description: string) => void;
+  removeThread: (threadId: string) => void;
+  toggleThreadResolved: (threadId: string) => void;
+  addSceneNPC: (name: string, worldNpcId?: string | null) => void;
+  removeSceneNPC: (npcId: string) => void;
 
   // --- Serialization ---
   getGameState: () => GameState;
@@ -324,6 +338,178 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       worldNPCs: (s.worldNPCs || []).map(n => n.id === npcId ? { ...n, ...updates } : n)
     }));
     return get().worldNPCs.find(n => n.id === npcId);
+  },
+
+  // --- Scene actions ---
+
+  getSceneState: () => {
+    const party = get().getActiveParty();
+    return party?.sceneState || { ...DEFAULT_SCENE_STATE };
+  },
+
+  updateSceneState: (updates) => {
+    const { activePartyId } = get();
+    if (!activePartyId) return;
+    set(s => ({
+      parties: (s.parties || []).map(p => {
+        if (p.id !== activePartyId) return p;
+        const currentScene = p.sceneState || { ...DEFAULT_SCENE_STATE };
+        return { ...p, sceneState: { ...currentScene, ...updates } };
+      })
+    }));
+  },
+
+  startScene: (title, type) => {
+    const sceneState = get().getSceneState();
+    const cf = sceneState.chaosFactor;
+    const die = rollD10();
+
+    let checkResult: SceneCheckResult = 'normal';
+    let alteration: string | undefined;
+    let focus: string | undefined;
+
+    if (die <= cf) {
+      if (die % 2 === 1) {
+        checkResult = 'altered';
+        alteration = randomFrom(SCENE_ALTERATION_TABLE);
+      } else {
+        checkResult = 'interrupted';
+        focus = randomFrom(INTERRUPTED_SCENE_FOCUS);
+      }
+    }
+
+    const newScene: Scene = {
+      id: generateId(),
+      number: sceneState.sceneCount + 1,
+      title,
+      type,
+      checkResult,
+      checkDie: die,
+      chaosAtStart: cf,
+      startedAt: new Date().toISOString()
+    };
+
+    get().updateSceneState({
+      currentScene: newScene,
+      sceneCount: sceneState.sceneCount + 1
+    });
+
+    const checkLabels: Record<SceneCheckResult, string> = {
+      normal: 'Normalni',
+      altered: 'Pozmenena',
+      interrupted: 'Prerusena'
+    };
+    let content = `Scena #${newScene.number}: ${title} (${SCENE_TYPE_LABELS[type] || type})`;
+    content += ` | Check: [${die}] vs CF ${cf} = ${checkLabels[checkResult]}`;
+    if (alteration) content += ` | ${alteration}`;
+    if (focus) content += ` | ${focus}`;
+
+    get().handleLogEntry({
+      type: 'scene_start',
+      timestamp: formatTimestamp(),
+      sceneNumber: newScene.number,
+      sceneTitle: title,
+      sceneType: type,
+      checkResult,
+      checkDie: die,
+      chaosFactor: cf,
+      content
+    } as any);
+
+    return { scene: newScene, checkResult, alteration, focus };
+  },
+
+  endScene: (outcome) => {
+    const sceneState = get().getSceneState();
+    if (!sceneState.currentScene) return;
+
+    const scene = sceneState.currentScene;
+    const cfBefore = sceneState.chaosFactor;
+    const delta = outcome === 'in_control' ? -1 : 1;
+    const cfAfter = Math.max(1, Math.min(9, cfBefore + delta));
+
+    const endedScene: Scene = {
+      ...scene,
+      outcome,
+      endedAt: new Date().toISOString()
+    };
+
+    get().updateSceneState({
+      currentScene: null,
+      chaosFactor: cfAfter,
+      sceneHistory: [...sceneState.sceneHistory, endedScene]
+    });
+
+    const outcomeLabel = outcome === 'in_control' ? 'Pod kontrolou' : 'Mimo kontrolu';
+    const content = `Scena #${scene.number} ukoncena: ${outcomeLabel} | Chaos: ${cfBefore} → ${cfAfter}`;
+
+    get().handleLogEntry({
+      type: 'scene_end',
+      timestamp: formatTimestamp(),
+      sceneNumber: scene.number,
+      sceneTitle: scene.title,
+      outcome,
+      chaosChange: delta,
+      chaosBefore: cfBefore,
+      chaosAfter: cfAfter,
+      content
+    } as any);
+  },
+
+  adjustChaosFactor: (delta) => {
+    const sceneState = get().getSceneState();
+    const cfBefore = sceneState.chaosFactor;
+    const cfAfter = Math.max(1, Math.min(9, cfBefore + delta));
+    if (cfBefore === cfAfter) return;
+
+    get().updateSceneState({ chaosFactor: cfAfter });
+
+    get().handleLogEntry({
+      type: 'chaos_adjust',
+      timestamp: formatTimestamp(),
+      chaosBefore: cfBefore,
+      chaosAfter: cfAfter,
+      content: `Chaos: ${cfBefore} → ${cfAfter}`
+    } as any);
+  },
+
+  addThread: (description) => {
+    const sceneState = get().getSceneState();
+    const newThread = { id: generateId(), description, resolved: false };
+    get().updateSceneState({
+      threads: [...sceneState.threads, newThread]
+    });
+  },
+
+  removeThread: (threadId) => {
+    const sceneState = get().getSceneState();
+    get().updateSceneState({
+      threads: sceneState.threads.filter(t => t.id !== threadId)
+    });
+  },
+
+  toggleThreadResolved: (threadId) => {
+    const sceneState = get().getSceneState();
+    get().updateSceneState({
+      threads: sceneState.threads.map(t =>
+        t.id === threadId ? { ...t, resolved: !t.resolved } : t
+      )
+    });
+  },
+
+  addSceneNPC: (name, worldNpcId = null) => {
+    const sceneState = get().getSceneState();
+    const newNPC = { id: generateId(), name, worldNpcId: worldNpcId || null };
+    get().updateSceneState({
+      sceneNPCs: [...sceneState.sceneNPCs, newNPC]
+    });
+  },
+
+  removeSceneNPC: (npcId) => {
+    const sceneState = get().getSceneState();
+    get().updateSceneState({
+      sceneNPCs: sceneState.sceneNPCs.filter(n => n.id !== npcId)
+    });
   },
 
   // --- Serialization ---
