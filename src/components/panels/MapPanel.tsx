@@ -1,68 +1,76 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Tldraw, useEditor } from 'tldraw';
+import React, { useState, useRef, useLayoutEffect, useMemo } from 'react';
+import { Tldraw, createTLStore, getSnapshot, loadSnapshot } from 'tldraw';
 import 'tldraw/tldraw.css';
 import { useGameStore } from '../../stores/gameStore';
 import { Button, SectionHeader } from '../ui/common';
 
-// Inner component that has access to tldraw's useEditor hook
-const MapEditorInner = ({ mapId }: { mapId: string }) => {
-  const editor = useEditor();
-  const updateMapData = useGameStore(s => s.updateMapData);
-  const maps = useGameStore(s => s.maps);
+// Tldraw editor with external store for persistence
+const MapEditor = ({ mapId }: { mapId: string }) => {
+  const store = useMemo(() => createTLStore(), [mapId]);
   const isLoadingRef = useRef(true);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Load snapshot on mount
-  useEffect(() => {
-    const map = maps.find(m => m.id === mapId);
-    if (map?.data && editor) {
+  useLayoutEffect(() => {
+    isLoadingRef.current = true;
+
+    // Load saved snapshot
+    const map = useGameStore.getState().maps.find(m => m.id === mapId);
+    if (map?.data) {
       try {
-        editor.store.loadStoreSnapshot(map.data as any);
+        loadSnapshot(store, map.data as any);
       } catch (e) {
         console.warn('Failed to load map snapshot:', e);
       }
     }
-    // Mark loading complete after a tick
+
+    // Mark loading done after a tick
     requestAnimationFrame(() => {
       isLoadingRef.current = false;
     });
-  }, [editor, mapId]);
 
-  // Listen to store changes and debounce save
-  useEffect(() => {
-    if (!editor) return;
+    // Auto-save on changes (debounce 2s)
+    const cleanup = store.listen(() => {
+      if (isLoadingRef.current) return;
 
-    const cleanup = editor.store.listen(
-      () => {
-        if (isLoadingRef.current) return;
-
-        if (saveTimeoutRef.current) {
-          clearTimeout(saveTimeoutRef.current);
-        }
-        saveTimeoutRef.current = setTimeout(() => {
-          const snapshot = editor.store.getStoreSnapshot();
-          updateMapData(mapId, snapshot as any);
-        }, 2000);
-      },
-      { scope: 'document', source: 'user' }
-    );
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+      saveTimeoutRef.current = setTimeout(() => {
+        const snapshot = getSnapshot(store);
+        useGameStore.getState().updateMapData(mapId, snapshot as any);
+      }, 2000);
+    });
 
     return () => {
       cleanup();
+      // Save immediately on unmount
       if (saveTimeoutRef.current) {
-        // Save immediately on unmount
         clearTimeout(saveTimeoutRef.current);
-        const snapshot = editor.store.getStoreSnapshot();
-        updateMapData(mapId, snapshot as any);
+      }
+      if (!isLoadingRef.current) {
+        const snapshot = getSnapshot(store);
+        useGameStore.getState().updateMapData(mapId, snapshot as any);
       }
     };
-  }, [editor, mapId, updateMapData]);
+  }, [store, mapId]);
 
-  return null;
+  return (
+    <div
+      className="border border-stone-300 rounded-lg overflow-hidden"
+      style={{ height: 'calc(100vh - 280px)', minHeight: '400px' }}
+    >
+      <Tldraw store={store} />
+    </div>
+  );
 };
 
 const MapPanel = () => {
-  const { maps, activeMapId, setActiveMapId, createMap, deleteMap, renameMap } = useGameStore();
+  const maps = useGameStore(s => s.maps);
+  const activeMapId = useGameStore(s => s.activeMapId);
+  const setActiveMapId = useGameStore(s => s.setActiveMapId);
+  const createMap = useGameStore(s => s.createMap);
+  const deleteMap = useGameStore(s => s.deleteMap);
+  const renameMap = useGameStore(s => s.renameMap);
   const [editingName, setEditingName] = useState<string | null>(null);
   const [nameValue, setNameValue] = useState('');
   const nameInputRef = useRef<HTMLInputElement>(null);
@@ -161,14 +169,7 @@ const MapPanel = () => {
           </div>
 
           {/* tldraw editor */}
-          <div
-            className="border border-stone-300 rounded-lg overflow-hidden"
-            style={{ height: 'calc(100vh - 280px)', minHeight: '400px' }}
-          >
-            <Tldraw key={activeMap.id}>
-              <MapEditorInner mapId={activeMap.id} />
-            </Tldraw>
-          </div>
+          <MapEditor key={activeMap.id} mapId={activeMap.id} />
         </>
       )}
     </div>
