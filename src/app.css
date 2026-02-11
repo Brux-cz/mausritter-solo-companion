@@ -100,3 +100,6 @@ body { overscroll-behavior: none; }
 .journal-html-content p {
   margin: 0.125rem 0;
 }
+
+/* === tldraw Map Editor === */
+.tl-container { border-radius: 0.5rem; }

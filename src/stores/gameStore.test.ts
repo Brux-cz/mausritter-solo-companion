@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useGameStore } from './gameStore';
-import type { Party, GameState, WorldNPC, Settlement, JournalEntry, SceneState } from '../types';
+import type { Party, GameState, WorldNPC, Settlement, JournalEntry, SceneState, DungeonMap } from '../types';
 import { DEFAULT_SCENE_STATE } from '../data/constants';
 
 // Reset store data (merge mode — preserves actions/selectors)
@@ -14,6 +14,8 @@ const resetData = {
   worldNPCs: [] as any[],
   timedEvents: [] as any[],
   lexicon: [] as any[],
+  maps: [] as any[],
+  activeMapId: null as string | null,
   journalPartyFilter: 'all',
 };
 
@@ -235,12 +237,12 @@ describe('World management', () => {
 });
 
 describe('Serialization', () => {
-  it('getGameState — vrátí 9 polí, nevrátí interní', () => {
+  it('getGameState — vrátí 11 polí, nevrátí interní', () => {
     useGameStore.getState().createParty();
     const gameState = useGameStore.getState().getGameState();
     expect(Object.keys(gameState).sort()).toEqual([
-      'activeCharacterId', 'activePartyId', 'factions',
-      'journal', 'lexicon', 'parties', 'settlements',
+      'activeCharacterId', 'activeMapId', 'activePartyId', 'factions',
+      'journal', 'lexicon', 'maps', 'parties', 'settlements',
       'timedEvents', 'worldNPCs',
     ]);
     expect(gameState).not.toHaveProperty('journalPartyFilter');
@@ -496,5 +498,100 @@ describe('Scene management', () => {
     // End scene 2
     useGameStore.getState().endScene('out_of_control');
     expect(useGameStore.getState().getSceneState().sceneHistory).toHaveLength(2);
+  });
+});
+
+describe('Map management', () => {
+  it('createMap — výchozí jméno, nastaví activeMapId', () => {
+    const map = useGameStore.getState().createMap();
+    const state = useGameStore.getState();
+    expect(map.name).toBe('Nová mapa');
+    expect(map.data).toBeNull();
+    expect(map.id).toBeTruthy();
+    expect(map.createdAt).toBeTruthy();
+    expect(state.activeMapId).toBe(map.id);
+    expect(state.maps).toHaveLength(1);
+  });
+
+  it('createMap("Dungeon") — vlastní jméno', () => {
+    const map = useGameStore.getState().createMap('Dungeon');
+    expect(map.name).toBe('Dungeon');
+  });
+
+  it('deleteMap — odstraní mapu, přepne activeMapId', () => {
+    const m1 = useGameStore.getState().createMap('Mapa 1');
+    const m2 = useGameStore.getState().createMap('Mapa 2');
+    expect(useGameStore.getState().activeMapId).toBe(m2.id);
+
+    useGameStore.getState().deleteMap(m2.id);
+    expect(useGameStore.getState().maps).toHaveLength(1);
+    expect(useGameStore.getState().activeMapId).toBe(m1.id);
+  });
+
+  it('deleteMap — null když poslední', () => {
+    const map = useGameStore.getState().createMap();
+    useGameStore.getState().deleteMap(map.id);
+    expect(useGameStore.getState().maps).toHaveLength(0);
+    expect(useGameStore.getState().activeMapId).toBeNull();
+  });
+
+  it('deleteMap — neaktivní mapa nemění activeMapId', () => {
+    const m1 = useGameStore.getState().createMap('Mapa 1');
+    const m2 = useGameStore.getState().createMap('Mapa 2');
+    // m2 je aktivní
+    useGameStore.getState().deleteMap(m1.id);
+    expect(useGameStore.getState().activeMapId).toBe(m2.id);
+    expect(useGameStore.getState().maps).toHaveLength(1);
+  });
+
+  it('renameMap — přejmenuje mapu', () => {
+    const map = useGameStore.getState().createMap('Starý název');
+    useGameStore.getState().renameMap(map.id, 'Nový název');
+    const updated = useGameStore.getState().maps.find(m => m.id === map.id);
+    expect(updated?.name).toBe('Nový název');
+  });
+
+  it('updateMapData — uloží snapshot', () => {
+    const map = useGameStore.getState().createMap();
+    const snapshot = { shapes: [{ id: 's1' }], bindings: [] };
+    useGameStore.getState().updateMapData(map.id, snapshot);
+    const updated = useGameStore.getState().maps.find(m => m.id === map.id);
+    expect(updated?.data).toEqual(snapshot);
+  });
+
+  it('updateMapData — aktualizuje updatedAt', () => {
+    const map = useGameStore.getState().createMap();
+    const originalUpdatedAt = map.updatedAt;
+    // Malá pauza pro odlišný timestamp
+    useGameStore.getState().updateMapData(map.id, { test: true });
+    const updated = useGameStore.getState().maps.find(m => m.id === map.id);
+    expect(updated?.updatedAt).toBeTruthy();
+  });
+
+  it('serializace — maps a activeMapId v getGameState', () => {
+    const map = useGameStore.getState().createMap('Test');
+    const gameState = useGameStore.getState().getGameState();
+    expect(gameState.maps).toHaveLength(1);
+    expect(gameState.maps[0].name).toBe('Test');
+    expect(gameState.activeMapId).toBe(map.id);
+  });
+
+  it('loadGameState — obnoví maps', () => {
+    const data: Partial<GameState> = {
+      maps: [{ id: 'm1', name: 'Loaded Map', data: null, createdAt: '2025-01-01', updatedAt: '2025-01-01' }],
+      activeMapId: 'm1',
+    };
+    useGameStore.getState().loadGameState(data);
+    const state = useGameStore.getState();
+    expect(state.maps).toHaveLength(1);
+    expect(state.maps[0].name).toBe('Loaded Map');
+    expect(state.activeMapId).toBe('m1');
+  });
+
+  it('loadGameState — defaults pro chybějící maps', () => {
+    useGameStore.getState().loadGameState({});
+    const state = useGameStore.getState();
+    expect(state.maps).toEqual([]);
+    expect(state.activeMapId).toBeNull();
   });
 });

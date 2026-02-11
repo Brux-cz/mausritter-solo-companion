@@ -7,7 +7,7 @@ import {
 import type {
   Party, Character, PC, Hireling, GameTime, GameState,
   JournalEntry, Faction, Settlement, WorldNPC, TimedEvent, LexiconEntry,
-  SceneState, SceneType, SceneCheckResult, SceneOutcome, Scene
+  SceneState, SceneType, SceneCheckResult, SceneOutcome, Scene, DungeonMap
 } from '../types';
 
 interface CreatureData {
@@ -72,6 +72,14 @@ interface GameStoreState extends GameState {
   addSceneNPC: (name: string, worldNpcId?: string | null) => void;
   removeSceneNPC: (npcId: string) => void;
 
+  // --- Map actions ---
+  setMaps: (maps: DungeonMap[]) => void;
+  setActiveMapId: (activeMapId: string | null) => void;
+  createMap: (name?: string) => DungeonMap;
+  deleteMap: (mapId: string) => void;
+  renameMap: (mapId: string, name: string) => void;
+  updateMapData: (mapId: string, data: Record<string, unknown> | null) => void;
+
   // --- Serialization ---
   getGameState: () => GameState;
   loadGameState: (data: Partial<GameState>) => void;
@@ -90,6 +98,8 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   worldNPCs: [],
   timedEvents: [],
   lexicon: [],
+  maps: [],
+  activeMapId: null,
   journalPartyFilter: 'all',
 
   // --- Derived (computed via selectors, not stored) ---
@@ -116,6 +126,8 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   setWorldNPCs: (worldNPCs) => set({ worldNPCs }),
   setTimedEvents: (timedEvents) => set({ timedEvents }),
   setLexicon: (lexicon) => set({ lexicon }),
+  setMaps: (maps) => set({ maps }),
+  setActiveMapId: (activeMapId) => set({ activeMapId }),
   setJournalPartyFilter: (journalPartyFilter) => set({ journalPartyFilter }),
 
   // --- Actions ---
@@ -340,6 +352,50 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     return get().worldNPCs.find(n => n.id === npcId);
   },
 
+  // --- Map actions ---
+
+  createMap: (name = 'Nová mapa') => {
+    const newMap: DungeonMap = {
+      id: generateId(),
+      name,
+      data: null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    set(s => ({
+      maps: [...(s.maps || []), newMap],
+      activeMapId: newMap.id
+    }));
+    return newMap;
+  },
+
+  deleteMap: (mapId) => {
+    const { activeMapId, maps } = get();
+    const remaining = (maps || []).filter(m => m.id !== mapId);
+    set({
+      maps: remaining,
+      activeMapId: activeMapId === mapId
+        ? (remaining[0]?.id || null)
+        : activeMapId
+    });
+  },
+
+  renameMap: (mapId, name) => {
+    set(s => ({
+      maps: (s.maps || []).map(m =>
+        m.id === mapId ? { ...m, name, updatedAt: new Date().toISOString() } : m
+      )
+    }));
+  },
+
+  updateMapData: (mapId, data) => {
+    set(s => ({
+      maps: (s.maps || []).map(m =>
+        m.id === mapId ? { ...m, data, updatedAt: new Date().toISOString() } : m
+      )
+    }));
+  },
+
   // --- Scene actions ---
 
   getSceneState: () => {
@@ -515,10 +571,12 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   // --- Serialization ---
   getGameState: () => {
     const { parties, activePartyId, activeCharacterId, journal,
-      factions, settlements, worldNPCs, timedEvents, lexicon } = get();
+      factions, settlements, worldNPCs, timedEvents, lexicon,
+      maps, activeMapId } = get();
     return {
       parties, activePartyId, activeCharacterId,
-      journal, factions, settlements, worldNPCs, timedEvents, lexicon
+      journal, factions, settlements, worldNPCs, timedEvents, lexicon,
+      maps, activeMapId
     };
   },
 
@@ -533,6 +591,8 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       worldNPCs: data.worldNPCs || [],
       timedEvents: data.timedEvents || [],
       lexicon: data.lexicon || [],
+      maps: data.maps || [],
+      activeMapId: data.activeMapId || null,
     });
   },
 
@@ -549,6 +609,8 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     if (state.worldNPCs) updates.worldNPCs = state.worldNPCs;
     if (state.timedEvents) updates.timedEvents = state.timedEvents;
     if (state.lexicon) updates.lexicon = state.lexicon;
+    if (state.maps) updates.maps = state.maps;
+    if (state.activeMapId !== undefined) updates.activeMapId = state.activeMapId;
     set(updates);
   },
 }));

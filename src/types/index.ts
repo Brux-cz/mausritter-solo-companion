@@ -399,6 +399,16 @@ export type JournalEntry =
   | ChaosAdjustEntry
   | (BaseJournalEntry & { type: string; [key: string]: unknown });
 
+// --- Maps ---
+
+export interface DungeonMap {
+  id: string;
+  name: string;
+  data: Record<string, unknown> | null; // tldraw document snapshot
+  createdAt: string;
+  updatedAt: string;
+}
+
 // --- Game State ---
 
 export interface GameState {
@@ -411,6 +421,8 @@ export interface GameState {
   worldNPCs: WorldNPC[];
   timedEvents: TimedEvent[];
   lexicon: LexiconEntry[];
+  maps: DungeonMap[];
+  activeMapId: string | null;
 }
 
 export interface SaveData extends GameState {

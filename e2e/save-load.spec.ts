@@ -18,7 +18,7 @@ test.describe('Save / Load', () => {
     await expect(page.locator('option', { hasText: 'Moje družina' })).toBeAttached();
   });
 
-  test('Export JSON — stáhne soubor s version=5', async ({ page }) => {
+  test('Export JSON — stáhne soubor s version=6', async ({ page }) => {
     await page.goto('/');
     // Vytvořit nějaká data
     await page.getByRole('button', { name: 'Postavy' }).click();
@@ -34,7 +34,7 @@ test.describe('Save / Load', () => {
     expect(filePath).toBeTruthy();
     const content = fs.readFileSync(filePath!, 'utf-8');
     const data = JSON.parse(content);
-    expect(data.version).toBe(5);
+    expect(data.version).toBe(6);
     expect(data.parties).toBeDefined();
     expect(data.parties).toHaveLength(1);
   });

@@ -36,6 +36,8 @@ import { TimeBar } from './components/panels/TimeBar';
 import { FloatingDice } from './components/panels/FloatingDice';
 import { SmallWorldPanel } from './components/panels/SmallWorldPanel';
 
+const MapPanel = React.lazy(() => import('./components/panels/MapPanel'));
+
 
 // ============================================
 // MAIN APP
@@ -50,6 +52,7 @@ function MausritterSoloCompanion() {
     journal, setJournal, factions, setFactions,
     settlements, setSettlements, worldNPCs, setWorldNPCs,
     timedEvents, setTimedEvents, lexicon, setLexicon,
+    maps, activeMapId,
     journalPartyFilter, setJournalPartyFilter,
     getActiveParty, getActiveCharacter,
     getGameState, loadGameState, applyRemoteState,
@@ -150,7 +153,7 @@ function MausritterSoloCompanion() {
       ? `mausritter-save-${roomCode}`
       : 'mausritter-save';
     localStorage.setItem(saveKey, JSON.stringify(saveData));
-  }, [parties, activePartyId, activeCharacterId, journal, factions, settlements, worldNPCs, timedEvents, lexicon, roomConnected, roomCode]);
+  }, [parties, activePartyId, activeCharacterId, journal, factions, settlements, worldNPCs, timedEvents, lexicon, maps, activeMapId, roomConnected, roomCode]);
 
   const handleLogEntry = useCallback((entry) => {
     useGameStore.getState().addJournalEntry({
@@ -1577,6 +1580,7 @@ function MausritterSoloCompanion() {
     { id: 'factions', label: 'Frakce', icon: '🏰' },
     { id: 'lexicon', label: 'Lexikon', icon: '📚' },
     { id: 'smallworld', label: 'Malý Svět', icon: '🏠' },
+    { id: 'maps', label: 'Mapy', icon: '🗺️' },
     { id: 'studio', label: 'Kartičky', icon: '🎴' },
     { id: 'howto', label: 'Jak hrát', icon: '📚' }
   ];
@@ -2701,6 +2705,7 @@ function MausritterSoloCompanion() {
         {activePanel === 'factions' && <FactionPanel />}
         {activePanel === 'lexicon' && <LexikonPanel />}
         {activePanel === 'smallworld' && <SmallWorldPanel />}
+        {activePanel === 'maps' && <React.Suspense fallback={<div className="text-center py-8 text-stone-500">Načítám editor map...</div>}><MapPanel /></React.Suspense>}
         {activePanel === 'journal' && <JournalPanel onExport={handleExport} />}
       </main>
 

@@ -2058,7 +2058,7 @@ export const SPELLS = [
 // SAVE VERSION & MIGRATION SYSTEM
 // ============================================
 // Increment this when save format changes!
-export const SAVE_VERSION = 5;
+export const SAVE_VERSION = 6;
 
 // Migration functions - each upgrades from version N to N+1
 export const migrations = {
@@ -2124,6 +2124,16 @@ export const migrations = {
       version: 5,
       parties: migratedParties
     };
+  },
+
+  // v5 -> v6: Added maps (tldraw dungeon/world maps)
+  5: (data) => {
+    return {
+      ...data,
+      version: 6,
+      maps: data.maps || [],
+      activeMapId: data.activeMapId || null
+    };
   }
 };
 
@@ -2155,9 +2165,11 @@ export const migrateSaveData = (data) => {
     factions: currentData.factions || [],
     settlements: currentData.settlements || [],
     worldNPCs: currentData.worldNPCs || [],
+    maps: currentData.maps || [],
+    activeMapId: currentData.activeMapId || null,
     // Preserve any extra data for forward compatibility
     _extra: Object.keys(currentData)
-      .filter(k => !['version', 'parties', 'activePartyId', 'activeCharacterId', 'journal', 'factions', 'settlements', 'worldNPCs', 'exportDate', 'character', 'gameTime'].includes(k))
+      .filter(k => !['version', 'parties', 'activePartyId', 'activeCharacterId', 'journal', 'factions', 'settlements', 'worldNPCs', 'maps', 'activeMapId', 'exportDate', 'character', 'gameTime'].includes(k))
       .reduce((acc, k) => ({ ...acc, [k]: currentData[k] }), {})
   };
 };
