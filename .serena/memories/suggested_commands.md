@@ -2,42 +2,44 @@
 
 ## Vývoj
 
-### Editace zdrojového kódu
-Upravovat pouze soubor:
-```
-mausritter-project/mausritter-solo-companion.jsx
+### Dev server (Vite, hot reload)
+```bash
+npm run dev              # http://localhost:8081
 ```
 
-### Build do HTML
+### Build pro produkci
 ```bash
-node mausritter-project/build-html.js
+npm run build            # Výstup: dist/
+npm run preview          # Náhled produkčního buildu
 ```
-Výstup: `mausritter-solo-companion.html`
 
-### Spuštění aplikace
+### Testy
 ```bash
-xdg-open mausritter-solo-companion.html
+npm test                 # Unit testy (Vitest) — PŘED KAŽDÝM COMMITEM
+npm run test:watch       # Watch mode pro vývoj
+npm run test:e2e         # E2E testy (Playwright, potřebuje browser)
 ```
-nebo otevřít v prohlížeči přímo.
+
+### Zdrojový kód
+```
+src/components/panels/   # Panely aplikace (.tsx)
+src/components/ui/       # UI komponenty (.tsx)
+src/stores/              # Zustand stores (.ts)
+src/data/constants.ts    # Herní konstanty
+src/types/index.ts       # TypeScript typy
+src/utils/helpers.ts     # Utility funkce
+```
 
 ## Git příkazy
 ```bash
 git status
-git add .
+git add soubor1 soubor2
 git commit -m "popis změny"
 git log --oneline -10
 ```
 
-## Systémové příkazy (Linux)
-```bash
-ls -la                    # seznam souborů
-cat soubor                # zobrazit obsah
-grep -r "pattern" .       # hledat v souborech
-find . -name "*.jsx"      # najít soubory
-```
-
 ## Poznámky
-- Není potřeba npm/yarn - vše z CDN
-- Žádné testy (zatím)
-- Žádný linting/formatting tool
-- Babel transpiluje JSX přímo v prohlížeči
+- Vite dev server běží na portu 8081
+- `npm test` = Vitest (82 unit testů)
+- `npm run test:e2e` = Playwright (13 E2E testů)
+- Deploy automaticky přes GitHub Actions na GitHub Pages

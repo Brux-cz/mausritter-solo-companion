@@ -2,21 +2,26 @@
 
 ## Checklist po úpravách kódu
 
-### 1. Build
+### 1. Unit testy
 ```bash
-node mausritter-project/build-html.js
+npm test
 ```
+Musí projít všech 82 testů (helpers, constants/migrace, gameStore).
 
-### 2. Testování
-- Otevřít `mausritter-solo-companion.html` v prohlížeči
-- Ověřit, že aplikace funguje bez chyb v konzoli
-- Otestovat upravené funkce manuálně
+### 2. Build
+```bash
+npm run build
+```
+Ověří TypeScript typy a vytvoří produkční build.
 
-### 3. Validace
-- Zkontrolovat, že localStorage data zůstávají kompatibilní
-- Pokud se mění datový model, aktualizovat migrační funkci a zvýšit SAVE_VERSION
+### 3. E2E testy (volitelné)
+```bash
+npm run test:e2e
+```
+Vyžaduje nainstalovaný Chromium (`npx playwright install chromium`).
 
 ## Důležité
-- **Žádné automatické testy** - vše se testuje manuálně
-- **Žádný linting** - dbát na konzistenci stylu ručně
-- **Migrace dat** - při změně struktury uložených dat přidat migraci do `migrations` objektu
+- **Migrační systém** — při změně struktury dat: přidat migraci do `constants.ts`, zvýšit `CURRENT_VERSION` (aktuálně 6), přidat test do `constants.test.ts`
+- **TypeScript typy** — při změně datového modelu aktualizovat `src/types/index.ts`
+- **Zustand store** — nové akce/selektory přidat do `gameStore.ts`, otestovat v `gameStore.test.ts`
+- **`_extra` pole** — zachovávat neznámá pole pro dopřednou kompatibilitu
