@@ -21,7 +21,7 @@ interface UIState {
 
 // UI state store — transient state (active panel, mobile menu, side panel)
 export const useUIStore = create<UIState>((set) => ({
-  activePanel: 'journal',
+  activePanel: 'playarea',
   mobileMenuOpen: false,
   pendingMentionOpen: null,
   sidePanelCharacter: null,

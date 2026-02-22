@@ -35,6 +35,9 @@ import { EventsPanel } from './components/panels/EventsPanel';
 import { TimeBar } from './components/panels/TimeBar';
 import { FloatingDice } from './components/panels/FloatingDice';
 import { SmallWorldPanel } from './components/panels/SmallWorldPanel';
+import { SessionStartScreen } from './components/panels/SessionStartScreen';
+import { SessionEndDialog } from './components/panels/SessionEndDialog';
+import { PlayArea } from './components/panels/PlayArea';
 
 const MapPanel = React.lazy(() => import('./components/panels/MapPanel'));
 
@@ -117,6 +120,10 @@ function MausritterSoloCompanion() {
   const isLoadingFromFirebaseRef = useRef(false);
   const isSyncingFromRemoteRef = useRef(false);
 
+  // Session flow
+  const [showSessionStart, setShowSessionStart] = useState(false);
+  const [showSessionEnd, setShowSessionEnd] = useState(false);
+
   // Derived values
   const activeParty = getActiveParty();
   const activeCharacter = getActiveCharacter();
@@ -137,6 +144,12 @@ function MausritterSoloCompanion() {
         const oldVersion = rawData.version || 1;
         if (oldVersion < SAVE_VERSION) {
           console.log(`Save migrated from v${oldVersion} to v${SAVE_VERSION}`);
+        }
+
+        // Show session start screen for returning players
+        const hasData = (data.journal?.length ?? 0) > 0 || (data.parties?.length ?? 0) > 0;
+        if (hasData) {
+          setShowSessionStart(true);
         }
       }
     } catch (e) {
@@ -1570,6 +1583,7 @@ function MausritterSoloCompanion() {
   };
 
   const panels = [
+    { id: 'playarea', label: 'Hrací Plocha', icon: '🎲' },
     { id: 'journal', label: 'Deník', icon: '📖' },
     { id: 'character', label: 'Postavy', icon: '🐭' },
     { id: 'oracle', label: 'Věštírna', icon: '🔮' },
@@ -1591,6 +1605,16 @@ function MausritterSoloCompanion() {
       <div className="fixed inset-0 opacity-5 pointer-events-none" style={{
         backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
       }} />
+
+      {/* Session Start Screen */}
+      {showSessionStart && (
+        <SessionStartScreen onContinue={() => setShowSessionStart(false)} />
+      )}
+
+      {/* Session End Dialog */}
+      {showSessionEnd && (
+        <SessionEndDialog onClose={() => setShowSessionEnd(false)} />
+      )}
 
       {/* Sync Conflict Dialog */}
       {syncConflict && (
@@ -2691,6 +2715,7 @@ function MausritterSoloCompanion() {
 
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 py-6 overflow-hidden">
+        {activePanel === 'playarea' && <PlayArea />}
         {activePanel === 'howto' && (
           <HowToPlayPanel />
         )}
@@ -2720,6 +2745,12 @@ function MausritterSoloCompanion() {
         <p className="text-sm">
           🐭 Mausritter Solo Companion • Pro sólo hráče Mausritter RPG
         </p>
+        <button
+          onClick={() => setShowSessionEnd(true)}
+          className="mt-2 text-xs text-amber-400 hover:text-amber-200 underline transition-colors"
+        >
+          🌙 Ukončit session
+        </button>
       </footer>
     </div>
   );
