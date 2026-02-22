@@ -37,6 +37,7 @@ import { FloatingDice } from './components/panels/FloatingDice';
 import { SmallWorldPanel } from './components/panels/SmallWorldPanel';
 import { SessionStartScreen } from './components/panels/SessionStartScreen';
 import { SessionEndDialog } from './components/panels/SessionEndDialog';
+import { PlayArea } from './components/panels/PlayArea';
 
 const MapPanel = React.lazy(() => import('./components/panels/MapPanel'));
 
@@ -1582,6 +1583,7 @@ function MausritterSoloCompanion() {
   };
 
   const panels = [
+    { id: 'playarea', label: 'Hrací Plocha', icon: '🎲' },
     { id: 'journal', label: 'Deník', icon: '📖' },
     { id: 'character', label: 'Postavy', icon: '🐭' },
     { id: 'oracle', label: 'Věštírna', icon: '🔮' },
@@ -2713,6 +2715,7 @@ function MausritterSoloCompanion() {
 
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 py-6 overflow-hidden">
+        {activePanel === 'playarea' && <PlayArea />}
         {activePanel === 'howto' && (
           <HowToPlayPanel />
         )}
