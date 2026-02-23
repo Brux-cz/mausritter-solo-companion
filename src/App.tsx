@@ -17,29 +17,22 @@ import {
 import { generateId } from './utils/helpers';
 
 // --- UI Components ---
-import { HowToPlayPanel, Select } from './components/ui/common';
+import { Select } from './components/ui/common';
 
 
 // --- Panel Components ---
 import { OraclePanel } from './components/panels/OraclePanel';
-import { CombatPanel } from './components/panels/CombatPanel';
 import { CharacterSheet, CharacterSidePanel, CharacterTabs, CharacterPanel } from './components/panels/CharacterPanel';
-import { ItemCardStudio } from './components/panels/ItemCardStudio';
-import { WorldPanel } from './components/panels/WorldPanel';
-import { FactionPanel } from './components/panels/FactionPanel';
-import { LexikonPanel } from './components/panels/LexikonPanel';
 import { PartyPanel } from './components/panels/PartyPanel';
-import { TimePanel } from './components/panels/TimePanel';
 import { JournalPanel } from './components/panels/JournalPanel';
-import { EventsPanel } from './components/panels/EventsPanel';
 import { TimeBar } from './components/panels/TimeBar';
 import { FloatingDice } from './components/panels/FloatingDice';
-import { SmallWorldPanel } from './components/panels/SmallWorldPanel';
 import { SessionStartScreen } from './components/panels/SessionStartScreen';
 import { SessionEndDialog } from './components/panels/SessionEndDialog';
 import { PlayArea } from './components/panels/PlayArea';
-
-const MapPanel = React.lazy(() => import('./components/panels/MapPanel'));
+import { TimeHub } from './components/panels/TimeHub';
+import { WorldHub } from './components/panels/WorldHub';
+import { ToolsHub } from './components/panels/ToolsHub';
 
 
 // ============================================
@@ -1583,20 +1576,13 @@ function MausritterSoloCompanion() {
   };
 
   const panels = [
-    { id: 'playarea', label: 'Hrací Plocha', icon: '🎲' },
-    { id: 'journal', label: 'Deník', icon: '📖' },
-    { id: 'character', label: 'Postavy', icon: '🐭' },
-    { id: 'oracle', label: 'Věštírna', icon: '🔮' },
-    { id: 'combat', label: 'Boj', icon: '⚔️' },
-    { id: 'time', label: 'Čas', icon: '⏰' },
-    { id: 'events', label: 'Události', icon: '📅' },
-    { id: 'world', label: 'Svět', icon: '🌍' },
-    { id: 'factions', label: 'Frakce', icon: '🏰' },
-    { id: 'lexicon', label: 'Lexikon', icon: '📚' },
-    { id: 'smallworld', label: 'Malý Svět', icon: '🏠' },
-    { id: 'maps', label: 'Mapy', icon: '🗺️' },
-    { id: 'studio', label: 'Kartičky', icon: '🎴' },
-    { id: 'howto', label: 'Jak hrát', icon: '📚' }
+    { id: 'playarea',  label: 'Hrací Plocha', icon: '🎲' },
+    { id: 'journal',   label: 'Deník',         icon: '📖' },
+    { id: 'character', label: 'Postavy',        icon: '🐭' },
+    { id: 'oracle',    label: 'Věštírna',       icon: '🔮' },
+    { id: 'timehub',   label: 'Čas',            icon: '🗓️' },
+    { id: 'worldhub',  label: 'Svět',           icon: '🌍' },
+    { id: 'tools',     label: 'Nástroje',       icon: '🗺️' },
   ];
 
   return (
@@ -2715,23 +2701,13 @@ function MausritterSoloCompanion() {
 
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 py-6 overflow-hidden">
-        {activePanel === 'playarea' && <PlayArea />}
-        {activePanel === 'howto' && (
-          <HowToPlayPanel />
-        )}
-
-        {activePanel === 'oracle' && <OraclePanel />}
-        {activePanel === 'studio' && <ItemCardStudio />}
-        {activePanel === 'combat' && <CombatPanel />}
-        {activePanel === 'time' && <TimePanel />}
-        {activePanel === 'events' && <EventsPanel />}
+        {activePanel === 'playarea'  && <PlayArea />}
+        {activePanel === 'journal'   && <JournalPanel onExport={handleExport} />}
         {activePanel === 'character' && <CharacterPanel />}
-        {activePanel === 'world' && <WorldPanel />}
-        {activePanel === 'factions' && <FactionPanel />}
-        {activePanel === 'lexicon' && <LexikonPanel />}
-        {activePanel === 'smallworld' && <SmallWorldPanel />}
-        {activePanel === 'maps' && <React.Suspense fallback={<div className="text-center py-8 text-stone-500">Načítám editor map...</div>}><MapPanel /></React.Suspense>}
-        {activePanel === 'journal' && <JournalPanel onExport={handleExport} />}
+        {activePanel === 'oracle'    && <OraclePanel />}
+        {activePanel === 'timehub'   && <TimeHub />}
+        {activePanel === 'worldhub'  && <WorldHub />}
+        {activePanel === 'tools'     && <ToolsHub />}
       </main>
 
       {/* TimeBar - sledování času (jen pokud je aktivní družina) */}
