@@ -15,6 +15,8 @@ const CombatPanel = () => {
   const [attackResult, setAttackResult] = useState(null);
   const [newCombatantName, setNewCombatantName] = useState('');
   const [newCombatantHP, setNewCombatantHP] = useState(4);
+  const [selectedTargetId, setSelectedTargetId] = useState('');
+  const [selectedAttackerId, setSelectedAttackerId] = useState('');
 
   // Add single combatant
   const addCombatant = (isEnemy = true) => {
@@ -29,6 +31,7 @@ const CombatPanel = () => {
       isEnemy,
       isPartyMember: false,
       conditions: [],
+      prone: false,
       actedThisRound: false
     };
     setCombatants([...combatants, newCombatant]);
@@ -129,7 +132,26 @@ const CombatPanel = () => {
     setCombatants([]);
   };
 
-  const rollAttack = (attackerId, targetId, weaponDice = 6) => {
+  const toggleProne = (id: string) => {
+    setCombatants(combatants.map(c => c.id === id ? { ...c, prone: !c.prone } : c));
+  };
+
+  const shortRest = (combatantId: string) => {
+    const combatant = combatants.find(c => c.id === combatantId);
+    if (!combatant) return;
+    const roll = rollD6();
+    const healing = roll + 1;
+    const newHp = Math.min(combatant.maxHp, combatant.hp + healing);
+    setCombatants(combatants.map(c => c.id === combatantId ? { ...c, hp: newHp } : c));
+    setCombatLog([...combatLog, {
+      round: currentRound,
+      message: `💤 Short Rest ${combatant.name}: d6=${roll}+1 = +${healing} HP → ${newHp}/${combatant.maxHp}`
+    }]);
+  };
+
+  const rollAttack = (attackerId: string, targetId: string, weaponDice = 6) => {
+    const target = combatants.find(c => c.id === targetId);
+    const effectiveDice = target?.prone ? 12 : weaponDice; // Prone = d12
     const { dice, total } = roll2D6();
     const hitResult = HIT_TABLE[total];
     
@@ -141,28 +163,27 @@ const CombatPanel = () => {
         damage = 0;
         break;
       case 'disadvantage':
-        damageRolls = rollDice(2, weaponDice);
+        damageRolls = rollDice(2, effectiveDice);
         damage = Math.min(...damageRolls);
         break;
       case 'normal':
-        damageRolls = rollDice(1, weaponDice);
+        damageRolls = rollDice(1, effectiveDice);
         damage = damageRolls[0];
         break;
       case 'advantage':
-        damageRolls = rollDice(2, weaponDice);
+        damageRolls = rollDice(2, effectiveDice);
         damage = Math.max(...damageRolls);
         break;
       case 'advantage+1':
-        damageRolls = rollDice(2, weaponDice);
+        damageRolls = rollDice(2, effectiveDice);
         damage = Math.max(...damageRolls) + 1;
         break;
       case 'max':
-        damage = weaponDice;
+        damage = effectiveDice;
         break;
     }
 
-    const attacker = combatants.find(c => c.id === attackerId) || { name: 'Hráč' };
-    const target = combatants.find(c => c.id === targetId);
+    const attacker = combatants.find(c => c.id === attackerId) || { name: 'Útočník' };
     
     const result = {
       attacker: attacker.name,
@@ -172,7 +193,8 @@ const CombatPanel = () => {
       hitResult: hitResult.result,
       effect: hitResult.effect,
       damageRolls,
-      damage
+      damage,
+      prone: target?.prone || false,
     };
     
     setAttackResult(result);
@@ -318,11 +340,27 @@ const CombatPanel = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <Button size="small" variant="success" onClick={() => updateCombatantHP(c.id, 1)}>+HP</Button>
                     <Button size="small" variant="danger" onClick={() => updateCombatantHP(c.id, -1)}>-HP</Button>
+                    {!c.isEnemy && (
+                      <Button size="small" variant="secondary" onClick={() => shortRest(c.id)}>💤 Rest (d6+1)</Button>
+                    )}
                     {currentRound > 0 && c.isEnemy && (
                       <Button size="small" variant="ghost" onClick={() => rollMorale(c.id)}>🏃 Morálka</Button>
+                    )}
+                    {currentRound > 0 && (
+                      <button
+                        onClick={() => toggleProne(c.id)}
+                        title="Prone: damage die = d12"
+                        className={`px-2 py-1 rounded text-xs font-medium border transition-colors ${
+                          c.prone
+                            ? 'bg-orange-200 border-orange-400 text-orange-800'
+                            : 'bg-stone-100 border-stone-300 text-stone-500 hover:bg-stone-200'
+                        }`}
+                      >
+                        {c.prone ? '🤸 Prone' : 'Prone'}
+                      </button>
                     )}
                     <Button size="small" variant="ghost" onClick={() => removeCombatant(c.id)}>✕</Button>
                   </div>
@@ -370,30 +408,49 @@ const CombatPanel = () => {
               </div>
             }
           />
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Select 
-                value=""
-                onChange={(id) => {
-                  if (id && combatants.filter(c => c.isEnemy).length > 0) {
-                    const target = combatants.filter(c => c.isEnemy)[0];
-                    rollAttack('player', target.id);
-                  }
-                }}
-                options={[
-                  { value: '', label: 'Vybrat cíl...' },
-                  ...combatants.filter(c => c.isEnemy && c.hp > 0).map(c => ({
-                    value: c.id,
-                    label: `${c.name} (HP: ${c.hp})`
-                  }))
-                ]}
-              />
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs text-stone-500 block mb-1">Útočník</label>
+                <Select
+                  value={selectedAttackerId}
+                  onChange={(id) => setSelectedAttackerId(id)}
+                  options={[
+                    { value: '', label: 'Vybrat útočníka...' },
+                    ...combatants.filter(c => !c.isEnemy && c.hp > 0).map(c => ({
+                      value: c.id,
+                      label: c.name
+                    }))
+                  ]}
+                />
+              </div>
+              <div>
+                <label className="text-xs text-stone-500 block mb-1">
+                  Cíl {selectedTargetId && combatants.find(c => c.id === selectedTargetId)?.prone && <span className="text-orange-600 font-bold">🤸 Prone → d12!</span>}
+                </label>
+                <Select
+                  value={selectedTargetId}
+                  onChange={(id) => setSelectedTargetId(id)}
+                  options={[
+                    { value: '', label: 'Vybrat cíl...' },
+                    ...combatants.filter(c => c.isEnemy && c.hp > 0).map(c => ({
+                      value: c.id,
+                      label: `${c.name} (HP: ${c.hp})${c.prone ? ' 🤸' : ''}`
+                    }))
+                  ]}
+                />
+              </div>
             </div>
-            
-            <Button onClick={() => {
-              const enemies = combatants.filter(c => c.isEnemy && c.hp > 0);
-              if (enemies.length > 0) rollAttack('player', enemies[0].id);
-            }} className="w-full">
+
+            <Button
+              onClick={() => {
+                if (!selectedTargetId) return;
+                const attackerId = selectedAttackerId || combatants.find(c => !c.isEnemy && c.hp > 0)?.id || '';
+                if (attackerId) rollAttack(attackerId, selectedTargetId);
+              }}
+              disabled={!selectedTargetId}
+              className="w-full"
+            >
               🎲 Hodit útok
             </Button>
             
@@ -407,7 +464,10 @@ const CombatPanel = () => {
                     <p className="text-2xl font-bold text-red-700">💥 {attackResult.damage} poškození</p>
                   )}
                   {attackResult.damageRolls.length > 0 && (
-                    <p className="text-sm text-stone-500">Damage roll: [{attackResult.damageRolls.join(', ')}]</p>
+                    <p className="text-sm text-stone-500">
+                      Damage roll: [{attackResult.damageRolls.join(', ')}]
+                      {attackResult.prone && <span className="text-orange-600 ml-1">(🤸 Prone → d12)</span>}
+                    </p>
                   )}
                 </div>
               </div>
