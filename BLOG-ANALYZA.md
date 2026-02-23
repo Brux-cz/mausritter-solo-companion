@@ -1,14 +1,14 @@
 # Analýza blogu "Alone in the Realm" — Mousey Wizard (Sezóna 1)
 
-**Datum analýzy:** 2026-02-22
+**Datum analýzy:** 2026-02-22 → aktualizováno 2026-02-23
 **Zdroj:** https://aloneintherealm.substack.com/
-**Metodologie:** Multi-agent analýza 15 dostupných epizod (z 25 celkem)
+**Metodologie:** Multi-agent analýza všech 25 epizod (kompletní sezóna)
 
 ---
 
 ## 1. STAV EPIZOD
 
-### Nalezené epizody (15/25)
+### Všechny epizody (25/25) — KOMPLETNÍ
 
 | # | Datum | Název | URL |
 |---|-------|-------|-----|
@@ -20,19 +20,23 @@
 | Ep5 | 11.10.2025 | Bitter trek to shelter | https://aloneintherealm.substack.com/p/mausritter-solo-actual-play-mousey-0ea |
 | Ep6 | 18.10.2025 | Into the bowels of the Tower | https://aloneintherealm.substack.com/p/mausritter-solo-actual-play-mousey-a2d |
 | Ep7 | 25.10.2025 | It's now Spring and trouble is afoot | https://aloneintherealm.substack.com/p/mausritter-solo-actual-play-mousey-6dc |
+| Ep8 | ~1.11.2025 | Back to Stumpsville | https://aloneintherealm.substack.com/p/mausritter-solo-actual-play-mousey-0e2 |
 | Ep9 | 9.11.2025 | The Battle of the Grand Hall | https://aloneintherealm.substack.com/p/mausritter-solo-actual-play-mousey-6e2 |
+| Ep10 | ~15.11.2025 | This really should have been 2 episodes | https://aloneintherealm.substack.com/p/mausritter-solo-actual-play-mousey-437 |
 | Ep11 | 22.11.2025 | Such a close call | https://aloneintherealm.substack.com/p/mausritter-solo-actual-play-mousey-5dd |
+| Ep12 | ~29.11.2025 | Sugar Cultists | https://aloneintherealm.substack.com/p/mausritter-solo-actual-play-mousey-6f3 |
+| Ep13 | ~6.12.2025 | The mice leave Poppyseed House and cross the river... | https://aloneintherealm.substack.com/p/mausritter-solo-actual-play-mousey-eff |
+| Ep14 | ~13.12.2025 | More Sugar Cult shenanigans... | https://aloneintherealm.substack.com/p/mausritter-solo-actual-play-mousey-f8e |
 | Ep15 | 19.12.2025 | The Cat Lord, Balthazar | https://aloneintherealm.substack.com/p/mausritter-solo-actual-play-mousey-a28 |
 | Ep16 | 26.12.2025 | Into the sewers we go! | https://aloneintherealm.substack.com/p/mausritter-solo-actual-play-mousey-84b |
 | Ep17 | ~leden 2026 | Myrtle gets an itch | https://aloneintherealm.substack.com/p/mausritter-solo-actual-play-mousey-b97 |
+| Ep18 | ~leden 2026 | A party in your honor! | https://aloneintherealm.substack.com/p/mausritter-solo-actual-play-mousey-fec |
+| Ep19 | ~únor 2026 | Oh brother, where art thou? | https://aloneintherealm.substack.com/p/mausritter-solo-actual-play-mousey-c15 |
+| Ep20 | ~únor 2026 | Drunken Rat Capture | https://aloneintherealm.substack.com/p/mausritter-solo-actual-play-mousey-b87 |
 | Ep21 | ~únor 2026 | Meeting with the Grand Librarian | https://aloneintherealm.substack.com/p/mausritter-solo-actual-play-mousey-f45 |
+| Ep22 | ~únor 2026 | Only you can prevent forest fires... | https://aloneintherealm.substack.com/p/mausritter-solo-actual-play-mousey-bad |
+| Ep23 | ~únor 2026 | Into the Woodshack | https://aloneintherealm.substack.com/p/mausritter-solo-actual-play-mousey-c58 |
 | Ep24 | ~únor 2026 | Season 1 Finale | https://aloneintherealm.substack.com/p/mausritter-solo-actual-play-mousey-2cf |
-
-### Chybějící epizody (10/25)
-
-Ep8, Ep10, Ep12, Ep13, Ep14, Ep18, Ep19, Ep20, Ep22, Ep23
-
-**DŮVOD:** Blog je proložen více sériemi (Kal-Arath, Achtung Cthulhu, Mythic Fantasy...). Substack "Next/Previous" navigace přechází mezi sériemi, nikoliv sekvenčně v rámci Mousey Wizard. URL nelze rekonstruovat přes navigaci — je potřeba projít archiv nebo použít Substack search.
 
 ---
 
@@ -42,20 +46,21 @@ Ep8, Ep10, Ep12, Ep13, Ep14, Ep18, Ep19, Ep20, Ep22, Ep23
 |-----------|----------------|---------|
 | Ep0 | Mausritter Core | Vše základní |
 | Ep0 | OPSE | GM emulator (Oracle, Scene) |
-| Ep0 | Bernpyle #3 | Survivability modifikace pro solo |
+| Ep0 | Bernpyle #3 | 2d6 modifikovaný bojový systém |
 | Ep0 | Oak Mill Institute | Season/Weather tabulky, Season Events |
-| Ep0 | Adventuring Mice | Class abilities (Arcane, Grit, Aegis) |
 | Ep1 | Knave 2e | Faction systém, NPC generování |
 | Ep3 | Bernpyle #8 | Miscast tabulky |
-| Ep3 | Ironsworn Oracles | NPC goals/motivace |
-| Ep3 | Hanson Expansion | Spell tabulky (2d8), Downtime |
-| Ep4 | Burrows Chronicles | Adventure sites |
+| Ep3 | Ironsworn Oracles | NPC goals/motivace, vztahové bondy |
+| Ep3 | Hanson Expansion | Spell tabulky (2d8), Downtime, ration efekty |
+| Ep4 | Burrows Chronicles | Adventure sites, Nauseated condition |
 | Ep6 | Deck of Dungeons | Procedurální dungeon generování |
+| Ep8 | Adventuring Mice | Class abilities (Arcane, Grit, Aegis) |
 | Ep11 | Poppyseed House | Town supplement |
-| Ep15 | Solo Toolkit | Dungeon flowchart, town reaction |
-| Ep24 | The Woodshed | Finální adventure module |
+| Ep14 | Solo Toolkit | Dungeon flowchart, town/settlement generování |
+| Ep22 | Mythic | Environment oracle tabulky (forest, plants...) |
+| Ep23 | The Woodshed | Finální adventure module |
 
-**Klíčový trend:** Toolkit rostl z 5 → 12+ supplementů přes 24 epizod. Každý nový supplement přidával specifickou procedurální vrstvu (spelly, dungeony, frakce...).
+**Klíčový trend:** Toolkit rostl z 5 → 15 supplementů. Každý přidal konkrétní procedurální vrstvu. Na konci sezóny autor zná každý supplement nazpaměť a přepíná mezi nimi plynule.
 
 ---
 
@@ -63,7 +68,11 @@ Ep8, Ep10, Ep12, Ep13, Ep14, Ep18, Ep19, Ep20, Ep22, Ep23
 
 ### 3.1 Bojový systém
 
-**Útok: 2d6 (roll-high)**
+**DŮLEŽITÉ ROZLIŠENÍ:**
+- **Core Mausritter**: útoky vždy trefí, pouze se hází damage *(doloženo Ep7: "Attacks always hit; only roll damage")*
+- **Bernpyle #3 modifikace**: 2d6 systém (miss/slabý/silný/crushing) — autor používá tuto variantu ve většině epizod
+
+**2d6 útok (Bernpyle #3):**
 
 | 2d6 | Výsledek | Damage |
 |-----|----------|--------|
@@ -72,11 +81,13 @@ Ep8, Ep10, Ep12, Ep13, Ep14, Ep18, Ep19, Ep20, Ep22, Ep23
 | 10–11 | Hit (Strong) | větší ze 2 kostek (advantage) |
 | 12 | Crushing Blow | maximální damage zbraně |
 
-*Doloženo: Ep1, Ep2, Ep4, Ep5, Ep7, Ep9, Ep11, Ep16, Ep17*
+*Doloženo konzistentně Ep1–Ep24*
 
 **Speciální situace:**
-- Prone target: damage die = d12 (místo normálního dX) — doloženo Ep9
+- Prone target: damage die = d12 *(doloženo Ep9: všichni prone protivníci zasaženi d12)*
+- Drunk enemies: disadvantage na WIL saves *(Ep9)*
 - Armor: odečítá 1 nebo 2 z damage
+- Invisible attacker: útočí s advantage *(Ep19: d12 heavy weapon)*
 
 **Saves: d20 roll-under**
 
@@ -86,21 +97,21 @@ Ep8, Ep10, Ep12, Ep13, Ep14, Ep18, Ep19, Ep20, Ep22, Ep23
 | d20 > stat | FAIL |
 | d20 = stat | SUCCESS (rovnost = úspěch, doloženo Ep3, Ep17) |
 
-*Doloženo: Ep1–Ep17 konzistentně*
-
 **Initiative:**
 - DEX save (d20 ≤ DEX): SAVE = jde dříve, FAIL = jde později
-- *Doloženo: Ep1, Ep2, Ep4, Ep7, Ep9*
+- *Doloženo: Ep1, Ep2, Ep4, Ep7, Ep9, Ep16, Ep17*
 
 **HP & Damage:**
 - Damage jde do HP; po 0 HP → damage do STR
 - Po každém STR damage: STR save, FAIL = Injured/KO
-- Short Rest (1 watch): d6+1 HP recovered
+- Short Rest (1 watch): **d6+1 HP** recovered *(doloženo Ep9, Ep17, Ep20)*
+- STR recovery: 1d6 STR na long rest *(Ep21)*
 - Morale: WIL save, FAIL = útěk; trigger: outmatched/critical/ally down
+- Armor repair kit: 3 usage slots, každý slot opraví 1 usage dot na armor *(Ep9)*
 
 ### 3.2 OPSE Oracle
 
-**2d6 systém (ověřeno z OPSE PDF + epizod):**
+**2d6 systém:**
 
 | Pravděpodobnost | Podmínka Yes |
 |-----------------|-------------|
@@ -155,6 +166,8 @@ Ep8, Ep10, Ep12, Ep13, Ep14, Ep18, Ep19, Ep20, Ep22, Ep23
 - Hodnota karty = Action (Seek/Oppose/Communicate/Move/Harm/Create/Reveal/Command/Take/Protect/Assist/Transform/Deceive)
 - Barva = Domain (Clubs=Physical, Diamonds=Technical, Spades=Mystical, Hearts=Social)
 
+**Mythic doplněk (Ep22+):** Pro environment-specifické oracle (les, rostliny, elementy) autor přidává Mythic tabulky vedle OPSE.
+
 ### 3.3 Frakce — Progress systém
 
 **Progress Roll:** 1d6 + počet relevantních resources
@@ -162,69 +175,104 @@ Ep8, Ep10, Ep12, Ep13, Ep14, Ep18, Ep19, Ep20, Ep22, Ep23
 - Cíl má threshold (3 nebo 5 marks)
 - Po dokončení cíle → nový resource
 
-**Faction Determination:** d4 roll (který z 4 faction typů = hostile forces)
-*Doloženo: Ep21*
+**Faction Determination:** d4 roll (který ze 4 faction typů = hostile forces) *Doloženo: Ep21*
 
-**Timing:** Faction rolls přeskočeny pro krátká časová okna (<1 týden game-time)
-*Doloženo: Ep4 (autor explicitně vysvětluje přeskočení)*
+**Timing:** Faction rolls přeskočeny pro krátká časová okna (<1 týden game-time) *Doloženo: Ep4*
 
 ### 3.4 Spell systém
 
 **Spell Learning:**
-- WIL save (d20 ≤ WIL) = 1 progress bod
-- 5 progress bodů = kouzlo naučeno
-- Jeden pokus per den
+- WIL save (d20 ≤ WIL) = 1 progress bod; 5 bodů = kouzlo naučeno; 1 pokus per den
 - *Doloženo: Ep3 (6-denní výzkum Frenzy)*
 
-**Casting (Hanson/Mausritter):**
-- Hod d6 per power slot
-- Miscast: při 2d6=6,6 (Ep9) → Miscast efekt + WIL damage
-- Miscast damage: 2d6 WIL dmg, pak WIL save vs Drained
-- Usage dots: po použití d6; plné dots = kouzlo vyčerpáno
+**Casting:**
+- Hod d6 per power slot: 1–3 = bez spotřeby, 4–5 = 1 usage dot, 6 = Miscast *(Frenzy, Ep7)*
+- **Miscast: 2d6 = dvojice šestek (6,6) = automatický Miscast** *(potvrzeno Ep9: Invisibility 2d6=6,6)*
+- Miscast damage: **2d6 WIL damage** *(Ep9: 2d6=3 → −3 WIL)*; poté WIL save vs Drained
+- Po miscastu kouzlo "ceases being useful in memory" — zmizí z aktivní paměti *(Ep22)*
 
-**Arcane talent (Level 2 wizard):** Memorize jeden spell tablet → nezabírá inventory slot
+**Spell Tablets — Trading:**
+- Tablety jsou fyzické předměty; lze vyměnit nebo prodat *(Ep21: Anise Frenzy → Healing)*
+
+**Spellcrafting — výroba tabletu (Ep7):**
+Detailní 11-krokový proces: sklizeň obsidiánu za novu → rytí run → herbal tea (henbane root) → beeswax svíčka → summon duchů v mechové kruhu → binding → zalití voskem → completion (tablet zvoní/svítí).
+- **Materiály:** obsidian, henbane root, beeswax, fairy toadstool, dew (nova + úplněk), fae rose needle, mandrake root
+- **Hazardy:** henbane otrava, ztráta 1d4 watchů u víl (Exhausted+Drained), riziko Feywildu
+
+**Spell příklady:**
+
+| Kouzlo | Efekt | Recharge | Pozn. |
+|--------|-------|----------|-------|
+| Frenzy | [SUM] nepřátel útočí na prvního viditelného; [DICE] kol | Bystřina 1 den | Miscast: Alopecia Universalis |
+| Grease | [DICE]×6" skluzká plocha, DEX save nebo pád; hořlavá | — | Invertovat bez usage = rozpustit |
+| Invisibility | Bytost neviditelná [DICE] kol; −1 kolo per pohyb *(Ep19)* | Rituál 1 den | Miscast = 2d6=6,6 |
+| Shadow Wasp | Summon (2 HP, 4 STR, 0 WIL, 1 DEX, d6 sting) | Vespí hnízdo 3 dny | Špionáž + útok |
+| Mind Shatter | d4 psychické damage + WIL save; insights o paměti | — | — |
+| Shockwave | AoE; nalezeno v Tower (600p) | — | — |
+| Fireball | Součet všech dice = damage; vše usage okamžitě *(Ep23: 4+4+5=13)* | — | — |
+| Healing | 3d6 HP restored *(Ep23)* | — | — |
+
+**Ration advantage (Hanson Expansion):**
+- Dried Dragonfly Tail → advantage na STR save
+- Roasted garlic wedge → advantage na WIL save
 
 ### 3.5 Level Up
 
 | Co | Mechanismus |
 |----|-------------|
-| HP | nd6, kde n = nový level |
-| Stat | d20 > aktuální hodnota = +1 |
+| HP | nd6, kde n = nový level; výsledek **nahrazuje** staré HP (NEADIČUJE) |
+| Stat | **3× hod d20**; d20 > aktuální hodnota = +1 (možno získat max +3) |
 | Talent | Jeden nový talent per level |
 
 **Viděné talenty:**
-- **Arcane** (L2 wizard): memorize 1 spell tablet
-- **1 Grit** (L2): ignore 1 condition per rest
-- **Aegis** (L3 z Adventuring Mice): intercept 1 damage pro sousedního spojence
+- **Arcane** (L2 wizard): memorize 1 spell tablet bez inventory slotu
+- **1 Grit** (L2): ignore 1 condition per rest (jednorázové)
+- **Aegis** (L3): intercept 1 damage pro souseda; house rule: omezeno na konkrétní dvojici (Aloe → Anise only)
+
+**XP vzorec (house rule):**
+- `10% × (XP do next level / party size)` per completed event *(Ep23)*
+- Bonus za non-combat řešení: +20 XP
+- Donation bonus: darované pipy → 10% hodnoty jako XP *(Ep16: 2000 pip → +200 XP)*
 
 ### 3.6 Dungeon generování
 
-**Živé generování (per místnost):**
+**Adventure Site (Ep4):** d20 typ / d12 ruination / d10 denizens / d8 objective / d6 secret
 
-| Hod | Výsledek |
-|-----|----------|
-| d6 typ | Passage/Area/... |
-| d6 obsah | Empty/Encounter/Trap/Treasure |
-| d20 detail | Rotting acorns/Statue/... |
+**Deck of Dungeons (Ep6):** 20 karet v matici 4×5; dokončení = součet hodnot 50
 
-**Tvar místnosti (d6):** Irregular/Circular/Rectangular/L-shaped/Tiered/Irregular
+**Solo Toolkit Flowchart (Ep15+):**
+- d6 typ → Passage/Area; d4 podtyp; d6 obsah → Empty/Encounter/Trap/Treasure
+- d20 detail místnosti; d6 tvar → Irregular/Circular/Rectangular/L-shaped/Tiered
+- Encounter: d6 typ + 2d6 Reaction + d12 aktivita (Battling/Roaming/Sleeping...)
 
-**Encounter:** d6 typ + 2d6 Reaction roll
+**Settlement generování (Solo Toolkit, Ep15):**
+d20 landmark → d6 typ → d20 inhabitants → d6 velikost (Hamlet 50-150) → d6+3 governance → d20 notable feature → d20 industry → d20 current crisis
 
 ### 3.7 Weather & Travel
 
-**Weather roll:** 2d6 (Bitter Cold 6, Sleet 4, Overcast 10)
+**Zimní weather (2d6):** 6=Bitter Cold, 4=Sleet, 9-10=Overcast
+**Jarní weather:** 3=Drizzle, 5=Drizzle *(Ep12, Ep13)*
 **Seasonal Events:** d6 (1 = Snow prevents travel 1 týden)
-**STR save v nepříznivém počasí:** FAIL → Exhausted condition (obsadí 1 inventory slot)
+**STR save v nepříznivém počasí:** FAIL → Exhausted (1 inventory slot)
+**River crossing:** DEX save; FAIL → 1d4 HP damage *(Ep13)*
 
 ### 3.8 NPC generování
 
-- Gender: d6
-- Jméno: d100
-- Osobnost: d100
-- Fyzické rysy: d100 (3× pro detaily)
-- Profese: d100
-- Cíle: d100
+Gender d6 / Jméno d100 / Osobnost d100 / Fyzické rysy 3×d100 / Profese d100 / Cíle d100
+
+**Vztahy:** Oracle (Likely/Even/Unlikely) → pokud Yes: Disposition d100 + Bond Goals d100 (Ironsworn)
+**Rodinný vztah:** d20 *(Ep13: 2 = Sibling)*
+
+**Downtime aktivita:** Miss = komplikace / Weak Hit = vedlejší efekt / Hit = plný benefit
+
+### 3.9 Warband mechanika (Ep24)
+
+**Warband stat block:** 6 HP, STR 10, DEX 10, WIL 10, Armor 1, d10 halberd
+
+- Warband útočí jako normální postava (2d6 systém)
+- Při critical damage na Warband: hod d20; **1 = PC obdrží damage**
+- **Rallying:** WIL save (d20 ≤ WIL) = jednotka se vrátí do boje
+- **Escape counter:** d6 = počet kol pro útěk NPC *(Ep24: d6=6)*
 
 ---
 
@@ -239,24 +287,33 @@ Ep8, Ep10, Ep12, Ep13, Ep14, Ep18, Ep19, Ep20, Ep22, Ep23
    *Ep2: "Sling repair free? Yes, but (2 pips cost)"*
 
 3. **"Yes, And"** = intenzifikace dominantního trendu (i negativního)
-   *Ep2: Mayor's disposition Unlikely → Yes, And = aktivní nepřízeň (horší než jen Yes)*
+   *Ep2: Mayor's disposition Unlikely → Yes, And = aktivní nepřízeň*
 
 4. **Vágní výsledky** → autor vyplní narrativně pomocí kontextu
-   *Ep3: Oba failed saves pro trap = "trap set but won't work" — elegantní interpretace*
+   *Ep3: Oba failed saves pro trap = "trap set but won't work"*
 
-5. **Pravděpodobnostní framing:** Autor VŽDY rozhodne "Unlikely/Likely/Even" PŘED hodem
-   = meta-rozhodnutí autora, pak Oracle potvrdí/překvapí
+5. **Pravděpodobnostní framing:** Autor VŽDY rozhodne Unlikely/Likely/Even PŘED hodem
 
-6. **Karetní systém** (Ep15+): Action Focus + Topic Focus = dvojice slov k narrativní interpretaci
-   = více prostoru pro kreativitu než binární Yes/No
+6. **Karetní systém (Ep15+):** Action Focus + Topic Focus = dvojice slov k narrativní interpretaci
 
 7. **d4 faction roll:** Explicitní mechanismus pro výběr hostile faction = zabraňuje autorskému biasu
 
-### Kdy autor "fudguje" (ohýbá pravidla)
+8. **Oracle pro rodinné vztahy (Ep13):** "Je NPC příbuzný s PC?" → d20 = typ vztahu
 
-- XP za non-combat řešení (+20 bonus) — vlastní house rule
-- Přeskočení faction rolls pro krátká časová okna (vědomé rozhodnutí)
-- Interpretace "Yes, And" pro negativní kontexty jako intenzifikace negativního (ne přidání pozitivního)
+### Kdy autor "fudguje"
+
+- XP za non-combat řešení (+20 bonus) — house rule
+- Přeskočení faction rolls pro krátká časová okna
+- Aegis talent omezen jen na konkrétní dvojici (Aloe → Anise)
+- Full Rest vs Long Rest — autor sám přizná retcon *(Ep13)*
+- Editor přizná zapomenuté sling disadvantage *(Ep1)*
+
+### Narrativní styly napříč sezónou
+
+- **Mechanicky-těžké epizody** (Ep1, Ep6, Ep9, Ep17, Ep23): každý hod popsán explicitně
+- **Narrativně-těžké epizody** (Ep14): *"other than the scene and foraging rolls, we didn't even roll the dice"*
+- Autor vědomě střídá oba styly podle dramatické situace
+- Formát: **tučně** = herní mechanika, *kurzíva* = OOC komentář, normální text = roleplay
 
 ### Struktura session
 
@@ -271,59 +328,76 @@ Ep8, Ep10, Ep12, Ep13, Ep14, Ep18, Ep19, Ep20, Ep22, Ep23
 
 ## 5. CO TATO ANALÝZA ŘÍKÁ O APLIKACI
 
-### Validace PLAN-ANALYSIS.md
-
 | Zjištění z blogu | Impakt na plán |
 |-----------------|----------------|
-| Autor začíná KAŽDOU session materiály + recap | **Potvrzuje F1 (Session Flow)** — "Vítej zpět + recap" je klíčové |
-| Oracle je JÁDRO celé hry (každá scéna) | **Potvrzuje** Oracle panel jako centrální prvek |
-| 12 supplementů = kognitivní zátěž | **Potvrzuje** potřebu zjednodušení navigace (F3) |
-| Faction rolls přeskočeny pro krátká okna | **Nová feature**: faction tracker s časovým razítkem |
-| Karetní systém OPSE (Ep15+) | **Nová feature**: alternativní karetní oracle |
-| Dungeon generování per místnost | **Potvrzuje** hex grid + průzkumový panel (F5) |
-| Morale systém u NPCs | **Chybí v CombatPanel** — dodat |
-| Prone = d12 damage | **Chybí v CombatPanel** — dodat mechaniku |
-| Session začíná Season/Weather rollem | **Potvrzuje** integraci TimePanel do Session Start |
+| Autor začíná KAŽDOU session materiály + recap | **Potvrzuje F1 (Session Flow)** |
+| Oracle je JÁDRO celé hry (každá scéna) | Oracle panel jako centrální prvek |
+| 15 supplementů = kognitivní zátěž | Potřeba zjednodušení navigace |
+| Faction rolls přeskočeny pro krátká okna | Faction tracker s časovým razítkem |
+| Karetní systém OPSE (Ep15+) | Karetní oracle alternativa |
+| Dungeon generování per místnost | Průzkumový panel + Solo Toolkit flowchart |
+| Morale systém u NPCs | Chybí v CombatPanel — dodat |
+| Prone = d12 damage | Chybí v CombatPanel — dodat mechaniku |
+| Session začíná Season/Weather rollem | Integrace TimePanel do Session Start |
+| Narrativní epizody bez hodů (Ep14) | "Narrative mode" bez povinných mechanik |
+| Donation XP (Ep16) | WorldPanel tracker darování |
+| Warband pravidla (Ep24) | Group combat support |
+| Spell tablet trading (Ep21) | Spell manager s trading funkcí |
+| Settlement generování (Ep15) | Generátor v WorldPanel |
 
 ### Nové featury navržené na základě blogu
 
-1. **Toolkit Tracker** — seznam aktivních supplementů v kampani (jak autor u každé session)
+1. **Toolkit Tracker** — seznam aktivních supplementů v kampani
 2. **Faction Progress Timeline** — automatické připomínání faction rolls po X game-time
 3. **Karetní Oracle** — alternativa k 2d6 (Pacing Moves z OPSE)
-4. **NPC Generator** (Gender/Jméno/Osobnost/Cíle) — integrovat do WorldPanel
+4. **NPC Generator** (Gender/Jméno/Osobnost/Cíle) integrovaný do WorldPanel
 5. **Prone condition** v CombatPanel → d12 damage automaticky
 6. **Morale mechanic** pro NPC v CombatPanel
+7. **Spell Tablet manager** — usage dots, trading, miscast history
+8. **Settlement Generator** — Solo Toolkit tabulky v WorldPanel
+9. **Warband tracker** — HP + morale + rallying
 
 ---
 
-## 6. OTEVŘENÉ OTÁZKY
+## 5b. ZAJÍMAVÉ DETAILY A EDGE CASES
 
-1. **Přesný miscast systém:** 2d6=12 = automatický miscast? Nebo specifická podmínka?
-2. **Bernpyle #3 modifikace:** Přesné "survivability tweaks" (text ho zmiňuje, ale nikdy nevysvětluje specifika)
-3. **Even/Odd Oracle varianta:** V Ep5 "2d6=3,5 Yes (even result)" — alternativní systém?
-4. **Faction progress vzorec:** 1d6+bonuses = celkový počet marks za jedno kolo, nebo threshold systém?
-5. **Chybějící epizody Ep8, 10, 12-14, 18-20, 22-23** — zejm. Ep8-10 pro pochopení Daisy smrtí a Grape arrival
-6. **Hanson Expansion spell tabulky** — 2d8 systém, ale kompletní tabulka není veřejná
-7. **Warband pravidla** (Ep24) — odkud pochází?
+**Grease — inverzní casting (Ep9):** Cast Grease inverzně aby rozpustil existující grease — bez usage cost. House rule nebo alternativní interpretace kouzla.
+
+**Invisibility countdown (Ep19):** Trvá [DICE] kol, ale odečítá 1 kolo za každý pohyb. Např. 3 kola → po slanění žebříku = 2 kola.
+
+**Myrtle — tajná identita (Ep17):** Není pravý rytíř. Převzal identitu mrtvého Sir Anarkera. Odhalení přes Oracle.
+
+**Bosco — mushroom power-up (Ep10):** Boss snědl černou houbu → d12 damage po dobu 1 kola. Improvizovaný status effect pro bossfight.
+
+**Spell trading (Ep21):** Tablety jsou fyzické předměty s tržní hodnotou. Anise vyměnila Frenzy za Healing u Grand Librarian.
+
+**Potion of Bug Fearing (Ep18):** Ingredience: powdered frog tongue + cinnamon + boiling water. Efekt: hmyz a pavouci utíkají 1 watch. Výroba: d4=2 potiony z jedné dávky.
+
+**XP per combat (Ep9):** 20 XP per poražená nepřátelská postava + treasure XP = pip hodnota pokladu.
 
 ---
 
-## 7. POROVNÁNÍ NÁSTROJŮ
-
-### Oracle: OPSE vs Mythic GME vs Ironsworn
+## 6. POROVNÁNÍ NÁSTROJŮ
 
 | | OPSE 1.6 | Mythic GME 2e | Ironsworn |
 |---|---|---|---|
 | Systém | 2d6 | 2d10/d100 | 2d10 + d10 |
 | Pravděpodobnostní úrovně | 3 | 9 | 5 |
-| Chaos tracking | Ne | Ano (CF 1–9) | Ne |
 | Pacing Moves | Karty | Tabulky | Ne |
-| Licence | CC-BY-SA 4.0 | Placené | Zdarma (SR) |
-| Vhodnost pro Mausritter | Nejlepší | Dobrý | Dobrý (oracle) |
+| Vhodnost pro Mausritter | Nejlepší základ | Dobrý pro env. tables | Dobrý pro NPC goals |
 
-**Naše aplikace** již má Mythic GME style (Chaos Factor, Scene Check) — **OPSE je jednodušší alternativa vhodná pro začátečníky.**
+Autor používá **OPSE jako základ** + Mythic pro environment tables + Ironsworn pro NPC motivace/vztahy.
 
 ---
 
-*Analyza provedena: 2026-02-22*
-*Agenti: Episode Hunter + OPSE Analytik + Episode Analytik*
+## 7. OTEVŘENÉ OTÁZKY
+
+1. **Bernpyle #3 — přesný text:** Přesné znění "survivability tweaks" nikdy necitováno
+2. **Hanson Expansion spell tabulky** — 2d8 systém, kompletní tabulka není veřejná
+3. **"Ultimate Solo RPG Toolkit" vs "Solo Toolkit"** — stejný supplement nebo jiný? Ep17 uvádí "Ultimate", ostatní "Solo Toolkit"
+4. **Ration advantage rule origin** — Hanson Expansion nebo house rule? Autor uvádí obojí
+
+---
+
+*Analýza provedena: 2026-02-22*
+*Aktualizováno: 2026-02-23 — kompletní sezóna (25/25 epizod)*
