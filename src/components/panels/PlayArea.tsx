@@ -8,161 +8,21 @@ import {
 import { roll2D6, rollDice, randomFrom, formatTimestamp } from '../../utils/helpers';
 import { Button } from '../ui/common';
 import { CombatPanel } from './CombatPanel';
-import type { SceneType, SceneThread, SceneOutcome } from '../../types';
+import type { SceneType, SceneThread, SceneCheckResult, SceneOutcome } from '../../types';
 
 // ────────────────────────────────────────────────────────────────
-// SceneStrip — vždy viditelný pruh scény
+// Typy
 // ────────────────────────────────────────────────────────────────
 
-const SceneStrip = () => {
-  const getSceneState = useGameStore(s => s.getSceneState);
-  const startScene = useGameStore(s => s.startScene);
-  const endScene = useGameStore(s => s.endScene);
-  const adjustChaosFactor = useGameStore(s => s.adjustChaosFactor);
-  const addThread = useGameStore(s => s.addThread);
-  const removeThread = useGameStore(s => s.removeThread);
-  const toggleThreadResolved = useGameStore(s => s.toggleThreadResolved);
-  const activeParty = useGameStore(s => s.getActiveParty());
-
-  const [sceneTitle, setSceneTitle] = useState('');
-  const [sceneType, setSceneType] = useState<SceneType>('exploration');
-  const [showThreads, setShowThreads] = useState(false);
-  const [newThread, setNewThread] = useState('');
-
-  if (!activeParty) {
-    return (
-      <div className="bg-stone-100 border border-stone-300 rounded-xl p-4 text-center text-stone-500 text-sm">
-        🐭 Vyber nebo vytvoř družinu v panelu Postavy
-      </div>
-    );
-  }
-
-  const { chaosFactor, currentScene, threads, sceneCount } = getSceneState();
-
-  const handleStart = () => {
-    if (!sceneTitle.trim()) return;
-    startScene(sceneTitle.trim(), sceneType);
-    setSceneTitle('');
-  };
-
-  const handleAddThread = () => {
-    if (!newThread.trim()) return;
-    addThread(newThread.trim());
-    setNewThread('');
-  };
-
-  // ── Žádná scéna: formulář ──────────────────────────────────
-  if (!currentScene) {
-    return (
-      <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-4 space-y-3">
-        <div className="flex items-center gap-2 text-amber-800 font-bold text-sm">
-          <span>🎬</span>
-          <span>Zahájit novou scénu</span>
-          {sceneCount > 0 && (
-            <span className="ml-auto text-xs text-amber-600 font-normal">Scény: {sceneCount}</span>
-          )}
-        </div>
-
-        <div className="flex gap-2 flex-wrap">
-          <input
-            value={sceneTitle}
-            onChange={(e) => setSceneTitle(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleStart()}
-            placeholder="Název scény..."
-            className="flex-1 min-w-[180px] px-3 py-2 rounded-lg border border-amber-300 bg-white text-sm"
-          />
-          <select
-            value={sceneType}
-            onChange={(e) => setSceneType(e.target.value as SceneType)}
-            className="px-3 py-2 rounded-lg border border-amber-300 bg-white text-sm font-medium"
-          >
-            {Object.entries(SCENE_TYPE_LABELS).map(([k, v]) => (
-              <option key={k} value={k}>{v}</option>
-            ))}
-          </select>
-          <Button onClick={handleStart} variant="primary">
-            Zahájit →
-          </Button>
-        </div>
-
-        {/* Threads (zapletky) i bez scény */}
-        {threads.length > 0 && (
-          <button
-            onClick={() => setShowThreads(!showThreads)}
-            className="text-xs text-amber-700 hover:text-amber-900 flex items-center gap-1"
-          >
-            {showThreads ? '▲' : '▾'} Zapletky ({threads.filter(t => !t.resolved).length} aktivní)
-          </button>
-        )}
-        {showThreads && <ThreadList threads={threads} onToggle={toggleThreadResolved} onRemove={removeThread} />}
-      </div>
-    );
-  }
-
-  // ── Aktivní scéna ─────────────────────────────────────────
-  return (
-    <div className="bg-amber-50 border-2 border-amber-400 rounded-xl overflow-hidden">
-      {/* Hlavní pruh */}
-      <div className="flex items-center gap-3 px-4 py-3 flex-wrap">
-        <span className="text-amber-700 font-bold text-sm shrink-0">
-          🎬 #{currentScene.number}: {currentScene.title}
-        </span>
-        <span className="text-xs text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full shrink-0">
-          {SCENE_TYPE_LABELS[currentScene.type] || currentScene.type}
-        </span>
-
-        {/* Chaos Factor */}
-        <div className="flex items-center gap-1 ml-auto shrink-0">
-          <span className="text-xs text-stone-500">CF:</span>
-          <button
-            onClick={() => adjustChaosFactor(-1)}
-            disabled={chaosFactor <= 1}
-            className="w-6 h-6 rounded bg-stone-200 hover:bg-stone-300 disabled:opacity-40 text-stone-700 font-bold text-sm flex items-center justify-center"
-          >–</button>
-          <span className="w-6 text-center font-bold text-amber-800">{chaosFactor}</span>
-          <button
-            onClick={() => adjustChaosFactor(1)}
-            disabled={chaosFactor >= 9}
-            className="w-6 h-6 rounded bg-stone-200 hover:bg-stone-300 disabled:opacity-40 text-stone-700 font-bold text-sm flex items-center justify-center"
-          >+</button>
-        </div>
-
-        <button
-          onClick={() => setShowThreads(!showThreads)}
-          className="text-xs text-amber-700 hover:text-amber-900 shrink-0"
-        >
-          {showThreads ? '▲' : '▾'} Zapletky ({threads.filter(t => !t.resolved).length})
-        </button>
-
-        <Button onClick={() => endScene('in_control')} variant="secondary" size="small" className="shrink-0">
-          🏁 Konec scény
-        </Button>
-      </div>
-
-      {/* Zapletky (collapsible) */}
-      {showThreads && (
-        <div className="border-t border-amber-200 px-4 py-3 bg-amber-50/80 space-y-2">
-          <ThreadList threads={threads} onToggle={toggleThreadResolved} onRemove={removeThread} />
-          <div className="flex gap-2 mt-2">
-            <input
-              value={newThread}
-              onChange={(e) => setNewThread(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleAddThread()}
-              placeholder="Nová zápletka..."
-              className="flex-1 px-3 py-1.5 text-sm rounded border border-amber-300 bg-white"
-            />
-            <button
-              onClick={handleAddThread}
-              className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded text-sm font-medium"
-            >
-              +
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+type StartSceneResult = {
+  checkResult: SceneCheckResult;
+  alteration?: string;
+  focus?: string;
+  checkDie: number;
+  chaosFactor: number;
 };
+
+type QuickAction = 'action' | 'encounter' | 'dice' | null;
 
 // ────────────────────────────────────────────────────────────────
 // ThreadList — seznam zápletek
@@ -201,62 +61,201 @@ const ThreadList = ({ threads, onToggle, onRemove }: {
 );
 
 // ────────────────────────────────────────────────────────────────
-// OracleQuick — 4 zjednodušené oracle taby
+// IdleState — žádná aktivní scéna
 // ────────────────────────────────────────────────────────────────
 
-const OracleQuick = () => {
-  const handleLogEntry = useGameStore(s => s.handleLogEntry);
-  const [activeTab, setActiveTab] = useState('yesno');
-  const [lastResult, setLastResult] = useState<string | null>(null);
+const IdleState = ({ sceneCount, onStart }: {
+  sceneCount: number;
+  onStart: (title: string, type: SceneType) => void;
+}) => {
+  const [sceneTitle, setSceneTitle] = useState('');
+  const [sceneType, setSceneType] = useState<SceneType>('exploration');
 
-  // Ano/Ne state
+  const handleStart = () => {
+    if (!sceneTitle.trim()) return;
+    onStart(sceneTitle.trim(), sceneType);
+    setSceneTitle('');
+  };
+
+  return (
+    <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-6 space-y-4">
+      <div className="text-center">
+        <span className="text-3xl">🎬</span>
+        <p className="text-amber-800 font-bold mt-2">Žádná aktivní scéna</p>
+        {sceneCount > 0 && (
+          <p className="text-xs text-amber-600 mt-1">Celkem scén: {sceneCount}</p>
+        )}
+      </div>
+      <div className="space-y-2">
+        <input
+          value={sceneTitle}
+          onChange={(e) => setSceneTitle(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleStart()}
+          placeholder="Název scény..."
+          className="w-full px-3 py-2 rounded-lg border border-amber-300 bg-white text-sm"
+          autoFocus
+        />
+        <select
+          value={sceneType}
+          onChange={(e) => setSceneType(e.target.value as SceneType)}
+          className="w-full px-3 py-2 rounded-lg border border-amber-300 bg-white text-sm font-medium"
+        >
+          {Object.entries(SCENE_TYPE_LABELS).map(([k, v]) => (
+            <option key={k} value={k}>{v}</option>
+          ))}
+        </select>
+        <Button onClick={handleStart} variant="primary" className="w-full">
+          ▶ Zahájit scénu
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+// ────────────────────────────────────────────────────────────────
+// SceneCheckCard — výsledek scene check
+// ────────────────────────────────────────────────────────────────
+
+const SceneCheckCard = ({ result, onContinue }: {
+  result: StartSceneResult;
+  onContinue: () => void;
+}) => {
+  const { checkResult, alteration, focus, checkDie, chaosFactor } = result;
+
+  const configs: Record<SceneCheckResult, { emoji: string; label: string; bg: string; text: string; desc: string }> = {
+    normal: {
+      emoji: '✅',
+      label: 'NORMÁLNÍ SCÉNA',
+      bg: 'bg-green-50 border-green-400',
+      text: 'text-green-800',
+      desc: 'Scéna probíhá jak jsi plánoval.',
+    },
+    altered: {
+      emoji: '⚡',
+      label: 'POZMĚNĚNÁ SCÉNA',
+      bg: 'bg-yellow-50 border-yellow-400',
+      text: 'text-yellow-800',
+      desc: alteration || '',
+    },
+    interrupted: {
+      emoji: '🔀',
+      label: 'PŘERUŠENÁ SCÉNA',
+      bg: 'bg-red-50 border-red-400',
+      text: 'text-red-800',
+      desc: focus || '',
+    },
+  };
+
+  const cfg = configs[checkResult];
+
+  return (
+    <div className={`border-2 rounded-xl p-5 space-y-3 ${cfg.bg}`}>
+      <div className={`flex items-center gap-2 font-bold ${cfg.text}`}>
+        <span className="text-2xl">{cfg.emoji}</span>
+        <span>{cfg.label}</span>
+        <span className="ml-auto text-xs font-normal opacity-70">
+          d10: {checkDie} vs CF {chaosFactor}
+        </span>
+      </div>
+      {cfg.desc && (
+        <p className={`text-sm ${cfg.text} opacity-90`}>{cfg.desc}</p>
+      )}
+      <Button onClick={onContinue} variant="primary" className="w-full">
+        Pokračovat →
+      </Button>
+    </div>
+  );
+};
+
+// ────────────────────────────────────────────────────────────────
+// StatusBar — vždy viditelný pruh v PLAYING
+// ────────────────────────────────────────────────────────────────
+
+const StatusBar = ({ sceneNumber, sceneTitle, sceneType, chaosFactor, onCFChange, onEndScene }: {
+  sceneNumber: number;
+  sceneTitle: string;
+  sceneType: SceneType;
+  chaosFactor: number;
+  onCFChange: (delta: number) => void;
+  onEndScene: (outcome: SceneOutcome) => void;
+}) => (
+  <div className="bg-amber-50 border-2 border-amber-400 rounded-xl px-4 py-3 space-y-2">
+    <div className="flex items-center gap-2 flex-wrap">
+      <span className="text-amber-700 font-bold text-sm shrink-0">
+        🎬 #{sceneNumber}: {sceneTitle}
+      </span>
+      <span className="text-xs text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full shrink-0">
+        {SCENE_TYPE_LABELS[sceneType] || sceneType}
+      </span>
+      <div className="flex items-center gap-1 ml-auto shrink-0">
+        <span className="text-xs text-stone-500">CF:</span>
+        <button
+          onClick={() => onCFChange(-1)}
+          disabled={chaosFactor <= 1}
+          className="w-6 h-6 rounded bg-stone-200 hover:bg-stone-300 disabled:opacity-40 text-stone-700 font-bold text-sm flex items-center justify-center"
+        >–</button>
+        <span className="w-6 text-center font-bold text-amber-800">{chaosFactor}</span>
+        <button
+          onClick={() => onCFChange(1)}
+          disabled={chaosFactor >= 9}
+          className="w-6 h-6 rounded bg-stone-200 hover:bg-stone-300 disabled:opacity-40 text-stone-700 font-bold text-sm flex items-center justify-center"
+        >+</button>
+      </div>
+    </div>
+    <div className="flex gap-2">
+      <button
+        onClick={() => onEndScene('in_control')}
+        className="flex-1 px-3 py-1.5 bg-green-100 hover:bg-green-200 text-green-800 rounded-lg text-xs font-medium transition-colors"
+      >
+        ✅ V kontrole (CF−1)
+      </button>
+      <button
+        onClick={() => onEndScene('out_of_control')}
+        className="flex-1 px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-800 rounded-lg text-xs font-medium transition-colors"
+      >
+        ❌ Mimo kontrolu (CF+1)
+      </button>
+    </div>
+  </div>
+);
+
+// ────────────────────────────────────────────────────────────────
+// ConversationCore — Oracle + quick actions
+// ────────────────────────────────────────────────────────────────
+
+const ConversationCore = () => {
+  const handleLogEntry = useGameStore(s => s.handleLogEntry);
+  const log = (entry: Record<string, unknown>) => handleLogEntry(entry);
+
   const [question, setQuestion] = useState('');
   const [probability, setProbability] = useState<'unlikely' | 'even' | 'likely'>('even');
+  const [lastResult, setLastResult] = useState<string | null>(null);
+  const [openAction, setOpenAction] = useState<QuickAction>(null);
 
-  // Kostky state
+  // Dice state
   const [diceCount, setDiceCount] = useState(1);
   const [diceSides, setDiceSides] = useState(6);
   const [diceReason, setDiceReason] = useState('');
   const [diceResult, setDiceResult] = useState<{ dice: number[]; total: number } | null>(null);
 
-  const log = (entry: Record<string, unknown>) => handleLogEntry(entry);
-
-  // ── Ano/Ne ────────────────────────────────────────────────
   const rollYesNo = () => {
     const { dice, total } = roll2D6();
     const result = ORACLE_TABLE[probability][total as keyof typeof ORACLE_TABLE[typeof probability]];
-    const entry = {
-      type: 'oracle',
-      subtype: 'yes_no',
-      timestamp: formatTimestamp(),
-      question: question || '(Bez otázky)',
-      probability,
-      dice,
-      total,
-      result,
-    };
+    log({
+      type: 'oracle', subtype: 'yes_no', timestamp: formatTimestamp(),
+      question: question || '(Bez otázky)', probability, dice, total, result,
+    });
     setLastResult(`${question ? `"${question}" → ` : ''}**${result}** (2d6: ${total})`);
-    log(entry);
     setQuestion('');
   };
 
-  // ── Akce+Téma ─────────────────────────────────────────────
   const rollActionTheme = () => {
     const action = randomFrom(ACTION_ORACLE);
     const theme = randomFrom(THEME_ORACLE);
-    const entry = {
-      type: 'oracle',
-      subtype: 'action_theme',
-      timestamp: formatTimestamp(),
-      result: `${action} + ${theme}`,
-      action,
-      theme,
-    };
+    log({ type: 'oracle', subtype: 'action_theme', timestamp: formatTimestamp(), result: `${action} + ${theme}`, action, theme });
     setLastResult(`**${action}** + **${theme}**`);
-    log(entry);
   };
 
-  // ── Setkání ───────────────────────────────────────────────
   const rollEncounter = () => {
     const creature = randomFrom(ENCOUNTER_CREATURES);
     const activity = randomFrom(ENCOUNTER_ACTIVITIES);
@@ -265,215 +264,183 @@ const OracleQuick = () => {
     const detail = randomFrom(ENCOUNTER_DETAILS);
     const motivation = randomFrom(ENCOUNTER_MOTIVATIONS);
     const narrative = `${mood}. ${location.charAt(0).toUpperCase() + location.slice(1)} spatříš **${creature.name}**. ${creature.name} ${activity}. ${detail} *${motivation}*`;
-    const entry = {
-      type: 'oracle',
-      subtype: 'encounter',
-      timestamp: formatTimestamp(),
-      result: narrative,
-    };
+    log({ type: 'oracle', subtype: 'encounter', timestamp: formatTimestamp(), result: narrative });
     setLastResult(narrative);
-    log(entry);
   };
 
-  // ── Kostky ────────────────────────────────────────────────
   const rollCustomDice = () => {
     const dice = rollDice(diceCount, diceSides);
     const total = dice.reduce((a, b) => a + b, 0);
     setDiceResult({ dice, total });
-    const entry = {
-      type: 'oracle',
-      subtype: 'custom_dice',
-      timestamp: formatTimestamp(),
-      dice,
-      sides: diceSides,
-      count: diceCount,
-      total,
-      reason: diceReason || null,
-    };
+    log({ type: 'oracle', subtype: 'custom_dice', timestamp: formatTimestamp(), dice, sides: diceSides, count: diceCount, total, reason: diceReason || null });
     setLastResult(`${diceCount}d${diceSides}: [${dice.join(', ')}]${diceCount > 1 ? ` = ${total}` : ''}${diceReason ? ` (${diceReason})` : ''}`);
-    log(entry);
     setDiceReason('');
   };
 
-  const oracleTabs = [
-    { id: 'yesno', label: 'Ano/Ne', icon: '🎲' },
-    { id: 'action', label: 'Akce+Téma', icon: '💡' },
-    { id: 'encounter', label: 'Setkání', icon: '👁️' },
-    { id: 'dice', label: 'Kostky', icon: '🎯' },
-  ];
+  const renderMarkdown = (text: string) => (
+    <span
+      dangerouslySetInnerHTML={{
+        __html: text
+          .replace(/\*\*(.+?)\*\*/g, '<strong class="text-amber-300">$1</strong>')
+          .replace(/\*(.+?)\*/g, '<em class="text-stone-400">$1</em>'),
+      }}
+    />
+  );
 
   return (
-    <div className="bg-white border border-stone-200 rounded-xl overflow-hidden">
-      {/* Taby */}
-      <div className="border-b border-stone-200">
-        <div className="flex overflow-x-auto">
-          {oracleTabs.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors ${
-                activeTab === tab.id
-                  ? 'bg-amber-50 text-amber-900 border-b-2 border-amber-500'
-                  : 'text-stone-500 hover:text-stone-800 hover:bg-stone-50'
-              }`}
-            >
-              {tab.icon} {tab.label}
-            </button>
-          ))}
+    <div className="bg-white border border-stone-200 rounded-xl p-4 space-y-3">
+      <p className="text-xs text-stone-500 font-medium uppercase tracking-wide">The Conversation</p>
+
+      {/* Oracle input */}
+      <input
+        value={question}
+        onChange={(e) => setQuestion(e.target.value)}
+        onKeyDown={(e) => e.key === 'Enter' && rollYesNo()}
+        placeholder="Co se děje? Zadej otázku pro Oracle..."
+        className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-white text-sm"
+      />
+
+      {/* Pravděpodobnost */}
+      <div className="flex flex-wrap gap-2">
+        {(['unlikely', 'even', 'likely'] as const).map(prob => (
+          <button
+            key={prob}
+            onClick={() => setProbability(prob)}
+            className={`flex-1 px-2 py-1.5 rounded-lg font-medium text-xs transition-all ${
+              probability === prob
+                ? 'bg-amber-700 text-amber-50'
+                : 'bg-amber-100 text-amber-900 hover:bg-amber-200'
+            }`}
+          >
+            {prob === 'unlikely' ? '⬇️ Nepravděpodobné' : prob === 'likely' ? '⬆️ Pravděpodobné' : '➡️ Rovné šance'}
+          </button>
+        ))}
+      </div>
+
+      {/* Hlavní tlačítko Oracle */}
+      <Button onClick={rollYesNo} variant="primary" className="w-full">
+        🎲 Hodit Oracle (2d6)
+      </Button>
+
+      {/* Výsledek */}
+      {lastResult && (
+        <div className="p-3 bg-stone-800 text-stone-100 rounded-lg text-sm">
+          <span className="text-stone-400 text-xs block mb-1">Výsledek:</span>
+          {renderMarkdown(lastResult)}
         </div>
+      )}
+
+      {/* Quick action tlačítka */}
+      <div className="flex flex-wrap gap-2">
+        {([
+          { id: 'action' as QuickAction, label: '💡 Akce+Téma' },
+          { id: 'encounter' as QuickAction, label: '👁️ Setkání' },
+          { id: 'dice' as QuickAction, label: '🎯 Kostky' },
+        ]).map(btn => (
+          <button
+            key={btn.id as string}
+            onClick={() => setOpenAction(openAction === btn.id ? null : btn.id)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              openAction === btn.id
+                ? 'bg-stone-700 text-stone-100'
+                : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+            }`}
+          >
+            {btn.label}
+          </button>
+        ))}
       </div>
 
-      <div className="p-4 space-y-3">
-        {/* ── ANO/NE ── */}
-        {activeTab === 'yesno' && (
-          <div className="space-y-3">
-            <input
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && rollYesNo()}
-              placeholder="Zadej otázku pro oracle..."
-              className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-white text-sm"
-            />
-            <div className="flex flex-wrap gap-2">
-              {(['unlikely', 'even', 'likely'] as const).map(prob => (
-                <button
-                  key={prob}
-                  onClick={() => setProbability(prob)}
-                  className={`px-3 py-1.5 rounded-lg font-medium text-sm transition-all ${
-                    probability === prob
-                      ? 'bg-amber-700 text-amber-50'
-                      : 'bg-amber-100 text-amber-900 hover:bg-amber-200'
-                  }`}
-                >
-                  {prob === 'unlikely' ? '⬇️ Nepravděpodobné' : prob === 'likely' ? '⬆️ Pravděpodobné' : '➡️ Rovné šance'}
-                </button>
-              ))}
-            </div>
-            <Button onClick={rollYesNo} variant="primary" className="w-full">
-              🎲 Hodit 2d6
-            </Button>
-          </div>
-        )}
+      {/* Akce+Téma panel */}
+      {openAction === 'action' && (
+        <div className="bg-stone-50 rounded-lg p-3 space-y-2 border border-stone-200">
+          <p className="text-xs text-stone-500">Náhodná kombinace Akce + Tématu pro inspiraci.</p>
+          <Button onClick={rollActionTheme} variant="secondary" className="w-full">
+            💡 Generovat Akce + Téma
+          </Button>
+        </div>
+      )}
 
-        {/* ── AKCE+TÉMA ── */}
-        {activeTab === 'action' && (
-          <div className="space-y-3">
-            <p className="text-sm text-stone-600">
-              Náhodná kombinace Akce + Tématu z Ironsworn oracle tabulek. Použij pro inspiraci když nevíš co dál.
-            </p>
-            <Button onClick={rollActionTheme} variant="primary" className="w-full">
-              💡 Generovat Akce + Téma
-            </Button>
-          </div>
-        )}
+      {/* Setkání panel */}
+      {openAction === 'encounter' && (
+        <div className="bg-stone-50 rounded-lg p-3 space-y-2 border border-stone-200">
+          <p className="text-xs text-stone-500">Narativní setkání s náhodným tvorem, aktivitou a motivací.</p>
+          <Button onClick={rollEncounter} variant="secondary" className="w-full">
+            👁️ Generovat setkání
+          </Button>
+        </div>
+      )}
 
-        {/* ── SETKÁNÍ ── */}
-        {activeTab === 'encounter' && (
-          <div className="space-y-3">
-            <p className="text-sm text-stone-600">
-              Narativní setkání s náhodným tvorem, aktivitou a motivací.
-            </p>
-            <Button onClick={rollEncounter} variant="primary" className="w-full">
-              👁️ Generovat setkání
-            </Button>
-          </div>
-        )}
-
-        {/* ── KOSTKY ── */}
-        {activeTab === 'dice' && (
-          <div className="space-y-3">
-            {/* Rychlé kostky */}
-            <div className="flex flex-wrap gap-2">
-              {[4, 6, 8, 10, 12, 20].map(sides => (
-                <button
-                  key={sides}
-                  onClick={() => {
-                    const result = rollDice(1, sides)[0];
-                    setDiceResult({ dice: [result], total: result });
-                    const entry = {
-                      type: 'oracle', subtype: 'custom_dice', timestamp: formatTimestamp(),
-                      dice: [result], sides, count: 1, total: result,
-                    };
-                    setLastResult(`d${sides}: **${result}**`);
-                    log(entry);
-                  }}
-                  className="px-3 py-2 bg-amber-100 hover:bg-amber-200 rounded-lg font-bold text-amber-900 text-sm transition-colors"
-                >
-                  d{sides}
-                </button>
-              ))}
-            </div>
-            {/* Vlastní hod */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <select
-                value={diceCount}
-                onChange={(e) => setDiceCount(parseInt(e.target.value))}
-                className="px-2 py-1.5 rounded border border-stone-300 bg-white font-bold text-sm"
+      {/* Kostky panel */}
+      {openAction === 'dice' && (
+        <div className="bg-stone-50 rounded-lg p-3 space-y-3 border border-stone-200">
+          {/* Rychlé kostky */}
+          <div className="flex flex-wrap gap-2">
+            {[4, 6, 8, 10, 12, 20].map(sides => (
+              <button
+                key={sides}
+                onClick={() => {
+                  const result = rollDice(1, sides)[0];
+                  setDiceResult({ dice: [result], total: result });
+                  log({ type: 'oracle', subtype: 'custom_dice', timestamp: formatTimestamp(), dice: [result], sides, count: 1, total: result });
+                  setLastResult(`d${sides}: **${result}**`);
+                }}
+                className="px-3 py-2 bg-amber-100 hover:bg-amber-200 rounded-lg font-bold text-amber-900 text-sm transition-colors"
               >
-                {[1, 2, 3, 4, 5, 6].map(n => <option key={n} value={n}>{n}</option>)}
-              </select>
-              <span className="font-bold text-stone-600">d</span>
-              <input
-                type="number"
-                min="2"
-                max="1000"
-                value={diceSides}
-                onChange={(e) => setDiceSides(parseInt(e.target.value) || 6)}
-                className="w-16 px-2 py-1.5 rounded border border-stone-300 bg-white font-bold text-sm"
-              />
-              <input
-                type="text"
-                value={diceReason}
-                onChange={(e) => setDiceReason(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && rollCustomDice()}
-                placeholder="Proč? (volitelné)"
-                className="flex-1 min-w-[120px] px-2 py-1.5 text-sm rounded border border-stone-300 bg-white"
-              />
-              <Button onClick={rollCustomDice} variant="primary">
-                Hodit
-              </Button>
-            </div>
-            {/* Výsledek kostek */}
-            {diceResult && activeTab === 'dice' && (
-              <div className="flex items-center gap-2 p-3 bg-amber-50 rounded-lg border border-amber-200">
-                <div className="flex gap-1 flex-wrap">
-                  {diceResult.dice.map((d, i) => (
-                    <span key={i} className="w-8 h-8 flex items-center justify-center bg-amber-700 text-amber-50 rounded font-bold text-sm">
-                      {d}
-                    </span>
-                  ))}
-                </div>
-                {diceResult.dice.length > 1 && (
-                  <span className="text-xl font-bold text-amber-800 ml-2">= {diceResult.total}</span>
-                )}
-              </div>
-            )}
+                d{sides}
+              </button>
+            ))}
           </div>
-        )}
-
-        {/* Výsledek */}
-        {lastResult && (
-          <div className="p-3 bg-stone-800 text-stone-100 rounded-lg text-sm">
-            <span className="text-stone-400 text-xs block mb-1">Výsledek:</span>
-            <span
-              dangerouslySetInnerHTML={{
-                __html: lastResult
-                  .replace(/\*\*(.+?)\*\*/g, '<strong class="text-amber-300">$1</strong>')
-                  .replace(/\*(.+?)\*/g, '<em class="text-stone-400">$1</em>'),
-              }}
+          {/* Vlastní hod */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <select
+              value={diceCount}
+              onChange={(e) => setDiceCount(parseInt(e.target.value))}
+              className="px-2 py-1.5 rounded border border-stone-300 bg-white font-bold text-sm"
+            >
+              {[1, 2, 3, 4, 5, 6].map(n => <option key={n} value={n}>{n}</option>)}
+            </select>
+            <span className="font-bold text-stone-600">d</span>
+            <input
+              type="number" min="2" max="1000" value={diceSides}
+              onChange={(e) => setDiceSides(parseInt(e.target.value) || 6)}
+              className="w-16 px-2 py-1.5 rounded border border-stone-300 bg-white font-bold text-sm"
             />
+            <input
+              type="text" value={diceReason}
+              onChange={(e) => setDiceReason(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && rollCustomDice()}
+              placeholder="Proč? (volitelné)"
+              className="flex-1 min-w-[100px] px-2 py-1.5 text-sm rounded border border-stone-300 bg-white"
+            />
+            <Button onClick={rollCustomDice} variant="primary" size="small">Hodit</Button>
           </div>
-        )}
-      </div>
+          {/* Výsledek kostek */}
+          {diceResult && (
+            <div className="flex items-center gap-2 p-2 bg-amber-50 rounded-lg border border-amber-200">
+              <div className="flex gap-1 flex-wrap">
+                {diceResult.dice.map((d, i) => (
+                  <span key={i} className="w-8 h-8 flex items-center justify-center bg-amber-700 text-amber-50 rounded font-bold text-sm">
+                    {d}
+                  </span>
+                ))}
+              </div>
+              {diceResult.dice.length > 1 && (
+                <span className="text-xl font-bold text-amber-800 ml-2">= {diceResult.total}</span>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
 
 // ────────────────────────────────────────────────────────────────
-// CombatArea — toggle pro CombatPanel
+// CombatInline — wrapper kolem CombatPanel
 // ────────────────────────────────────────────────────────────────
 
-const CombatArea = () => {
+const CombatInline = () => {
   const [showCombat, setShowCombat] = useState(false);
 
   return (
@@ -499,29 +466,147 @@ const CombatArea = () => {
 };
 
 // ────────────────────────────────────────────────────────────────
-// PlayArea — hlavní komponenta
+// ThreadsSection — zapletky (collapsible, výchozí: skryté)
+// ────────────────────────────────────────────────────────────────
+
+const ThreadsSection = () => {
+  const threads = useGameStore(s => s.getSceneState().threads);
+  const addThread = useGameStore(s => s.addThread);
+  const removeThread = useGameStore(s => s.removeThread);
+  const toggleThreadResolved = useGameStore(s => s.toggleThreadResolved);
+
+  const [showThreads, setShowThreads] = useState(false);
+  const [newThread, setNewThread] = useState('');
+
+  const handleAddThread = () => {
+    if (!newThread.trim()) return;
+    addThread(newThread.trim());
+    setNewThread('');
+  };
+
+  const activeCount = threads.filter(t => !t.resolved).length;
+
+  return (
+    <div className="border border-amber-200 rounded-xl overflow-hidden">
+      <button
+        onClick={() => setShowThreads(!showThreads)}
+        className={`w-full flex items-center justify-between px-4 py-3 text-sm transition-colors ${
+          showThreads
+            ? 'bg-amber-50 text-amber-800 border-b border-amber-200'
+            : 'bg-amber-50/50 text-amber-700 hover:bg-amber-50'
+        }`}
+      >
+        <span className="font-medium">
+          🧵 Zapletky {threads.length > 0 && `(${activeCount} aktivní)`}
+        </span>
+        <span className="text-xs text-stone-500">{showThreads ? '▲ Skrýt' : '▼ Zobrazit'}</span>
+      </button>
+      {showThreads && (
+        <div className="px-4 py-3 bg-amber-50/30 space-y-3">
+          {threads.length > 0 ? (
+            <ThreadList threads={threads} onToggle={toggleThreadResolved} onRemove={removeThread} />
+          ) : (
+            <p className="text-xs text-stone-400 text-center">Žádné zapletky.</p>
+          )}
+          <div className="flex gap-2">
+            <input
+              value={newThread}
+              onChange={(e) => setNewThread(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleAddThread()}
+              placeholder="Nová zápletka..."
+              className="flex-1 px-3 py-1.5 text-sm rounded border border-amber-300 bg-white"
+            />
+            <button
+              onClick={handleAddThread}
+              className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded text-sm font-medium"
+            >
+              +
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ────────────────────────────────────────────────────────────────
+// PlayArea — orchestrátor flow-based rozhraní
 // ────────────────────────────────────────────────────────────────
 
 export const PlayArea = () => {
-  return (
-    <div className="space-y-4 max-w-2xl mx-auto">
-      {/* Nadpis */}
-      <div className="flex items-center gap-3">
-        <span className="text-2xl">🎲</span>
-        <div>
-          <h2 className="text-xl font-bold text-stone-800">Hrací Plocha</h2>
-          <p className="text-xs text-stone-500">Scéna · Oracle · Souboj na jednom místě</p>
+  const getSceneState = useGameStore(s => s.getSceneState);
+  const startScene = useGameStore(s => s.startScene);
+  const endScene = useGameStore(s => s.endScene);
+  const adjustChaosFactor = useGameStore(s => s.adjustChaosFactor);
+  const activeParty = useGameStore(s => s.getActiveParty());
+
+  // Lokální stav flow
+  const [sceneSetupResult, setSceneSetupResult] = useState<StartSceneResult | null>(null);
+  const [sceneSetupDone, setSceneSetupDone] = useState(false);
+
+  const { chaosFactor, currentScene, sceneCount } = getSceneState();
+  const hasScene = !!currentScene;
+
+  if (!activeParty) {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-stone-100 border border-stone-300 rounded-xl p-6 text-center text-stone-500">
+          🐭 Vyber nebo vytvoř družinu v panelu Postavy
         </div>
       </div>
+    );
+  }
 
-      {/* 1. Scéna */}
-      <SceneStrip />
+  const handleStartScene = (title: string, type: SceneType) => {
+    const result = startScene(title, type);
+    setSceneSetupResult({
+      checkResult: result.checkResult,
+      alteration: result.alteration,
+      focus: result.focus,
+      checkDie: result.scene.checkDie,
+      chaosFactor: result.scene.chaosAtStart,
+    });
+    setSceneSetupDone(false);
+  };
 
-      {/* 2. Oracle */}
-      <OracleQuick />
+  const handleEndScene = (outcome: SceneOutcome) => {
+    endScene(outcome);
+    setSceneSetupResult(null);
+    setSceneSetupDone(false);
+  };
 
-      {/* 3. Souboj */}
-      <CombatArea />
+  // ── IDLE: žádná aktivní scéna ────────────────────────────────
+  if (!hasScene) {
+    return (
+      <div className="space-y-4 max-w-2xl mx-auto">
+        <IdleState sceneCount={sceneCount} onStart={handleStartScene} />
+      </div>
+    );
+  }
+
+  // ── SCENE SETUP: scene check karta (jen po právě zahájeném startu) ──
+  if (!sceneSetupDone && sceneSetupResult) {
+    return (
+      <div className="space-y-4 max-w-2xl mx-auto">
+        <SceneCheckCard result={sceneSetupResult} onContinue={() => setSceneSetupDone(true)} />
+      </div>
+    );
+  }
+
+  // ── PLAYING: hlavní layout ───────────────────────────────────
+  return (
+    <div className="space-y-4 max-w-2xl mx-auto">
+      <StatusBar
+        sceneNumber={currentScene!.number}
+        sceneTitle={currentScene!.title}
+        sceneType={currentScene!.type}
+        chaosFactor={chaosFactor}
+        onCFChange={adjustChaosFactor}
+        onEndScene={handleEndScene}
+      />
+      <ConversationCore />
+      <CombatInline />
+      <ThreadsSection />
     </div>
   );
 };
