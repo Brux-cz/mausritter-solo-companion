@@ -11,6 +11,71 @@ import { CombatPanel } from './CombatPanel';
 import type { SceneType, SceneThread, SceneCheckResult, SceneOutcome } from '../../types';
 
 // ────────────────────────────────────────────────────────────────
+// HowToPlay — dočasný hint pro testování workflow (TODO: smazat)
+// ────────────────────────────────────────────────────────────────
+
+const HowToPlay = () => {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="border border-blue-200 rounded-xl overflow-hidden text-xs">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-3 py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 font-medium"
+      >
+        <span>📖 Jak hrát (workflow)</span>
+        <span>{open ? '▲' : '▼'}</span>
+      </button>
+      {open && (
+        <div className="px-3 py-3 bg-blue-50/40 space-y-3 text-stone-700">
+          <div>
+            <p className="font-bold text-blue-800 mb-1">🟣 Začátek session</p>
+            <ol className="list-decimal ml-4 space-y-0.5">
+              <li>Čas → zkontroluj sezónu, hoď počasí</li>
+              <li>Deník → napiš 1 větu recap</li>
+              <li>Pokud uplynul &gt;1 týden: Svět → Frakce → Progress Roll</li>
+            </ol>
+          </div>
+          <div>
+            <p className="font-bold text-blue-800 mb-1">🟡 Každá scéna</p>
+            <ol className="list-decimal ml-4 space-y-0.5">
+              <li>IDLE: napiš název scény → Zahájit</li>
+              <li>SCENE SETUP: přečti check kartu (normální/pozměněná/přerušená)</li>
+              <li>PLAYING — The Conversation smyčka:
+                <ul className="list-disc ml-4 mt-0.5">
+                  <li>Ptej se konkrétně: "Je strážce u dveří?"</li>
+                  <li>Rozhodní PŘED hodem: Likely/Rovné/Unlikely</li>
+                  <li>Yes,and = intenzifikuj · No,but = přidej alternativu</li>
+                  <li>Z výsledku plyne další otázka → opakuj</li>
+                </ul>
+              </li>
+              <li>Souboj jen když to dává smysl → ⚔️ rozbalit inline</li>
+              <li>Konec: V kontrole (CF−1) nebo Mimo kontrolu (CF+1)</li>
+            </ol>
+          </div>
+          <div>
+            <p className="font-bold text-blue-800 mb-1">🟢 Konec session</p>
+            <ol className="list-decimal ml-4 space-y-0.5">
+              <li>Deník → zapiš XP + co se stalo</li>
+              <li>Postavy → zkontroluj inventory (rations, torch, armor)</li>
+              <li>Deník → cliffhanger (1 věta kam příště začít)</li>
+            </ol>
+          </div>
+          <div className="border-t border-blue-200 pt-2 text-stone-500">
+            <p className="font-bold text-blue-700 mb-1">⚡ Oracle pravidla</p>
+            <ul className="list-disc ml-4 space-y-0.5">
+              <li>2d6 útok: 2–6 miss · 7–9 slabý · 10–11 silný · 12 drtivý</li>
+              <li>Save: d20 ≤ stat = úspěch (rovnost = úspěch)</li>
+              <li>Prone = d12 damage die (hoď ručně)</li>
+              <li>Morale: outmatched → WIL save, fail = útěk</li>
+            </ul>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ────────────────────────────────────────────────────────────────
 // Typy
 // ────────────────────────────────────────────────────────────────
 
@@ -122,7 +187,7 @@ const SceneCheckCard = ({ result, onContinue }: {
 }) => {
   const { checkResult, alteration, focus, checkDie, chaosFactor } = result;
 
-  const configs: Record<SceneCheckResult, { emoji: string; label: string; bg: string; text: string; desc: string }> = {
+  const configs: Record<SceneCheckResult, { emoji: string; label: string; bg: string; text: string; desc: string; hint?: string }> = {
     normal: {
       emoji: '✅',
       label: 'NORMÁLNÍ SCÉNA',
@@ -143,6 +208,7 @@ const SceneCheckCard = ({ result, onContinue }: {
       bg: 'bg-red-50 border-red-400',
       text: 'text-red-800',
       desc: focus || '',
+      hint: '→ Hoď 💡 Akce+Téma níže pro inspiraci co se místo toho stane.',
     },
   };
 
@@ -159,6 +225,11 @@ const SceneCheckCard = ({ result, onContinue }: {
       </div>
       {cfg.desc && (
         <p className={`text-sm ${cfg.text} opacity-90`}>{cfg.desc}</p>
+      )}
+      {'hint' in cfg && cfg.hint && (
+        <p className="text-xs text-red-700 bg-red-100 rounded-lg px-3 py-2 border border-red-200">
+          {cfg.hint}
+        </p>
       )}
       <Button onClick={onContinue} variant="primary" className="w-full">
         Pokračovat →
@@ -188,13 +259,19 @@ const StatusBar = ({ sceneNumber, sceneTitle, sceneType, chaosFactor, onCFChange
         {SCENE_TYPE_LABELS[sceneType] || sceneType}
       </span>
       <div className="flex items-center gap-1 ml-auto shrink-0">
-        <span className="text-xs text-stone-500">CF:</span>
+        <span
+          className="text-xs text-stone-500 cursor-help border-b border-dotted border-stone-400"
+          title="Chaos Factor (1–9): čím vyšší, tím pravděpodobnější přerušení nebo pozměnění scény. Po vyhrané scéně −1, po prohře +1."
+        >CF</span>
         <button
           onClick={() => onCFChange(-1)}
           disabled={chaosFactor <= 1}
           className="w-6 h-6 rounded bg-stone-200 hover:bg-stone-300 disabled:opacity-40 text-stone-700 font-bold text-sm flex items-center justify-center"
         >–</button>
-        <span className="w-6 text-center font-bold text-amber-800">{chaosFactor}</span>
+        <span
+          className={`w-6 text-center font-bold ${chaosFactor >= 7 ? 'text-red-700' : chaosFactor >= 5 ? 'text-amber-800' : 'text-green-700'}`}
+          title={`CF ${chaosFactor}: ${chaosFactor <= 3 ? 'Nízké — situace pod kontrolou' : chaosFactor <= 6 ? 'Střední — nejistota roste' : 'Vysoké — chaos hrozí!'}`}
+        >{chaosFactor}</span>
         <button
           onClick={() => onCFChange(1)}
           disabled={chaosFactor >= 9}
@@ -579,6 +656,7 @@ export const PlayArea = () => {
   if (!hasScene) {
     return (
       <div className="space-y-4 max-w-2xl mx-auto">
+        <HowToPlay />
         <IdleState sceneCount={sceneCount} onStart={handleStartScene} />
       </div>
     );
@@ -588,6 +666,7 @@ export const PlayArea = () => {
   if (!sceneSetupDone && sceneSetupResult) {
     return (
       <div className="space-y-4 max-w-2xl mx-auto">
+        <HowToPlay />
         <SceneCheckCard result={sceneSetupResult} onContinue={() => setSceneSetupDone(true)} />
       </div>
     );
@@ -596,6 +675,7 @@ export const PlayArea = () => {
   // ── PLAYING: hlavní layout ───────────────────────────────────
   return (
     <div className="space-y-4 max-w-2xl mx-auto">
+      <HowToPlay />
       <StatusBar
         sceneNumber={currentScene!.number}
         sceneTitle={currentScene!.title}
