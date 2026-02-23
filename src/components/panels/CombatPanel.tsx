@@ -143,6 +143,12 @@ const CombatPanel = () => {
     const healing = roll + 1;
     const newHp = Math.min(combatant.maxHp, combatant.hp + healing);
     setCombatants(combatants.map(c => c.id === combatantId ? { ...c, hp: newHp } : c));
+    // Sync back to character sheet immediately
+    if (combatant.isPartyMember && combatant.memberId) {
+      updateCharacterInParty(combatant.memberId, {
+        hp: { current: newHp, max: combatant.maxHp }
+      });
+    }
     setCombatLog([...combatLog, {
       round: currentRound,
       message: `💤 Short Rest ${combatant.name}: d6=${roll}+1 = +${healing} HP → ${newHp}/${combatant.maxHp}`
@@ -247,9 +253,16 @@ const CombatPanel = () => {
   };
 
   const updateCombatantHP = (id, delta) => {
-    setCombatants(combatants.map(c => 
-      c.id === id ? { ...c, hp: Math.max(0, Math.min(c.maxHp, c.hp + delta)) } : c
-    ));
+    const combatant = combatants.find(c => c.id === id);
+    if (!combatant) return;
+    const newHp = Math.max(0, Math.min(combatant.maxHp, combatant.hp + delta));
+    setCombatants(combatants.map(c => c.id === id ? { ...c, hp: newHp } : c));
+    // Sync back to character sheet for party members
+    if (combatant.isPartyMember && combatant.memberId) {
+      updateCharacterInParty(combatant.memberId, {
+        hp: { current: newHp, max: combatant.maxHp }
+      });
+    }
   };
 
   return (
