@@ -31,6 +31,7 @@ const JournalPanel = ({ onExport }) => {
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [collapsedScenes, setCollapsedScenes] = useState<Set<string>>(new Set());
 
   // Modal pro zobrazení detailu NPC/osady
   const [detailModal, setDetailModal] = useState(null); // { type: 'npc'|'settlement', data: ... }
@@ -61,7 +62,12 @@ const JournalPanel = ({ onExport }) => {
   ];
 
   // Render content: HTML (nové záznamy) nebo plain text (staré záznamy)
-  const renderContent = (text: string) => {
+  const renderContent = (text: string | Record<string, string>) => {
+    // Oprava broken serializace: objekt s char indexy {"0":"D","1":"r",...}
+    if (text && typeof text === 'object') {
+      const numericKeys = Object.keys(text).filter(k => !isNaN(Number(k))).sort((a, b) => Number(a) - Number(b));
+      text = numericKeys.map(k => (text as Record<string, string>)[k]).join('');
+    }
     if (!text) return null;
     const isHtml = /<[a-z][\s\S]*>/i.test(text);
     if (isHtml) {
@@ -623,15 +629,26 @@ const JournalPanel = ({ onExport }) => {
           altered: 'bg-orange-100 text-orange-700',
           interrupted: 'bg-red-100 text-red-700'
         };
+        const isCollapsed = collapsedScenes.has(entry.id);
         return (
-          <div className={`my-2 pl-4 border-l-4 ${checkColors[entry.checkResult] || 'border-blue-400 bg-blue-50'} rounded-r py-2 pr-2`}>
+          <div
+            className={`my-2 pl-3 border-l-4 ${checkColors[entry.checkResult] || 'border-blue-400 bg-blue-50'} rounded-r py-2 pr-2 cursor-pointer hover:brightness-95 transition-all select-none`}
+            onClick={() => setCollapsedScenes(prev => {
+              const next = new Set(prev);
+              if (next.has(entry.id)) next.delete(entry.id); else next.add(entry.id);
+              return next;
+            })}
+            title={isCollapsed ? 'Rozvinout scénu' : 'Sbalit scénu'}
+          >
             <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-stone-400 text-xs">{isCollapsed ? '▶' : '▼'}</span>
               <span className="text-lg">🎬</span>
               <span className="font-bold text-stone-800">Scena #{entry.sceneNumber}: {entry.sceneTitle}</span>
               <span className={`text-xs px-2 py-0.5 rounded font-bold ${checkBadge[entry.checkResult] || ''}`}>
                 [{entry.checkDie}] {checkLabels[entry.checkResult] || entry.checkResult}
               </span>
               <span className="text-xs text-stone-400">CF {entry.chaosFactor}</span>
+              {isCollapsed && <span className="text-xs text-stone-400 ml-auto italic">— sbaleno</span>}
             </div>
           </div>
         );
@@ -932,7 +949,14 @@ const JournalPanel = ({ onExport }) => {
 
       default:
         // For any other type, show as mechanical note
-        const content = entry.content || entry.data || entry;
+        let content = entry.content || entry.data || entry;
+        // Oprava broken char-index serializace: {"0":"D","1":"r",...}
+        if (content && typeof content === 'object' && !Array.isArray(content)) {
+          const numericKeys = Object.keys(content as object).filter(k => !isNaN(Number(k)));
+          if (numericKeys.length > 0) {
+            content = numericKeys.sort((a, b) => Number(a) - Number(b)).map(k => (content as Record<string, string>)[k]).join('');
+          }
+        }
         return (
           <div className="my-1 cursor-pointer hover:bg-stone-100 rounded px-1 -mx-1 transition-colors"
                onClick={() => startEdit(entry)}
@@ -1060,7 +1084,28 @@ const JournalPanel = ({ onExport }) => {
             </div>
 
             {/* Flat list s date headers */}
-            {filteredJournal.map((entry, i) => {
+            {(() => {
+              // Pre-výpočet příslušnosti k scéně (scan od nejstaršího k nejnovějšímu)
+              const sceneOf = new Map<string, string>();
+              let _curScene: string | null = null;
+              for (let i = filteredJournal.length - 1; i >= 0; i--) {
+                const e = filteredJournal[i];
+                if (e.type === 'scene_start') {
+                  _curScene = e.id;
+                  sceneOf.set(e.id, e.id);
+                } else if (e.type === 'scene_end') {
+                  if (_curScene) { sceneOf.set(e.id, _curScene); _curScene = null; }
+                } else if (_curScene) {
+                  sceneOf.set(e.id, _curScene);
+                }
+              }
+              // Skryj záznamy v sbalených scénách (scene_start samotný zůstane viditelný)
+              const visibleEntries = filteredJournal.filter(e => {
+                const sid = sceneOf.get(e.id);
+                return !(sid && collapsedScenes.has(sid) && e.type !== 'scene_start');
+              });
+
+              return visibleEntries.map((entry, i) => {
               const content = formatEntry(entry);
               if (!content) return null;
 
@@ -1071,15 +1116,30 @@ const JournalPanel = ({ onExport }) => {
               // Zjisti datum pro header
               const parts = entry.timestamp?.split(' ') || [];
               const entryDate = parts.length >= 3 ? `${parts[0]} ${parts[1]} ${parts[2]}` : (entry.timestamp || 'Neznámé datum');
-              const prevEntry = filteredJournal[i - 1];
+              const prevEntry = visibleEntries[i - 1];
               const prevParts = prevEntry?.timestamp?.split(' ') || [];
               const prevDate = prevParts.length >= 3 ? `${prevParts[0]} ${prevParts[1]} ${prevParts[2]}` : (prevEntry?.timestamp || '');
               const showDateHeader = i === 0 || entryDate !== prevDate;
 
+              // Scene grouping
+              const sceneId = sceneOf.get(entry.id);
+              const isInsideScene = sceneId !== undefined && entry.type !== 'scene_start';
+              const isSceneEnd = entry.type === 'scene_end';
+              const isSceneStart = entry.type === 'scene_start';
+
               return (
                 <React.Fragment key={entry.id}>
+                  {/* Vizuální oddělovač před novou scénou */}
+                  {isSceneStart && i > 0 && (
+                    <div className="my-4 flex items-center gap-2">
+                      <div className="flex-1 h-px bg-stone-200/60 border-dashed"></div>
+                      <span className="text-[10px] text-stone-300 uppercase tracking-widest">nová scéna</span>
+                      <div className="flex-1 h-px bg-stone-200/60"></div>
+                    </div>
+                  )}
+
                   {/* Date separator - nenápadný, jen tečky s datem při hoveru */}
-                  {showDateHeader && i > 0 && (
+                  {showDateHeader && i > 0 && !isSceneStart && (
                     <div className="group flex items-center justify-center my-3 gap-2" title={entryDate}>
                       <div className="flex-1 h-px bg-stone-200/30"></div>
                       <span className="text-[10px] text-stone-300/40 group-hover:text-stone-400 transition-colors cursor-default">
@@ -1124,7 +1184,9 @@ const JournalPanel = ({ onExport }) => {
                   <div
                     data-entry-id={entry.id}
                     className={`group flex items-start gap-1 transition-all ${
-                      isSelected ? 'bg-amber-100 rounded -mx-2 px-2' : ''
+                      isInsideScene && !isSceneEnd ? 'ml-3 pl-1 border-l-2 border-amber-200/60' : ''
+                    } ${isSceneEnd ? 'ml-3 mb-4' : ''} ${
+                      isSelected ? 'bg-amber-100 rounded' : ''
                     } ${isDragging || touchDragId === entry.id ? 'opacity-50 bg-amber-50' : ''} ${
                       isDropTarget ? 'border-b-2 border-amber-500' : ''
                     }`}
@@ -1234,7 +1296,8 @@ const JournalPanel = ({ onExport }) => {
                   )}
                 </React.Fragment>
               );
-            })}
+            });
+            })()}
           </div>
         )}
       </div>

@@ -1,0 +1,1083 @@
+{
+  "version": 6,
+  "parties": [
+    {
+      "id": "jsc3o7jk9",
+      "name": "Moje družina",
+      "members": [
+        {
+          "id": "6g7qnjx8u",
+          "type": "pc",
+          "name": "Ostnatka",
+          "gender": "male",
+          "level": 1,
+          "STR": {
+            "current": 7,
+            "max": 7
+          },
+          "DEX": {
+            "current": 8,
+            "max": 8
+          },
+          "WIL": {
+            "current": 10,
+            "max": 10
+          },
+          "hp": {
+            "current": 1,
+            "max": 6
+          },
+          "pips": 5,
+          "xp": 0,
+          "origin": {
+            "name": "Knihovník",
+            "itemA": "Útržek ze starodávné knihy",
+            "itemB": "Brk a inkoust"
+          },
+          "birthsign": {
+            "sign": "Měsíc",
+            "trait": "Moudrá/záhadná"
+          },
+          "fur": {
+            "color": "Černá",
+            "pattern": "Strakatá"
+          },
+          "distinctiveFeature": "Módní oblečení",
+          "conditions": [],
+          "inventory": [],
+          "spells": [],
+          "inventorySlots": {
+            "mainPaw": {
+              "id": "c1stgjz5j",
+              "name": "Hůl (k6)",
+              "slots": 1,
+              "usageDots": 0,
+              "maxUsage": 3,
+              "isWeapon": true
+            },
+            "offPaw": null,
+            "body1": null,
+            "body2": null,
+            "pack1": {
+              "id": "pu0rz5uv0",
+              "name": "Zásoby",
+              "slots": 1,
+              "usageDots": 0,
+              "maxUsage": 3
+            },
+            "pack2": {
+              "id": "9n35ra68v",
+              "name": "Pochodně",
+              "slots": 1,
+              "usageDots": 0,
+              "maxUsage": 3
+            },
+            "pack3": {
+              "id": "qvrvgqvlo",
+              "name": "Útržek ze starodávné knihy",
+              "slots": 1,
+              "usageDots": 0,
+              "maxUsage": 3
+            },
+            "pack4": {
+              "id": "quipu5g1f",
+              "name": "Brk a inkoust",
+              "slots": 1,
+              "usageDots": 0,
+              "maxUsage": 3
+            },
+            "pack5": null,
+            "pack6": null
+          }
+        }
+      ],
+      "gameTime": {
+        "day": 1,
+        "season": "spring",
+        "watch": 1,
+        "turn": 0,
+        "restedToday": false
+      },
+      "createdAt": "2026-02-23T13:51:12.330Z",
+      "currentSettlement": "9tinmir14",
+      "sceneState": {
+        "chaosFactor": 1,
+        "currentScene": null,
+        "sceneHistory": [
+          {
+            "id": "bs9g0gtxq",
+            "number": 1,
+            "title": "Bláto Nora — první kroky",
+            "type": "exploration",
+            "checkResult": "normal",
+            "checkDie": 8,
+            "chaosAtStart": 5,
+            "startedAt": "2026-02-23T13:55:48.372Z",
+            "outcome": "in_control",
+            "endedAt": "2026-02-23T13:58:42.664Z"
+          },
+          {
+            "id": "sng00cw74",
+            "number": 2,
+            "title": "V hospodě — rozhovor se Sedmikráskou",
+            "type": "social",
+            "checkResult": "normal",
+            "checkDie": 6,
+            "chaosAtStart": 4,
+            "startedAt": "2026-02-23T13:59:06.750Z",
+            "outcome": "in_control",
+            "endedAt": "2026-02-23T14:02:12.260Z"
+          },
+          {
+            "id": "crz5xjoh1",
+            "number": 3,
+            "title": "V lese — Liščičina skýyš",
+            "type": "combat",
+            "checkResult": "normal",
+            "checkDie": 10,
+            "chaosAtStart": 3,
+            "startedAt": "2026-02-23T14:02:38.626Z",
+            "outcome": "in_control",
+            "endedAt": "2026-02-23T14:09:29.629Z"
+          },
+          {
+            "id": "ty8iom4pq",
+            "number": 4,
+            "title": "Zásilka nalezena — závěr",
+            "type": "exploration",
+            "checkResult": "normal",
+            "checkDie": 8,
+            "chaosAtStart": 2,
+            "startedAt": "2026-02-23T14:09:54.758Z",
+            "outcome": "in_control",
+            "endedAt": "2026-02-23T14:12:05.814Z"
+          },
+          {
+            "id": "ef0r6co1w",
+            "number": 5,
+            "title": "Spirálové schodiště — sestup dolů",
+            "type": "exploration",
+            "checkResult": "normal",
+            "checkDie": 5,
+            "chaosAtStart": 1,
+            "startedAt": "2026-02-23T14:15:37.678Z",
+            "outcome": "in_control",
+            "endedAt": "2026-02-23T14:31:05.879Z"
+          },
+          {
+            "id": "591gmtc8o",
+            "number": 6,
+            "title": "Záchrana Píska — konfrontace s Velkou Liščicí",
+            "type": "combat",
+            "checkResult": "normal",
+            "checkDie": 10,
+            "chaosAtStart": 1,
+            "startedAt": "2026-02-23T14:31:47.283Z",
+            "outcome": "in_control",
+            "endedAt": "2026-02-23T14:38:55.788Z"
+          },
+          {
+            "id": "zsccf21kn",
+            "number": 7,
+            "title": "Velitelka Rezavá — stopa",
+            "type": "exploration",
+            "checkResult": "normal",
+            "checkDie": 8,
+            "chaosAtStart": 1,
+            "startedAt": "2026-02-23T16:07:50.117Z",
+            "outcome": "in_control",
+            "endedAt": "2026-02-24T09:21:37.489Z"
+          }
+        ],
+        "threads": [
+          {
+            "id": "t6kxmoxmh",
+            "description": "Najít ukradenou zásilku vzácných bylin",
+            "resolved": false
+          },
+          {
+            "id": "hh32pvsxq",
+            "description": "Osvobodit Písek — Sedmikrásčin přítel v zajetí Velké Liščice",
+            "resolved": false
+          },
+          {
+            "id": "cwgvdu1wp",
+            "description": "Odhalit padělek — laboratoř vyrábí falešné lektvary z ukradených bylin",
+            "resolved": false
+          }
+        ],
+        "sceneNPCs": [],
+        "sceneCount": 7
+      }
+    }
+  ],
+  "activePartyId": "jsc3o7jk9",
+  "activeCharacterId": "6g7qnjx8u",
+  "journal": [
+    {
+      "type": "scene_end",
+      "timestamp": "24. 2. 2026 10:21:37",
+      "sceneNumber": 7,
+      "sceneTitle": "Velitelka Rezavá — stopa",
+      "outcome": "in_control",
+      "chaosChange": -1,
+      "chaosBefore": 1,
+      "chaosAfter": 1,
+      "content": "Scena #7 ukoncena: Pod kontrolou | Chaos: 1 → 1",
+      "id": "cvcu24wgp",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "oracle",
+      "subtype": "yes_no",
+      "timestamp": "24. 2. 2026 10:20:37",
+      "question": "Je v tomto místě stopa po Velitelce Rezavé?",
+      "probability": "even",
+      "dice": [
+        3,
+        2
+      ],
+      "total": 5,
+      "result": "No, but...",
+      "id": "si3tin3pl",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "id": "yxp6ppt8a",
+      "type": "narrative",
+      "timestamp": "24. 2. 2026 10:00:09",
+      "content": "<p>Pavouk se vrhl — chelicera jen škrábla. Ostnatka druhým úderem hole praštila ho přímo do oka. Pavouk se zhroutil. HP 1. Ruce se třesou.</p>",
+      "partyId": null,
+      "authorId": null,
+      "authorName": null
+    },
+    {
+      "type": "oracle",
+      "subtype": "custom_dice",
+      "timestamp": "24. 2. 2026 9:59:22",
+      "dice": [
+        3,
+        4
+      ],
+      "sides": 6,
+      "count": 2,
+      "total": 7,
+      "reason": "Ostnatka dmg k2 — Silný zásah (výhoda)",
+      "id": "pdwul1ltg",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "oracle",
+      "subtype": "custom_dice",
+      "timestamp": "24. 2. 2026 9:59:08",
+      "dice": [
+        5,
+        5
+      ],
+      "sides": 6,
+      "count": 2,
+      "total": 10,
+      "reason": "Ostnatka útok k2 — Hůl 2d6",
+      "id": "wfbznghqc",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "oracle",
+      "subtype": "custom_dice",
+      "timestamp": "24. 2. 2026 9:58:58",
+      "dice": [
+        3
+      ],
+      "sides": 8,
+      "count": 1,
+      "total": 3,
+      "reason": "Pavouk — kousnutí k2 d8",
+      "id": "kpm021yt7",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "oracle",
+      "subtype": "custom_dice",
+      "timestamp": "24. 2. 2026 9:58:44",
+      "dice": [
+        5
+      ],
+      "sides": 6,
+      "count": 1,
+      "total": 5,
+      "reason": "Ostnatka dmg — Hůl d6",
+      "id": "syqjy7t5t",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "oracle",
+      "subtype": "custom_dice",
+      "timestamp": "24. 2. 2026 9:58:27",
+      "dice": [
+        2,
+        4
+      ],
+      "sides": 6,
+      "count": 2,
+      "total": 6,
+      "reason": "Ostnatka útok — Hůl 2d6",
+      "id": "pzmtsm6fp",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "oracle",
+      "subtype": "custom_dice",
+      "timestamp": "24. 2. 2026 9:58:14",
+      "dice": [
+        1
+      ],
+      "sides": 8,
+      "count": 1,
+      "total": 1,
+      "reason": "Obří Pavouk — kousnutí d8",
+      "id": "p6rd7suzs",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "oracle",
+      "subtype": "yes_no",
+      "timestamp": "24. 2. 2026 9:55:55",
+      "question": "Stihnu utéct před pavoukem?",
+      "probability": "even",
+      "dice": [
+        1,
+        2
+      ],
+      "total": 3,
+      "result": "No",
+      "id": "7k4wkhg6o",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "oracle",
+      "subtype": "yes_no",
+      "timestamp": "23. 2. 2026 17:45:53",
+      "question": "Pavouk si mě všimne?",
+      "probability": "unlikely",
+      "dice": [
+        5,
+        3
+      ],
+      "total": 8,
+      "result": "Yes",
+      "id": "wp8bvmdqx",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "scene_start",
+      "timestamp": "23. 2. 2026 17:07:50",
+      "sceneNumber": 7,
+      "sceneTitle": "Velitelka Rezavá — stopa",
+      "sceneType": "exploration",
+      "checkResult": "normal",
+      "checkDie": 8,
+      "chaosFactor": 1,
+      "content": "Scena #7: Velitelka Rezavá — stopa (Průzkum) | Check: [8] vs CF 1 = Normalni",
+      "id": "4264hmrzl",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "scene_end",
+      "timestamp": "23. 2. 2026 15:38:55",
+      "sceneNumber": 6,
+      "sceneTitle": "Záchrana Píska — konfrontace s Velkou Liščicí",
+      "outcome": "in_control",
+      "chaosChange": -1,
+      "chaosBefore": 1,
+      "chaosAfter": 1,
+      "content": "Scena #6 ukoncena: Pod kontrolou | Chaos: 1 → 1",
+      "id": "vzpwo9hvz",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "combat_end",
+      "timestamp": "23. 2. 2026 15:36:57",
+      "rounds": 1,
+      "log": [
+        {
+          "round": 1,
+          "message": "⚔️ Boj začíná!"
+        },
+        {
+          "round": 1,
+          "message": "Ostnatka útočí na Rez — Strážce Liščice: Silný zásah +1 (11) → 7 poškození"
+        },
+        {
+          "round": 1,
+          "message": "🏃 Morálka Hrbák — Váhající strážce: d20=20 vs WIL=7 → PRCHÁ!"
+        }
+      ],
+      "id": "bebvfdj7n",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "combat_action",
+      "subtype": "attack",
+      "timestamp": "23. 2. 2026 15:36:35",
+      "attacker": "Ostnatka",
+      "target": "Rez — Strážce Liščice",
+      "hitDice": [
+        6,
+        5
+      ],
+      "hitTotal": 11,
+      "hitResult": "Silný zásah +1",
+      "effect": "Poškození s VÝHODOU +1",
+      "damageRolls": [
+        6,
+        4
+      ],
+      "damage": 7,
+      "prone": false,
+      "id": "xyyl2dnle",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "oracle",
+      "subtype": "custom_dice",
+      "timestamp": "23. 2. 2026 15:35:11",
+      "dice": [
+        3
+      ],
+      "sides": 6,
+      "count": 1,
+      "total": 3,
+      "reason": "Rez — damage d6 (Silný+1)",
+      "id": "j1bbgvg4q",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "oracle",
+      "subtype": "custom_dice",
+      "timestamp": "23. 2. 2026 15:34:16",
+      "dice": [
+        5,
+        6
+      ],
+      "sides": 6,
+      "count": 2,
+      "total": 11,
+      "reason": "Rez útočí na Ostnatku (drápy d6)",
+      "id": "bpjjlhpux",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "oracle",
+      "subtype": "yes_no",
+      "timestamp": "23. 2. 2026 15:32:25",
+      "question": "Uvěří strážci bluffu — že Ostnatka je emisar Velitelky Rezavé?",
+      "probability": "unlikely",
+      "dice": [
+        3,
+        1
+      ],
+      "total": 4,
+      "result": "No, but...",
+      "id": "2drdorkm3",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "scene_start",
+      "timestamp": "23. 2. 2026 15:31:47",
+      "sceneNumber": 6,
+      "sceneTitle": "Záchrana Píska — konfrontace s Velkou Liščicí",
+      "sceneType": "combat",
+      "checkResult": "normal",
+      "checkDie": 10,
+      "chaosFactor": 1,
+      "content": "Scena #6: Záchrana Píska — konfrontace s Velkou Liščicí (Souboj) | Check: [10] vs CF 1 = Normalni",
+      "id": "8eoe8e36w",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "scene_end",
+      "timestamp": "23. 2. 2026 15:31:05",
+      "sceneNumber": 5,
+      "sceneTitle": "Spirálové schodiště — sestup dolů",
+      "outcome": "in_control",
+      "chaosChange": -1,
+      "chaosBefore": 1,
+      "chaosAfter": 1,
+      "content": "Scena #5 ukoncena: Pod kontrolou | Chaos: 1 → 1",
+      "id": "vj22whsoy",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "oracle",
+      "subtype": "yes_no",
+      "timestamp": "23. 2. 2026 15:30:43",
+      "question": "Najde Ostnatka v laboratoři důkaz o vůdci padělatelů?",
+      "probability": "likely",
+      "dice": [
+        3,
+        2
+      ],
+      "total": 5,
+      "result": "Yes",
+      "id": "uubw013zn",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "oracle",
+      "subtype": "action_theme",
+      "timestamp": "23. 2. 2026 15:16:18",
+      "result": "Vyrobit + Podvod",
+      "action": "Vyrobit",
+      "theme": "Podvod",
+      "id": "n807r7qmi",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "oracle",
+      "subtype": "yes_no",
+      "timestamp": "23. 2. 2026 15:16:04",
+      "question": "Je spirálové schodiště volné — bez strážců nebo pastí?",
+      "probability": "even",
+      "dice": [
+        6,
+        4
+      ],
+      "total": 10,
+      "result": "Yes, and...",
+      "id": "3xmqj7z0k",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "scene_start",
+      "timestamp": "23. 2. 2026 15:15:37",
+      "sceneNumber": 5,
+      "sceneTitle": "Spirálové schodiště — sestup dolů",
+      "sceneType": "exploration",
+      "checkResult": "normal",
+      "checkDie": 5,
+      "chaosFactor": 1,
+      "content": "Scena #5: Spirálové schodiště — sestup dolů (Průzkum) | Check: [5] vs CF 1 = Normalni",
+      "id": "cn82hdpdw",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "scene_end",
+      "timestamp": "23. 2. 2026 15:12:05",
+      "sceneNumber": 4,
+      "sceneTitle": "Zásilka nalezena — závěr",
+      "outcome": "in_control",
+      "chaosChange": -1,
+      "chaosBefore": 2,
+      "chaosAfter": 1,
+      "content": "Scena #4 ukoncena: Pod kontrolou | Chaos: 2 → 1",
+      "id": "o0zilqgw7",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "oracle",
+      "subtype": "yes_no",
+      "timestamp": "23. 2. 2026 15:11:24",
+      "question": "Je v zásilce i svitek se zapomnělými zaříkáváními — to co hledala Ostnatka?",
+      "probability": "even",
+      "dice": [
+        5,
+        4
+      ],
+      "total": 9,
+      "result": "Yes, and...",
+      "id": "5dojhvi98",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "oracle",
+      "subtype": "yes_no",
+      "timestamp": "23. 2. 2026 15:10:41",
+      "question": "Je zásilka vzácných bylin ukrytá v táboře Velké Liščice?",
+      "probability": "likely",
+      "dice": [
+        4,
+        3
+      ],
+      "total": 7,
+      "result": "Yes",
+      "id": "8309pxm4z",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "scene_start",
+      "timestamp": "23. 2. 2026 15:09:54",
+      "sceneNumber": 4,
+      "sceneTitle": "Zásilka nalezena — závěr",
+      "sceneType": "exploration",
+      "checkResult": "normal",
+      "checkDie": 8,
+      "chaosFactor": 2,
+      "content": "Scena #4: Zásilka nalezena — závěr (Průzkum) | Check: [8] vs CF 2 = Normalni",
+      "id": "312btksq6",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "scene_end",
+      "timestamp": "23. 2. 2026 15:09:29",
+      "sceneNumber": 3,
+      "sceneTitle": "V lese — Liščičina skýyš",
+      "outcome": "in_control",
+      "chaosChange": -1,
+      "chaosBefore": 3,
+      "chaosAfter": 2,
+      "content": "Scena #3 ukoncena: Pod kontrolou | Chaos: 3 → 2",
+      "id": "xkpoxqirp",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "combat_end",
+      "timestamp": "23. 2. 2026 15:08:19",
+      "rounds": 2,
+      "log": [
+        {
+          "round": 1,
+          "message": "⚔️ Boj začíná!"
+        },
+        {
+          "round": 1,
+          "message": "Ostnatka útočí na Suk: Slabý zásah (3) → 1 poškození"
+        },
+        {
+          "round": 2,
+          "message": "🔄 Kolo 2"
+        },
+        {
+          "round": 2,
+          "message": "Ostnatka útočí na Suk: Zásah (7) → 3 poškození"
+        },
+        {
+          "round": 2,
+          "message": "Ostnatka útočí na Dráp: Zásah (7) → 5 poškození"
+        }
+      ],
+      "id": "th1417qy2",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "combat_action",
+      "subtype": "attack",
+      "timestamp": "23. 2. 2026 15:08:01",
+      "attacker": "Ostnatka",
+      "target": "Dráp",
+      "hitDice": [
+        5,
+        2
+      ],
+      "hitTotal": 7,
+      "hitResult": "Zásah",
+      "effect": "Normální poškození",
+      "damageRolls": [
+        5
+      ],
+      "damage": 5,
+      "prone": true,
+      "id": "qbbxmto0t",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "combat_action",
+      "subtype": "attack",
+      "timestamp": "23. 2. 2026 15:06:54",
+      "attacker": "Ostnatka",
+      "target": "Suk",
+      "hitDice": [
+        3,
+        4
+      ],
+      "hitTotal": 7,
+      "hitResult": "Zásah",
+      "effect": "Normální poškození",
+      "damageRolls": [
+        3
+      ],
+      "damage": 3,
+      "prone": false,
+      "id": "1jlt4owhj",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "combat_action",
+      "subtype": "attack",
+      "timestamp": "23. 2. 2026 15:05:27",
+      "attacker": "Ostnatka",
+      "target": "Suk",
+      "hitDice": [
+        2,
+        1
+      ],
+      "hitTotal": 3,
+      "hitResult": "Slabý zásah",
+      "effect": "Poškození s NEVÝHODOU",
+      "damageRolls": [
+        1,
+        6
+      ],
+      "damage": 1,
+      "prone": false,
+      "id": "7i9q118ka",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "oracle",
+      "subtype": "yes_no",
+      "timestamp": "23. 2. 2026 15:03:21",
+      "question": "Je Písek naživu a viditelný v táboře gangu?",
+      "probability": "likely",
+      "dice": [
+        2,
+        5
+      ],
+      "total": 7,
+      "result": "Yes",
+      "id": "zstdejccm",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "scene_start",
+      "timestamp": "23. 2. 2026 15:02:38",
+      "sceneNumber": 3,
+      "sceneTitle": "V lese — Liščičina skýyš",
+      "sceneType": "combat",
+      "checkResult": "normal",
+      "checkDie": 10,
+      "chaosFactor": 3,
+      "content": "Scena #3: V lese — Liščičina skýyš (Souboj) | Check: [10] vs CF 3 = Normalni",
+      "id": "xq33rk4cc",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "scene_end",
+      "timestamp": "23. 2. 2026 15:02:12",
+      "sceneNumber": 2,
+      "sceneTitle": "V hospodě — rozhovor se Sedmikráskou",
+      "outcome": "in_control",
+      "chaosChange": -1,
+      "chaosBefore": 4,
+      "chaosAfter": 3,
+      "content": "Scena #2 ukoncena: Pod kontrolou | Chaos: 4 → 3",
+      "id": "nsn1gvpcl",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "oracle",
+      "subtype": "yes_no",
+      "timestamp": "23. 2. 2026 15:01:51",
+      "question": "Zná Sedmikráska někoho kdo by věděl jak do lesa k Liščici?",
+      "probability": "likely",
+      "dice": [
+        4,
+        5
+      ],
+      "total": 9,
+      "result": "Yes, and...",
+      "id": "z1hq5xw2g",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "oracle",
+      "subtype": "yes_no",
+      "timestamp": "23. 2. 2026 15:01:13",
+      "question": "Ví Sedmikráska přibližně kde je skrýš Velké Liščice?",
+      "probability": "even",
+      "dice": [
+        2,
+        1
+      ],
+      "total": 3,
+      "result": "No",
+      "id": "tuhbrz04g",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "oracle",
+      "subtype": "yes_no",
+      "timestamp": "23. 2. 2026 14:59:56",
+      "question": "Je Sedmikráska ochotná mluvit o krádeži zásilky?",
+      "probability": "likely",
+      "dice": [
+        4,
+        6
+      ],
+      "total": 10,
+      "result": "Yes, and...",
+      "id": "qjhe81k9c",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "scene_start",
+      "timestamp": "23. 2. 2026 14:59:06",
+      "sceneNumber": 2,
+      "sceneTitle": "V hospodě — rozhovor se Sedmikráskou",
+      "sceneType": "social",
+      "checkResult": "normal",
+      "checkDie": 6,
+      "chaosFactor": 4,
+      "content": "Scena #2: V hospodě — rozhovor se Sedmikráskou (Sociální) | Check: [6] vs CF 4 = Normalni",
+      "id": "cs169arlo",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "scene_end",
+      "timestamp": "23. 2. 2026 14:58:42",
+      "sceneNumber": 1,
+      "sceneTitle": "Bláto Nora — první kroky",
+      "outcome": "in_control",
+      "chaosChange": -1,
+      "chaosBefore": 5,
+      "chaosAfter": 4,
+      "content": "Scena #1 ukoncena: Pod kontrolou | Chaos: 5 → 4",
+      "id": "4jzbrag6j",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "oracle",
+      "subtype": "encounter",
+      "timestamp": "23. 2. 2026 14:58:18",
+      "result": "Je nepříjemné ticho.. Na slunném místě u skály spatříš **vosa hledající potravu**. vosa hledající potravu staví si úkryt. Je zjevně zraněný/á. *Sbírá součástky pro vynález.*",
+      "id": "w23cfy242",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "oracle",
+      "subtype": "yes_no",
+      "timestamp": "23. 2. 2026 14:57:43",
+      "question": "Mluví někdo z místních otevřeně o krádeži — přijde k Ostnatce?",
+      "probability": "unlikely",
+      "dice": [
+        1,
+        1
+      ],
+      "total": 2,
+      "result": "No",
+      "id": "xb8kcc6n7",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "oracle",
+      "subtype": "yes_no",
+      "timestamp": "23. 2. 2026 14:57:06",
+      "question": "Je v Bláto Noře vidět napjatá atmosféra — bylo tu krádení?",
+      "probability": "likely",
+      "dice": [
+        3,
+        4
+      ],
+      "total": 7,
+      "result": "Yes",
+      "id": "n4yb71yea",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "scene_start",
+      "timestamp": "23. 2. 2026 14:55:48",
+      "sceneNumber": 1,
+      "sceneTitle": "Bláto Nora — první kroky",
+      "sceneType": "exploration",
+      "checkResult": "normal",
+      "checkDie": 8,
+      "chaosFactor": 5,
+      "content": "Scena #1: Bláto Nora — první kroky (Průzkum) | Check: [8] vs CF 5 = Normalni",
+      "id": "yq5m201ec",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "saved_npc",
+      "npcId": "itujc53zw",
+      "data": {
+        "id": "itujc53zw",
+        "type": "npc",
+        "name": "Sedmikráska Jarníková",
+        "role": "Sladovník",
+        "birthsign": "Matka (Pečující/ustaraná)",
+        "physicalDetail": "Tělo plné jizev",
+        "quirk": "Má tajnou identitu",
+        "goal": "Osvobodit vězněného přítele",
+        "reaction": {
+          "dice": [
+            5,
+            5
+          ],
+          "total": 10
+        },
+        "hp": {
+          "current": 4,
+          "max": 4
+        },
+        "str": {
+          "current": 7,
+          "max": 7
+        },
+        "dex": {
+          "current": 5,
+          "max": 5
+        },
+        "wil": {
+          "current": 8,
+          "max": 8
+        },
+        "settlementId": null
+      },
+      "id": "215f2c3vj",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "0": "D",
+      "1": "r",
+      "2": "u",
+      "3": "ž",
+      "4": "i",
+      "5": "n",
+      "6": "a",
+      "7": " ",
+      "8": "M",
+      "9": "o",
+      "10": "j",
+      "11": "e",
+      "12": " ",
+      "13": "d",
+      "14": "r",
+      "15": "u",
+      "16": "ž",
+      "17": "i",
+      "18": "n",
+      "19": "a",
+      "20": " ",
+      "21": "s",
+      "22": "e",
+      "23": " ",
+      "24": "p",
+      "25": "ř",
+      "26": "e",
+      "27": "s",
+      "28": "u",
+      "29": "n",
+      "30": "u",
+      "31": "l",
+      "32": "a",
+      "33": " ",
+      "34": "d",
+      "35": "o",
+      "36": ":",
+      "37": " ",
+      "38": "B",
+      "39": "l",
+      "40": "á",
+      "41": "t",
+      "42": "o",
+      "43": " ",
+      "44": "N",
+      "45": "o",
+      "46": "r",
+      "47": "a",
+      "id": "w63mj733m",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "saved_settlement",
+      "settlementId": "9tinmir14",
+      "data": {
+        "id": "9tinmir14",
+        "type": "settlement",
+        "name": "Bláto Nora",
+        "size": "Farma/zámeček",
+        "population": "1–3 rodiny",
+        "governance": "Spravovaná rytířem nebo nižším šlechticem",
+        "trades": [
+          "Zahrádky vzácných bylin, střežené sušáky"
+        ],
+        "event": "Někdo ukradl drahocenné dědictví",
+        "landmark": "Houbový háj",
+        "feature": "Spirálové schodiště hluboko do země",
+        "inn": null,
+        "npcs": [],
+        "rolls": {
+          "size": [
+            6,
+            1
+          ],
+          "sizeResult": 1
+        }
+      },
+      "id": "n4wzu4nuu",
+      "partyId": "jsc3o7jk9"
+    },
+    {
+      "type": "character_created",
+      "timestamp": "23. 2. 2026 14:52:30",
+      "character": "Ostnatka",
+      "id": "sbz92l38v",
+      "partyId": "jsc3o7jk9"
+    }
+  ],
+  "factions": [],
+  "settlements": [
+    {
+      "id": "9tinmir14",
+      "type": "settlement",
+      "name": "Bláto Nora",
+      "size": "Farma/zámeček",
+      "population": "1–3 rodiny",
+      "governance": "Spravovaná rytířem nebo nižším šlechticem",
+      "trades": [
+        "Zahrádky vzácných bylin, střežené sušáky"
+      ],
+      "event": "Někdo ukradl drahocenné dědictví",
+      "landmark": "Houbový háj",
+      "feature": "Spirálové schodiště hluboko do země",
+      "inn": null,
+      "npcs": [],
+      "rolls": {
+        "size": [
+          6,
+          1
+        ],
+        "sizeResult": 1
+      }
+    }
+  ],
+  "worldNPCs": [
+    {
+      "id": "itujc53zw",
+      "type": "npc",
+      "name": "Sedmikráska Jarníková",
+      "role": "Sladovník",
+      "birthsign": "Matka (Pečující/ustaraná)",
+      "physicalDetail": "Tělo plné jizev",
+      "quirk": "Má tajnou identitu",
+      "goal": "Osvobodit vězněného přítele",
+      "reaction": {
+        "dice": [
+          5,
+          5
+        ],
+        "total": 10
+      },
+      "hp": {
+        "current": 4,
+        "max": 4
+      },
+      "str": {
+        "current": 7,
+        "max": 7
+      },
+      "dex": {
+        "current": 5,
+        "max": 5
+      },
+      "wil": {
+        "current": 8,
+        "max": 8
+      },
+      "settlementId": null
+    }
+  ],
+  "timedEvents": [],
+  "lexicon": [],
+  "maps": [],
+  "activeMapId": null
+}

@@ -429,7 +429,7 @@ const CharacterPanel = () => {
   const [editMode, setEditMode] = useState(false);
   const [editingName, setEditingName] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
-  const [openSection, setOpenSection] = useState('inventory');
+  const [openSection, setOpenSection] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState(null); // For tap-to-move inventory
   const [popupItem, setPopupItem] = useState(null); // For item detail popup
   const inventoryRef = useRef(null);
@@ -1561,25 +1561,35 @@ const CharacterPanel = () => {
               </button>
             </div>
 
-            {/* HP & Pips - only for PC (hirelings have their own in HirelingSheet) */}
+            {/* HP, Pips & XP - only for PC (hirelings have their own in HirelingSheet) */}
             {character.type === 'pc' && (
-              <div className="flex gap-4">
+              <div className="flex gap-3">
                 <div className="flex-1 bg-white rounded-lg p-3 text-center shadow-sm">
                   <div className="text-xs text-stone-500 mb-1">❤️ HP</div>
                   <div className="flex items-center justify-center gap-2">
-                    <button onClick={() => updateHP(-1)} className="w-10 h-10 bg-red-100 text-red-700 rounded-lg font-bold text-xl">-</button>
-                    <span className="text-2xl font-bold text-red-700 min-w-[60px]">
+                    <button onClick={() => updateHP(-1)} className="w-8 h-8 bg-red-100 text-red-700 rounded-lg font-bold text-lg">-</button>
+                    <span className="text-xl font-bold text-red-700 min-w-[48px]">
                       {character.hp?.current || 0}/{character.hp?.max || 6}
                     </span>
-                    <button onClick={() => updateHP(1)} className="w-10 h-10 bg-green-100 text-green-700 rounded-lg font-bold text-xl">+</button>
+                    <button onClick={() => updateHP(1)} className="w-8 h-8 bg-green-100 text-green-700 rounded-lg font-bold text-lg">+</button>
                   </div>
                 </div>
                 <div className="flex-1 bg-white rounded-lg p-3 text-center shadow-sm">
                   <div className="text-xs text-stone-500 mb-1">💰 Pips</div>
                   <div className="flex items-center justify-center gap-2">
-                    <button onClick={() => updatePips(-1)} className="w-10 h-10 bg-stone-100 text-stone-700 rounded-lg font-bold text-xl">-</button>
-                    <span className="text-2xl font-bold text-amber-600 min-w-[60px]">{character.pips || 0}</span>
-                    <button onClick={() => updatePips(1)} className="w-10 h-10 bg-stone-100 text-stone-700 rounded-lg font-bold text-xl">+</button>
+                    <button onClick={() => updatePips(-1)} className="w-8 h-8 bg-stone-100 text-stone-700 rounded-lg font-bold text-lg">-</button>
+                    <span className="text-xl font-bold text-amber-600 min-w-[32px]">{character.pips || 0}</span>
+                    <button onClick={() => updatePips(1)} className="w-8 h-8 bg-stone-100 text-stone-700 rounded-lg font-bold text-lg">+</button>
+                  </div>
+                </div>
+                <div className="flex-1 bg-white rounded-lg p-3 text-center shadow-sm">
+                  <div className="text-xs text-stone-500 mb-1">⭐ XP</div>
+                  <div className="text-xl font-bold text-purple-700">{character.xp || 0}</div>
+                  <div className="flex justify-center gap-1 mt-1">
+                    <button onClick={() => updateCharacter({ xp: (character.xp || 0) + 10 })}
+                      className="px-1.5 py-0.5 text-xs bg-purple-100 text-purple-700 rounded hover:bg-purple-200">+10</button>
+                    <button onClick={() => updateCharacter({ xp: (character.xp || 0) + 50 })}
+                      className="px-1.5 py-0.5 text-xs bg-purple-100 text-purple-700 rounded hover:bg-purple-200">+50</button>
                   </div>
                 </div>
               </div>
@@ -1591,25 +1601,35 @@ const CharacterPanel = () => {
             <>
               {/* Attributes */}
               <ResultCard title="💪 Atributy">
-                <div className="grid grid-cols-3 gap-3">
-                  {['STR', 'DEX', 'WIL'].map(attr => (
-                    <div key={attr} className="text-center p-3 bg-amber-50 rounded-lg">
-                      <div className="text-xs font-bold text-amber-700 mb-1">{attr}</div>
-                      <div className="flex items-center justify-center gap-1">
-                        <input
-                          type="number"
-                          value={character[attr]?.current || 10}
-                          onChange={(e) => updateAttribute(attr, 'current', e.target.value)}
-                          className="w-12 text-center text-xl font-bold text-amber-900 bg-white border border-amber-300 rounded"
-                          min="1"
-                          max="18"
-                        />
-                        <span className="text-stone-400">/</span>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { key: 'STR', label: 'SÍL', bg: 'bg-red-50', textColor: 'text-red-900', labelColor: 'text-red-600' },
+                    { key: 'DEX', label: 'MRŠ', bg: 'bg-green-50', textColor: 'text-green-900', labelColor: 'text-green-600' },
+                    { key: 'WIL', label: 'VŮL', bg: 'bg-purple-50', textColor: 'text-purple-900', labelColor: 'text-purple-600' },
+                  ].map(({ key: attr, label, bg, textColor, labelColor }) => (
+                    <div key={attr} className={`text-center p-3 ${bg} rounded-xl`}>
+                      <div className={`text-xs font-bold ${labelColor} mb-1`}>{label}</div>
+                      <div className={`text-5xl font-black ${textColor} leading-none`}>
+                        {character[attr]?.current ?? 10}
+                      </div>
+                      <div className="text-xs text-stone-400 mt-0.5">/{character[attr]?.max || 10}</div>
+                      <div className="flex justify-center gap-1 mt-2">
+                        <button
+                          onClick={() => updateAttribute(attr, 'current', Math.max(1, (character[attr]?.current || 10) - 1))}
+                          className="w-7 h-7 rounded bg-white/80 hover:bg-red-100 text-red-700 font-bold text-sm border border-red-200"
+                        >−</button>
+                        <button
+                          onClick={() => updateAttribute(attr, 'current', Math.min(character[attr]?.max || 10, (character[attr]?.current || 10) + 1))}
+                          className="w-7 h-7 rounded bg-white/80 hover:bg-green-100 text-green-700 font-bold text-sm border border-green-200"
+                        >+</button>
+                      </div>
+                      <div className="flex items-center justify-center gap-1 mt-1">
+                        <span className="text-[10px] text-stone-400">max:</span>
                         <input
                           type="number"
                           value={character[attr]?.max || 10}
                           onChange={(e) => updateAttribute(attr, 'max', e.target.value)}
-                          className="w-12 text-center text-sm font-medium text-stone-500 bg-white border border-stone-200 rounded"
+                          className="w-10 text-center text-[10px] text-stone-400 bg-white/60 border border-stone-200 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           min="1"
                           max="18"
                         />
@@ -1757,18 +1777,26 @@ const CharacterPanel = () => {
                 </div>
               </ResultCard>
 
-              {/* Info */}
-              <ResultCard title="📋 Info">
-                <div className="space-y-2 text-sm">
-                  <p><strong>Původ:</strong> {character.origin?.name || character.background || '—'}</p>
-                  <p><strong>Znamení:</strong> {character.birthsign?.sign || character.birthsign?.name} <span className="text-stone-500">({character.birthsign?.trait || character.birthsign?.traits})</span></p>
-                  {character.fur && (
-                    <p><strong>Srst:</strong> {character.fur.color}, {character.fur.pattern?.toLowerCase()}</p>
-                  )}
-                  <p><strong>Výrazný rys:</strong> {character.distinctiveFeature || character.physicalDetail || '—'}</p>
-                  <p><strong>XP:</strong> {character.xp || 0}</p>
-                </div>
-              </ResultCard>
+              {/* Info — collapsible, defaultně zavřeno */}
+              <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                <button
+                  onClick={() => setOpenSection(s => s === 'info' ? null : 'info')}
+                  className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-stone-50"
+                >
+                  <span className="text-sm font-bold text-stone-600">📋 Info o postavě</span>
+                  <span className="text-stone-400 text-xs">{openSection === 'info' ? '▼' : '▶'}</span>
+                </button>
+                {openSection === 'info' && (
+                  <div className="px-4 pb-3 space-y-1.5 text-sm border-t border-stone-100">
+                    <p className="pt-2"><strong>Původ:</strong> {character.origin?.name || character.background || '—'}</p>
+                    <p><strong>Znamení:</strong> {character.birthsign?.sign || character.birthsign?.name} <span className="text-stone-500">({character.birthsign?.trait || character.birthsign?.traits})</span></p>
+                    {character.fur && (
+                      <p><strong>Srst:</strong> {character.fur.color}, {character.fur.pattern?.toLowerCase()}</p>
+                    )}
+                    <p><strong>Výrazný rys:</strong> {character.distinctiveFeature || character.physicalDetail || '—'}</p>
+                  </div>
+                )}
+              </div>
             </>
           )}
 
