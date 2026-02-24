@@ -5,6 +5,180 @@ import { rollD6, roll2D6, rollK66, randomFrom, generateId, formatTimestamp } fro
 import { SectionHeader, ResultCard, Button, HelpHeader, Input } from '../ui/common';
 import { useSlotSize, InvSlot, ItemPopup } from './ItemCardStudio';
 
+// ============================================
+// LEVEL UP — konstanty a helper funkce
+// ============================================
+// XP thresholds: index = cílová úroveň (level 2 = 1000 zk., atd.)
+const XP_THRESHOLDS: number[] = [0, 0, 1000, 3000, 6000, 11000, 16000, 21000];
+const getNextLevelXP = (level: number): number => {
+  if (level + 1 < XP_THRESHOLDS.length) return XP_THRESHOLDS[level + 1];
+  return XP_THRESHOLDS[XP_THRESHOLDS.length - 1] + (level - 5) * 5000;
+};
+const getGrit = (level: number): number => level <= 1 ? 0 : level <= 2 ? 1 : level <= 4 ? 2 : 3;
+
+// ============================================
+// LEVEL UP MODAL
+// ============================================
+const LevelUpModal = ({ character, onConfirm, onCancel }) => {
+  const newLevel = (character.level || 1) + 1;
+  const [phase, setPhase] = useState<'attrs' | 'hp' | 'done'>('attrs');
+  const [attrRolls, setAttrRolls] = useState<{ STR: number; DEX: number; WIL: number } | null>(null);
+  const [hpRolls, setHpRolls] = useState<{ dice: number[]; total: number; newMax: number } | null>(null);
+
+  const rollAttributes = () => {
+    const strRoll = Math.ceil(Math.random() * 20);
+    const dexRoll = Math.ceil(Math.random() * 20);
+    const wilRoll = Math.ceil(Math.random() * 20);
+    setAttrRolls({ STR: strRoll, DEX: dexRoll, WIL: wilRoll });
+    setPhase('hp');
+  };
+
+  const rollHP = () => {
+    const dice: number[] = Array.from({ length: newLevel }, () => Math.ceil(Math.random() * 6));
+    const total = dice.reduce((a, b) => a + b, 0);
+    const currentMax = character.hp?.max || 6;
+    const newMax = total > currentMax ? total : currentMax + 1;
+    setHpRolls({ dice, total, newMax });
+    setPhase('done');
+  };
+
+  const confirm = () => {
+    if (!attrRolls || !hpRolls) return;
+    const updates: Record<string, unknown> = { level: newLevel };
+    const attrs = [
+      { key: 'STR', roll: attrRolls.STR, current: character.STR?.max || 10, stat: character.STR },
+      { key: 'DEX', roll: attrRolls.DEX, current: character.DEX?.max || 10, stat: character.DEX },
+      { key: 'WIL', roll: attrRolls.WIL, current: character.WIL?.max || 10, stat: character.WIL },
+    ];
+    attrs.forEach(({ key, roll, current, stat }) => {
+      if (roll > current) {
+        updates[key] = { current: (stat?.current || current), max: current + 1 };
+      }
+    });
+    updates['hp'] = {
+      current: Math.min(character.hp?.current || hpRolls.newMax, hpRolls.newMax),
+      max: hpRolls.newMax,
+    };
+    onConfirm(updates);
+  };
+
+  const attrLabel = { STR: 'SÍL', DEX: 'MRŠ', WIL: 'VŮL' };
+  const attrMax = { STR: character.STR?.max || 10, DEX: character.DEX?.max || 10, WIL: character.WIL?.max || 10 };
+
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[200] p-4">
+      <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl">
+        <h2 className="text-2xl font-bold text-amber-900 mb-1">🎉 Level Up!</h2>
+        <p className="text-stone-600 mb-4">
+          <strong>{character.name}</strong> postupuje na <strong>{newLevel}. úroveň</strong>
+          {getGrit(newLevel) > getGrit(newLevel - 1) && (
+            <span className="ml-2 text-sm text-blue-600 font-semibold">
+              +Kuráž (celkem {getGrit(newLevel)})
+            </span>
+          )}
+        </p>
+
+        {/* Fáze 1: Atributy */}
+        {phase === 'attrs' && (
+          <div className="space-y-3">
+            <p className="text-sm text-stone-500">
+              Hoď k20 pro každý atribut. Pokud je výsledek <strong>vyšší</strong> než aktuální max → +1.
+            </p>
+            <button
+              onClick={rollAttributes}
+              className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold text-lg"
+            >
+              🎲 Hodit k20 pro SÍL / MRŠ / VŮL
+            </button>
+          </div>
+        )}
+
+        {/* Výsledky atributů + Fáze 2: HP */}
+        {phase === 'hp' && attrRolls && (
+          <div className="space-y-3">
+            <div className="grid grid-cols-3 gap-2">
+              {(['STR', 'DEX', 'WIL'] as const).map(attr => {
+                const roll = attrRolls[attr];
+                const max = attrMax[attr];
+                const improved = roll > max;
+                return (
+                  <div key={attr} className={`text-center p-3 rounded-xl ${improved ? 'bg-green-50 border-2 border-green-400' : 'bg-stone-50 border border-stone-200'}`}>
+                    <div className="text-xs font-bold text-stone-500 mb-1">{attrLabel[attr]}</div>
+                    <div className="text-xl font-black text-stone-800">k20={roll}</div>
+                    <div className="text-xs text-stone-400">vs max={max}</div>
+                    {improved
+                      ? <div className="text-green-600 font-bold text-sm mt-1">✅ +1 → {max + 1}</div>
+                      : <div className="text-stone-400 text-sm mt-1">— beze změny</div>
+                    }
+                  </div>
+                );
+              })}
+            </div>
+            <p className="text-sm text-stone-500">
+              Teď hoď {newLevel}k6 pro Body ochrany.
+              Pokud je výsledek vyšší než aktuální max BO → nahradit.
+            </p>
+            <button
+              onClick={rollHP}
+              className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold text-lg"
+            >
+              🎲 Hodit {newLevel}k6 pro BO
+            </button>
+          </div>
+        )}
+
+        {/* Fáze 3: Výsledky + Potvrzení */}
+        {phase === 'done' && attrRolls && hpRolls && (
+          <div className="space-y-3">
+            <div className="grid grid-cols-3 gap-2">
+              {(['STR', 'DEX', 'WIL'] as const).map(attr => {
+                const roll = attrRolls[attr];
+                const max = attrMax[attr];
+                const improved = roll > max;
+                return (
+                  <div key={attr} className={`text-center p-2 rounded-xl ${improved ? 'bg-green-50 border-2 border-green-400' : 'bg-stone-50 border border-stone-200'}`}>
+                    <div className="text-xs font-bold text-stone-500">{attrLabel[attr]}</div>
+                    <div className="text-sm text-stone-600">k20={roll}</div>
+                    {improved
+                      ? <div className="text-green-600 font-bold text-sm">✅ {max}→{max + 1}</div>
+                      : <div className="text-stone-400 text-xs">beze změny</div>
+                    }
+                  </div>
+                );
+              })}
+            </div>
+            <div className={`p-3 rounded-xl ${hpRolls.total > (character.hp?.max || 6) ? 'bg-green-50 border-2 border-green-400' : 'bg-blue-50 border border-blue-200'}`}>
+              <div className="text-sm font-bold text-stone-700">❤️ Body ochrany ({newLevel}k6)</div>
+              <div className="text-sm text-stone-500">
+                Kostky: [{hpRolls.dice.join(', ')}] = {hpRolls.total}
+                {' '}vs max={character.hp?.max || 6}
+              </div>
+              {hpRolls.total > (character.hp?.max || 6)
+                ? <div className="text-green-600 font-bold text-sm mt-1">✅ Nahrazeno: {character.hp?.max || 6} → {hpRolls.newMax}</div>
+                : <div className="text-blue-600 font-bold text-sm mt-1">+1: {character.hp?.max || 6} → {hpRolls.newMax}</div>
+              }
+            </div>
+            <div className="flex gap-2">
+              <button onClick={onCancel} className="flex-1 py-2 bg-stone-200 hover:bg-stone-300 text-stone-700 rounded-xl font-semibold">
+                Zrušit
+              </button>
+              <button onClick={confirm} className="flex-2 flex-grow py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold">
+                ✅ Potvrdit Level {newLevel}!
+              </button>
+            </div>
+          </div>
+        )}
+
+        {phase !== 'done' && (
+          <button onClick={onCancel} className="mt-3 w-full py-2 text-sm text-stone-400 hover:text-stone-600">
+            Zrušit
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const CharacterSheet = ({
   character,
   updateCharacter,
@@ -422,6 +596,17 @@ const CharacterPanel = () => {
     updateCharacterInParty(activePartyId, activeCharacterId, updates);
   const onLogEntry = handleLogEntry;
 
+  const performLevelUp = (updates: Record<string, unknown>) => {
+    if (!character || character.type !== 'pc') return;
+    updateCharacter(updates);
+    const newLevel = updates['level'] as number;
+    onLogEntry({
+      type: 'oracle',
+      content: `🎉 Level Up! ${character.name} postupuje na ${newLevel}. úroveň. Kuráž: ${getGrit(newLevel)}.`,
+    });
+    setShowLevelUp(false);
+  };
+
   // Defensive null checks for props that may be undefined from Firebase
   const safeParties = parties || [];
   const safeParty = party || null;
@@ -441,6 +626,9 @@ const CharacterPanel = () => {
   const [pendingChar, setPendingChar] = useState(null);
   const [bonusOrigin, setBonusOrigin] = useState(null);
   const [selectedBonusItems, setSelectedBonusItems] = useState([]);
+
+  // State for level up modal
+  const [showLevelUp, setShowLevelUp] = useState(false);
 
   // State for hireling recruitment picker
   const [showHirelingPicker, setShowHirelingPicker] = useState(false);
@@ -1583,8 +1771,31 @@ const CharacterPanel = () => {
                   </div>
                 </div>
                 <div className="flex-1 bg-white rounded-lg p-3 text-center shadow-sm">
-                  <div className="text-xs text-stone-500 mb-1">⭐ XP</div>
+                  <div className="text-xs text-stone-500 mb-1">⭐ XP · Úroveň {character.level || 1}</div>
                   <div className="text-xl font-bold text-purple-700">{character.xp || 0}</div>
+                  {(() => {
+                    const lvl = character.level || 1;
+                    const xp = character.xp || 0;
+                    const nextXP = getNextLevelXP(lvl);
+                    const prevXP = XP_THRESHOLDS[lvl] || 0;
+                    const canLevelUp = xp >= nextXP;
+                    const progress = Math.min(100, Math.round(((xp - prevXP) / (nextXP - prevXP)) * 100));
+                    return canLevelUp ? (
+                      <button
+                        onClick={() => setShowLevelUp(true)}
+                        className="mt-1 w-full py-1 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded animate-pulse"
+                      >
+                        🎉 Level Up! → Úroveň {lvl + 1}
+                      </button>
+                    ) : (
+                      <div className="mt-1">
+                        <div className="text-[10px] text-stone-400">{xp}/{nextXP} zk.</div>
+                        <div className="h-1.5 bg-stone-100 rounded-full mt-0.5 overflow-hidden">
+                          <div className="h-full bg-purple-400 rounded-full" style={{ width: `${progress}%` }} />
+                        </div>
+                      </div>
+                    );
+                  })()}
                   <div className="flex justify-center gap-1 mt-1">
                     <button onClick={() => updateCharacter({ xp: (character.xp || 0) + 10 })}
                       className="px-1.5 py-0.5 text-xs bg-purple-100 text-purple-700 rounded hover:bg-purple-200">+10</button>
@@ -1813,6 +2024,15 @@ const CharacterPanel = () => {
             />
           )}
         </>
+      )}
+
+      {/* Level Up Modal */}
+      {showLevelUp && character && character.type === 'pc' && (
+        <LevelUpModal
+          character={character}
+          onConfirm={performLevelUp}
+          onCancel={() => setShowLevelUp(false)}
+        />
       )}
     </div>
   );
