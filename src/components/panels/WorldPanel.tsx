@@ -822,7 +822,7 @@ const WorldPanel = () => {
                 onChange={(v) => {
                   updateParty(activePartyId, { currentSettlement: v || null });
                   const settlementName = v ? settlements.find(s => s.id === v)?.name : 'na cestě';
-                  onLogEntry && onLogEntry(`Družina ${activeParty.name} se přesunula do: ${settlementName}`);
+                  onLogEntry && onLogEntry({ type: 'note', content: `Družina ${activeParty.name} se přesunula do: ${settlementName}` });
                 }}
                 options={[
                   { value: '', label: '— Na cestě / neznámo —' },

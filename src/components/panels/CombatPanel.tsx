@@ -71,13 +71,22 @@ const CombatPanel = () => {
 
   const startCombat = () => {
     setCurrentRound(1);
-    setCombatLog([{ round: 1, message: '⚔️ Boj začíná!' }]);
-    // Roll initiative
-    const withInitiative = combatants.map(c => ({
-      ...c,
-      initiative: rollD20(),
-      actedThisRound: false
-    })).sort((a, b) => b.initiative - a.initiative);
+    const initLog: { round: number; message: string }[] = [{ round: 1, message: '⚔️ Boj začíná!' }];
+
+    // Iniciativa: záchrana na MRŠ (d20 ≤ MRŠ = úspěch → jedná první)
+    // Nepřátelé mají DEX defaultně 6
+    const withInitiative = combatants.map(c => {
+      const dex = c.dex ?? (c.isEnemy ? 6 : 10); // PC default MRŠ=10, nepřítel=6
+      const roll = rollD20();
+      const goesFirst = roll <= dex;
+      initLog.push({
+        round: 1,
+        message: `🎲 Iniciativa ${c.name}: d20=${roll} vs MRŠ=${dex} → ${goesFirst ? '✅ jde PRVNÍ' : '⬇️ jde DRUHÝ'}`
+      });
+      return { ...c, initiative: goesFirst ? 1 : 0, initiativeRoll: roll, actedThisRound: false };
+    }).sort((a, b) => b.initiative - a.initiative);
+
+    setCombatLog(initLog);
     setCombatants(withInitiative);
   };
 
@@ -143,6 +152,12 @@ const CombatPanel = () => {
     const healing = roll + 1;
     const newHp = Math.min(combatant.maxHp, combatant.hp + healing);
     setCombatants(combatants.map(c => c.id === combatantId ? { ...c, hp: newHp } : c));
+    // Sync back to character sheet immediately
+    if (combatant.isPartyMember && combatant.memberId) {
+      updateCharacterInParty(combatant.memberId, {
+        hp: { current: newHp, max: combatant.maxHp }
+      });
+    }
     setCombatLog([...combatLog, {
       round: currentRound,
       message: `💤 Short Rest ${combatant.name}: d6=${roll}+1 = +${healing} HP → ${newHp}/${combatant.maxHp}`
@@ -154,10 +169,10 @@ const CombatPanel = () => {
     const effectiveDice = target?.prone ? 12 : weaponDice; // Prone = d12
     const { dice, total } = roll2D6();
     const hitResult = HIT_TABLE[total];
-    
+
     let damage = 0;
     let damageRolls = [];
-    
+
     switch (hitResult.damageType) {
       case 'none':
         damage = 0;
@@ -184,7 +199,51 @@ const CombatPanel = () => {
     }
 
     const attacker = combatants.find(c => c.id === attackerId) || { name: 'Útočník' };
-    
+
+    // Calculate HP/STR damage and STR save
+    let strSave: { roll: number; target: number; passed: boolean } | null = null;
+    let finalHp = target ? target.hp : 0;
+    let finalStr = target ? target.str : 0;
+
+    if (target && damage > 0) {
+      const rawHp = target.hp - damage;
+      if (rawHp < 0) {
+        const overflow = Math.abs(rawHp);
+        finalHp = 0;
+        finalStr = Math.max(0, target.str - overflow);
+        // STR save: roll d20 ≤ remaining STR = success (only if not dead)
+        if (finalStr > 0) {
+          const saveRoll = rollD20();
+          strSave = { roll: saveRoll, target: finalStr, passed: saveRoll <= finalStr };
+        }
+      } else {
+        finalHp = rawHp;
+      }
+
+      const newCombatants = combatants.map(c => {
+        if (c.id === targetId) {
+          const updated = { ...c, hp: finalHp, str: finalStr };
+          // Failed STR save → add Poranění condition
+          if (strSave && !strSave.passed) {
+            const conditions = [...(c.conditions || [])];
+            if (!conditions.includes('Poranění')) conditions.push('Poranění');
+            return { ...updated, conditions };
+          }
+          return updated;
+        }
+        return c;
+      });
+      setCombatants(newCombatants);
+
+      // Sync STR back to party member sheet
+      const targetCombatant = combatants.find(c => c.id === targetId);
+      if (targetCombatant?.isPartyMember && targetCombatant.memberId && finalStr !== target.str) {
+        updateCharacterInParty(targetCombatant.memberId, {
+          STR: { current: finalStr, max: targetCombatant.maxStr }
+        });
+      }
+    }
+
     const result = {
       attacker: attacker.name,
       target: target?.name || 'Cíl',
@@ -195,36 +254,18 @@ const CombatPanel = () => {
       damageRolls,
       damage,
       prone: target?.prone || false,
+      strSave,
     };
-    
+
     setAttackResult(result);
-    
-    // Apply damage to target
-    if (target && damage > 0) {
-      const newCombatants = combatants.map(c => {
-        if (c.id === targetId) {
-          let newHp = c.hp - damage;
-          let newStr = c.str;
-          let overflow = 0;
-          
-          if (newHp < 0) {
-            overflow = Math.abs(newHp);
-            newHp = 0;
-            newStr = Math.max(0, c.str - overflow);
-          }
-          
-          return { ...c, hp: newHp, str: newStr };
-        }
-        return c;
-      });
-      setCombatants(newCombatants);
+
+    let logMsg = `${result.attacker} útočí na ${result.target}: ${result.hitResult} (${total}) → ${damage} poškození`;
+    if (strSave) {
+      logMsg += ` | 🎯 STR save: d20=${strSave.roll} vs STR=${strSave.target} → ${strSave.passed ? '✅ úspěch' : '❌ SELHÁNÍ! Poranění!'}`;
     }
-    
-    setCombatLog([...combatLog, {
-      round: currentRound,
-      message: `${result.attacker} útočí na ${result.target}: ${result.hitResult} (${total}) → ${damage} poškození`
-    }]);
-    
+
+    setCombatLog([...combatLog, { round: currentRound, message: logMsg }]);
+
     onLogEntry({
       type: 'combat_action',
       subtype: 'attack',
@@ -236,20 +277,28 @@ const CombatPanel = () => {
   const rollMorale = (combatantId) => {
     const target = combatants.find(c => c.id === combatantId);
     if (!target) return;
-    
+
+    const wil = target.wil || 6; // nepřítel default VŮL=6
     const roll = rollD20();
-    const success = roll <= (target.wil || 7);
-    
+    const success = roll <= wil; // záchrana na VŮL: d20 ≤ VŮL = drží pozici
+
     setCombatLog([...combatLog, {
       round: currentRound,
-      message: `🏃 Morálka ${target.name}: d20=${roll} vs WIL=${target.wil || 7} → ${success ? 'Drží pozici' : 'PRCHÁ!'}`
+      message: `🏃 Morálka ${target.name}: d20=${roll} vs VŮL=${wil} → ${success ? '✅ Drží pozici' : '❌ PRCHÁ / vzdává se!'}`
     }]);
   };
 
   const updateCombatantHP = (id, delta) => {
-    setCombatants(combatants.map(c => 
-      c.id === id ? { ...c, hp: Math.max(0, Math.min(c.maxHp, c.hp + delta)) } : c
-    ));
+    const combatant = combatants.find(c => c.id === id);
+    if (!combatant) return;
+    const newHp = Math.max(0, Math.min(combatant.maxHp, combatant.hp + delta));
+    setCombatants(combatants.map(c => c.id === id ? { ...c, hp: newHp } : c));
+    // Sync back to character sheet for party members
+    if (combatant.isPartyMember && combatant.memberId) {
+      updateCharacterInParty(combatant.memberId, {
+        hp: { current: newHp, max: combatant.maxHp }
+      });
+    }
   };
 
   return (
@@ -336,7 +385,11 @@ const CombatPanel = () => {
                         <span className={c.str < c.maxStr ? 'text-orange-600 font-bold' : 'text-stone-600'}>
                           STR: {c.str}/{c.maxStr}
                         </span>
-                        {c.initiative && <span className="text-blue-600">Init: {c.initiative}</span>}
+                        {c.initiativeRoll !== undefined && (
+                          <span className={c.initiative === 1 ? 'text-green-600 font-bold' : 'text-stone-400'}>
+                            {c.initiative === 1 ? '⚡ 1.' : '2.'} (d20={c.initiativeRoll})
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -347,7 +400,13 @@ const CombatPanel = () => {
                       <Button size="small" variant="secondary" onClick={() => shortRest(c.id)}>💤 Rest (d6+1)</Button>
                     )}
                     {currentRound > 0 && c.isEnemy && (
-                      <Button size="small" variant="ghost" onClick={() => rollMorale(c.id)}>🏃 Morálka</Button>
+                      <button
+                        onClick={() => rollMorale(c.id)}
+                        title="Záchrana na VŮL (d20 ≤ VŮL): Hod když je nepřítel v nevýhodě nebo utrpí první STR damage. Neúspěch = prchá/vzdává se."
+                        className="px-2 py-1 rounded text-xs font-medium bg-stone-100 border border-stone-300 text-stone-600 hover:bg-stone-200"
+                      >
+                        🏃 Morálka
+                      </button>
                     )}
                     {currentRound > 0 && (
                       <button
@@ -468,6 +527,17 @@ const CombatPanel = () => {
                       Damage roll: [{attackResult.damageRolls.join(', ')}]
                       {attackResult.prone && <span className="text-orange-600 ml-1">(🤸 Prone → d12)</span>}
                     </p>
+                  )}
+                  {attackResult.strSave && (
+                    <div className={`mt-2 p-3 rounded-lg border-2 ${attackResult.strSave.passed ? 'bg-green-100 border-green-400' : 'bg-red-100 border-red-500'}`}>
+                      <p className="font-bold text-sm">
+                        🎯 Záchrana SÍL: d20={attackResult.strSave.roll} vs SÍL={attackResult.strSave.target}
+                      </p>
+                      {attackResult.strSave.passed
+                        ? <p className="text-green-700 font-bold">✅ Úspěch — odolává!</p>
+                        : <p className="text-red-700 font-bold">❌ Selhání — Poranění! Postava je vyřazena z boje.</p>
+                      }
+                    </div>
                   )}
                 </div>
               </div>
