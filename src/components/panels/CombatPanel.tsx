@@ -71,13 +71,22 @@ const CombatPanel = () => {
 
   const startCombat = () => {
     setCurrentRound(1);
-    setCombatLog([{ round: 1, message: '⚔️ Boj začíná!' }]);
-    // Roll initiative
-    const withInitiative = combatants.map(c => ({
-      ...c,
-      initiative: rollD20(),
-      actedThisRound: false
-    })).sort((a, b) => b.initiative - a.initiative);
+    const initLog: { round: number; message: string }[] = [{ round: 1, message: '⚔️ Boj začíná!' }];
+
+    // Iniciativa: záchrana na MRŠ (d20 ≤ MRŠ = úspěch → jedná první)
+    // Nepřátelé mají DEX defaultně 6
+    const withInitiative = combatants.map(c => {
+      const dex = c.dex ?? (c.isEnemy ? 6 : 10); // PC default MRŠ=10, nepřítel=6
+      const roll = rollD20();
+      const goesFirst = roll <= dex;
+      initLog.push({
+        round: 1,
+        message: `🎲 Iniciativa ${c.name}: d20=${roll} vs MRŠ=${dex} → ${goesFirst ? '✅ jde PRVNÍ' : '⬇️ jde DRUHÝ'}`
+      });
+      return { ...c, initiative: goesFirst ? 1 : 0, initiativeRoll: roll, actedThisRound: false };
+    }).sort((a, b) => b.initiative - a.initiative);
+
+    setCombatLog(initLog);
     setCombatants(withInitiative);
   };
 
@@ -268,13 +277,14 @@ const CombatPanel = () => {
   const rollMorale = (combatantId) => {
     const target = combatants.find(c => c.id === combatantId);
     if (!target) return;
-    
+
+    const wil = target.wil || 6; // nepřítel default VŮL=6
     const roll = rollD20();
-    const success = roll <= (target.wil || 7);
-    
+    const success = roll <= wil; // záchrana na VŮL: d20 ≤ VŮL = drží pozici
+
     setCombatLog([...combatLog, {
       round: currentRound,
-      message: `🏃 Morálka ${target.name}: d20=${roll} vs WIL=${target.wil || 7} → ${success ? 'Drží pozici' : 'PRCHÁ!'}`
+      message: `🏃 Morálka ${target.name}: d20=${roll} vs VŮL=${wil} → ${success ? '✅ Drží pozici' : '❌ PRCHÁ / vzdává se!'}`
     }]);
   };
 
@@ -375,7 +385,11 @@ const CombatPanel = () => {
                         <span className={c.str < c.maxStr ? 'text-orange-600 font-bold' : 'text-stone-600'}>
                           STR: {c.str}/{c.maxStr}
                         </span>
-                        {c.initiative && <span className="text-blue-600">Init: {c.initiative}</span>}
+                        {c.initiativeRoll !== undefined && (
+                          <span className={c.initiative === 1 ? 'text-green-600 font-bold' : 'text-stone-400'}>
+                            {c.initiative === 1 ? '⚡ 1.' : '2.'} (d20={c.initiativeRoll})
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -386,7 +400,13 @@ const CombatPanel = () => {
                       <Button size="small" variant="secondary" onClick={() => shortRest(c.id)}>💤 Rest (d6+1)</Button>
                     )}
                     {currentRound > 0 && c.isEnemy && (
-                      <Button size="small" variant="ghost" onClick={() => rollMorale(c.id)}>🏃 Morálka</Button>
+                      <button
+                        onClick={() => rollMorale(c.id)}
+                        title="Záchrana na VŮL (d20 ≤ VŮL): Hod když je nepřítel v nevýhodě nebo utrpí první STR damage. Neúspěch = prchá/vzdává se."
+                        className="px-2 py-1 rounded text-xs font-medium bg-stone-100 border border-stone-300 text-stone-600 hover:bg-stone-200"
+                      >
+                        🏃 Morálka
+                      </button>
                     )}
                     {currentRound > 0 && (
                       <button
