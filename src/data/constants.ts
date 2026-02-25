@@ -2035,12 +2035,11 @@ export const DUNGEON_DENIZENS = [
 ];
 
 export const CONDITIONS = [
-  { id: 'exhausted', name: 'Vyčerpaný', effect: 'Nevýhoda na fyzické hody' },
-  { id: 'frightened', name: 'Vystrašený', effect: 'Musí prchat od zdroje' },
-  { id: 'poisoned', name: 'Otrávený', effect: '1 poškození za kolo, nelze léčit' },
-  { id: 'drained', name: 'Vysátý', effect: 'Nemůže sesílat kouzla' },
-  { id: 'stunned', name: 'Omráčený', effect: 'Přeskočí další akci' },
-  { id: 'prone', name: 'Na zemi', effect: 'Nevýhoda na útoky, snadnější cíl' }
+  { id: 'hungry', name: 'Hlad', effect: 'Nenajíst se celý den. Odstraní se konzumací zásob.' },
+  { id: 'exhausted', name: 'Vyčerpání', effect: 'Méně než 6h odpočinku nebo těžké cestování. Odstraní se dlouhým odpočinkem.' },
+  { id: 'injured', name: 'Poranění', effect: 'Nevýhoda na hody SÍL a MRŠ. Odstraní se odpočinkem (týden) nebo kouzlem Zahojení.' },
+  { id: 'frightened', name: 'Vystrašení', effect: 'Musí prchat od zdroje strachu. Odstraní se kouzlem Zotavení.' },
+  { id: 'confused', name: 'Pomatení', effect: 'Při nezdařeném sesílání kouzla. Postih na volní hody.' },
 ];
 
 export const SPELLS = [
