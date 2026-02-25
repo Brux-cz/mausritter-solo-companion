@@ -53,10 +53,10 @@ export const ResultCard = ({ title, children, className = '' }) => (
 
 export const Button = ({ onClick, children, variant = 'primary', size = 'normal', disabled = false, className = '' }) => {
   const variants = {
-    primary: 'bg-amber-800 hover:bg-amber-900 text-amber-50 border-amber-950',
-    secondary: 'bg-stone-600 hover:bg-stone-700 text-stone-50 border-stone-800',
-    danger: 'bg-red-800 hover:bg-red-900 text-red-50 border-red-950',
-    success: 'bg-green-700 hover:bg-green-800 text-green-50 border-green-900',
+    primary: 'bg-[#E36A6A] hover:bg-[#C84848] text-white border-[#C84848]',
+    secondary: 'bg-[#FFD8A8] hover:bg-[#FFC090] text-[#2A1810] border-[#FFC090]',
+    danger: 'bg-red-700 hover:bg-red-800 text-white border-red-900',
+    success: 'bg-[#5A8A5A] hover:bg-[#4A7A4A] text-white border-[#4A7A4A]',
     ghost: 'bg-transparent hover:bg-amber-100 text-amber-900 border-amber-300'
   };
 

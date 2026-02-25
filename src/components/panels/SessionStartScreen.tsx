@@ -59,7 +59,7 @@ export function SessionStartScreen({ onContinue }: Props) {
     .slice(0, 3) as string[];
 
   return (
-    <div className="fixed inset-0 bg-stone-950/95 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-amber-950/95 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
       <div className="bg-amber-950 border border-amber-800 rounded-xl max-w-lg w-full shadow-2xl p-6">
 
         <div className="text-center mb-6">
@@ -82,14 +82,14 @@ export function SessionStartScreen({ onContinue }: Props) {
         )}
 
         {recentEntries.length > 0 && (
-          <div className="mb-6 bg-stone-900/50 border border-stone-700 rounded-lg p-4">
-            <p className="text-stone-400 text-xs font-bold uppercase tracking-wide mb-2">
+          <div className="mb-6 bg-amber-900/50 border border-amber-800 rounded-lg p-4">
+            <p className="text-amber-400 text-xs font-bold uppercase tracking-wide mb-2">
               Poslední záznamy v deníku
             </p>
             <ul className="space-y-1">
               {recentEntries.map((text, i) => (
-                <li key={i} className="text-stone-300 text-sm flex gap-2">
-                  <span className="text-stone-500 shrink-0">•</span>
+                <li key={i} className="text-amber-200 text-sm flex gap-2">
+                  <span className="text-amber-600 shrink-0">•</span>
                   <span className="line-clamp-2">{text}</span>
                 </li>
               ))}

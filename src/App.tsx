@@ -33,6 +33,7 @@ import { PlayArea } from './components/panels/PlayArea';
 import { TimeHub } from './components/panels/TimeHub';
 import { WorldHub } from './components/panels/WorldHub';
 import { ToolsHub } from './components/panels/ToolsHub';
+import { RightSidebar } from './components/panels/RightSidebar';
 
 
 // ============================================
@@ -1586,11 +1587,7 @@ function MausritterSoloCompanion() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-100 via-amber-50 to-orange-100">
-      {/* Background Pattern */}
-      <div className="fixed inset-0 opacity-5 pointer-events-none" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-      }} />
+    <div className="min-h-screen bg-[#FFFBF1]">
 
       {/* Session Start Screen */}
       {showSessionStart && (
@@ -2312,24 +2309,24 @@ function MausritterSoloCompanion() {
       )}
 
       {/* Header */}
-      <header className="bg-gradient-to-r from-amber-900 via-amber-800 to-amber-900 text-amber-50 shadow-xl sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-3 md:px-4 py-2 md:py-3">
+      <header className="bg-[#FFF5DC] border-b-2 border-[#FFD8A8] sticky top-0 z-50">
+        <div className="max-w-[1340px] mx-auto px-3 md:px-4 py-2">
           <div className="flex items-center justify-between gap-2">
             {/* Logo and title */}
             <div className="flex items-center gap-2 min-w-0">
-              <span className="text-2xl md:text-4xl flex-shrink-0">🐭</span>
+              <span className="text-xl flex-shrink-0">🐭</span>
               <div className="min-w-0">
-                <h1 className="text-lg md:text-2xl font-bold tracking-wide" style={{ fontFamily: 'Georgia, serif' }}>
+                <h1 className="text-base font-bold tracking-wide leading-none text-[#2A1810]" style={{ fontFamily: 'Georgia, serif' }}>
                   Mausritter
                 </h1>
                 {activeParty && (
-                  <p className="text-amber-200 text-xs md:text-sm truncate">
+                  <p className="text-[#8A5A4A] text-xs truncate leading-none mt-0.5">
                     {activeParty.name}
-                    {activeCharacter && <span> • {activeCharacter.name}</span>}
+                    {activeCharacter && <span> · {activeCharacter.name}</span>}
                     {activeCharacter?.hp && (
-                      <span className="hidden md:inline"> • HP {activeCharacter.hp.current}/{activeCharacter.hp.max}</span>
+                      <span className="hidden md:inline"> · HP {activeCharacter.hp.current}/{activeCharacter.hp.max}</span>
                     )}
-                    {activeParty.gameTime && <span> • D{activeParty.gameTime.day}</span>}
+                    {activeParty.gameTime && <span> · D{activeParty.gameTime.day}</span>}
                   </p>
                 )}
               </div>
@@ -2345,7 +2342,7 @@ function MausritterSoloCompanion() {
                       className={`text-xs px-2 py-1 rounded ${
                         syncStatus === 'saving' ? 'bg-yellow-600 text-yellow-100' :
                         syncStatus === 'error' ? 'bg-red-600 text-red-100' :
-                        'bg-green-700 text-green-100'
+                        'bg-[#5A8A5A] text-white'
                       }`}
                       title={lastSyncTime ? `Lokální soubor\nPoslední sync: ${lastSyncTime.toLocaleTimeString('cs-CZ')}` : 'Lokální soubor'}
                     >
@@ -2353,7 +2350,7 @@ function MausritterSoloCompanion() {
                     </span>
                     <button
                       onClick={disconnectFile}
-                      className="px-1.5 py-1 bg-green-700/50 hover:bg-red-600 rounded text-xs transition-colors"
+                      className="px-1.5 py-1 bg-[#FFD8A8] hover:bg-[#E36A6A] text-[#2A1810] rounded text-xs transition-colors"
                       title="Odpojit lokální soubor"
                     >
                       ✕
@@ -2369,7 +2366,7 @@ function MausritterSoloCompanion() {
                       }
                       connectToFile();
                     }}
-                    className="px-2 py-1.5 bg-green-700/70 hover:bg-green-600 rounded text-xs font-medium transition-colors cursor-pointer"
+                    className="px-2 py-1.5 bg-[#FFD8A8]/70 hover:bg-[#FFD8A8] text-[#2A1810] rounded text-xs font-medium transition-colors cursor-pointer"
                     title="Sync do lokálního souboru (pouze Chrome/Edge)"
                   >
                     📄 Lokální
@@ -2386,7 +2383,7 @@ function MausritterSoloCompanion() {
                       className={`text-xs px-2 py-1.5 rounded flex items-center gap-1 cursor-pointer transition-colors ${
                         googleSyncStatus === 'saving' ? 'bg-yellow-600 text-yellow-100 hover:bg-yellow-500' :
                         googleSyncStatus === 'error' ? 'bg-red-600 text-red-100 hover:bg-red-500' :
-                        'bg-blue-600 text-blue-100 hover:bg-blue-500'
+                        'bg-[#E36A6A] text-white hover:bg-[#C84848]'
                       }`}
                       title={googleLastSync ? `Uložit na Google Drive\n${googleDriveFileName || 'Nový soubor'}\nPoslední sync: ${googleLastSync.toLocaleTimeString('cs-CZ')}` : 'Uložit na Google Drive'}
                     >
@@ -2394,33 +2391,33 @@ function MausritterSoloCompanion() {
                     </button>
                     <button
                       onClick={openLoadDialog}
-                      className="text-xs px-2 py-1.5 rounded bg-blue-600 text-blue-100 hover:bg-blue-500 cursor-pointer transition-colors"
+                      className="text-xs px-2 py-1.5 rounded bg-[#FFD8A8] text-[#2A1810] hover:bg-[#FFC090] cursor-pointer transition-colors"
                       title="Načíst z Google Drive"
                     >
                       📂 Load
                     </button>
                     <button
                       onClick={() => setShowNewGameDialog(true)}
-                      className="text-xs px-2 py-1.5 rounded bg-amber-600 text-amber-100 hover:bg-amber-500 cursor-pointer transition-colors"
+                      className="text-xs px-2 py-1.5 rounded bg-[#E36A6A] text-white hover:bg-[#C84848] cursor-pointer transition-colors"
                       title="Nová hra"
                     >
                       🆕 New
                     </button>
-                    <button onClick={disconnectGoogleDrive} className="px-1.5 py-1 bg-blue-600/50 hover:bg-red-600 rounded text-xs transition-colors" title="Odpojit Google Drive">✕</button>
+                    <button onClick={disconnectGoogleDrive} className="px-1.5 py-1 bg-[#FFD8A8] hover:bg-[#E36A6A] text-[#2A1810] rounded text-xs transition-colors" title="Odpojit Google Drive">✕</button>
                   </>
                 ) : (
                   <>
                     <button
                       type="button"
                       onClick={connectGoogleDrive}
-                      className="px-2 py-1.5 bg-blue-600 hover:bg-blue-500 rounded text-xs font-medium transition-colors cursor-pointer"
+                      className="px-2 py-1.5 bg-[#E36A6A] text-white hover:bg-[#C84848] rounded text-xs font-medium transition-colors cursor-pointer"
                       title="Připojit Google Drive"
                     >
                       ☁️ Připojit Drive
                     </button>
                     <button
                       onClick={() => setShowNewGameDialog(true)}
-                      className="text-xs px-2 py-1.5 rounded bg-amber-600 text-amber-100 hover:bg-amber-500 cursor-pointer transition-colors"
+                      className="text-xs px-2 py-1.5 rounded bg-[#E36A6A] text-white hover:bg-[#C84848] cursor-pointer transition-colors"
                       title="Nová hra - vymazat vše"
                     >
                       🆕 New
@@ -2430,37 +2427,37 @@ function MausritterSoloCompanion() {
               </div>
 
               {/* Multiplayer */}
-              <div className="flex items-center gap-1 border-l border-amber-700 pl-2 ml-1">
+              <div className="flex items-center gap-1 border-l border-[#FFD8A8] pl-2 ml-1">
                 {roomConnected ? (() => {
                   const myPlayer = roomPlayers.find(p => p.oderId === myUserId);
                   return (
                   <>
                     <span
-                      className={`text-xs px-2 py-1 rounded ${isGM ? 'bg-purple-600 text-purple-100' : 'bg-green-600 text-green-100'}`}
+                      className={`text-xs px-2 py-1 rounded ${isGM ? 'bg-[#E36A6A] text-white' : 'bg-[#FFD8A8] text-[#2A1810]'}`}
                       title={myPlayer ? `Přihlášen jako: ${myPlayer.name} (${isGM ? 'GM' : 'hráč'})` : ''}
                     >
                       {isGM ? '👑' : '🐭'} {myPlayer?.name || (isGM ? 'GM' : 'Hráč')}
                     </span>
-                    <span className="text-xs px-2 py-1 rounded bg-stone-600 text-stone-300" title={`Kód: ${roomCode}`}>
+                    <span className="text-xs px-2 py-1 rounded bg-[#FFD8A8] text-[#2A1810]" title={`Kód: ${roomCode}`}>
                       🎮 {roomName || roomCode}
                     </span>
                     <button
                       onClick={() => setShowPlayersDialog(true)}
-                      className="text-xs px-1.5 py-1 bg-purple-600/70 hover:bg-purple-500 rounded transition-colors"
+                      className="text-xs px-1.5 py-1 bg-[#E36A6A]/70 hover:bg-[#E36A6A] text-white rounded transition-colors"
                       title="Zobrazit hráče"
                     >
                       👥{roomPlayers.length}
                     </button>
                     <button
                       onClick={copyRoomLink}
-                      className="px-1.5 py-1 bg-purple-600/70 hover:bg-purple-500 rounded text-xs transition-colors"
+                      className="px-1.5 py-1 bg-[#FFD8A8] hover:bg-[#FFC090] text-[#2A1810] rounded text-xs transition-colors"
                       title="Kopírovat odkaz na místnost"
                     >
                       📋
                     </button>
                     <button
                       onClick={leaveRoom}
-                      className="px-1.5 py-1 bg-purple-600/50 hover:bg-red-600 rounded text-xs transition-colors"
+                      className="px-1.5 py-1 bg-[#FFD8A8] hover:bg-[#E36A6A] text-[#2A1810] rounded text-xs transition-colors"
                       title="Opustit místnost"
                     >
                       ✕
@@ -2476,7 +2473,7 @@ function MausritterSoloCompanion() {
                         return (
                           <button
                             onClick={() => joinRoom(creds.roomCode, creds.playerName, creds.playerPin)}
-                            className="px-2 py-1.5 bg-green-600 hover:bg-green-500 rounded text-xs font-medium transition-colors"
+                            className="px-2 py-1.5 bg-[#FFD8A8] hover:bg-[#FFC090] text-[#2A1810] rounded text-xs font-medium transition-colors"
                             title={`Rychlé připojení: ${creds.roomCode} jako ${creds.playerName}`}
                           >
                             ⚡ {creds.roomName || creds.roomCode}
@@ -2487,14 +2484,14 @@ function MausritterSoloCompanion() {
                     })()}
                     <button
                       onClick={() => setShowCreateRoomDialog(true)}
-                      className="px-2 py-1.5 bg-purple-600 hover:bg-purple-500 rounded text-xs font-medium transition-colors"
+                      className="px-2 py-1.5 bg-[#E36A6A] hover:bg-[#C84848] text-white rounded text-xs font-medium transition-colors"
                       title="Vytvořit multiplayer místnost (jako GM)"
                     >
                       🎮 Místnost
                     </button>
                     <button
                       onClick={() => setShowJoinRoomDialog(true)}
-                      className="px-2 py-1.5 bg-purple-600/70 hover:bg-purple-500 rounded text-xs font-medium transition-colors"
+                      className="px-2 py-1.5 bg-[#E36A6A]/70 hover:bg-[#E36A6A] text-white rounded text-xs font-medium transition-colors"
                       title="Připojit se k místnosti (jako hráč)"
                     >
                       🚪
@@ -2503,8 +2500,8 @@ function MausritterSoloCompanion() {
                 )}
               </div>
 
-              <button onClick={handleExport} className="px-3 py-1.5 bg-amber-700 hover:bg-amber-600 rounded text-sm font-medium transition-colors" title="Exportovat save">📤</button>
-              <label className="px-3 py-1.5 bg-amber-700 hover:bg-amber-600 rounded text-sm font-medium cursor-pointer transition-colors" title="Importovat save">
+              <button onClick={handleExport} className="px-3 py-1.5 bg-[#E36A6A] hover:bg-[#C84848] rounded text-sm font-medium transition-colors" title="Exportovat save">📤</button>
+              <label className="px-3 py-1.5 bg-[#E36A6A] hover:bg-[#C84848] rounded text-sm font-medium cursor-pointer transition-colors" title="Importovat save">
                 📥
                 <input type="file" accept=".json" onChange={handleImport} className="hidden" />
               </label>
@@ -2513,7 +2510,7 @@ function MausritterSoloCompanion() {
             {/* Mobile: Hamburger button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded hover:bg-amber-700 transition-colors"
+              className="md:hidden p-2 rounded hover:bg-[#FFD8A8]/60 transition-colors"
               title="Menu"
             >
               <span className="text-xl">{mobileMenuOpen ? '✕' : '☰'}</span>
@@ -2522,14 +2519,14 @@ function MausritterSoloCompanion() {
 
           {/* Mobile dropdown menu */}
           {mobileMenuOpen && (
-            <div className="md:hidden mt-3 pt-3 border-t border-amber-700 space-y-2">
+            <div className="md:hidden mt-3 pt-3 border-t border-[#FFD8A8] space-y-2 text-[#2A1810]">
               {/* Local sync */}
               <div className="flex items-center justify-between">
                 <span className="text-sm">📄 Lokální soubor</span>
                 {fileHandle ? (
                   <div className="flex items-center gap-2">
                     <span className={`text-xs px-2 py-1 rounded ${
-                      syncStatus === 'saving' ? 'bg-yellow-600' : syncStatus === 'error' ? 'bg-red-600' : 'bg-green-700'
+                      syncStatus === 'saving' ? 'bg-yellow-600' : syncStatus === 'error' ? 'bg-red-600' : 'bg-[#5A8A5A]'
                     }`}>
                       {syncStatus === 'saving' ? '⏳ Ukládám' : syncStatus === 'error' ? '❌ Chyba' : '✓ Připojeno'}
                     </span>
@@ -2545,7 +2542,7 @@ function MausritterSoloCompanion() {
                       connectToFile();
                       setMobileMenuOpen(false);
                     }}
-                    className="px-3 py-1.5 bg-green-700 hover:bg-green-600 rounded text-xs font-medium"
+                    className="px-3 py-1.5 bg-[#FFD8A8] hover:bg-[#FFC090] text-[#2A1810] rounded text-xs font-medium"
                   >
                     Připojit
                   </button>
@@ -2560,20 +2557,20 @@ function MausritterSoloCompanion() {
                     <button
                       onClick={() => { openSaveDialog(); setMobileMenuOpen(false); }}
                       className={`text-xs px-2 py-1.5 rounded ${
-                        googleSyncStatus === 'saving' ? 'bg-yellow-600' : googleSyncStatus === 'error' ? 'bg-red-600' : 'bg-blue-600'
+                        googleSyncStatus === 'saving' ? 'bg-yellow-600' : googleSyncStatus === 'error' ? 'bg-red-600' : 'bg-[#E36A6A] text-white'
                       }`}
                     >
                       💾 Save
                     </button>
                     <button
                       onClick={() => { openLoadDialog(); setMobileMenuOpen(false); }}
-                      className="text-xs px-2 py-1.5 rounded bg-blue-600"
+                      className="text-xs px-2 py-1.5 rounded bg-[#FFD8A8] text-[#2A1810]"
                     >
                       📂 Load
                     </button>
                     <button
                       onClick={() => { setShowNewGameDialog(true); setMobileMenuOpen(false); }}
-                      className="text-xs px-2 py-1.5 rounded bg-amber-600"
+                      className="text-xs px-2 py-1.5 rounded bg-[#E36A6A] text-white"
                     >
                       🆕 New
                     </button>
@@ -2582,7 +2579,7 @@ function MausritterSoloCompanion() {
                 ) : (
                   <button
                     onClick={() => { connectGoogleDrive(); setMobileMenuOpen(false); }}
-                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 rounded text-xs font-medium"
+                    className="px-3 py-1.5 bg-[#E36A6A] text-white hover:bg-[#C84848] rounded text-xs font-medium"
                   >
                     Připojit
                   </button>
@@ -2590,16 +2587,16 @@ function MausritterSoloCompanion() {
               </div>
 
               {/* Multiplayer */}
-              <div className="flex items-center justify-between pt-2 border-t border-amber-700">
+              <div className="flex items-center justify-between pt-2 border-t border-[#FFD8A8]">
                 <span className="text-sm">🎮 Multiplayer</span>
                 {roomConnected ? (
                   <div className="flex items-center gap-2">
-                    <span className="text-xs px-2 py-1 rounded bg-purple-600">
+                    <span className="text-xs px-2 py-1 rounded bg-[#FFD8A8] text-[#2A1810]">
                       {roomCode} • 👥{roomPlayers.length}
                     </span>
                     <button
                       onClick={() => { copyRoomLink(); setMobileMenuOpen(false); }}
-                      className="px-2 py-1 bg-purple-600 hover:bg-purple-500 rounded text-xs"
+                      className="px-2 py-1 bg-[#FFD8A8] hover:bg-[#FFC090] text-[#2A1810] rounded text-xs"
                     >
                       📋
                     </button>
@@ -2614,13 +2611,13 @@ function MausritterSoloCompanion() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => { setShowCreateRoomDialog(true); setMobileMenuOpen(false); }}
-                      className="px-2 py-1.5 bg-purple-600 hover:bg-purple-500 rounded text-xs font-medium"
+                      className="px-2 py-1.5 bg-[#E36A6A] hover:bg-[#C84848] text-white rounded text-xs font-medium"
                     >
                       Vytvořit
                     </button>
                     <button
                       onClick={() => { setShowJoinRoomDialog(true); setMobileMenuOpen(false); }}
-                      className="px-2 py-1.5 bg-purple-600/70 hover:bg-purple-500 rounded text-xs font-medium"
+                      className="px-2 py-1.5 bg-[#E36A6A]/70 hover:bg-[#E36A6A] text-white rounded text-xs font-medium"
                     >
                       Připojit
                     </button>
@@ -2629,7 +2626,7 @@ function MausritterSoloCompanion() {
               </div>
 
               {/* New Game button - always visible */}
-              <div className="flex items-center justify-between pt-2 border-t border-amber-700">
+              <div className="flex items-center justify-between pt-2 border-t border-[#FFD8A8]">
                 <span className="text-sm">🆕 Nová hra</span>
                 <button
                   onClick={() => { setShowNewGameDialog(true); setMobileMenuOpen(false); }}
@@ -2640,11 +2637,11 @@ function MausritterSoloCompanion() {
               </div>
 
               {/* Export/Import */}
-              <div className="flex gap-2 pt-2 border-t border-amber-700">
-                <button onClick={() => { handleExport(); setMobileMenuOpen(false); }} className="flex-1 px-3 py-2 bg-amber-700 hover:bg-amber-600 rounded text-sm font-medium">
+              <div className="flex gap-2 pt-2 border-t border-[#FFD8A8]">
+                <button onClick={() => { handleExport(); setMobileMenuOpen(false); }} className="flex-1 px-3 py-2 bg-[#E36A6A] hover:bg-[#C84848] rounded text-sm font-medium">
                   📤 Export
                 </button>
-                <label className="flex-1 px-3 py-2 bg-amber-700 hover:bg-amber-600 rounded text-sm font-medium cursor-pointer text-center">
+                <label className="flex-1 px-3 py-2 bg-[#E36A6A] hover:bg-[#C84848] rounded text-sm font-medium cursor-pointer text-center">
                   📥 Import
                   <input type="file" accept=".json" onChange={(e) => { handleImport(e); setMobileMenuOpen(false); }} className="hidden" />
                 </label>
@@ -2655,20 +2652,20 @@ function MausritterSoloCompanion() {
       </header>
 
       {/* Navigation */}
-      <nav className="bg-amber-800/90 backdrop-blur-sm shadow-lg sticky top-[76px] z-40">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex gap-1 overflow-x-auto lg:overflow-visible py-2 scrollbar-hide">
+      <nav className="bg-[#FFFBF1] border-b border-[#FFD8A8] sticky top-[44px] z-40">
+        <div className="max-w-[1340px] mx-auto px-4">
+          <div className="flex gap-0.5 overflow-x-auto py-1 hide-scrollbar">
             {panels.map(panel => (
               <button
                 key={panel.id}
                 onClick={() => setActivePanel(panel.id)}
-                className={`px-4 py-2.5 rounded-lg font-bold transition-all duration-200 whitespace-nowrap flex items-center gap-2 ${
+                className={`px-2.5 py-1 rounded font-medium transition-all duration-150 whitespace-nowrap flex items-center gap-1 text-[11px] uppercase tracking-wide ${
                   activePanel === panel.id
-                    ? 'bg-amber-50 text-amber-900 shadow-lg'
-                    : 'text-amber-100 hover:bg-amber-700'
+                    ? 'bg-[#E36A6A] text-white shadow-sm'
+                    : 'text-[#8A5A4A] hover:bg-[#FFD8A8]/60 hover:text-[#2A1810]'
                 }`}
               >
-                <span className="text-lg">{panel.icon}</span>
+                <span className="text-[13px]">{panel.icon}</span>
                 <span className="hidden sm:inline">{panel.label}</span>
               </button>
             ))}
@@ -2699,16 +2696,19 @@ function MausritterSoloCompanion() {
         }}
       />
 
-      {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-6 overflow-hidden">
-        {activePanel === 'playarea'  && <PlayArea />}
-        {activePanel === 'journal'   && <JournalPanel onExport={handleExport} />}
-        {activePanel === 'character' && <CharacterPanel />}
-        {activePanel === 'oracle'    && <OraclePanel />}
-        {activePanel === 'timehub'   && <TimeHub />}
-        {activePanel === 'worldhub'  && <WorldHub />}
-        {activePanel === 'tools'     && <ToolsHub />}
-      </main>
+      {/* Main Content + Right Sidebar (L6 layout) */}
+      <div className="max-w-[1340px] mx-auto px-4 py-4 flex gap-4 items-start">
+        <main className="flex-1 min-w-0 overflow-hidden">
+          {activePanel === 'playarea'  && <PlayArea />}
+          {activePanel === 'journal'   && <JournalPanel onExport={handleExport} />}
+          {activePanel === 'character' && <CharacterPanel />}
+          {activePanel === 'oracle'    && <OraclePanel />}
+          {activePanel === 'timehub'   && <TimeHub />}
+          {activePanel === 'worldhub'  && <WorldHub />}
+          {activePanel === 'tools'     && <ToolsHub />}
+        </main>
+        <RightSidebar activePanel={activePanel} />
+      </div>
 
       {/* TimeBar - sledování času (jen pokud je aktivní družina) */}
       {activeParty && <TimeBar />}
@@ -2717,13 +2717,13 @@ function MausritterSoloCompanion() {
       <FloatingDice />
 
       {/* Footer */}
-      <footer className="bg-amber-900 text-amber-200 text-center py-4 mt-8">
+      <footer className="bg-[#FFF5DC] border-t-2 border-[#FFD8A8] text-[#8A5A4A] text-center py-3 mt-8">
         <p className="text-sm">
           🐭 Mausritter Solo Companion • Pro sólo hráče Mausritter RPG
         </p>
         <button
           onClick={() => setShowSessionEnd(true)}
-          className="mt-2 text-xs text-amber-400 hover:text-amber-200 underline transition-colors"
+          className="mt-2 text-xs text-[#E36A6A] hover:text-[#C84848] underline transition-colors"
         >
           🌙 Ukončit session
         </button>

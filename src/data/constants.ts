@@ -1973,6 +1973,7 @@ export const ORIGINS = {
 
 // Počáteční zbraně k výběru
 export const STARTING_WEAPONS = [
+  { name: 'Klacek', damage: 'k6', weight: 'improvised', slots: 1 },
   { name: 'Jehla', damage: 'k6', weight: 'light', slots: 1 },
   { name: 'Dýka', damage: 'k6', weight: 'light', slots: 1 },
   { name: 'Hůl', damage: 'k6', weight: 'light', slots: 1 },
@@ -1980,7 +1981,10 @@ export const STARTING_WEAPONS = [
   { name: 'Sekera', damage: 'k6/k8', weight: 'medium', slots: 1 },
   { name: 'Kladivo', damage: 'k6/k8', weight: 'medium', slots: 1 },
   { name: 'Kopí', damage: 'k10', weight: 'heavy', slots: 2 },
-  { name: 'Hák', damage: 'k10', weight: 'heavy', slots: 2 }
+  { name: 'Hák', damage: 'k10', weight: 'heavy', slots: 2 },
+  { name: 'Prak', damage: 'k6', weight: 'ranged_light', slots: 1 },
+  { name: 'Ruční kuše', damage: 'k6', weight: 'ranged_light', slots: 1 },
+  { name: 'Luk', damage: 'k8', weight: 'ranged_heavy', slots: 2 },
 ];
 
 // Backward compatibility aliases

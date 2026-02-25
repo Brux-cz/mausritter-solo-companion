@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { generateId, formatTimestamp, rollD6, rollD10, randomFrom } from '../utils/helpers';
 import {
   FIRST_NAMES, LAST_NAMES, BIRTHSIGNS, PHYSICAL_DETAILS, HIRELING_TYPES,
+  ORIGINS, FUR_COLORS, FUR_PATTERNS, DISTINCTIVE_FEATURES,
   DEFAULT_SCENE_STATE, SCENE_ALTERATION_TABLE, INTERRUPTED_SCENE_FOCUS, SCENE_TYPE_LABELS
 } from '../data/constants';
 import type {
@@ -65,6 +66,7 @@ interface GameStoreState extends GameState {
   updateSceneState: (updates: Partial<SceneState>) => void;
   startScene: (title: string, type: SceneType) => { scene: Scene; checkResult: SceneCheckResult; alteration?: string; focus?: string };
   endScene: (outcome: SceneOutcome) => void;
+  cancelScene: () => void;
   adjustChaosFactor: (delta: number) => void;
   addThread: (description: string) => void;
   removeThread: (threadId: string) => void;
@@ -237,24 +239,62 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   },
 
   createPC: (partyId, characterData = null) => {
-    const newChar: any = characterData || {
-      id: generateId(),
-      type: 'pc',
-      name: `${randomFrom(FIRST_NAMES)} ${randomFrom(LAST_NAMES)}`,
-      pronouns: '',
-      level: 1,
-      STR: { current: 10, max: 10 },
-      DEX: { current: 10, max: 10 },
-      WIL: { current: 10, max: 10 },
-      hp: { current: 6, max: 6 },
-      pips: 0,
-      xp: 0,
-      birthsign: randomFrom(BIRTHSIGNS),
-      physicalDetail: randomFrom(PHYSICAL_DETAILS),
-      conditions: [],
-      inventory: [],
-      spells: []
-    };
+    let newChar: any = characterData;
+    if (!newChar) {
+      // Roll attributes: 3k6 keep two highest
+      const roll3k6keep2 = () => {
+        const rolls = [rollD6(), rollD6(), rollD6()].sort((a, b) => b - a);
+        return rolls[0] + rolls[1];
+      };
+      const str = roll3k6keep2();
+      const dex = roll3k6keep2();
+      const wil = roll3k6keep2();
+      const hp = rollD6();
+      const pips = rollD6();
+
+      // Origin lookup (HP × Pips table)
+      const originKey = `${hp}-${pips}`;
+      const origin = (ORIGINS as any)[originKey] || ORIGINS['1-1'];
+
+      // Physical details
+      const furColor = randomFrom(FUR_COLORS);
+      const furPattern = randomFrom(FUR_PATTERNS);
+      const featureKey = `${rollD6()}-${rollD6()}`;
+      const distinctiveFeature = (DISTINCTIVE_FEATURES as any)[featureKey] || 'Běžný vzhled';
+      const birthsign = randomFrom(BIRTHSIGNS);
+
+      // Bonus items: maxAttr ≤9 → 1 bonus item; ≤7 → 2 bonus items
+      const maxAttr = Math.max(str, dex, wil);
+      const bonusItemCount = maxAttr <= 7 ? 2 : maxAttr <= 9 ? 1 : 0;
+
+      newChar = {
+        id: generateId(),
+        type: 'pc',
+        name: `${randomFrom(FIRST_NAMES)} ${randomFrom(LAST_NAMES)}`,
+        pronouns: '',
+        level: 1,
+        STR: { current: str, max: str },
+        DEX: { current: dex, max: dex },
+        WIL: { current: wil, max: wil },
+        hp: { current: hp, max: hp },
+        pips,
+        xp: 0,
+        origin,
+        birthsign,
+        fur: { color: furColor, pattern: furPattern },
+        distinctiveFeature,
+        physicalDetail: distinctiveFeature,
+        bonusItemCount,
+        conditions: [],
+        inventory: [
+          { id: generateId(), name: 'Zásoby', slots: 1, usageDots: 0, maxUsage: 3 },
+          { id: generateId(), name: 'Pochodně', slots: 1, usageDots: 0, maxUsage: 3 },
+          { id: generateId(), name: origin.itemA, slots: 1, usageDots: 0, maxUsage: 3 },
+          { id: generateId(), name: origin.itemB, slots: 1, usageDots: 0, maxUsage: 3 },
+        ],
+        spells: []
+      };
+    }
     if (!newChar.id) newChar.id = generateId();
     if (!newChar.type) newChar.type = 'pc';
     get().addCharacterToParty(partyId, newChar);
@@ -510,6 +550,18 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       chaosAfter: cfAfter,
       content
     } as any);
+  },
+
+  cancelScene: () => {
+    const sceneState = get().getSceneState();
+    if (!sceneState.currentScene) return;
+    const sceneNumber = sceneState.currentScene.number;
+    // Smaž scene_start entry a vše co přišlo po něm (patří k této scéně)
+    const journal = get().journal;
+    const sceneStartIdx = journal.findIndex(e => e.type === 'scene_start' && (e as any).sceneNumber === sceneNumber);
+    const newJournal = sceneStartIdx >= 0 ? journal.slice(0, sceneStartIdx) : journal;
+    set({ journal: newJournal });
+    get().updateSceneState({ currentScene: null, sceneCount: sceneState.sceneCount - 1 });
   },
 
   adjustChaosFactor: (delta) => {

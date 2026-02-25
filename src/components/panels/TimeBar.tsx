@@ -103,7 +103,7 @@ const TimeBar = () => {
         <div
           key={i}
           className={`h-2 flex-1 rounded-sm ${
-            filled ? 'bg-amber-500' : 'bg-stone-300'
+            filled ? 'bg-[#E36A6A]' : 'bg-[#FFD8A8]'
           } ${isThird ? 'mr-1' : 'mr-px'}`}
         />
       );
@@ -114,14 +114,14 @@ const TimeBar = () => {
   return (
     <>
       {/* Hlavní TimeBar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-stone-800 text-stone-100 z-40 shadow-lg border-t border-stone-700">
+      <div className="fixed bottom-0 left-0 right-0 bg-[#FFF5DC] text-[#2A1810] z-40 shadow-sm border-t-2 border-[#FFD8A8]">
         <div className="max-w-4xl mx-auto px-2 py-2">
           {/* Kompaktní layout pro mobil */}
           <div className="flex items-center gap-2 text-sm">
             {/* Den a sezóna */}
             <button
               onClick={() => setShowSettings(!showSettings)}
-              className="flex items-center gap-1 px-2 py-1 bg-stone-700 rounded hover:bg-stone-600 transition-colors"
+              className="flex items-center gap-1 px-2 py-1 bg-[#FFD8A8]/60 rounded hover:bg-[#FFD8A8] transition-colors"
             >
               <span className="text-base">{currentSeason.icon}</span>
               <span className="font-medium">D{day}</span>
@@ -134,10 +134,10 @@ const TimeBar = () => {
                   key={w.id}
                   className={`w-7 h-7 flex items-center justify-center rounded text-base ${
                     w.id === watch
-                      ? 'bg-amber-500 text-white'
+                      ? 'bg-[#E36A6A] text-white'
                       : w.id < watch
-                      ? 'bg-stone-600 text-stone-400'
-                      : 'bg-stone-700 text-stone-500'
+                      ? 'bg-[#FFD8A8] text-[#C09A80]'
+                      : 'bg-[#FFF5DC] text-[#C09A80] border border-[#FFD8A8]'
                   } ${restedToday && w.id < watch ? 'ring-1 ring-green-400' : ''}`}
                   title={w.name}
                 >
@@ -148,7 +148,7 @@ const TimeBar = () => {
 
             {/* Směny */}
             <div className="flex-1 flex items-center gap-2">
-              <span className="text-xs text-stone-400 whitespace-nowrap">{turn}/36</span>
+              <span className="text-xs text-[#C09A80] whitespace-nowrap">{turn}/36</span>
               <div className="flex-1 flex items-center gap-px">
                 {renderTurnProgress()}
               </div>
@@ -161,7 +161,7 @@ const TimeBar = () => {
               const next = activeEvents.sort((a, b) => a.targetDay - b.targetDay)[0];
               const daysLeft = next ? next.targetDay - day : 0;
               return (
-                <div className={`px-2 py-1 rounded text-xs ${urgent.length > 0 ? 'bg-orange-600' : 'bg-stone-700'}`} title={next?.title}>
+                <div className={`px-2 py-1 rounded text-xs ${urgent.length > 0 ? 'bg-orange-600' : 'bg-[#FFD8A8]/60'}`} title={next?.title}>
                   ⏰ {activeEvents.length}{daysLeft <= 1 && daysLeft >= 0 ? '!' : ''}
                 </div>
               );
@@ -171,21 +171,21 @@ const TimeBar = () => {
             <div className="flex gap-1">
               <button
                 onClick={addTurn}
-                className="px-2 py-1 bg-amber-600 hover:bg-amber-500 rounded text-xs font-medium transition-colors"
+                className="px-2 py-1 bg-[#E36A6A] hover:bg-[#C84848] text-white rounded text-xs font-medium transition-colors"
                 title="Přidat směnu"
               >
                 +1
               </button>
               <button
                 onClick={markRest}
-                className="px-2 py-1 bg-blue-600 hover:bg-blue-500 rounded text-xs transition-colors"
+                className="px-2 py-1 bg-[#5A8A5A] hover:bg-[#4A7A4A] text-white rounded text-xs transition-colors"
                 title="Odpočinek (celá hlídka)"
               >
                 💤
               </button>
               <button
                 onClick={nextWatch}
-                className="px-2 py-1 bg-stone-600 hover:bg-stone-500 rounded text-xs transition-colors"
+                className="px-2 py-1 bg-[#FFD8A8] hover:bg-[#FFC090] text-[#2A1810] rounded text-xs transition-colors"
                 title="Další hlídka"
               >
                 →
@@ -195,19 +195,19 @@ const TimeBar = () => {
 
           {/* Rozšířené nastavení */}
           {showSettings && (
-            <div className="mt-2 pt-2 border-t border-stone-700 flex flex-wrap items-center gap-2 text-xs">
-              <span className="text-stone-400">Den:</span>
-              <button onClick={() => adjustDay(-1)} className="px-2 py-1 bg-stone-700 rounded hover:bg-stone-600">-</button>
+            <div className="mt-2 pt-2 border-t border-[#FFD8A8] flex flex-wrap items-center gap-2 text-xs">
+              <span className="text-[#C09A80]">Den:</span>
+              <button onClick={() => adjustDay(-1)} className="px-2 py-1 bg-[#FFD8A8]/60 rounded hover:bg-[#FFD8A8] text-[#2A1810]">-</button>
               <span className="font-medium w-8 text-center">{day}</span>
-              <button onClick={() => adjustDay(1)} className="px-2 py-1 bg-stone-700 rounded hover:bg-stone-600">+</button>
+              <button onClick={() => adjustDay(1)} className="px-2 py-1 bg-[#FFD8A8]/60 rounded hover:bg-[#FFD8A8] text-[#2A1810]">+</button>
 
-              <span className="text-stone-400 ml-2">Sezóna:</span>
-              <button onClick={cycleSeason} className="px-2 py-1 bg-stone-700 rounded hover:bg-stone-600">
+              <span className="text-[#C09A80] ml-2">Sezóna:</span>
+              <button onClick={cycleSeason} className="px-2 py-1 bg-[#FFD8A8]/60 rounded hover:bg-[#FFD8A8] text-[#2A1810]">
                 {currentSeason.icon} {currentSeason.name}
               </button>
 
               {partyName && (
-                <span className="ml-auto text-stone-500">🐭 {partyName}</span>
+                <span className="ml-auto text-[#C09A80]">🐭 {partyName}</span>
               )}
             </div>
           )}

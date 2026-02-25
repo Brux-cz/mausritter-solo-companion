@@ -435,12 +435,12 @@ const JournalPanel = ({ onExport }) => {
             {confirmDeleteId === entry.id ? (
               <div className="flex gap-1 text-xs whitespace-nowrap">
                 <button onMouseDown={(e) => { e.preventDefault(); deleteEntry(entry.id); }} className="text-red-500 hover:text-red-700">Smazat?</button>
-                <button onMouseDown={(e) => { e.preventDefault(); setConfirmDeleteId(null); }} className="text-stone-400 hover:text-stone-600">Ne</button>
+                <button onMouseDown={(e) => { e.preventDefault(); setConfirmDeleteId(null); }} className="text-amber-400 hover:text-amber-600">Ne</button>
               </div>
             ) : (
               <button
                 onMouseDown={(e) => { e.preventDefault(); setConfirmDeleteId(entry.id); }}
-                className="text-stone-300 hover:text-red-400 text-sm"
+                className="text-amber-300 hover:text-red-400 text-sm"
                 title="Smazat"
               >
                 ×
@@ -454,18 +454,21 @@ const JournalPanel = ({ onExport }) => {
     switch (entry.type) {
       case 'narrative':
         return (
-          <div className="my-3 cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
-               onClick={() => startEdit(entry)}
-               title="Klikni pro úpravu">
+          <div
+            className="my-2 cursor-pointer hover:opacity-90 transition-opacity"
+            style={{ padding:'8px 12px', borderRadius:6, borderLeft:'2px solid #FFC090', background:'#FFFBF1', fontSize:13, lineHeight:1.65, color:'#8A5A4A', fontFamily:'ui-serif, Georgia, serif' }}
+            onClick={() => startEdit(entry)}
+            title="Klikni pro úpravu"
+          >
             {entry.authorName && (
-              <span className="text-xs font-medium text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded mr-2">
+              <span className="text-xs font-medium px-1.5 py-0.5 rounded mr-2" style={{ color:'#8A5A4A', background:'#FFD8A8' }}>
                 {entry.authorName}
               </span>
             )}
-            <span className="text-stone-800 italic leading-relaxed">
+            <span className="italic">
               {renderContent(entry.content)}
             </span>
-            {entry.edited && <span className="text-xs text-stone-400 ml-1">✎</span>}
+            {entry.edited && <span className="text-xs ml-1" style={{ color:'#C09A80' }}>✎</span>}
           </div>
         );
 
@@ -478,10 +481,10 @@ const JournalPanel = ({ onExport }) => {
                  onClick={() => setDetailModal({ type: 'creature', data: c, note: entry.note })}
                  title="Klikni pro detail">
               <p className="font-bold text-amber-900 truncate">
-                {c.type?.icon || '🐭'} {c.name} <span className="font-normal text-stone-500">— {c.type?.name}</span>
+                {c.type?.icon || '🐭'} {c.name} <span className="font-normal text-amber-800/60">— {c.type?.name}</span>
               </p>
-              <p className="text-stone-600 text-sm truncate">Je {c.personality}</p>
-              {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
+              <p className="text-amber-800/70 text-sm truncate">Je {c.personality}</p>
+              {entry.note && <p className="text-amber-900/80 italic text-sm mt-1 border-t border-amber-200 pt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
             </div>
           );
         }
@@ -506,10 +509,10 @@ const JournalPanel = ({ onExport }) => {
                  onClick={() => startEdit(entry)}
                  title="Klikni pro úpravu">
               <p className="font-bold text-amber-900 truncate">
-                🐭 {name} {typePart && <span className="font-normal text-stone-500">— {typePart}</span>}
+                🐭 {name} {typePart && <span className="font-normal text-amber-800/60">— {typePart}</span>}
               </p>
-              {personality && <p className="text-stone-600 text-sm truncate">{personality}</p>}
-              {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
+              {personality && <p className="text-amber-800/70 text-sm truncate">{personality}</p>}
+              {entry.note && <p className="text-amber-900/80 italic text-sm mt-1 border-t border-amber-200 pt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
             </div>
           );
         }
@@ -520,22 +523,22 @@ const JournalPanel = ({ onExport }) => {
             <div className="my-2 pl-4 border-l-2 border-red-400 cursor-pointer hover:bg-red-50 rounded transition-colors overflow-hidden"
                  onClick={() => setDetailModal({ type: 'encounter', data: { creature: e.creature?.name || e.creature, activity: e.activity, danger: e.danger }, note: entry.note })}
                  title="Klikni pro detail">
-              <p className="font-bold text-stone-800 truncate">
+              <p className="font-bold text-amber-900 truncate">
                 {e.danger ? '⚠️' : '👁️'} {e.creature?.name}
               </p>
-              <p className="text-stone-600 text-sm truncate">{e.activity}</p>
-              {entry.note && <p className="text-stone-700 italic text-sm mt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
+              <p className="text-amber-800/70 text-sm truncate">{e.activity}</p>
+              {entry.note && <p className="text-amber-900/80 italic text-sm mt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
             </div>
           );
         }
         // Handle narrative subtype - abstraktní slova
         if (entry.subtype === 'narrative') {
           return (
-            <div className="my-2 pl-4 border-l-2 border-purple-400 cursor-pointer hover:bg-purple-50 rounded transition-colors overflow-hidden"
+            <div className="my-2 pl-4 border-l-2 border-amber-400 cursor-pointer hover:bg-amber-50/50 rounded transition-colors overflow-hidden"
                  onClick={() => startEdit(entry)}
                  title="Klikni pro úpravu">
-              <p className="font-medium text-purple-900 truncate">{entry.result}</p>
-              {entry.note && <p className="text-stone-700 italic text-sm mt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
+              <p className="font-medium text-amber-800 truncate">{entry.result}</p>
+              {entry.note && <p className="text-amber-900/80 italic text-sm mt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
             </div>
           );
         }
@@ -550,17 +553,17 @@ const JournalPanel = ({ onExport }) => {
                    title="Klikni pro detail">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-lg">🎬</span>
-                  <span className={`text-sm font-bold ${d.isAltered ? 'text-orange-600' : 'text-green-700'}`}>
+                  <span className={`text-sm font-bold ${d.isAltered ? 'text-amber-700' : 'text-green-700'}`}>
                     [{d.alteredDie}] {d.isAltered ? 'Pozměněná scéna!' : 'Scéna dle očekávání'}
                   </span>
                 </div>
-                <p className="text-stone-800 text-sm"><span className="text-stone-500">📖</span> {d.opening}</p>
-                <p className="text-stone-700 text-sm"><span className="text-stone-500">📍</span> {d.setting}</p>
-                <p className="text-purple-700 text-sm font-medium"><span className="text-stone-500">💡</span> {d.action} + {d.theme}</p>
+                <p className="text-amber-900 text-sm"><span className="text-amber-600">📖</span> {d.opening}</p>
+                <p className="text-amber-900/80 text-sm"><span className="text-amber-600">📍</span> {d.setting}</p>
+                <p className="text-amber-800 text-sm font-medium"><span className="text-amber-600">💡</span> {d.action} + {d.theme}</p>
                 {d.isAltered && d.complication && (
-                  <p className="text-orange-700 text-sm font-medium"><span className="text-stone-500">⚡</span> {d.complication}</p>
+                  <p className="text-amber-700 text-sm font-medium"><span className="text-amber-600">⚡</span> {d.complication}</p>
                 )}
-                {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
+                {entry.note && <p className="text-amber-900/80 italic text-sm mt-1 border-t border-amber-200 pt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
               </div>
             );
           }
@@ -576,47 +579,55 @@ const JournalPanel = ({ onExport }) => {
                 </span>
               </div>
               {entry.narrative && (
-                <div className="text-stone-700 text-sm whitespace-pre-line">{entry.narrative}</div>
+                <div className="text-amber-900/80 text-sm whitespace-pre-line">{entry.narrative}</div>
               )}
-              {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
+              {entry.note && <p className="text-amber-900/80 italic text-sm mt-1 border-t border-amber-200 pt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
             </div>
           );
         }
         // Handle custom_dice subtype differently
         if (entry.subtype === 'custom_dice') {
           return (
-            <div className="my-2 pl-4 border-l-2 border-stone-300 cursor-pointer hover:bg-amber-50 rounded transition-colors overflow-hidden"
+            <div className="my-2 pl-4 border-l-2 border-amber-200 cursor-pointer hover:bg-amber-50 rounded transition-colors overflow-hidden"
                  onClick={() => startEdit(entry)}
                  title="Klikni pro úpravu">
-              {entry.reason && <p className="text-stone-700 font-medium truncate">{entry.reason}</p>}
+              {entry.reason && <p className="text-amber-900 font-medium truncate">{entry.reason}</p>}
               <p className="text-amber-900 truncate">
-                <span className="text-stone-500 text-sm">{entry.count}d{entry.sides}: </span>
+                <span className="text-amber-600/70 text-sm">{entry.count}d{entry.sides}: </span>
                 <span className="font-bold">[{entry.dice?.join(', ')}]</span>
                 {entry.count > 1 && <span className="font-bold"> = {entry.total}</span>}
               </p>
-              {entry.note && <p className="text-stone-600 italic text-sm mt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
+              {entry.note && <p className="text-amber-900/80 italic text-sm mt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
             </div>
           );
         }
         // Standard oracle (yes/no, etc.)
         return (
-          <div className="my-2 pl-4 border-l-2 border-amber-400 cursor-pointer hover:bg-amber-50 rounded transition-colors overflow-hidden"
-               onClick={() => startEdit(entry)}
-               title="Klikni pro úpravu">
-            {entry.question && <p className="text-stone-600 text-sm truncate">„{entry.question}"</p>}
-            <p className="font-bold text-amber-900 truncate">
-              {entry.dice && <span className="font-normal text-stone-500 text-xs">[{entry.dice.join(', ')}] </span>}
-              {entry.result}
-            </p>
-            {entry.note && <p className="text-stone-700 italic text-sm mt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
-            {entry.edited && <span className="text-xs text-stone-400">✎</span>}
+          <div
+            className="my-2 cursor-pointer hover:opacity-90 transition-opacity overflow-hidden"
+            style={{ padding:'10px 12px', borderRadius:7, border:'1px solid #B0782048', background:'#FFFBF1' }}
+            onClick={() => startEdit(entry)}
+            title="Klikni pro úpravu"
+          >
+            {entry.question && <p className="italic truncate mb-1" style={{ fontSize:11, color:'#8A5A4A' }}>„{entry.question}"</p>}
+            <div className="flex items-baseline gap-2.5">
+              {entry.dice && <span className="font-mono" style={{ fontSize:11, color:'#C09A80' }}>[{entry.dice.join(', ')}]</span>}
+              <span className="font-bold" style={{ fontSize:18, color: oracleEntryColor(entry.result) }}>
+                {entry.result}
+              </span>
+              {entry.probability && (
+                <span className="ml-auto" style={{ fontSize:10, color:'#C09A80' }}>{probLabel(entry.probability)}</span>
+              )}
+            </div>
+            {entry.note && <p className="italic text-sm mt-1 whitespace-pre-wrap" style={{ color:'#8A5A4A' }}>{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
+            {entry.edited && <span className="text-xs" style={{ color:'#C09A80' }}>✎</span>}
           </div>
         );
       
       case 'scene_start': {
         const checkColors: Record<string, string> = {
           normal: 'border-green-400 bg-green-50',
-          altered: 'border-orange-400 bg-orange-50',
+          altered: 'border-amber-400 bg-amber-50',
           interrupted: 'border-red-400 bg-red-50'
         };
         const checkLabels: Record<string, string> = {
@@ -626,13 +637,13 @@ const JournalPanel = ({ onExport }) => {
         };
         const checkBadge: Record<string, string> = {
           normal: 'bg-green-100 text-green-700',
-          altered: 'bg-orange-100 text-orange-700',
+          altered: 'bg-amber-100 text-amber-700',
           interrupted: 'bg-red-100 text-red-700'
         };
         const isCollapsed = collapsedScenes.has(entry.id);
         return (
           <div
-            className={`my-2 pl-3 border-l-4 ${checkColors[entry.checkResult] || 'border-blue-400 bg-blue-50'} rounded-r py-2 pr-2 cursor-pointer hover:brightness-95 transition-all select-none`}
+            className={`my-2 pl-3 border-l-4 ${checkColors[entry.checkResult] || 'border-amber-300 bg-amber-50'} rounded-r py-2 pr-2 cursor-pointer hover:brightness-95 transition-all select-none`}
             onClick={() => setCollapsedScenes(prev => {
               const next = new Set(prev);
               if (next.has(entry.id)) next.delete(entry.id); else next.add(entry.id);
@@ -641,14 +652,14 @@ const JournalPanel = ({ onExport }) => {
             title={isCollapsed ? 'Rozvinout scénu' : 'Sbalit scénu'}
           >
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-stone-400 text-xs">{isCollapsed ? '▶' : '▼'}</span>
+              <span className="text-amber-400 text-xs">{isCollapsed ? '▶' : '▼'}</span>
               <span className="text-lg">🎬</span>
-              <span className="font-bold text-stone-800">Scena #{entry.sceneNumber}: {entry.sceneTitle}</span>
+              <span className="font-bold text-amber-900">Scena #{entry.sceneNumber}: {entry.sceneTitle}</span>
               <span className={`text-xs px-2 py-0.5 rounded font-bold ${checkBadge[entry.checkResult] || ''}`}>
                 [{entry.checkDie}] {checkLabels[entry.checkResult] || entry.checkResult}
               </span>
-              <span className="text-xs text-stone-400">CF {entry.chaosFactor}</span>
-              {isCollapsed && <span className="text-xs text-stone-400 ml-auto italic">— sbaleno</span>}
+              <span className="text-xs text-amber-600">CF {entry.chaosFactor}</span>
+              {isCollapsed && <span className="text-xs text-amber-600 ml-auto italic">— sbaleno</span>}
             </div>
           </div>
         );
@@ -660,9 +671,9 @@ const JournalPanel = ({ onExport }) => {
         return (
           <div className={`my-2 pl-4 border-l-4 ${outcomeColor} rounded-r py-2 pr-2`}>
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-bold text-stone-800">Scena #{entry.sceneNumber} ukoncena</span>
+              <span className="font-bold text-amber-900">Scena #{entry.sceneNumber} ukoncena</span>
               <span className="text-sm">{outcomeLabel}</span>
-              <span className="text-xs text-stone-500">Chaos: {entry.chaosBefore} → {entry.chaosAfter}</span>
+              <span className="text-xs text-amber-700">Chaos: {entry.chaosBefore} → {entry.chaosAfter}</span>
             </div>
           </div>
         );
@@ -670,19 +681,31 @@ const JournalPanel = ({ onExport }) => {
 
       case 'chaos_adjust':
         return (
-          <p className="my-1 text-xs text-purple-600 font-medium">
+          <p className="my-1 text-xs text-amber-700 font-medium">
             ⚡ Chaos: {entry.chaosBefore} → {entry.chaosAfter}
           </p>
         );
 
       case 'combat_action':
         return (
-          <p className="my-1 text-sm text-stone-700 font-medium cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
-             onClick={() => startEdit(entry)}
-             title="Klikni pro úpravu">
-            ⚔️ <strong>{entry.attacker}</strong> → <strong>{entry.target}</strong>: {entry.hitResult}, {entry.damage} dmg
-            {entry.note && <span className="font-normal italic text-stone-600 ml-2">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</span>}
-          </p>
+          <div
+            className="my-1 flex items-center justify-between gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+            style={{ padding:'7px 11px', borderRadius:6, border:'1px solid #C8383850', background:'#C8383812', fontSize:12 }}
+            onClick={() => startEdit(entry)}
+            title="Klikni pro úpravu"
+          >
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              <span className="flex-shrink-0" style={{ color:'#C09A80' }}>×</span>
+              <span className="truncate" style={{ color:'#2A1810' }}>
+                <strong>{entry.attacker}</strong> → <strong>{entry.target}</strong>
+                {entry.hitResult && <span className="font-normal ml-1" style={{ color:'#8A5A4A' }}>{entry.hitResult}</span>}
+              </span>
+              {entry.note && <span className="font-normal italic text-xs truncate" style={{ color:'#8A5A4A' }}>{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</span>}
+            </div>
+            <span className="flex-shrink-0 font-bold text-white" style={{ fontSize:10, padding:'2px 7px', borderRadius:4, background:'#C83838' }}>
+              {entry.damage} dmg
+            </span>
+          </div>
         );
 
       case 'combat_end':
@@ -701,20 +724,20 @@ const JournalPanel = ({ onExport }) => {
                onClick={() => startEdit(entry)}
                title="Klikni pro úpravu">
             <p className="font-bold text-amber-900 truncate">{entry.subtype}: {entry.data?.name}</p>
-            {entry.data?.trait && <p className="text-stone-600 text-sm italic truncate">{entry.data.trait}</p>}
-            {entry.data?.appearance && <p className="text-stone-600 text-sm truncate">{entry.data.appearance}</p>}
-            {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
+            {entry.data?.trait && <p className="text-amber-800/70 text-sm italic truncate">{entry.data.trait}</p>}
+            {entry.data?.appearance && <p className="text-amber-800/70 text-sm truncate">{entry.data.appearance}</p>}
+            {entry.note && <p className="text-amber-900/80 italic text-sm mt-1 border-t border-amber-200 pt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
           </div>
         );
       
       case 'faction_progress':
         return (
-          <p className="my-1 text-xs text-stone-500 cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
+          <p className="my-1 text-xs text-amber-700 cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
-            <span className="font-medium text-stone-700">{entry.faction}</span>: {entry.success ? '✓ pokrok' : '– beze změny'} 
+            <span className="font-medium text-amber-900">{entry.faction}</span>: {entry.success ? '✓ pokrok' : '– beze změny'}
             <span className="opacity-60"> (d6={entry.roll}+{entry.bonus})</span>
-            {entry.note && <span className="italic text-stone-600 ml-2">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</span>}
+            {entry.note && <span className="italic text-amber-800 ml-2">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</span>}
           </p>
         );
 
@@ -726,7 +749,7 @@ const JournalPanel = ({ onExport }) => {
             ☀️ {['Ráno', 'Odpoledne', 'Večer', 'Noc'][entry.to?.watch || 0]}
             {entry.events?.includes('new_day') && ' — Nový den'}
             {entry.events?.includes('new_week') && ' — Nový týden'}
-            {entry.note && <span className="normal-case font-normal text-stone-600 ml-2">• {parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</span>}
+            {entry.note && <span className="normal-case font-normal text-amber-800 ml-2">• {parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</span>}
           </p>
         );
 
@@ -741,7 +764,7 @@ const JournalPanel = ({ onExport }) => {
             <div className="flex items-center gap-2 text-amber-900 font-medium">
               <span className="text-xl">{entry.data?.seasonIcon}</span>
               <span>{entry.data?.seasonName}</span>
-              <span className="text-stone-400">•</span>
+              <span className="text-amber-400">•</span>
               <span className="text-xl">{entry.data?.weather?.icon}</span>
               <span>{entry.data?.weather?.type}</span>
               {entry.data?.weather?.danger && <span className="text-red-600">⚠️</span>}
@@ -753,11 +776,11 @@ const JournalPanel = ({ onExport }) => {
         // Jen počasí (při novém dni)
         return (
           <div
-            className="my-1 p-2 bg-blue-50 rounded-lg cursor-pointer hover:bg-blue-100 transition-colors border border-blue-200"
+            className="my-1 p-2 bg-amber-50 rounded-lg cursor-pointer hover:bg-amber-100 transition-colors border border-amber-200"
             onClick={() => setWeatherModal({ weather: entry.data })}
             title="Klikni pro detail"
           >
-            <div className="flex items-center gap-2 text-blue-900">
+            <div className="flex items-center gap-2 text-amber-800">
               <span className="text-xl">{entry.data?.icon || '☁️'}</span>
               <span className="font-medium">{entry.data?.type || entry.weather || 'neznámé'}</span>
               {entry.data?.danger && <span className="text-red-600">⚠️</span>}
@@ -769,21 +792,21 @@ const JournalPanel = ({ onExport }) => {
         // Handle world_event with subtypes
         if (entry.subtype === 'weather' || entry.data?.type === 'weather') {
           return (
-            <p className="my-1 text-sm text-stone-600 cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
+            <p className="my-1 text-sm text-amber-800 cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
                onClick={() => startEdit(entry)}
                title="Klikni pro úpravu">
-              <span className="text-blue-600">{entry.data?.icon || '☁️'}</span> Počasí: <em>{entry.data?.type || entry.data?.weather || entry.weather || 'neznámé'}</em>
+              <span className="text-amber-600">{entry.data?.icon || '☁️'}</span> Počasí: <em>{entry.data?.type || entry.data?.weather || entry.weather || 'neznámé'}</em>
               {entry.note && <span className="italic ml-2">— {parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</span>}
             </p>
           );
         }
         // Generic world event
         return (
-          <p className="my-1 text-sm text-stone-600 cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
+          <p className="my-1 text-sm text-amber-800 cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
             🌍 {entry.data?.name || entry.content || JSON.stringify(entry.data)}
-            {entry.note && <span className="italic ml-2">— {parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</span>}
+            {entry.note && <span className="italic text-amber-700 ml-2">— {parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</span>}
           </p>
         );
 
@@ -793,17 +816,17 @@ const JournalPanel = ({ onExport }) => {
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
             {entry.subtype === 'short' ? '☕ Krátký odpočinek' : '🏕️ Dlouhý odpočinek v bezpečí'}
-            {entry.note && <span className="italic text-stone-600 ml-2">— {parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</span>}
+            {entry.note && <span className="italic text-amber-800 ml-2">— {parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</span>}
           </p>
         );
 
       case 'usage_roll':
         return (
-          <p className="my-1 text-xs text-stone-500 cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
+          <p className="my-1 text-xs text-amber-700 cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
-            📦 {entry.item}: {entry.consumed ? <span className="text-orange-600">spotřebováno!</span> : <span className="text-green-600">OK</span>}
-            {entry.note && <span className="italic text-stone-600 ml-2">— {parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</span>}
+            📦 {entry.item}: {entry.consumed ? <span className="text-red-600">spotřebováno!</span> : <span className="text-green-600">OK</span>}
+            {entry.note && <span className="italic text-amber-800 ml-2">— {parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</span>}
           </p>
         );
 
@@ -813,17 +836,17 @@ const JournalPanel = ({ onExport }) => {
                onClick={() => startEdit(entry)}
                title="Klikni pro úpravu">
             <p className="text-red-700 font-bold">⚠️ Náhodné setkání!</p>
-            {entry.note && <p className="italic text-stone-700 text-sm whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
+            {entry.note && <p className="italic text-amber-900/80 text-sm whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
           </div>
         );
 
       case 'dungeon_turn':
         return (
-          <p className="my-1 text-xs text-stone-500 uppercase tracking-wider cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
+          <p className="my-1 text-xs text-amber-600 uppercase tracking-wider cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
             ⛏️ Tah {entry.turn} — pochodeň: {6 - entry.torchTurns}/6
-            {entry.note && <span className="normal-case ml-2">• {parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</span>}
+            {entry.note && <span className="normal-case text-amber-800 ml-2">• {parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</span>}
           </p>
         );
 
@@ -834,17 +857,17 @@ const JournalPanel = ({ onExport }) => {
                onClick={() => startEdit(entry)}
                title="Klikni pro úpravu">
             <p className="text-red-700 font-bold">👹 Něco se blíží!</p>
-            {entry.note && <p className="italic text-stone-700 text-sm whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
+            {entry.note && <p className="italic text-amber-900/80 text-sm whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
           </div>
         );
 
       case 'torch_lit':
         return (
-          <p className="my-1 text-xs text-orange-600 cursor-pointer hover:bg-orange-50 rounded px-1 -mx-1 transition-colors"
+          <p className="my-1 text-xs text-amber-600 cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
             🔥 Nová pochodeň
-            {entry.note && <span className="text-stone-600 ml-2">— {parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</span>}
+            {entry.note && <span className="text-amber-800 ml-2">— {parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</span>}
           </p>
         );
 
@@ -856,7 +879,7 @@ const JournalPanel = ({ onExport }) => {
             🤝 Test loajality ({entry.hireling}): {entry.success 
               ? <span className="text-green-700">zůstává věrný</span> 
               : <span className="text-red-700 font-bold">ZRADA!</span>}
-            {entry.note && <span className="italic text-stone-600 ml-2">— {parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</span>}
+            {entry.note && <span className="italic text-amber-800 ml-2">— {parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</span>}
           </p>
         );
 
@@ -866,7 +889,7 @@ const JournalPanel = ({ onExport }) => {
              onClick={() => startEdit(entry)}
              title="Klikni pro úpravu">
             🐭 Na scénu vstupuje <strong>{entry.character}</strong>
-            {entry.note && <span className="font-normal italic text-stone-600 ml-2">— {parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</span>}
+            {entry.note && <span className="font-normal italic text-amber-800 ml-2">— {parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</span>}
           </p>
         );
 
@@ -875,11 +898,11 @@ const JournalPanel = ({ onExport }) => {
         if (entry.subtype === 'hp') {
           const sign = entry.change > 0 ? '+' : '';
           return (
-            <span className="text-xs text-stone-400 cursor-pointer hover:bg-amber-50 rounded px-1 transition-colors"
+            <span className="text-xs text-amber-600 cursor-pointer hover:bg-amber-50 rounded px-1 transition-colors"
                   onClick={() => startEdit(entry)}
                   title="Klikni pro úpravu">
               {entry.change > 0 ? '💚' : '💔'} {sign}{entry.change} HP
-              {entry.note && <span className="italic ml-1">({parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)})</span>}
+              {entry.note && <span className="italic text-amber-800 ml-1">({parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)})</span>}
             </span>
           );
         }
@@ -920,30 +943,30 @@ const JournalPanel = ({ onExport }) => {
         return (
           <div
             className={`my-2 pl-4 border-l-2 cursor-pointer hover:bg-amber-50 rounded transition-colors overflow-hidden ${
-              npcIsDead ? 'border-stone-400 bg-stone-100/50' : 'border-amber-500'
+              npcIsDead ? 'border-amber-300 bg-amber-100/30' : 'border-amber-500'
             }`}
             onClick={() => setDetailModal({ type: 'npc', data: currentNPC })}
             title="Klikni pro detail"
           >
-            <p className={`font-bold truncate ${npcIsDead ? 'text-stone-500 line-through' : 'text-amber-900'}`}>
-              {npcIsDead ? '💀' : '🐭'} {entry.data?.name} {entry.data?.role && <span className="font-normal text-stone-500">— {entry.data.role}</span>}
+            <p className={`font-bold truncate ${npcIsDead ? 'text-amber-400 line-through' : 'text-amber-900'}`}>
+              {npcIsDead ? '💀' : '🐭'} {entry.data?.name} {entry.data?.role && <span className="font-normal text-amber-700">— {entry.data.role}</span>}
               {npcIsDead && <span className="ml-2 text-xs text-red-600 font-normal no-underline">† mrtvý</span>}
             </p>
-            {!npcIsDead && entry.data?.birthsign && <p className="text-stone-600 text-sm truncate">{entry.data.birthsign}</p>}
-            {!npcIsDead && entry.data?.physicalDetail && <p className="text-stone-500 text-sm truncate">{entry.data.physicalDetail}</p>}
-            {entry.note && <p className="text-stone-700 italic text-sm mt-1 border-t border-amber-200 pt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
+            {!npcIsDead && entry.data?.birthsign && <p className="text-amber-800/70 text-sm truncate">{entry.data.birthsign}</p>}
+            {!npcIsDead && entry.data?.physicalDetail && <p className="text-amber-700 text-sm truncate">{entry.data.physicalDetail}</p>}
+            {entry.note && <p className="text-amber-900/80 italic text-sm mt-1 border-t border-amber-200 pt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
           </div>
         );
 
       case 'saved_settlement':
         return (
           <p
-            className="my-1 text-sm cursor-pointer hover:bg-green-50 rounded px-1 -mx-1 transition-colors truncate"
+            className="my-1 text-sm cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors truncate"
             onClick={() => setDetailModal({ type: 'settlement', data: entry.data })}
             title="Klikni pro detail"
           >
-            🏘️ <span className="font-medium text-green-900">{entry.data?.name}</span>
-            <span className="text-stone-500 ml-1">— {entry.data?.size}</span>
+            🏘️ <span className="font-medium text-amber-900">{entry.data?.name}</span>
+            <span className="text-amber-700 ml-1">— {entry.data?.size}</span>
           </p>
         );
 
@@ -958,24 +981,46 @@ const JournalPanel = ({ onExport }) => {
           }
         }
         return (
-          <div className="my-1 cursor-pointer hover:bg-stone-100 rounded px-1 -mx-1 transition-colors"
+          <div className="my-1 cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors"
                onClick={() => startEdit(entry)}
                title="Klikni pro úpravu">
-            <p className="text-xs text-stone-500 font-mono">
+            <p className="text-xs text-amber-700 font-mono">
               {typeof content === 'string' ? content : JSON.stringify(content)}
             </p>
-            {entry.note && <p className="text-sm text-stone-700 italic mt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
+            {entry.note && <p className="text-sm text-amber-900/80 italic mt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
           </div>
         );
     }
   };
 
+  // Oracle entry color helper
+  const oracleEntryColor = (result: string | undefined) => {
+    if (!result) return '#2A1810';
+    const r = result.toLowerCase();
+    if (r.startsWith('yes, and')) return '#5A8A5A';
+    if (r.startsWith('yes, but') || r.startsWith('no, but')) return '#B07820';
+    if (r.startsWith('no, and') || r.startsWith('no')) return '#C83838';
+    if (r.startsWith('yes')) return '#5A8A5A';
+    return '#2A1810';
+  };
+  const probLabel = (prob: string) => {
+    if (prob === 'likely') return 'Pravděpodobné';
+    if (prob === 'unlikely') return 'Nepravděpodobné';
+    return 'Stejně možné';
+  };
+  const getCheckBadgeStyle = (result: string) => {
+    if (result === 'normal') return { color:'#5A8A5A', borderColor:'#5A8A5A50', background:'#5A8A5A12' };
+    if (result === 'altered') return { color:'#B07820', borderColor:'#B0782048', background:'#B0782012' };
+    if (result === 'interrupted') return { color:'#C83838', borderColor:'#C8383850', background:'#C8383812' };
+    return { color:'#8A5A4A', borderColor:'#FFD8A8', background:'#FFF5DC' };
+  };
+
   return (
-    <div className="max-w-3xl mx-auto">
+    <div>
       {/* Header */}
-      <div className="text-center mb-8 pt-4">
-        <h1 className="text-3xl font-serif text-amber-900 mb-2">Kronika dobrodružství</h1>
-        <p className="text-stone-500 text-sm">{journal.length} záznamů</p>
+      <div className="text-center mb-3 pt-2">
+        <h1 className="text-2xl font-serif text-[#2A1810] mb-1">Kronika dobrodružství</h1>
+        <p className="text-[#C09A80] text-xs">{journal.length} záznamů</p>
       </div>
 
       {/* Widget nadcházejících událostí */}
@@ -983,20 +1028,20 @@ const JournalPanel = ({ onExport }) => {
         const currentDay = gameTime?.day || 1;
         const activeEvents = timedEvents.filter(e => !e.completed).sort((a, b) => a.targetDay - b.targetDay).slice(0, 3);
         return (
-          <div className="mb-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+          <div className="mb-4 p-3 bg-amber-50 border border-amber-300 rounded-lg">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-orange-800">📅 Nadcházející události</span>
-              <button onClick={onOpenEvents} className="text-xs text-orange-600 hover:text-orange-800">Zobrazit vše →</button>
+              <span className="text-sm font-medium text-amber-800">📅 Nadcházející události</span>
+              <button onClick={onOpenEvents} className="text-xs text-amber-600 hover:text-amber-800">Zobrazit vše →</button>
             </div>
             <div className="space-y-1">
               {activeEvents.map(event => {
                 const daysLeft = event.targetDay - currentDay;
                 return (
                   <div key={event.id} className="flex items-center gap-2 text-sm">
-                    <span className={`px-1.5 py-0.5 rounded text-xs ${daysLeft <= 0 ? 'bg-red-200 text-red-800' : daysLeft <= 1 ? 'bg-orange-200 text-orange-800' : 'bg-stone-200 text-stone-600'}`}>
+                    <span className={`px-1.5 py-0.5 rounded text-xs ${daysLeft <= 0 ? 'bg-red-200 text-red-800' : daysLeft <= 1 ? 'bg-amber-200 text-amber-800' : 'bg-amber-100 text-amber-700'}`}>
                       {daysLeft <= 0 ? 'DNES!' : daysLeft === 1 ? 'Zítra' : `${daysLeft}d`}
                     </span>
-                    <span className="text-stone-700 truncate">{event.title}</span>
+                    <span className="text-amber-900 truncate">{event.title}</span>
                   </div>
                 );
               })}
@@ -1006,10 +1051,10 @@ const JournalPanel = ({ onExport }) => {
       })()}
 
       {/* Filters - Collapsible */}
-      <div className="mb-6 border-b border-amber-200 pb-4">
+      <div className="mb-3 border-b border-[#FFD8A8] pb-3">
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className="text-sm text-stone-500 hover:text-stone-700 flex items-center gap-1"
+          className="text-sm text-amber-700 hover:text-amber-900 flex items-center gap-1"
         >
           <span>{showFilters ? '▼' : '▶'}</span> Filtry a nástroje
         </button>
@@ -1020,13 +1065,13 @@ const JournalPanel = ({ onExport }) => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Hledat..."
-              className="px-3 py-1 border border-stone-200 rounded text-sm w-40"
+              className="px-3 py-1 border border-amber-200 rounded text-sm w-40 bg-amber-50"
             />
             {parties?.length > 1 && (
               <select 
                 value={partyFilter}
                 onChange={(e) => setPartyFilter(e.target.value)}
-                className="px-2 py-1 border border-stone-200 rounded text-sm"
+                className="px-2 py-1 border border-amber-200 rounded text-sm bg-amber-50"
               >
                 <option value="all">Všechny družiny</option>
                 {(parties || []).map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -1035,7 +1080,7 @@ const JournalPanel = ({ onExport }) => {
             <select 
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="px-2 py-1 border border-stone-200 rounded text-sm"
+              className="px-2 py-1 border border-amber-200 rounded text-sm bg-amber-50"
             >
               <option value="all">Vše</option>
               <option value="narrative">Příběh</option>
@@ -1050,10 +1095,10 @@ const JournalPanel = ({ onExport }) => {
         )}
       </div>
 
-      {/* Journal Content - Book Style */}
-      <div className="bg-gradient-to-b from-amber-50/50 to-white rounded-lg shadow-sm border border-amber-100">
+      {/* Journal Content */}
+      <div>
         {filteredJournal.length === 0 ? (
-          <div className="px-6 py-8 font-serif">
+          <div className="font-serif">
             {journal.length === 0 ? (
               <TiptapEditor
                 content=""
@@ -1064,15 +1109,15 @@ const JournalPanel = ({ onExport }) => {
                 clearOnSubmit
               />
             ) : (
-              <div className="text-center py-8 text-stone-400 italic">
+              <div className="text-center py-8 text-[#C09A80] italic text-sm">
                 Žádné záznamy neodpovídají filtru
               </div>
             )}
           </div>
         ) : (
-          <div className="px-6 py-8 font-serif">
+          <div className="font-serif">
             {/* Vstup pro nový záznam nahoře */}
-            <div className="mb-4">
+            <div className="mb-3">
               <TiptapEditor
                 content=""
                 onSubmit={addNarrativeEntryWithScene}
@@ -1083,235 +1128,240 @@ const JournalPanel = ({ onExport }) => {
               />
             </div>
 
-            {/* Flat list s date headers */}
+            {/* Chapter Book — scény jako karty, volné záznamy inline */}
             {(() => {
-              // Pre-výpočet příslušnosti k scéně (scan od nejstaršího k nejnovějšímu)
-              const sceneOf = new Map<string, string>();
-              let _curScene: string | null = null;
-              for (let i = filteredJournal.length - 1; i >= 0; i--) {
-                const e = filteredJournal[i];
-                if (e.type === 'scene_start') {
-                  _curScene = e.id;
-                  sceneOf.set(e.id, e.id);
-                } else if (e.type === 'scene_end') {
-                  if (_curScene) { sceneOf.set(e.id, _curScene); _curScene = null; }
-                } else if (_curScene) {
-                  sceneOf.set(e.id, _curScene);
+              // Seskup záznamy do scén a volných záznamů
+              type Seg =
+                | { type: 'loose'; entry: any }
+                | { type: 'scene'; sceneEntry: any; entries: any[]; endEntry: any | null };
+              const segments: Seg[] = [];
+              let curScene: { sceneEntry: any; entries: any[]; endEntry: any | null } | null = null;
+
+              // Journal je newest-first — skenujeme od nejstaršího k nejnovějšímu pro správné groupování
+              const oldestFirst = [...filteredJournal].reverse();
+              for (const entry of oldestFirst) {
+                if (entry.type === 'scene_start') {
+                  curScene = { sceneEntry: entry, entries: [], endEntry: null };
+                  segments.push({ type: 'scene', ...curScene });
+                } else if (entry.type === 'scene_end') {
+                  if (curScene) { curScene.endEntry = entry; curScene = null; }
+                  else segments.push({ type: 'loose', entry });
+                } else if (curScene) {
+                  curScene.entries.push(entry);
+                } else {
+                  segments.push({ type: 'loose', entry });
                 }
               }
-              // Skryj záznamy v sbalených scénách (scene_start samotný zůstane viditelný)
-              const visibleEntries = filteredJournal.filter(e => {
-                const sid = sceneOf.get(e.id);
-                return !(sid && collapsedScenes.has(sid) && e.type !== 'scene_start');
-              });
+              // Zobraz newest-first — obrátíme segmenty i záznamy uvnitř scén
+              segments.reverse();
+              for (const seg of segments) {
+                if (seg.type === 'scene') (seg as any).entries.reverse();
+              }
 
-              return visibleEntries.map((entry, i) => {
-              const content = formatEntry(entry);
-              if (!content) return null;
+              const checkLabel: Record<string, string> = {
+                normal: 'Normální', altered: 'Pozměněná', interrupted: 'Přerušená',
+              };
 
-              const isSelected = selectedIds.has(entry.id);
-              const isDragging = draggedId === entry.id;
-              const isDropTarget = dropTargetId === entry.id;
-
-              // Zjisti datum pro header
-              const parts = entry.timestamp?.split(' ') || [];
-              const entryDate = parts.length >= 3 ? `${parts[0]} ${parts[1]} ${parts[2]}` : (entry.timestamp || 'Neznámé datum');
-              const prevEntry = visibleEntries[i - 1];
-              const prevParts = prevEntry?.timestamp?.split(' ') || [];
-              const prevDate = prevParts.length >= 3 ? `${prevParts[0]} ${prevParts[1]} ${prevParts[2]}` : (prevEntry?.timestamp || '');
-              const showDateHeader = i === 0 || entryDate !== prevDate;
-
-              // Scene grouping
-              const sceneId = sceneOf.get(entry.id);
-              const isInsideScene = sceneId !== undefined && entry.type !== 'scene_start';
-              const isSceneEnd = entry.type === 'scene_end';
-              const isSceneStart = entry.type === 'scene_start';
-
-              return (
-                <React.Fragment key={entry.id}>
-                  {/* Vizuální oddělovač před novou scénou */}
-                  {isSceneStart && i > 0 && (
-                    <div className="my-4 flex items-center gap-2">
-                      <div className="flex-1 h-px bg-stone-200/60 border-dashed"></div>
-                      <span className="text-[10px] text-stone-300 uppercase tracking-widest">nová scéna</span>
-                      <div className="flex-1 h-px bg-stone-200/60"></div>
-                    </div>
-                  )}
-
-                  {/* Date separator - nenápadný, jen tečky s datem při hoveru */}
-                  {showDateHeader && i > 0 && !isSceneStart && (
-                    <div className="group flex items-center justify-center my-3 gap-2" title={entryDate}>
-                      <div className="flex-1 h-px bg-stone-200/30"></div>
-                      <span className="text-[10px] text-stone-300/40 group-hover:text-stone-400 transition-colors cursor-default">
-                        {entryDate}
-                      </span>
-                      <div className="flex-1 h-px bg-stone-200/30"></div>
-                    </div>
-                  )}
-
-                  {/* Drop zone PŘED záznamem */}
-                  {draggedId && draggedId !== entry.id && (
-                    <div
-                      className={`h-1 rounded my-1 transition-all ${
-                        dropTargetId === `before-${entry.id}` ? 'bg-amber-500 h-2' : 'bg-transparent hover:bg-amber-300'
-                      }`}
-                      onDragOver={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setDropTargetId(`before-${entry.id}`);
-                      }}
-                      onDragLeave={() => setDropTargetId(null)}
-                      onDrop={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const draggedIndex = journal.findIndex(j => j.id === draggedId);
-                        const targetIndex = journal.findIndex(j => j.id === entry.id);
-                        if (draggedIndex !== -1 && targetIndex !== -1 && draggedIndex !== targetIndex) {
-                          const newJournal = [...journal];
-                          const [draggedEntry] = newJournal.splice(draggedIndex, 1);
-                          // Vložit PŘED cílový záznam
-                          const insertAt = draggedIndex < targetIndex ? targetIndex - 1 : targetIndex;
-                          newJournal.splice(insertAt, 0, draggedEntry);
-                          setJournal(newJournal);
-                        }
-                        setDraggedId(null);
-                        setDropTargetId(null);
-                      }}
-                    />
-                  )}
-
-                  {/* Záznam s drag handle */}
-                  <div
-                    data-entry-id={entry.id}
-                    className={`group flex items-start gap-1 transition-all ${
-                      isInsideScene && !isSceneEnd ? 'ml-3 pl-1 border-l-2 border-amber-200/60' : ''
-                    } ${isSceneEnd ? 'ml-3 mb-4' : ''} ${
-                      isSelected ? 'bg-amber-100 rounded' : ''
-                    } ${isDragging || touchDragId === entry.id ? 'opacity-50 bg-amber-50' : ''} ${
-                      isDropTarget ? 'border-b-2 border-amber-500' : ''
-                    }`}
-                    draggable={!selectionMode && editingId !== entry.id}
-                    onDragStart={(e) => handleDragStart(e, entry.id)}
-                    onDragOver={(e) => handleDragOver(e, entry.id)}
-                    onDragLeave={handleDragLeave}
-                    onDrop={(e) => handleDrop(e, entry.id)}
-                    onDragEnd={handleDragEnd}
-                    onTouchStart={() => !selectionMode && !touchDragId && handleTouchStart(entry.id)}
-                    onTouchEnd={handleTouchEnd}
-                    onTouchMove={handleTouchEnd}
-                    onContextMenu={(e) => {
-                      e.preventDefault();
-                      setSelectionMode(true);
-                      setSelectedIds(new Set([entry.id]));
-                    }}
-                  >
-                    {/* Drag handle */}
-                    {!selectionMode && editingId !== entry.id && (
+              const renderEntryRow = (entry: any) => {
+                const content = formatEntry(entry);
+                if (!content) return null;
+                const isSelected = selectedIds.has(entry.id);
+                const isDragging = draggedId === entry.id;
+                const isDropTarget = dropTargetId === entry.id;
+                return (
+                  <React.Fragment key={entry.id}>
+                    {draggedId && draggedId !== entry.id && (
                       <div
-                        className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 cursor-grab active:cursor-grabbing text-stone-400 hover:text-stone-600 pt-2 px-1 select-none transition-opacity touch-none"
-                        title="Přetáhni pro přesun"
-                        onTouchStart={(e) => handleTouchDragStart(e, entry.id)}
-                        onTouchMove={handleTouchDragMove}
-                        onTouchEnd={handleTouchDragEnd}
-                      >
-                        ⋮⋮
+                        className={`h-1 rounded my-0.5 transition-all ${dropTargetId === `before-${entry.id}` ? 'bg-amber-500 h-2' : 'bg-transparent hover:bg-amber-300'}`}
+                        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setDropTargetId(`before-${entry.id}`); }}
+                        onDragLeave={() => setDropTargetId(null)}
+                        onDrop={(e) => {
+                          e.preventDefault(); e.stopPropagation();
+                          const di = journal.findIndex(j => j.id === draggedId);
+                          const ti = journal.findIndex(j => j.id === entry.id);
+                          if (di !== -1 && ti !== -1 && di !== ti) {
+                            const nj = [...journal];
+                            const [de] = nj.splice(di, 1);
+                            nj.splice(di < ti ? ti - 1 : ti, 0, de);
+                            setJournal(nj);
+                          }
+                          setDraggedId(null); setDropTargetId(null);
+                        }}
+                      />
+                    )}
+                    <div
+                      data-entry-id={entry.id}
+                      className={`group flex items-start gap-1 transition-all ${isSelected ? 'bg-amber-100 rounded' : ''} ${isDragging || touchDragId === entry.id ? 'opacity-50 bg-amber-50' : ''} ${isDropTarget ? 'border-b-2 border-amber-500' : ''}`}
+                      draggable={!selectionMode && editingId !== entry.id}
+                      onDragStart={(e) => handleDragStart(e, entry.id)}
+                      onDragOver={(e) => handleDragOver(e, entry.id)}
+                      onDragLeave={handleDragLeave}
+                      onDrop={(e) => handleDrop(e, entry.id)}
+                      onDragEnd={handleDragEnd}
+                      onTouchStart={() => !selectionMode && !touchDragId && handleTouchStart(entry.id)}
+                      onTouchEnd={handleTouchEnd}
+                      onTouchMove={handleTouchEnd}
+                      onContextMenu={(e) => { e.preventDefault(); setSelectionMode(true); setSelectedIds(new Set([entry.id])); }}
+                    >
+                      {!selectionMode && editingId !== entry.id && (
+                        <div
+                          className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 cursor-grab active:cursor-grabbing text-amber-400 hover:text-amber-600 pt-2 px-1 select-none transition-opacity touch-none"
+                          title="Přetáhni pro přesun"
+                          onTouchStart={(e) => handleTouchDragStart(e, entry.id)}
+                          onTouchMove={handleTouchDragMove}
+                          onTouchEnd={handleTouchDragEnd}
+                        >⋮⋮</div>
+                      )}
+                      {selectionMode && (
+                        <button
+                          onClick={() => toggleSelect(entry.id)}
+                          className={`mt-2 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${isSelected ? 'bg-amber-500 border-amber-500 text-white' : 'border-amber-300 hover:border-amber-400'}`}
+                        >{isSelected && '✓'}</button>
+                      )}
+                      <div className="flex-1 min-w-0">{content}</div>
+                      {!selectionMode && editingId !== entry.id && (
+                        <button
+                          onClick={() => setInsertAfterIndex(insertAfterIndex === entry.id ? null : entry.id)}
+                          className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 text-amber-400 hover:text-amber-600 pt-2 px-1 transition-opacity"
+                          title="Vložit poznámku pod"
+                        >+</button>
+                      )}
+                    </div>
+                    {insertAfterIndex === entry.id && (
+                      <div className="ml-5 flex items-start gap-1">
+                        <div className="flex-1">
+                          <TiptapEditor
+                            content=""
+                            onSubmit={(html) => {
+                              const targetIndex = journal.findIndex(e => e.id === entry.id);
+                              if (targetIndex === -1 || !html.trim()) { setInsertAfterIndex(null); return; }
+                              const targetEntry = journal[targetIndex];
+                              const newNote = {
+                                id: generateId(), type: 'narrative' as const,
+                                timestamp: targetEntry.timestamp, content: html,
+                                partyId: partyFilter !== 'all' ? partyFilter : targetEntry.partyId,
+                                authorId: roomConnected ? myUserId : null,
+                                authorName: roomConnected ? myAuthorName : null
+                              };
+                              const newJournal = [...journal];
+                              newJournal.splice(targetIndex + 1, 0, newNote);
+                              setJournal(newJournal); setInsertText(''); setInsertAfterIndex(null);
+                            }}
+                            placeholder="Poznámka... (@ pro zmínku, Enter ↵)"
+                            mentionItems={allMentions}
+                            autoFocus compact submitOnEnter
+                            onCancel={() => { setInsertAfterIndex(null); setInsertText(''); }}
+                          />
+                        </div>
+                        <button type="button" onClick={() => { setInsertAfterIndex(null); setInsertText(''); }} className="text-amber-400 hover:text-amber-600 p-2 text-lg" title="Zrušit">×</button>
                       </div>
                     )}
+                  </React.Fragment>
+                );
+              };
 
-                    {selectionMode && (
+              return segments.map((segment, segIdx) => {
+                if (segment.type === 'loose') {
+                  const entry = (segment as any).entry;
+                  const parts = entry.timestamp?.split(' ') || [];
+                  const entryDate = parts.length >= 3 ? `${parts[0]} ${parts[1]} ${parts[2]}` : (entry.timestamp || 'Neznámé datum');
+                  const prevSeg = segments[segIdx - 1];
+                  let prevDate = '';
+                  if (prevSeg?.type === 'loose') {
+                    const pp = (prevSeg as any).entry.timestamp?.split(' ') || [];
+                    prevDate = pp.length >= 3 ? `${pp[0]} ${pp[1]} ${pp[2]}` : '';
+                  }
+                  const showDateHeader = segIdx > 0 && entryDate !== prevDate;
+                  return (
+                    <React.Fragment key={entry.id}>
+                      {showDateHeader && (
+                        <div className="group flex items-center justify-center my-3 gap-2" title={entryDate}>
+                          <div className="flex-1 h-px bg-amber-200/60"></div>
+                          <span className="text-[10px] text-amber-300/60 group-hover:text-amber-600 transition-colors cursor-default">{entryDate}</span>
+                          <div className="flex-1 h-px bg-amber-200/60"></div>
+                        </div>
+                      )}
+                      {renderEntryRow(entry)}
+                    </React.Fragment>
+                  );
+                }
+
+                // Scene box — L6 style
+                const { sceneEntry, entries, endEntry } = segment as any;
+                const isCollapsed = collapsedScenes.has(sceneEntry.id);
+                return (
+                  <div key={sceneEntry.id} className="mb-2.5 overflow-hidden" style={{ border:'1px solid #FFD8A8', borderRadius:10, background:'#FFF5DC' }}>
+                    {/* Scene header */}
+                    <div
+                      className="flex items-center gap-2 flex-wrap cursor-pointer select-none transition-colors hover:bg-[#FFD8A8]/30"
+                      style={{ padding:'10px 14px' }}
+                      onClick={() => setCollapsedScenes(prev => {
+                        const next = new Set(prev);
+                        if (next.has(sceneEntry.id)) next.delete(sceneEntry.id); else next.add(sceneEntry.id);
+                        return next;
+                      })}
+                    >
+                      <span className="text-[10px]" style={{ color:'#C09A80' }}>{isCollapsed ? '▶' : '▼'}</span>
+                      <span className="flex-shrink-0 flex items-center justify-center font-bold text-white" style={{ width:26, height:26, borderRadius:6, background:'#E36A6A', fontSize:12 }}>
+                        {sceneEntry.sceneNumber}
+                      </span>
+                      <span className="font-bold text-sm" style={{ color:'#2A1810' }}>{sceneEntry.sceneTitle}</span>
+                      <span className="font-bold uppercase tracking-wide border rounded" style={{ fontSize:10, padding:'2px 7px', borderRadius:4, letterSpacing:'0.04em', ...getCheckBadgeStyle(sceneEntry.checkResult) }}>
+                        {checkLabel[sceneEntry.checkResult] || sceneEntry.checkResult} [{sceneEntry.checkDie}]
+                      </span>
+                      <span className="font-mono" style={{ fontSize:10, color:'#C09A80' }}>CF {sceneEntry.chaosFactor}</span>
                       <button
-                        onClick={() => toggleSelect(entry.id)}
-                        className={`mt-2 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
-                          isSelected
-                            ? 'bg-amber-500 border-amber-500 text-white'
-                            : 'border-stone-300 hover:border-amber-400'
-                        }`}
-                      >
-                        {isSelected && '✓'}
-                      </button>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      {content}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (window.confirm(`Smazat celou scénu „${sceneEntry.sceneTitle}" a všechny její záznamy?`)) {
+                            const idsToDelete = new Set([sceneEntry.id, ...entries.map((e: any) => e.id), ...(endEntry ? [endEntry.id] : [])]);
+                            setJournal(journal.filter(e => !idsToDelete.has(e.id)));
+                          }
+                        }}
+                        className="ml-auto flex-shrink-0 flex items-center justify-center rounded transition-colors hover:bg-[#C8383820]"
+                        style={{ width:20, height:20, fontSize:12, color:'#C09A80' }}
+                        title="Smazat celou scénu"
+                      >×</button>
                     </div>
-
-                    {/* Tlačítko pro vložení poznámky ZA tento záznam */}
-                    {!selectionMode && editingId !== entry.id && (
-                      <button
-                        onClick={() => setInsertAfterIndex(insertAfterIndex === entry.id ? null : entry.id)}
-                        className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 text-stone-400 hover:text-amber-600 pt-2 px-1 transition-opacity"
-                        title="Vložit poznámku pod"
-                      >
-                        +
-                      </button>
+                    {/* Scene body */}
+                    {!isCollapsed && entries.length > 0 && (
+                      <div className="space-y-1" style={{ padding:'8px 14px 10px' }}>
+                        {entries.map((entry: any) => renderEntryRow(entry))}
+                      </div>
+                    )}
+                    {/* Scene footer */}
+                    {endEntry && !isCollapsed && (
+                      <div className="flex items-center justify-center gap-2.5" style={{ padding:'8px 14px', borderTop:'1px solid #FFD8A8', fontSize:12, color:'#8A5A4A' }}>
+                        <span className="font-semibold" style={{ color: endEntry.outcome === 'in_control' ? '#5A8A5A' : '#C83838' }}>
+                          {endEntry.outcome === 'in_control' ? '✓ Pod kontrolou' : '✕ Mimo kontrolu'}
+                        </span>
+                        <span className="font-mono" style={{ color:'#C09A80' }}>CF {endEntry.chaosBefore} → {endEntry.chaosAfter}</span>
+                      </div>
+                    )}
+                    {isCollapsed && (
+                      <div className="text-center" style={{ padding:'6px 14px', borderTop:'1px solid #FFD8A8', fontSize:11, color:'#C09A80' }}>
+                        {entries.length} {entries.length === 1 ? 'záznam' : entries.length < 5 ? 'záznamy' : 'záznamů'}
+                      </div>
                     )}
                   </div>
-
-                  {/* Inline vstup pro poznámku */}
-                  {insertAfterIndex === entry.id && (
-                    <div className="ml-5 flex items-start gap-1">
-                      <div className="flex-1">
-                        <TiptapEditor
-                          content=""
-                          onSubmit={(html) => {
-                            setInsertText(html);
-                            // insertNoteAfter needs insertText — use direct insertion
-                            const targetIndex = journal.findIndex(e => e.id === entry.id);
-                            if (targetIndex === -1 || !html.trim()) {
-                              setInsertAfterIndex(null);
-                              return;
-                            }
-                            const targetEntry = journal[targetIndex];
-                            const newNote = {
-                              id: generateId(),
-                              type: 'narrative' as const,
-                              timestamp: targetEntry.timestamp,
-                              content: html,
-                              partyId: partyFilter !== 'all' ? partyFilter : targetEntry.partyId,
-                              authorId: roomConnected ? myUserId : null,
-                              authorName: roomConnected ? myAuthorName : null
-                            };
-                            const newJournal = [...journal];
-                            newJournal.splice(targetIndex + 1, 0, newNote);
-                            setJournal(newJournal);
-                            setInsertText('');
-                            setInsertAfterIndex(null);
-                          }}
-                          placeholder="Poznámka... (@ pro zmínku, Enter ↵)"
-                          mentionItems={allMentions}
-                          autoFocus
-                          compact
-                          submitOnEnter
-                          onCancel={() => { setInsertAfterIndex(null); setInsertText(''); }}
-                        />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => { setInsertAfterIndex(null); setInsertText(''); }}
-                        className="text-stone-400 hover:text-stone-600 p-2 text-lg"
-                        title="Zrušit"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  )}
-                </React.Fragment>
-              );
-            });
+                );
+              });
             })()}
+
           </div>
         )}
       </div>
 
       {/* Reading tip */}
       {!selectionMode && (
-        <p className="text-center text-xs text-stone-400 mt-6 font-sans">
+        <p className="text-center text-xs text-amber-400 mt-6 font-sans">
           💡 Klikni pro úpravu • Přetáhni ⋮⋮ pro přesun • + vloží poznámku • Dlouze podrž pro výběr více
         </p>
       )}
 
       {/* Selection toolbar */}
       {selectionMode && (
-        <div className="fixed bottom-16 left-0 right-0 bg-stone-800 text-white p-3 shadow-lg z-50 flex items-center justify-between">
+        <div className="fixed bottom-16 left-0 right-0 bg-[#2A1810] text-white p-3 shadow-lg z-50 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={cancelSelection}
@@ -1347,70 +1397,70 @@ const JournalPanel = ({ onExport }) => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }}>
           <div className="bg-amber-50 rounded-lg shadow-xl max-w-md w-full max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             {detailModal.type === 'npc' && detailModal.data && (
-              <div className={`p-4 space-y-3 ${detailModal.data.isDead ? 'bg-stone-200' : ''}`}>
+              <div className={`p-4 space-y-3 ${detailModal.data.isDead ? 'bg-amber-100/60' : ''}`}>
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className={`text-2xl font-bold ${detailModal.data.isDead ? 'text-stone-500 line-through' : 'text-amber-900'}`}>
+                    <h3 className={`text-2xl font-bold ${detailModal.data.isDead ? 'text-amber-400 line-through' : 'text-amber-900'}`}>
                       {detailModal.data.isDead ? '💀' : '🐭'} {detailModal.data.name}
                     </h3>
                     {detailModal.data.isDead && (
                       <span className="text-sm text-red-600 font-medium">† Mrtvý</span>
                     )}
                   </div>
-                  <button onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }} className="text-stone-400 hover:text-stone-600 text-xl">✕</button>
+                  <button onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }} className="text-amber-400 hover:text-amber-600 text-xl">✕</button>
                 </div>
                 {detailModal.data.role && (
-                  <p className={`font-medium ${detailModal.data.isDead ? 'text-stone-400' : 'text-stone-600'}`}>🔧 {detailModal.data.role}</p>
+                  <p className={`font-medium ${detailModal.data.isDead ? 'text-amber-400' : 'text-amber-700'}`}>🔧 {detailModal.data.role}</p>
                 )}
-                <div className="flex flex-wrap gap-2 text-sm font-mono bg-stone-100 rounded px-3 py-2 justify-center">
+                <div className="flex flex-wrap gap-2 text-sm font-mono bg-amber-100 rounded px-3 py-2 justify-center">
                   <span>BO: <b>{detailModal.data.hp?.max || detailModal.data.hp}</b></span>
                   <span>SÍL: <b>{detailModal.data.str?.max || detailModal.data.str}</b></span>
                   <span>MRŠ: <b>{detailModal.data.dex?.max || detailModal.data.dex}</b></span>
                   <span>VŮL: <b>{detailModal.data.wil?.max || detailModal.data.wil}</b></span>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="p-3 bg-amber-100/50 rounded">
-                    <span className="text-sm text-stone-500">Znamení</span>
-                    <p className="font-bold truncate">{detailModal.data.birthsign}</p>
+                  <div className="p-3 bg-amber-100 rounded">
+                    <span className="text-sm text-amber-700">Znamení</span>
+                    <p className="font-bold truncate text-amber-900">{detailModal.data.birthsign}</p>
                   </div>
-                  <div className="p-3 bg-amber-100/50 rounded">
-                    <span className="text-sm text-stone-500">Vzhled</span>
-                    <p className="font-bold truncate">{detailModal.data.physicalDetail}</p>
+                  <div className="p-3 bg-amber-100 rounded">
+                    <span className="text-sm text-amber-700">Vzhled</span>
+                    <p className="font-bold truncate text-amber-900">{detailModal.data.physicalDetail}</p>
                   </div>
                 </div>
                 {detailModal.data.quirk && (
-                  <div className="p-3 bg-purple-100 rounded">
-                    <span className="text-sm text-purple-700">Zvláštnost</span>
-                    <p className="font-bold text-purple-900">{detailModal.data.quirk}</p>
+                  <div className="p-3 bg-amber-100 rounded">
+                    <span className="text-sm text-amber-700">Zvláštnost</span>
+                    <p className="font-bold text-amber-900">{detailModal.data.quirk}</p>
                   </div>
                 )}
                 {detailModal.data.goal && (
-                  <div className="p-3 bg-blue-100 rounded">
-                    <span className="text-sm text-blue-700">Cíl</span>
-                    <p className="font-bold text-blue-900">{detailModal.data.goal}</p>
+                  <div className="p-3 bg-amber-100 rounded">
+                    <span className="text-sm text-amber-700">Cíl</span>
+                    <p className="font-bold text-amber-900">{detailModal.data.goal}</p>
                   </div>
                 )}
                 {detailModal.data.notes && (
-                  <div className="p-3 bg-stone-100 rounded">
-                    <span className="text-sm text-stone-500">Poznámky</span>
-                    <p className="text-stone-700">{detailModal.data.notes}</p>
+                  <div className="p-3 bg-amber-100 rounded">
+                    <span className="text-sm text-amber-700">Poznámky</span>
+                    <p className="text-amber-900">{detailModal.data.notes}</p>
                   </div>
                 )}
 
                 {/* Generátory chování */}
                 <div className="border-t border-amber-200 pt-3">
-                  <p className="text-xs text-stone-500 mb-2">🎲 Generátory (nezapisuje se)</p>
+                  <p className="text-xs text-amber-700 mb-2">🎲 Generátory (nezapisuje se)</p>
                   <div className="flex flex-wrap gap-1">
-                    <button onClick={() => setGeneratedBehavior(`🎭 ${randomFrom(NPC_BEHAVIOR_MOODS)}, ${randomFrom(NPC_BEHAVIOR_ACTIONS)}`)} className="px-2 py-1 text-xs bg-purple-100 hover:bg-purple-200 rounded">Chování</button>
+                    <button onClick={() => setGeneratedBehavior(`🎭 ${randomFrom(NPC_BEHAVIOR_MOODS)}, ${randomFrom(NPC_BEHAVIOR_ACTIONS)}`)} className="px-2 py-1 text-xs bg-amber-100 hover:bg-amber-200 rounded">Chování</button>
                     <button onClick={() => setGeneratedBehavior(`😊 ${randomFrom(NPC_BEHAVIOR_MOODS)}`)} className="px-2 py-1 text-xs bg-amber-100 hover:bg-amber-200 rounded">Nálada</button>
-                    <button onClick={() => setGeneratedBehavior(`🏃 ${randomFrom(NPC_BEHAVIOR_ACTIONS)}`)} className="px-2 py-1 text-xs bg-blue-100 hover:bg-blue-200 rounded">Akce</button>
-                    <button onClick={() => setGeneratedBehavior(`💭 ${randomFrom(NPC_BEHAVIOR_MOTIVATIONS)}`)} className="px-2 py-1 text-xs bg-green-100 hover:bg-green-200 rounded">Motivace</button>
+                    <button onClick={() => setGeneratedBehavior(`🏃 ${randomFrom(NPC_BEHAVIOR_ACTIONS)}`)} className="px-2 py-1 text-xs bg-amber-100 hover:bg-amber-200 rounded">Akce</button>
+                    <button onClick={() => setGeneratedBehavior(`💭 ${randomFrom(NPC_BEHAVIOR_MOTIVATIONS)}`)} className="px-2 py-1 text-xs bg-amber-100 hover:bg-amber-200 rounded">Motivace</button>
                     <button onClick={() => setGeneratedBehavior(`🤫 ${randomFrom(NPC_SECRETS)}`)} className="px-2 py-1 text-xs bg-red-100 hover:bg-red-200 rounded">Tajemství</button>
-                    <button onClick={() => setGeneratedBehavior(`⚡ ${randomFrom(NPC_REACTIONS)}`)} className="px-2 py-1 text-xs bg-orange-100 hover:bg-orange-200 rounded">Reakce</button>
+                    <button onClick={() => setGeneratedBehavior(`⚡ ${randomFrom(NPC_REACTIONS)}`)} className="px-2 py-1 text-xs bg-amber-100 hover:bg-amber-200 rounded">Reakce</button>
                   </div>
                   {generatedBehavior && (
-                    <div className="mt-2 p-2 bg-purple-50 rounded border border-purple-200">
-                      <p className="font-medium text-purple-900">{generatedBehavior}</p>
+                    <div className="mt-2 p-2 bg-amber-50 rounded border border-amber-200">
+                      <p className="font-medium text-amber-900">{generatedBehavior}</p>
                     </div>
                   )}
                 </div>
@@ -1421,12 +1471,12 @@ const JournalPanel = ({ onExport }) => {
                   if (npcEvents.length === 0) return null;
                   return (
                     <div className="border-t border-amber-200 pt-3">
-                      <p className="text-xs text-stone-500 mb-2">📜 Historie událostí ({npcEvents.length})</p>
+                      <p className="text-xs text-amber-700 mb-2">📜 Historie událostí ({npcEvents.length})</p>
                       <div className="space-y-2 max-h-32 overflow-y-auto">
                         {npcEvents.slice(-5).reverse().map((event, i) => (
-                          <div key={i} className="p-2 bg-orange-50 rounded border border-orange-200 text-sm">
-                            <p className="text-orange-900">{event.content}</p>
-                            <p className="text-xs text-stone-400 mt-1">{event.timestamp}</p>
+                          <div key={i} className="p-2 bg-amber-50 rounded border border-amber-200 text-sm">
+                            <p className="text-amber-900">{event.content}</p>
+                            <p className="text-xs text-amber-600 mt-1">{event.timestamp}</p>
                           </div>
                         ))}
                       </div>
@@ -1455,7 +1505,7 @@ const JournalPanel = ({ onExport }) => {
                       className={`px-4 py-2 rounded font-medium ${
                         detailModal.data.isDead
                           ? 'bg-green-500 hover:bg-green-600 text-white'
-                          : 'bg-stone-500 hover:bg-stone-600 text-white'
+                          : 'bg-amber-400 hover:bg-amber-500 text-white'
                       }`}
                       title={detailModal.data.isDead ? 'Oživit NPC' : 'Označit jako mrtvého'}
                     >
@@ -1483,75 +1533,75 @@ const JournalPanel = ({ onExport }) => {
             {detailModal.type === 'settlement' && detailModal.data && (
               <div className="p-4 space-y-3">
                 <div className="flex justify-between items-start">
-                  <h3 className="text-2xl font-bold text-green-900">🏘️ {detailModal.data.name}</h3>
-                  <button onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }} className="text-stone-400 hover:text-stone-600 text-xl">✕</button>
+                  <h3 className="text-2xl font-bold text-amber-900">🏘️ {detailModal.data.name}</h3>
+                  <button onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }} className="text-amber-400 hover:text-amber-600 text-xl">✕</button>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="p-3 bg-green-100 rounded">
-                    <span className="text-sm text-green-700">Velikost</span>
-                    <p className="font-bold text-green-900">{detailModal.data.size}</p>
-                    {detailModal.data.population && <p className="text-sm text-green-700">{detailModal.data.population}</p>}
+                  <div className="p-3 bg-amber-100 rounded">
+                    <span className="text-sm text-amber-700">Velikost</span>
+                    <p className="font-bold text-amber-900">{detailModal.data.size}</p>
+                    {detailModal.data.population && <p className="text-sm text-amber-700">{detailModal.data.population}</p>}
                   </div>
-                  <div className="p-3 bg-amber-100/50 rounded">
-                    <span className="text-sm text-stone-500">Zřízení</span>
-                    <p className="font-bold text-sm">{detailModal.data.governance}</p>
+                  <div className="p-3 bg-amber-100 rounded">
+                    <span className="text-sm text-amber-700">Zřízení</span>
+                    <p className="font-bold text-amber-900 text-sm">{detailModal.data.governance}</p>
                   </div>
                 </div>
                 {detailModal.data.trades?.length > 0 && (
-                  <div className="p-3 bg-blue-100 rounded">
-                    <span className="text-sm text-blue-700">Živnost</span>
+                  <div className="p-3 bg-amber-100 rounded">
+                    <span className="text-sm text-amber-700">Živnost</span>
                     {detailModal.data.trades.map((trade, i) => (
-                      <p key={i} className="font-bold text-blue-900">{trade}</p>
+                      <p key={i} className="font-bold text-amber-900">{trade}</p>
                     ))}
                   </div>
                 )}
                 {detailModal.data.event && (
-                  <div className="p-3 bg-orange-100 rounded">
-                    <span className="text-sm text-orange-700">Co se děje při příchodu</span>
-                    <p className="font-bold text-orange-900">{detailModal.data.event}</p>
+                  <div className="p-3 bg-amber-100 rounded">
+                    <span className="text-sm text-amber-700">Co se děje při příchodu</span>
+                    <p className="font-bold text-amber-900">{detailModal.data.event}</p>
                   </div>
                 )}
                 {detailModal.data.inn && (
-                  <div className="p-3 bg-purple-100 rounded">
-                    <span className="text-sm text-purple-700">Hostinec</span>
-                    <p className="font-bold text-purple-900">{detailModal.data.inn.name || detailModal.data.inn}</p>
-                    {detailModal.data.inn.specialty && <p className="text-sm text-purple-700">Specialita: {detailModal.data.inn.specialty}</p>}
+                  <div className="p-3 bg-amber-100 rounded">
+                    <span className="text-sm text-amber-700">Hostinec</span>
+                    <p className="font-bold text-amber-900">{detailModal.data.inn.name || detailModal.data.inn}</p>
+                    {detailModal.data.inn.specialty && <p className="text-sm text-amber-700">Specialita: {detailModal.data.inn.specialty}</p>}
                   </div>
                 )}
                 <div className="grid grid-cols-2 gap-3">
                   {detailModal.data.landmark && (
-                    <div className="p-3 bg-green-100 rounded">
-                      <span className="text-sm text-green-700">Landmark</span>
-                      <p className="font-bold text-green-900 text-sm">{detailModal.data.landmark}</p>
+                    <div className="p-3 bg-amber-100 rounded">
+                      <span className="text-sm text-amber-700">Landmark</span>
+                      <p className="font-bold text-amber-900 text-sm">{detailModal.data.landmark}</p>
                     </div>
                   )}
                   {detailModal.data.feature && (
-                    <div className="p-3 bg-stone-100 rounded">
-                      <span className="text-sm text-stone-500">Zajímavost</span>
-                      <p className="font-bold text-stone-700 text-sm">{detailModal.data.feature}</p>
+                    <div className="p-3 bg-amber-100 rounded">
+                      <span className="text-sm text-amber-700">Zajímavost</span>
+                      <p className="font-bold text-amber-900 text-sm">{detailModal.data.feature}</p>
                     </div>
                   )}
                 </div>
                 {detailModal.data.notes && (
-                  <div className="p-3 bg-stone-100 rounded">
-                    <span className="text-sm text-stone-500">Poznámky</span>
-                    <p className="text-stone-700">{detailModal.data.notes}</p>
+                  <div className="p-3 bg-amber-100 rounded">
+                    <span className="text-sm text-amber-700">Poznámky</span>
+                    <p className="text-amber-900">{detailModal.data.notes}</p>
                   </div>
                 )}
 
                 {/* Generátory pro osadu */}
-                <div className="border-t border-green-200 pt-3">
-                  <p className="text-xs text-stone-500 mb-2">🎲 Generátory (nezapisuje se)</p>
+                <div className="border-t border-amber-200 pt-3">
+                  <p className="text-xs text-amber-700 mb-2">🎲 Generátory (nezapisuje se)</p>
                   <div className="flex flex-wrap gap-1">
-                    <button onClick={() => setGeneratedBehavior(`⚡ ${randomFrom(SETTLEMENT_HAPPENINGS)}`)} className="px-2 py-1 text-xs bg-orange-100 hover:bg-orange-200 rounded">Událost</button>
-                    <button onClick={() => setGeneratedBehavior(`💬 ${randomFrom(SETTLEMENT_RUMORS)}`)} className="px-2 py-1 text-xs bg-purple-100 hover:bg-purple-200 rounded">Zvěst</button>
-                    <button onClick={() => setGeneratedBehavior(`🌤️ ${randomFrom(NATURE_EVENTS)}`)} className="px-2 py-1 text-xs bg-blue-100 hover:bg-blue-200 rounded">Počasí</button>
+                    <button onClick={() => setGeneratedBehavior(`⚡ ${randomFrom(SETTLEMENT_HAPPENINGS)}`)} className="px-2 py-1 text-xs bg-amber-100 hover:bg-amber-200 rounded">Událost</button>
+                    <button onClick={() => setGeneratedBehavior(`💬 ${randomFrom(SETTLEMENT_RUMORS)}`)} className="px-2 py-1 text-xs bg-amber-100 hover:bg-amber-200 rounded">Zvěst</button>
+                    <button onClick={() => setGeneratedBehavior(`🌤️ ${randomFrom(NATURE_EVENTS)}`)} className="px-2 py-1 text-xs bg-amber-100 hover:bg-amber-200 rounded">Počasí</button>
                     <button onClick={() => setGeneratedBehavior(`⚠️ ${randomFrom(WILDERNESS_THREATS)}`)} className="px-2 py-1 text-xs bg-red-100 hover:bg-red-200 rounded">Hrozba</button>
-                    <button onClick={() => setGeneratedBehavior(`🔍 ${randomFrom(DISCOVERIES)}`)} className="px-2 py-1 text-xs bg-green-100 hover:bg-green-200 rounded">Objev</button>
+                    <button onClick={() => setGeneratedBehavior(`🔍 ${randomFrom(DISCOVERIES)}`)} className="px-2 py-1 text-xs bg-amber-100 hover:bg-amber-200 rounded">Objev</button>
                   </div>
                   {generatedBehavior && (
-                    <div className="mt-2 p-2 bg-green-50 rounded border border-green-200">
-                      <p className="font-medium text-green-900">{generatedBehavior}</p>
+                    <div className="mt-2 p-2 bg-amber-50 rounded border border-amber-200">
+                      <p className="font-medium text-amber-900">{generatedBehavior}</p>
                     </div>
                   )}
                 </div>
@@ -1564,16 +1614,16 @@ const JournalPanel = ({ onExport }) => {
                   );
                   if (settlementLogs.length === 0) return null;
                   return (
-                    <div className="border-t border-green-200 pt-3">
-                      <p className="text-xs text-stone-500 mb-2">📜 Historie ({settlementLogs.length})</p>
+                    <div className="border-t border-amber-200 pt-3">
+                      <p className="text-xs text-amber-700 mb-2">📜 Historie ({settlementLogs.length})</p>
                       <div className="space-y-2 max-h-40 overflow-y-auto">
                         {settlementLogs.slice(-5).reverse().map((event, i) => (
-                          <div key={i} className={`p-2 rounded border text-sm ${event.subtype === 'settlement_rumor' ? 'bg-purple-50 border-purple-200' : 'bg-orange-50 border-orange-200'}`}>
+                          <div key={i} className="p-2 rounded border text-sm bg-amber-50 border-amber-200">
                             <div className="flex items-center gap-1 mb-1">
                               <span className="text-xs">{event.subtype === 'settlement_rumor' ? '💬 Zvěst' : '⚡ Událost'}</span>
                             </div>
-                            <p className={event.subtype === 'settlement_rumor' ? 'text-purple-900' : 'text-orange-900'}>{event.content}</p>
-                            <p className="text-xs text-stone-400 mt-1">{event.timestamp}</p>
+                            <p className="text-amber-900">{event.content}</p>
+                            <p className="text-xs text-amber-600 mt-1">{event.timestamp}</p>
                           </div>
                         ))}
                       </div>
@@ -1588,7 +1638,7 @@ const JournalPanel = ({ onExport }) => {
                       setDetailModal(null);
                       setGeneratedBehavior(null);
                     }}
-                    className="flex-1 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-medium"
+                    className="flex-1 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium"
                   >
                     ✏️ Upravit
                   </button>
@@ -1618,40 +1668,40 @@ const JournalPanel = ({ onExport }) => {
                     <span className="text-3xl">{detailModal.data.type?.icon || '🐭'}</span>
                     <div>
                       <h3 className="text-2xl font-bold text-amber-900">{detailModal.data.name}</h3>
-                      <p className="text-sm text-stone-600">{detailModal.data.type?.name}</p>
+                      <p className="text-sm text-amber-700">{detailModal.data.type?.name}</p>
                     </div>
                   </div>
-                  <button onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }} className="text-stone-400 hover:text-stone-600 text-xl">✕</button>
+                  <button onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }} className="text-amber-400 hover:text-amber-600 text-xl">✕</button>
                 </div>
 
                 {/* Aktivita a nálada */}
-                <div className="p-3 bg-amber-100/50 rounded">
-                  <p className="text-stone-700">
+                <div className="p-3 bg-amber-100 rounded">
+                  <p className="text-amber-900">
                     {detailModal.data.name} {detailModal.data.doing}.
-                    <span className="text-stone-600 ml-1">Je {detailModal.data.personality}.</span>
+                    <span className="text-amber-800 ml-1">Je {detailModal.data.personality}.</span>
                   </p>
                   {detailModal.data.mood && (
-                    <p className="text-stone-500 italic mt-1">{detailModal.data.mood.charAt(0).toUpperCase() + detailModal.data.mood.slice(1)}.</p>
+                    <p className="text-amber-700 italic mt-1">{detailModal.data.mood.charAt(0).toUpperCase() + detailModal.data.mood.slice(1)}.</p>
                   )}
                 </div>
 
                 {/* Vzhled */}
-                <div className="p-3 bg-white/50 rounded border-l-4 border-amber-400">
+                <div className="p-3 bg-amber-50 rounded border-l-4 border-amber-400">
                   <span className="text-xs text-amber-700 font-medium block mb-1">👁️ VZHLED</span>
-                  <p className="text-stone-700">{detailModal.data.appearance?.charAt(0).toUpperCase() + detailModal.data.appearance?.slice(1)}.</p>
+                  <p className="text-amber-900">{detailModal.data.appearance?.charAt(0).toUpperCase() + detailModal.data.appearance?.slice(1)}.</p>
                 </div>
 
                 {/* Cíl */}
-                <div className="p-3 bg-white/50 rounded border-l-4 border-blue-400">
-                  <span className="text-xs text-blue-600 font-medium block mb-1">🎯 CÍL</span>
-                  <p className="text-stone-700">{detailModal.data.goal?.charAt(0).toUpperCase() + detailModal.data.goal?.slice(1)}.</p>
+                <div className="p-3 bg-amber-50 rounded border-l-4 border-amber-400">
+                  <span className="text-xs text-amber-700 font-medium block mb-1">🎯 CÍL</span>
+                  <p className="text-amber-900">{detailModal.data.goal?.charAt(0).toUpperCase() + detailModal.data.goal?.slice(1)}.</p>
                 </div>
 
                 {/* Zvláštnost */}
                 {detailModal.data.quirk && (
-                  <div className="p-3 bg-white/50 rounded border-l-4 border-purple-400">
-                    <span className="text-xs text-purple-600 font-medium block mb-1">✨ ZVLÁŠTNOST</span>
-                    <p className="text-stone-700">{detailModal.data.quirk.charAt(0).toUpperCase() + detailModal.data.quirk.slice(1)}.</p>
+                  <div className="p-3 bg-amber-50 rounded border-l-4 border-amber-400">
+                    <span className="text-xs text-amber-700 font-medium block mb-1">✨ ZVLÁŠTNOST</span>
+                    <p className="text-amber-900">{detailModal.data.quirk.charAt(0).toUpperCase() + detailModal.data.quirk.slice(1)}.</p>
                   </div>
                 )}
 
@@ -1664,8 +1714,8 @@ const JournalPanel = ({ onExport }) => {
                 )}
 
                 {/* Kategorie */}
-                <div className="pt-3 border-t border-stone-200">
-                  <span className="px-2 py-1 bg-stone-100 rounded text-xs text-stone-500">
+                <div className="pt-3 border-t border-amber-200">
+                  <span className="px-2 py-1 bg-amber-100 rounded text-xs text-amber-700">
                     {detailModal.data.type?.category === 'mouse' ? '🐭 Myš' :
                      detailModal.data.type?.category === 'rat' ? '🐀 Krysa' :
                      detailModal.data.type?.category === 'insect' ? '🐛 Hmyz' :
@@ -1678,9 +1728,9 @@ const JournalPanel = ({ onExport }) => {
 
                 {/* Poznámka ze záznamu */}
                 {detailModal.note && (
-                  <div className="p-3 bg-stone-100 rounded">
-                    <span className="text-sm text-stone-500">Poznámka</span>
-                    <p className="text-stone-700 italic">{detailModal.note}</p>
+                  <div className="p-3 bg-amber-100 rounded">
+                    <span className="text-sm text-amber-700">Poznámka</span>
+                    <p className="text-amber-900 italic">{detailModal.note}</p>
                   </div>
                 )}
 
@@ -1698,7 +1748,7 @@ const JournalPanel = ({ onExport }) => {
                     >
                       ⭐ Povýšit na NPC
                     </button>
-                    <p className="text-xs text-stone-500 text-center mt-1">Vytvoří plnohodnotné NPC se statistikami</p>
+                    <p className="text-xs text-amber-700 text-center mt-1">Vytvoří plnohodnotné NPC se statistikami</p>
                   </div>
                 )}
               </div>
@@ -1711,45 +1761,45 @@ const JournalPanel = ({ onExport }) => {
                   <div className="flex items-center gap-2">
                     <span className="text-3xl">🎬</span>
                     <div>
-                      <h3 className={`text-xl font-bold ${detailModal.data.isAltered ? 'text-orange-700' : 'text-green-700'}`}>
+                      <h3 className={`text-xl font-bold ${detailModal.data.isAltered ? 'text-amber-700' : 'text-green-700'}`}>
                         [{detailModal.data.alteredDie}] {detailModal.data.isAltered ? 'Pozměněná scéna!' : 'Scéna dle očekávání'}
                       </h3>
                     </div>
                   </div>
-                  <button onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }} className="text-stone-400 hover:text-stone-600 text-xl">✕</button>
+                  <button onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }} className="text-amber-400 hover:text-amber-600 text-xl">✕</button>
                 </div>
 
                 {/* Úvodní situace */}
-                <div className="p-3 bg-amber-100/50 rounded border-l-4 border-amber-400">
+                <div className="p-3 bg-amber-100 rounded border-l-4 border-amber-400">
                   <span className="text-xs text-amber-700 font-medium block mb-1">📖 ÚVOD</span>
-                  <p className="text-stone-700">{detailModal.data.opening}</p>
+                  <p className="text-amber-900">{detailModal.data.opening}</p>
                 </div>
 
                 {/* Místo */}
-                <div className="p-3 bg-green-100/50 rounded border-l-4 border-green-400">
-                  <span className="text-xs text-green-700 font-medium block mb-1">📍 MÍSTO</span>
-                  <p className="text-stone-700">{detailModal.data.setting}</p>
+                <div className="p-3 bg-amber-100 rounded border-l-4 border-amber-400">
+                  <span className="text-xs text-amber-700 font-medium block mb-1">📍 MÍSTO</span>
+                  <p className="text-amber-900">{detailModal.data.setting}</p>
                 </div>
 
                 {/* Akce + Téma */}
-                <div className="p-3 bg-purple-100/50 rounded border-l-4 border-purple-400">
-                  <span className="text-xs text-purple-700 font-medium block mb-1">💡 AKCE + TÉMA</span>
-                  <p className="text-stone-700 font-medium">{detailModal.data.action} + {detailModal.data.theme}</p>
+                <div className="p-3 bg-amber-100 rounded border-l-4 border-amber-500">
+                  <span className="text-xs text-amber-800 font-medium block mb-1">💡 AKCE + TÉMA</span>
+                  <p className="text-amber-900 font-medium">{detailModal.data.action} + {detailModal.data.theme}</p>
                 </div>
 
                 {/* Komplikace (pokud je pozměněná) */}
                 {detailModal.data.isAltered && detailModal.data.complication && (
-                  <div className="p-3 bg-orange-100 rounded border-l-4 border-orange-500">
-                    <span className="text-xs text-orange-700 font-medium block mb-1">⚡ KOMPLIKACE</span>
-                    <p className="text-orange-900 font-medium">{detailModal.data.complication}</p>
+                  <div className="p-3 bg-amber-200 rounded border-l-4 border-amber-500">
+                    <span className="text-xs text-amber-800 font-medium block mb-1">⚡ KOMPLIKACE</span>
+                    <p className="text-amber-900 font-medium">{detailModal.data.complication}</p>
                   </div>
                 )}
 
                 {/* Poznámka */}
                 {detailModal.note && (
-                  <div className="p-3 bg-stone-100 rounded">
-                    <span className="text-sm text-stone-500">Poznámka</span>
-                    <p className="text-stone-700 italic">{detailModal.note}</p>
+                  <div className="p-3 bg-amber-100 rounded">
+                    <span className="text-sm text-amber-700">Poznámka</span>
+                    <p className="text-amber-900 italic">{detailModal.note}</p>
                   </div>
                 )}
               </div>
@@ -1763,26 +1813,26 @@ const JournalPanel = ({ onExport }) => {
                     <span className="text-3xl">🎭</span>
                     <h3 className="text-xl font-bold text-amber-900">Setkání</h3>
                   </div>
-                  <button onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }} className="text-stone-400 hover:text-stone-600 text-xl">✕</button>
+                  <button onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }} className="text-amber-400 hover:text-amber-600 text-xl">✕</button>
                 </div>
 
                 {/* Tvor */}
-                <div className="p-3 bg-amber-100/50 rounded border-l-4 border-amber-400">
+                <div className="p-3 bg-amber-100 rounded border-l-4 border-amber-400">
                   <span className="text-xs text-amber-700 font-medium block mb-1">🐭 TVOR</span>
-                  <p className="text-stone-700 font-medium">{detailModal.data.creature}</p>
+                  <p className="text-amber-900 font-medium">{detailModal.data.creature}</p>
                 </div>
 
                 {/* Aktivita */}
-                <div className="p-3 bg-blue-100/50 rounded border-l-4 border-blue-400">
-                  <span className="text-xs text-blue-700 font-medium block mb-1">🎬 AKTIVITA</span>
-                  <p className="text-stone-700">{detailModal.data.activity}</p>
+                <div className="p-3 bg-amber-100 rounded border-l-4 border-amber-400">
+                  <span className="text-xs text-amber-700 font-medium block mb-1">🎬 AKTIVITA</span>
+                  <p className="text-amber-900">{detailModal.data.activity}</p>
                 </div>
 
                 {/* Poznámka */}
                 {detailModal.note && (
-                  <div className="p-3 bg-stone-100 rounded">
-                    <span className="text-sm text-stone-500">Poznámka</span>
-                    <p className="text-stone-700 italic">{detailModal.note}</p>
+                  <div className="p-3 bg-amber-100 rounded">
+                    <span className="text-sm text-amber-700">Poznámka</span>
+                    <p className="text-amber-900 italic">{detailModal.note}</p>
                   </div>
                 )}
               </div>
@@ -1802,7 +1852,7 @@ const JournalPanel = ({ onExport }) => {
           }`} onClick={e => e.stopPropagation()}>
             <button
               onClick={() => setWeatherModal(null)}
-              className="absolute top-4 right-4 text-stone-400 hover:text-stone-600 text-xl"
+              className="absolute top-4 right-4 text-amber-400 hover:text-amber-600 text-xl"
             >
               ✕
             </button>

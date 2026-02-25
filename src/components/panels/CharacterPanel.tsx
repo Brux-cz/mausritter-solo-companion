@@ -544,7 +544,7 @@ const CharacterTabs = ({
   if (!party?.members || party.members.length === 0) return null;
 
   return (
-    <div className="fixed right-0 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-1 sm:hidden">
+    <div className="fixed right-0 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-1 lg:hidden">
       {party.members.map((member) => {
         const isActive = member.id === activeCharacterId;
         const hpPercent = member.hp ? (member.hp.current / member.hp.max) * 100 : 100;
@@ -1296,18 +1296,20 @@ const CharacterPanel = () => {
                   
                   {/* Bonus origin roller */}
                   <div className="bg-white rounded-lg p-3 mt-2">
-                    <button
-                      onClick={() => {
-                        const hp = Math.floor(Math.random() * 6) + 1;
-                        const pips = Math.floor(Math.random() * 6) + 1;
-                        const key = `${hp}-${pips}`;
-                        setBonusOrigin({ key, origin: ORIGINS[key], hp, pips });
-                        setSelectedBonusItems([]);
-                      }}
-                      className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded font-bold mb-2"
-                    >
-                      🎲 Hodit na bonus původ
-                    </button>
+                    {!bonusOrigin && (
+                      <button
+                        onClick={() => {
+                          const hp = Math.floor(Math.random() * 6) + 1;
+                          const pips = Math.floor(Math.random() * 6) + 1;
+                          const key = `${hp}-${pips}`;
+                          setBonusOrigin({ key, origin: ORIGINS[key], hp, pips });
+                          setSelectedBonusItems([]);
+                        }}
+                        className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded font-bold mb-2"
+                      >
+                        🎲 Hodit na bonus původ
+                      </button>
+                    )}
                     {bonusOrigin && (
                       <div className="text-center">
                         <div className="text-xs text-stone-500">HP {bonusOrigin.hp} × Pips {bonusOrigin.pips}</div>
@@ -1391,7 +1393,7 @@ const CharacterPanel = () => {
               >
                 {STARTING_WEAPONS.map((weapon, i) => (
                   <option key={i} value={i}>
-                    {weapon.name} ({weapon.damage}, {weapon.weight === 'light' ? 'lehká' : weapon.weight === 'medium' ? 'střední' : 'těžká'})
+                    {weapon.name} ({weapon.damage}, {weapon.weight === 'improvised' ? 'improvizovaná' : weapon.weight === 'light' ? 'lehká' : weapon.weight === 'medium' ? 'střední' : weapon.weight === 'ranged_light' ? 'lehká střelná' : weapon.weight === 'ranged_heavy' ? 'těžká střelná' : 'těžká'})
                   </option>
                 ))}
               </select>

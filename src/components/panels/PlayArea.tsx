@@ -17,18 +17,18 @@ import type { SceneType, SceneThread, SceneCheckResult, SceneOutcome } from '../
 const HowToPlay = () => {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border border-blue-200 rounded-xl overflow-hidden text-xs">
+    <div className="border border-[#FFD8A8] overflow-hidden text-xs" style={{ borderRadius:10 }}>
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-3 py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 font-medium"
+        className="w-full flex items-center justify-between px-3 py-2 bg-[#FFF5DC] text-[#8A5A4A] hover:bg-[#FFD8A8] font-medium"
       >
         <span>📖 Jak hrát (workflow)</span>
         <span>{open ? '▲' : '▼'}</span>
       </button>
       {open && (
-        <div className="px-3 py-3 bg-blue-50/40 space-y-3 text-stone-700">
+        <div className="px-3 py-3 bg-[#FFFBF1] space-y-3 text-[#2A1810]">
           <div>
-            <p className="font-bold text-blue-800 mb-1">🟣 Začátek session</p>
+            <p className="font-bold text-[#2A1810] mb-1">🟣 Začátek session</p>
             <ol className="list-decimal ml-4 space-y-0.5">
               <li>Čas → zkontroluj sezónu, hoď počasí</li>
               <li>Deník → napiš 1 větu recap</li>
@@ -36,7 +36,7 @@ const HowToPlay = () => {
             </ol>
           </div>
           <div>
-            <p className="font-bold text-blue-800 mb-1">🟡 Každá scéna</p>
+            <p className="font-bold text-[#2A1810] mb-1">🟡 Každá scéna</p>
             <ol className="list-decimal ml-4 space-y-0.5">
               <li>IDLE: napiš název scény → Zahájit</li>
               <li>SCENE SETUP: přečti check kartu (normální/pozměněná/přerušená)</li>
@@ -53,15 +53,15 @@ const HowToPlay = () => {
             </ol>
           </div>
           <div>
-            <p className="font-bold text-blue-800 mb-1">🟢 Konec session</p>
+            <p className="font-bold text-[#2A1810] mb-1">🟢 Konec session</p>
             <ol className="list-decimal ml-4 space-y-0.5">
               <li>Deník → zapiš XP + co se stalo</li>
               <li>Postavy → zkontroluj inventory (rations, torch, armor)</li>
               <li>Deník → cliffhanger (1 věta kam příště začít)</li>
             </ol>
           </div>
-          <div className="border-t border-blue-200 pt-2 text-stone-500">
-            <p className="font-bold text-blue-700 mb-1">⚡ Oracle pravidla</p>
+          <div className="border-t border-[#FFD8A8] pt-2 text-[#C09A80]">
+            <p className="font-bold text-[#E36A6A] mb-1">⚡ Oracle pravidla</p>
             <ul className="list-disc ml-4 space-y-0.5">
               <li>2d6 útok: 2–6 miss · 7–9 slabý · 10–11 silný · 12 drtivý</li>
               <li>Save: d20 ≤ stat = úspěch (rovnost = úspěch)</li>
@@ -106,17 +106,17 @@ const ThreadList = ({ threads, onToggle, onRemove }: {
           className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${
             t.resolved
               ? 'bg-green-500 border-green-500 text-white'
-              : 'border-amber-400 bg-white'
+              : 'border-[#FFD8A8] bg-white'
           }`}
         >
           {t.resolved && '✓'}
         </button>
-        <span className={t.resolved ? 'line-through text-stone-400' : 'text-stone-700'}>
+        <span className={t.resolved ? 'line-through text-[#C09A80]' : 'text-[#2A1810]'}>
           {t.description}
         </span>
         <button
           onClick={() => onRemove(t.id)}
-          className="ml-auto text-stone-400 hover:text-red-500 text-xs shrink-0"
+          className="ml-auto text-[#C09A80] hover:text-red-500 text-xs shrink-0"
         >
           ✕
         </button>
@@ -143,12 +143,12 @@ const IdleState = ({ sceneCount, onStart }: {
   };
 
   return (
-    <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-6 space-y-4">
+    <div className="border border-[#FFD8A8] p-5 space-y-4" style={{ borderRadius:10, background:'#FFF5DC' }}>
       <div className="text-center">
         <span className="text-3xl">🎬</span>
-        <p className="text-amber-800 font-bold mt-2">Žádná aktivní scéna</p>
+        <p className="font-bold mt-2" style={{ color:'#2A1810' }}>Žádná aktivní scéna</p>
         {sceneCount > 0 && (
-          <p className="text-xs text-amber-600 mt-1">Celkem scén: {sceneCount}</p>
+          <p className="text-xs mt-1" style={{ color:'#8A5A4A' }}>Celkem scén: {sceneCount}</p>
         )}
       </div>
       <div className="space-y-2">
@@ -157,21 +157,27 @@ const IdleState = ({ sceneCount, onStart }: {
           onChange={(e) => setSceneTitle(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleStart()}
           placeholder="Název scény..."
-          className="w-full px-3 py-2 rounded-lg border border-amber-300 bg-white text-sm"
+          className="w-full px-3 py-2 text-sm focus:outline-none focus:border-[#E36A6A]"
+          style={{ borderRadius:7, border:'1px solid #FFD8A8', background:'#FFFBF1', color:'#2A1810' }}
           autoFocus
         />
         <select
           value={sceneType}
           onChange={(e) => setSceneType(e.target.value as SceneType)}
-          className="w-full px-3 py-2 rounded-lg border border-amber-300 bg-white text-sm font-medium"
+          className="w-full px-3 py-2 text-sm font-medium focus:outline-none focus:border-[#E36A6A]"
+          style={{ borderRadius:7, border:'1px solid #FFD8A8', background:'#FFFBF1', color:'#2A1810' }}
         >
           {Object.entries(SCENE_TYPE_LABELS).map(([k, v]) => (
             <option key={k} value={k}>{v}</option>
           ))}
         </select>
-        <Button onClick={handleStart} variant="primary" className="w-full">
+        <button
+          onClick={handleStart}
+          className="w-full py-2 bg-[#E36A6A] hover:bg-[#C84848] text-white font-bold text-sm transition-colors"
+          style={{ borderRadius:8 }}
+        >
           ▶ Zahájit scénu
-        </Button>
+        </button>
       </div>
     </div>
   );
@@ -187,26 +193,29 @@ const SceneCheckCard = ({ result, onContinue }: {
 }) => {
   const { checkResult, alteration, focus, checkDie, chaosFactor } = result;
 
-  const configs: Record<SceneCheckResult, { emoji: string; label: string; bg: string; text: string; desc: string; hint?: string }> = {
+  const configs: Record<SceneCheckResult, { emoji: string; label: string; color: string; border: string; bg: string; desc: string; hint?: string }> = {
     normal: {
       emoji: '✅',
       label: 'NORMÁLNÍ SCÉNA',
-      bg: 'bg-green-50 border-green-400',
-      text: 'text-green-800',
+      color: '#5A8A5A',
+      border: '#5A8A5A50',
+      bg: '#5A8A5A08',
       desc: 'Scéna probíhá jak jsi plánoval.',
     },
     altered: {
       emoji: '⚡',
       label: 'POZMĚNĚNÁ SCÉNA',
-      bg: 'bg-yellow-50 border-yellow-400',
-      text: 'text-yellow-800',
+      color: '#B07820',
+      border: '#B0782048',
+      bg: '#B0782008',
       desc: alteration || '',
     },
     interrupted: {
       emoji: '🔀',
       label: 'PŘERUŠENÁ SCÉNA',
-      bg: 'bg-red-50 border-red-400',
-      text: 'text-red-800',
+      color: '#C83838',
+      border: '#C8383850',
+      bg: '#C8383808',
       desc: focus || '',
       hint: '→ Hoď 💡 Akce+Téma níže pro inspiraci co se místo toho stane.',
     },
@@ -215,19 +224,19 @@ const SceneCheckCard = ({ result, onContinue }: {
   const cfg = configs[checkResult];
 
   return (
-    <div className={`border-2 rounded-xl p-5 space-y-3 ${cfg.bg}`}>
-      <div className={`flex items-center gap-2 font-bold ${cfg.text}`}>
+    <div style={{ border:`1px solid ${cfg.border}`, borderRadius:10, padding:'20px', background:cfg.bg }} className="space-y-3">
+      <div className="flex items-center gap-2 font-bold">
         <span className="text-2xl">{cfg.emoji}</span>
-        <span>{cfg.label}</span>
-        <span className="ml-auto text-xs font-normal opacity-70">
+        <span style={{ color: cfg.color }}>{cfg.label}</span>
+        <span className="ml-auto text-xs font-normal" style={{ color:'#C09A80' }}>
           d10: {checkDie} vs CF {chaosFactor}
         </span>
       </div>
       {cfg.desc && (
-        <p className={`text-sm ${cfg.text} opacity-90`}>{cfg.desc}</p>
+        <p className="text-sm" style={{ color: cfg.color, opacity: 0.9 }}>{cfg.desc}</p>
       )}
       {'hint' in cfg && cfg.hint && (
-        <p className="text-xs text-red-700 bg-red-100 rounded-lg px-3 py-2 border border-red-200">
+        <p className="text-xs px-3 py-2" style={{ color:'#C83838', background:'#C8383812', borderRadius:6, border:'1px solid #C8383850' }}>
           {cfg.hint}
         </p>
       )}
@@ -242,55 +251,66 @@ const SceneCheckCard = ({ result, onContinue }: {
 // StatusBar — vždy viditelný pruh v PLAYING
 // ────────────────────────────────────────────────────────────────
 
-const StatusBar = ({ sceneNumber, sceneTitle, sceneType, chaosFactor, onCFChange, onEndScene }: {
+const StatusBar = ({ sceneNumber, sceneTitle, sceneType, chaosFactor, onCFChange, onEndScene, onCancel }: {
   sceneNumber: number;
   sceneTitle: string;
   sceneType: SceneType;
   chaosFactor: number;
   onCFChange: (delta: number) => void;
   onEndScene: (outcome: SceneOutcome) => void;
+  onCancel: () => void;
 }) => (
-  <div className="bg-amber-50 border-2 border-amber-400 rounded-xl px-4 py-3 space-y-2">
+  <div className="bg-[#FFF5DC] border border-[#FFD8A8] rounded-xl px-4 py-3 space-y-2">
     <div className="flex items-center gap-2 flex-wrap">
-      <span className="text-amber-700 font-bold text-sm shrink-0">
+      <span className="text-[#2A1810] font-bold text-sm shrink-0">
         🎬 #{sceneNumber}: {sceneTitle}
       </span>
-      <span className="text-xs text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full shrink-0">
+      <span className="text-xs text-[#8A5A4A] bg-[#FFD8A8]/40 px-2 py-0.5 rounded-full shrink-0">
         {SCENE_TYPE_LABELS[sceneType] || sceneType}
       </span>
       <div className="flex items-center gap-1 ml-auto shrink-0">
         <span
-          className="text-xs text-stone-500 cursor-help border-b border-dotted border-stone-400"
+          className="text-xs text-[#C09A80] cursor-help border-b border-dotted border-[#C09A80]"
           title="Chaos Factor (1–9): čím vyšší, tím pravděpodobnější přerušení nebo pozměnění scény. Po vyhrané scéně −1, po prohře +1."
         >CF</span>
         <button
           onClick={() => onCFChange(-1)}
           disabled={chaosFactor <= 1}
-          className="w-6 h-6 rounded bg-stone-200 hover:bg-stone-300 disabled:opacity-40 text-stone-700 font-bold text-sm flex items-center justify-center"
+          className="w-6 h-6 rounded bg-[#FFD8A8] hover:bg-[#FFC090] disabled:opacity-40 text-[#2A1810] font-bold text-sm flex items-center justify-center"
         >–</button>
         <span
-          className={`w-6 text-center font-bold ${chaosFactor >= 7 ? 'text-red-700' : chaosFactor >= 5 ? 'text-amber-800' : 'text-green-700'}`}
+          className={`w-6 text-center font-bold ${chaosFactor >= 7 ? 'text-red-700' : chaosFactor >= 5 ? 'text-[#E36A6A]' : 'text-green-700'}`}
           title={`CF ${chaosFactor}: ${chaosFactor <= 3 ? 'Nízké — situace pod kontrolou' : chaosFactor <= 6 ? 'Střední — nejistota roste' : 'Vysoké — chaos hrozí!'}`}
         >{chaosFactor}</span>
         <button
           onClick={() => onCFChange(1)}
           disabled={chaosFactor >= 9}
-          className="w-6 h-6 rounded bg-stone-200 hover:bg-stone-300 disabled:opacity-40 text-stone-700 font-bold text-sm flex items-center justify-center"
+          className="w-6 h-6 rounded bg-[#FFD8A8] hover:bg-[#FFC090] disabled:opacity-40 text-[#2A1810] font-bold text-sm flex items-center justify-center"
         >+</button>
       </div>
     </div>
     <div className="flex gap-2">
       <button
         onClick={() => onEndScene('in_control')}
-        className="flex-1 px-3 py-1.5 bg-green-100 hover:bg-green-200 text-green-800 rounded-lg text-xs font-medium transition-colors"
+        className="flex-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors hover:opacity-80"
+        style={{ background:'#5A8A5A12', color:'#5A8A5A', border:'1px solid #5A8A5A50' }}
       >
-        ✅ V kontrole (CF−1)
+        ✓ V kontrole (CF−1)
       </button>
       <button
         onClick={() => onEndScene('out_of_control')}
-        className="flex-1 px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-800 rounded-lg text-xs font-medium transition-colors"
+        className="flex-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors hover:opacity-80"
+        style={{ background:'#C8383812', color:'#C83838', border:'1px solid #C8383850' }}
       >
-        ❌ Mimo kontrolu (CF+1)
+        ✕ Mimo kontrolu (CF+1)
+      </button>
+      <button
+        onClick={() => { if (window.confirm('Zrušit scénu a smazat všechny její záznamy?')) onCancel(); }}
+        className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors hover:opacity-80"
+        style={{ background:'transparent', color:'#C09A80', border:'1px solid #FFD8A8' }}
+        title="Zrušit scénu bez uložení (smaže záznamy)"
+      >
+        × Zrušit
       </button>
     </div>
   </div>
@@ -306,7 +326,11 @@ const ConversationCore = () => {
 
   const [question, setQuestion] = useState('');
   const [probability, setProbability] = useState<'unlikely' | 'even' | 'likely'>('even');
-  const [lastResult, setLastResult] = useState<string | null>(null);
+  type LastOracleResult =
+    | { kind: 'yes_no'; question: string; result: string; dice: number[]; total: number; probability: string }
+    | { kind: 'text'; text: string }
+    | null;
+  const [lastResult, setLastResult] = useState<LastOracleResult>(null);
   const [openAction, setOpenAction] = useState<QuickAction>(null);
 
   // Dice state
@@ -322,7 +346,7 @@ const ConversationCore = () => {
       type: 'oracle', subtype: 'yes_no', timestamp: formatTimestamp(),
       question: question || '(Bez otázky)', probability, dice, total, result,
     });
-    setLastResult(`${question ? `"${question}" → ` : ''}**${result}** (2d6: ${total})`);
+    setLastResult({ kind: 'yes_no', question, result, dice, total, probability });
     setQuestion('');
   };
 
@@ -330,7 +354,7 @@ const ConversationCore = () => {
     const action = randomFrom(ACTION_ORACLE);
     const theme = randomFrom(THEME_ORACLE);
     log({ type: 'oracle', subtype: 'action_theme', timestamp: formatTimestamp(), result: `${action} + ${theme}`, action, theme });
-    setLastResult(`**${action}** + **${theme}**`);
+    setLastResult({ kind: 'text', text: `**${action}** + **${theme}**` });
   };
 
   const rollEncounter = () => {
@@ -342,7 +366,7 @@ const ConversationCore = () => {
     const motivation = randomFrom(ENCOUNTER_MOTIVATIONS);
     const narrative = `${mood}. ${location.charAt(0).toUpperCase() + location.slice(1)} spatříš **${creature.name}**. ${creature.name} ${activity}. ${detail} *${motivation}*`;
     log({ type: 'oracle', subtype: 'encounter', timestamp: formatTimestamp(), result: narrative });
-    setLastResult(narrative);
+    setLastResult({ kind: 'text', text: narrative });
   };
 
   const rollCustomDice = () => {
@@ -350,23 +374,32 @@ const ConversationCore = () => {
     const total = dice.reduce((a, b) => a + b, 0);
     setDiceResult({ dice, total });
     log({ type: 'oracle', subtype: 'custom_dice', timestamp: formatTimestamp(), dice, sides: diceSides, count: diceCount, total, reason: diceReason || null });
-    setLastResult(`${diceCount}d${diceSides}: [${dice.join(', ')}]${diceCount > 1 ? ` = ${total}` : ''}${diceReason ? ` (${diceReason})` : ''}`);
+    setLastResult({ kind: 'text', text: `${diceCount}d${diceSides}: [${dice.join(', ')}]${diceCount > 1 ? ` = ${total}` : ''}${diceReason ? ` (${diceReason})` : ''}` });
     setDiceReason('');
+  };
+
+  const oracleResultColor = (result: string) => {
+    const r = result.toLowerCase();
+    if (r.startsWith('yes, and')) return '#5A8A5A';
+    if (r.startsWith('yes, but') || r.startsWith('no, but')) return '#B07820';
+    if (r.startsWith('no, and') || r.startsWith('no')) return '#C83838';
+    if (r.startsWith('yes')) return '#5A8A5A';
+    return '#2A1810';
   };
 
   const renderMarkdown = (text: string) => (
     <span
       dangerouslySetInnerHTML={{
         __html: text
-          .replace(/\*\*(.+?)\*\*/g, '<strong class="text-amber-300">$1</strong>')
-          .replace(/\*(.+?)\*/g, '<em class="text-stone-400">$1</em>'),
+          .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*(.+?)\*/g, '<em style="color:#8A5A4A">$1</em>'),
       }}
     />
   );
 
   return (
-    <div className="bg-white border border-stone-200 rounded-xl p-4 space-y-3">
-      <p className="text-xs text-stone-500 font-medium uppercase tracking-wide">The Conversation</p>
+    <div className="bg-[#FFF5DC] border border-[#FFD8A8] rounded-xl p-4 space-y-3">
+      <p className="text-xs text-[#C09A80] font-medium uppercase tracking-wide">The Conversation</p>
 
       {/* Oracle input */}
       <input
@@ -374,36 +407,59 @@ const ConversationCore = () => {
         onChange={(e) => setQuestion(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && rollYesNo()}
         placeholder="Co se děje? Zadej otázku pro Oracle..."
-        className="w-full px-3 py-2 rounded-lg border border-stone-300 bg-white text-sm"
+        className="w-full px-3 py-2 rounded-lg border border-[#FFD8A8] bg-white text-sm text-[#2A1810] focus:outline-none focus:border-[#E36A6A]"
       />
 
-      {/* Pravděpodobnost */}
-      <div className="flex flex-wrap gap-2">
-        {(['unlikely', 'even', 'likely'] as const).map(prob => (
+      {/* Pravděpodobnost — Pravd./Rovné/Nepravd. */}
+      <div className="flex gap-1">
+        {([
+          { key: 'likely' as const, label: 'Pravd.' },
+          { key: 'even' as const, label: 'Stejně' },
+          { key: 'unlikely' as const, label: 'Nepravd.' },
+        ]).map(({ key, label }) => (
           <button
-            key={prob}
-            onClick={() => setProbability(prob)}
-            className={`flex-1 px-2 py-1.5 rounded-lg font-medium text-xs transition-all ${
-              probability === prob
-                ? 'bg-amber-700 text-amber-50'
-                : 'bg-amber-100 text-amber-900 hover:bg-amber-200'
+            key={key}
+            onClick={() => setProbability(key)}
+            className={`flex-1 py-1.5 rounded-lg font-bold uppercase tracking-wider transition-all border text-[10px] ${
+              probability === key
+                ? 'bg-[#E36A6A] text-white border-[#E36A6A]'
+                : 'text-[#8A5A4A] border-[#FFD8A8] hover:bg-[#E36A6A14] hover:text-[#2A1810]'
             }`}
+            style={{ background: probability === key ? undefined : 'transparent' }}
           >
-            {prob === 'unlikely' ? '⬇️ Nepravděpodobné' : prob === 'likely' ? '⬆️ Pravděpodobné' : '➡️ Rovné šance'}
+            {label}
           </button>
         ))}
       </div>
 
       {/* Hlavní tlačítko Oracle */}
-      <Button onClick={rollYesNo} variant="primary" className="w-full">
+      <button
+        onClick={rollYesNo}
+        className="w-full py-2 bg-[#E36A6A] hover:bg-[#C84848] text-white rounded-lg text-xs font-bold uppercase tracking-wide transition-colors"
+        style={{ borderRadius:8 }}
+      >
         🎲 Hodit Oracle (2d6)
-      </Button>
+      </button>
 
       {/* Výsledek */}
       {lastResult && (
-        <div className="p-3 bg-stone-800 text-stone-100 rounded-lg text-sm">
-          <span className="text-stone-400 text-xs block mb-1">Výsledek:</span>
-          {renderMarkdown(lastResult)}
+        <div style={{ background:'#FFFBF1', border:'1px solid #B0782048', borderRadius:7, padding:'10px 14px' }}>
+          {lastResult.kind === 'yes_no' ? (
+            <>
+              {lastResult.question && (
+                <p className="italic mb-1" style={{ fontSize:11, color:'#8A5A4A' }}>„{lastResult.question}"</p>
+              )}
+              <div className="flex items-baseline gap-2.5">
+                <span className="font-mono" style={{ fontSize:11, color:'#C09A80' }}>[{lastResult.dice.join(', ')}]</span>
+                <span className="font-bold" style={{ fontSize:22, color: oracleResultColor(lastResult.result) }}>{lastResult.result}</span>
+                <span className="ml-auto" style={{ fontSize:10, color:'#C09A80' }}>
+                  {lastResult.probability === 'likely' ? 'Pravděpodobné' : lastResult.probability === 'unlikely' ? 'Nepravděpodobné' : 'Stejně možné'}
+                </span>
+              </div>
+            </>
+          ) : (
+            <div style={{ fontSize:14, color:'#2A1810' }}>{renderMarkdown(lastResult.text)}</div>
+          )}
         </div>
       )}
 
@@ -419,8 +475,8 @@ const ConversationCore = () => {
             onClick={() => setOpenAction(openAction === btn.id ? null : btn.id)}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               openAction === btn.id
-                ? 'bg-stone-700 text-stone-100'
-                : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+                ? 'bg-[#E36A6A] text-white'
+                : 'bg-[#FFD8A8]/40 text-[#8A5A4A] hover:bg-[#FFD8A8]'
             }`}
           >
             {btn.label}
@@ -430,8 +486,8 @@ const ConversationCore = () => {
 
       {/* Akce+Téma panel */}
       {openAction === 'action' && (
-        <div className="bg-stone-50 rounded-lg p-3 space-y-2 border border-stone-200">
-          <p className="text-xs text-stone-500">Náhodná kombinace Akce + Tématu pro inspiraci.</p>
+        <div className="bg-[#FFFBF1] rounded-lg p-3 space-y-2 border border-[#FFD8A8]">
+          <p className="text-xs text-[#C09A80]">Náhodná kombinace Akce + Tématu pro inspiraci.</p>
           <Button onClick={rollActionTheme} variant="secondary" className="w-full">
             💡 Generovat Akce + Téma
           </Button>
@@ -440,8 +496,8 @@ const ConversationCore = () => {
 
       {/* Setkání panel */}
       {openAction === 'encounter' && (
-        <div className="bg-stone-50 rounded-lg p-3 space-y-2 border border-stone-200">
-          <p className="text-xs text-stone-500">Narativní setkání s náhodným tvorem, aktivitou a motivací.</p>
+        <div className="bg-[#FFFBF1] rounded-lg p-3 space-y-2 border border-[#FFD8A8]">
+          <p className="text-xs text-[#C09A80]">Narativní setkání s náhodným tvorem, aktivitou a motivací.</p>
           <Button onClick={rollEncounter} variant="secondary" className="w-full">
             👁️ Generovat setkání
           </Button>
@@ -450,7 +506,7 @@ const ConversationCore = () => {
 
       {/* Kostky panel */}
       {openAction === 'dice' && (
-        <div className="bg-stone-50 rounded-lg p-3 space-y-3 border border-stone-200">
+        <div className="bg-[#FFFBF1] rounded-lg p-3 space-y-3 border border-[#FFD8A8]">
           {/* Rychlé kostky */}
           <div className="flex flex-wrap gap-2">
             {[4, 6, 8, 10, 12, 20].map(sides => (
@@ -460,9 +516,9 @@ const ConversationCore = () => {
                   const result = rollDice(1, sides)[0];
                   setDiceResult({ dice: [result], total: result });
                   log({ type: 'oracle', subtype: 'custom_dice', timestamp: formatTimestamp(), dice: [result], sides, count: 1, total: result });
-                  setLastResult(`d${sides}: **${result}**`);
+                  setLastResult({ kind: 'text', text: `d${sides}: **${result}**` });
                 }}
-                className="px-3 py-2 bg-amber-100 hover:bg-amber-200 rounded-lg font-bold text-amber-900 text-sm transition-colors"
+                className="px-3 py-2 bg-[#FFD8A8]/60 hover:bg-[#FFD8A8] rounded-lg font-bold text-[#2A1810] text-sm transition-colors"
               >
                 d{sides}
               </button>
@@ -473,37 +529,37 @@ const ConversationCore = () => {
             <select
               value={diceCount}
               onChange={(e) => setDiceCount(parseInt(e.target.value))}
-              className="px-2 py-1.5 rounded border border-stone-300 bg-white font-bold text-sm"
+              className="px-2 py-1.5 rounded border border-[#FFD8A8] bg-white font-bold text-sm"
             >
               {[1, 2, 3, 4, 5, 6].map(n => <option key={n} value={n}>{n}</option>)}
             </select>
-            <span className="font-bold text-stone-600">d</span>
+            <span className="font-bold text-[#8A5A4A]">d</span>
             <input
               type="number" min="2" max="1000" value={diceSides}
               onChange={(e) => setDiceSides(parseInt(e.target.value) || 6)}
-              className="w-16 px-2 py-1.5 rounded border border-stone-300 bg-white font-bold text-sm"
+              className="w-16 px-2 py-1.5 rounded border border-[#FFD8A8] bg-white font-bold text-sm"
             />
             <input
               type="text" value={diceReason}
               onChange={(e) => setDiceReason(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && rollCustomDice()}
               placeholder="Proč? (volitelné)"
-              className="flex-1 min-w-[100px] px-2 py-1.5 text-sm rounded border border-stone-300 bg-white"
+              className="flex-1 min-w-[100px] px-2 py-1.5 text-sm rounded border border-[#FFD8A8] bg-white"
             />
             <Button onClick={rollCustomDice} variant="primary" size="small">Hodit</Button>
           </div>
           {/* Výsledek kostek */}
           {diceResult && (
-            <div className="flex items-center gap-2 p-2 bg-amber-50 rounded-lg border border-amber-200">
+            <div className="flex items-center gap-2 p-2 bg-[#FFF5DC] rounded-lg border border-[#FFD8A8]">
               <div className="flex gap-1 flex-wrap">
                 {diceResult.dice.map((d, i) => (
-                  <span key={i} className="w-8 h-8 flex items-center justify-center bg-amber-700 text-amber-50 rounded font-bold text-sm">
+                  <span key={i} className="w-8 h-8 flex items-center justify-center bg-[#E36A6A] text-white rounded font-bold text-sm">
                     {d}
                   </span>
                 ))}
               </div>
               {diceResult.dice.length > 1 && (
-                <span className="text-xl font-bold text-amber-800 ml-2">= {diceResult.total}</span>
+                <span className="text-xl font-bold text-[#2A1810] ml-2">= {diceResult.total}</span>
               )}
             </div>
           )}
@@ -521,20 +577,20 @@ const CombatInline = () => {
   const [showCombat, setShowCombat] = useState(false);
 
   return (
-    <div className="border border-stone-200 rounded-xl overflow-hidden">
+    <div className="border border-[#FFD8A8] rounded-xl overflow-hidden">
       <button
         onClick={() => setShowCombat(!showCombat)}
         className={`w-full flex items-center justify-between px-4 py-3 font-medium text-sm transition-colors ${
           showCombat
-            ? 'bg-red-50 text-red-800 border-b border-red-200'
-            : 'bg-stone-50 text-stone-700 hover:bg-stone-100'
+            ? 'bg-[#C8383812] text-[#C83838] border-b border-[#C8383850]'
+            : 'bg-[#FFF5DC] text-[#8A5A4A] hover:bg-[#FFD8A8]'
         }`}
       >
         <span>⚔️ Souboj</span>
-        <span className="text-xs text-stone-500">{showCombat ? '▲ Skrýt' : '▼ Zahájit souboj'}</span>
+        <span className="text-xs text-[#C09A80]">{showCombat ? '▲ Skrýt' : '▼ Zahájit souboj'}</span>
       </button>
       {showCombat && (
-        <div className="p-4 bg-white">
+        <div className="p-4 bg-[#FFFBF1]">
           <CombatPanel />
         </div>
       )}
@@ -564,26 +620,26 @@ const ThreadsSection = () => {
   const activeCount = threads.filter(t => !t.resolved).length;
 
   return (
-    <div className="border border-amber-200 rounded-xl overflow-hidden">
+    <div className="border border-[#FFD8A8] rounded-xl overflow-hidden">
       <button
         onClick={() => setShowThreads(!showThreads)}
         className={`w-full flex items-center justify-between px-4 py-3 text-sm transition-colors ${
           showThreads
-            ? 'bg-amber-50 text-amber-800 border-b border-amber-200'
-            : 'bg-amber-50/50 text-amber-700 hover:bg-amber-50'
+            ? 'bg-[#FFF5DC] text-[#2A1810] border-b border-[#FFD8A8]'
+            : 'bg-[#FFF5DC]/60 text-[#8A5A4A] hover:bg-[#FFF5DC]'
         }`}
       >
         <span className="font-medium">
           🧵 Zapletky {threads.length > 0 && `(${activeCount} aktivní)`}
         </span>
-        <span className="text-xs text-stone-500">{showThreads ? '▲ Skrýt' : '▼ Zobrazit'}</span>
+        <span className="text-xs text-[#C09A80]">{showThreads ? '▲ Skrýt' : '▼ Zobrazit'}</span>
       </button>
       {showThreads && (
-        <div className="px-4 py-3 bg-amber-50/30 space-y-3">
+        <div className="px-4 py-3 bg-[#FFF5DC]/30 space-y-3">
           {threads.length > 0 ? (
             <ThreadList threads={threads} onToggle={toggleThreadResolved} onRemove={removeThread} />
           ) : (
-            <p className="text-xs text-stone-400 text-center">Žádné zapletky.</p>
+            <p className="text-xs text-[#C09A80] text-center">Žádné zapletky.</p>
           )}
           <div className="flex gap-2">
             <input
@@ -591,11 +647,11 @@ const ThreadsSection = () => {
               onChange={(e) => setNewThread(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAddThread()}
               placeholder="Nová zápletka..."
-              className="flex-1 px-3 py-1.5 text-sm rounded border border-amber-300 bg-white"
+              className="flex-1 px-3 py-1.5 text-sm rounded border border-[#FFD8A8] bg-white"
             />
             <button
               onClick={handleAddThread}
-              className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded text-sm font-medium"
+              className="px-3 py-1.5 bg-[#E36A6A] hover:bg-[#C83838] text-white rounded text-sm font-medium"
             >
               +
             </button>
@@ -614,6 +670,7 @@ export const PlayArea = () => {
   const getSceneState = useGameStore(s => s.getSceneState);
   const startScene = useGameStore(s => s.startScene);
   const endScene = useGameStore(s => s.endScene);
+  const cancelScene = useGameStore(s => s.cancelScene);
   const adjustChaosFactor = useGameStore(s => s.adjustChaosFactor);
   const activeParty = useGameStore(s => s.getActiveParty());
 
@@ -626,10 +683,8 @@ export const PlayArea = () => {
 
   if (!activeParty) {
     return (
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-stone-100 border border-stone-300 rounded-xl p-6 text-center text-stone-500">
-          🐭 Vyber nebo vytvoř družinu v panelu Postavy
-        </div>
+      <div className="border border-[#FFD8A8] p-6 text-center text-[#8A5A4A]" style={{ borderRadius:10, background:'#FFF5DC' }}>
+        🐭 Vyber nebo vytvoř družinu v panelu Postavy
       </div>
     );
   }
@@ -652,10 +707,16 @@ export const PlayArea = () => {
     setSceneSetupDone(false);
   };
 
+  const handleCancelScene = () => {
+    cancelScene();
+    setSceneSetupResult(null);
+    setSceneSetupDone(false);
+  };
+
   // ── IDLE: žádná aktivní scéna ────────────────────────────────
   if (!hasScene) {
     return (
-      <div className="space-y-4 max-w-2xl mx-auto">
+      <div className="space-y-3">
         <HowToPlay />
         <IdleState sceneCount={sceneCount} onStart={handleStartScene} />
       </div>
@@ -665,7 +726,7 @@ export const PlayArea = () => {
   // ── SCENE SETUP: scene check karta (jen po právě zahájeném startu) ──
   if (!sceneSetupDone && sceneSetupResult) {
     return (
-      <div className="space-y-4 max-w-2xl mx-auto">
+      <div className="space-y-3">
         <HowToPlay />
         <SceneCheckCard result={sceneSetupResult} onContinue={() => setSceneSetupDone(true)} />
       </div>
@@ -674,7 +735,7 @@ export const PlayArea = () => {
 
   // ── PLAYING: hlavní layout ───────────────────────────────────
   return (
-    <div className="space-y-4 max-w-2xl mx-auto">
+    <div className="space-y-3">
       <HowToPlay />
       <StatusBar
         sceneNumber={currentScene!.number}
@@ -683,6 +744,7 @@ export const PlayArea = () => {
         chaosFactor={chaosFactor}
         onCFChange={adjustChaosFactor}
         onEndScene={handleEndScene}
+        onCancel={handleCancelScene}
       />
       <ConversationCore />
       <CombatInline />

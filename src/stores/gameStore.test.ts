@@ -76,14 +76,28 @@ describe('Character management', () => {
     partyId = party.id;
   });
 
-  it('createPC — type="pc", výchozí stats', () => {
+  it('createPC — type="pc", náhodné stats (dice rolls)', () => {
     const pc = useGameStore.getState().createPC(partyId);
     expect(pc.type).toBe('pc');
-    expect(pc.STR).toEqual({ current: 10, max: 10 });
-    expect(pc.DEX).toEqual({ current: 10, max: 10 });
-    expect(pc.WIL).toEqual({ current: 10, max: 10 });
-    expect(pc.hp).toEqual({ current: 6, max: 6 });
+    // Atributy: 3k6 keep 2 → rozsah 2-12
+    expect(pc.STR.current).toBeGreaterThanOrEqual(2);
+    expect(pc.STR.current).toBeLessThanOrEqual(12);
+    expect(pc.STR.current).toBe(pc.STR.max);
+    expect(pc.DEX.current).toBeGreaterThanOrEqual(2);
+    expect(pc.DEX.current).toBeLessThanOrEqual(12);
+    expect(pc.DEX.current).toBe(pc.DEX.max);
+    expect(pc.WIL.current).toBeGreaterThanOrEqual(2);
+    expect(pc.WIL.current).toBeLessThanOrEqual(12);
+    expect(pc.WIL.current).toBe(pc.WIL.max);
+    // BO a Ďobky: k6 → rozsah 1-6
+    expect(pc.hp.current).toBeGreaterThanOrEqual(1);
+    expect(pc.hp.current).toBeLessThanOrEqual(6);
+    expect(pc.hp.current).toBe(pc.hp.max);
+    expect(pc.pips).toBeGreaterThanOrEqual(1);
+    expect(pc.pips).toBeLessThanOrEqual(6);
     expect(pc.name).toBeTruthy();
+    // Základní vybavení: Zásoby + Pochodně + 2 předměty z Původu
+    expect(pc.inventory.length).toBeGreaterThanOrEqual(4);
     // Ověříme, že je přidaná do party
     const party = useGameStore.getState().parties.find(p => p.id === partyId);
     expect(party?.members).toHaveLength(1);
