@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useGameStore } from '../../stores/gameStore';
-import { ORACLE_TABLE } from '../../data/constants';
+import { ORACLE_TABLE, CONDITIONS } from '../../data/constants';
 import { roll2D6, formatTimestamp } from '../../utils/helpers';
 
 // Barva výsledku Oracle
@@ -117,15 +117,19 @@ const CharMiniStats = () => {
       {/* Podmínky */}
       {char.type === 'pc' && (char as any).conditions?.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-2">
-          {(char as any).conditions.map((c: string) => (
-            <span
-              key={c}
-              className="px-2 py-0.5 text-[10px] font-bold uppercase rounded-full border"
-              style={{ background: '#C8383812', color: '#C83838', borderColor: '#C8383850' }}
-            >
-              {c}
-            </span>
-          ))}
+          {(char as any).conditions.map((condId: string) => {
+            const condDef = CONDITIONS.find(c => c.id === condId);
+            return (
+              <span
+                key={condId}
+                className="px-2 py-0.5 text-[10px] font-bold uppercase rounded-full border"
+                style={{ background: '#C8383812', color: '#C83838', borderColor: '#C8383850' }}
+                title={condDef?.effect}
+              >
+                {condDef?.name || condId}
+              </span>
+            );
+          })}
         </div>
       )}
 

@@ -1094,11 +1094,11 @@ const CharacterPanel = () => {
     if (!character) return;
     // Don't add if already has this condition
     if (character.conditions?.includes(condId)) return;
-    
+
     const slots = { ...(character.inventorySlots || {}) };
     // Only add to empty slot
     if (slots[slotId]) return;
-    
+
     slots[slotId] = {
       id: generateId(),
       name: condName,
@@ -1107,10 +1107,39 @@ const CharacterPanel = () => {
       usageDots: 0,
       maxUsage: 0
     };
-    
-    updateCharacter({ 
+
+    updateCharacter({
       inventorySlots: slots,
       conditions: [...(character.conditions || []), condId]
+    });
+  };
+
+  const addConditionToFirstFreeSlot = (condId: string, condName: string) => {
+    if (!character || character.conditions?.includes(condId)) return;
+    const packSlots = ['pack1','pack2','pack3','pack4','pack5','pack6'];
+    const slots = character.inventorySlots || {};
+    const freeSlot = packSlots.find(s => !slots[s]);
+    if (!freeSlot) {
+      // Přetížen — přidat do conditions[] jako "pending" (bez slotu)
+      updateCharacter({ conditions: [...(character.conditions || []), condId] });
+      return;
+    }
+    addConditionToSlot(freeSlot, condId, condName);
+  };
+
+  const removeConditionFromSlots = (condId: string) => {
+    if (!character) return;
+    const slots = { ...(character.inventorySlots || {}) };
+    let changed = false;
+    Object.keys(slots).forEach(slotId => {
+      if (slots[slotId]?.isCondition && slots[slotId]?.conditionId === condId) {
+        slots[slotId] = null;
+        changed = true;
+      }
+    });
+    updateCharacter({
+      inventorySlots: changed ? slots : character.inventorySlots,
+      conditions: (character.conditions || []).filter(c => c !== condId)
     });
   };
 
@@ -1879,6 +1908,25 @@ const CharacterPanel = () => {
                   </div>
                 )}
                 <div className="space-y-3">
+                  {/* Encumbrance indicator */}
+                  {(() => {
+                    const stdSlots = ['mainPaw','offPaw','body1','body2','pack1','pack2','pack3','pack4','pack5','pack6'];
+                    const usedSlots = stdSlots.filter(s => character.inventorySlots?.[s]).length;
+                    const pendingConditions = (character.conditions || []).filter(condId =>
+                      !Object.values(character.inventorySlots || {}).some(
+                        item => item?.isCondition && item?.conditionId === condId
+                      )
+                    );
+                    return (
+                      <div className={`flex items-center justify-between text-xs px-1 ${usedSlots >= 10 ? 'text-red-600 font-bold' : 'text-stone-500'}`}>
+                        <span>🎒 {usedSlots}/10 slotů{usedSlots >= 10 ? ' — přetížen!' : ''}</span>
+                        {pendingConditions.length > 0 && (
+                          <span className="text-red-600 font-bold">⚠️ {pendingConditions.length} stav bez slotu</span>
+                        )}
+                      </div>
+                    );
+                  })()}
+
                   {/* Main Grid FIRST - Paws | Body | Pack */}
                   <div ref={inventoryRef} className="flex gap-2 md:gap-3 items-start justify-center">
                     {/* Paws */}
@@ -1943,6 +1991,27 @@ const CharacterPanel = () => {
                     </div>
                   </div>
                   
+                  {/* Kuráž (Grit) slots - level 2+ */}
+                  {(() => {
+                    const gritCount = getGrit(character.level || 1);
+                    if (gritCount === 0) return null;
+                    return (
+                      <div className="p-2 bg-blue-50 rounded-lg border border-blue-200">
+                        <div className="text-xs font-bold text-blue-600 mb-1">
+                          ⚡ Kuráž — {gritCount} {gritCount === 1 ? 'slot' : 'sloty'} (stavy zde nezabírají inventář)
+                        </div>
+                        <div className="flex gap-1 justify-center">
+                          {Array.from({ length: gritCount }, (_, i) => `grit${i + 1}`).map(gritId => (
+                            <InvSlot key={gritId} id={gritId} slots={character.inventorySlots} color="blue"
+                              onMove={moveInventoryItem} onUpdate={updateSlotItem} onRemove={removeSlotItem}
+                              updateChar={updateCharacter} slotSize={Math.min(slotSize, 50)}
+                              selectedSlot={selectedSlot} setSelectedSlot={setSelectedSlot} setPopupItem={setPopupItem} />
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
                   {/* Quick add items - below grid */}
                   <details className="border-t border-stone-200 pt-2">
                     <summary className="text-xs font-bold text-stone-500 cursor-pointer hover:text-stone-700">▼ Přidat předmět</summary>
@@ -1978,20 +2047,25 @@ const CharacterPanel = () => {
                         }`}
                       >{item.name}</button>
                     ))}
-                    {CONDITIONS.slice(0, 3).map(c => (
-                      <button key={c.id} onClick={() => {
-                        const slots = character.inventorySlots || {};
-                        const allSlots = ['mainPaw','offPaw','body1','body2','pack1','pack2','pack3','pack4','pack5','pack6'];
-                        const blockedByAbove = { offPaw: 'mainPaw', body2: 'body1', pack4: 'pack1', pack5: 'pack2', pack6: 'pack3' };
-                        const empty = allSlots.find(s => !slots[s] && !(blockedByAbove[s] && slots[blockedByAbove[s]]?.height === 2));
-                        if (empty) updateCharacter({ inventorySlots: { ...slots, [empty]: { 
-                          id: Math.random().toString(36).substr(2,9), name: c.name, type: 'condition', isCondition: true,
-                          conditionId: c.id, mechanic: c.effect, clear: c.clear, bgColor: '#fecaca', width: 1, height: 1, maxUsage: 0, usageDots: 0
-                        }}});
-                      }}
-                        className="px-2 py-1 rounded text-xs bg-red-50 border border-red-200 text-red-700 hover:bg-red-100"
-                      >{c.name}</button>
-                    ))}
+                    {CONDITIONS.map(c => {
+                      const hasIt = character.conditions?.includes(c.id);
+                      const inSlot = Object.values(character.inventorySlots || {}).some(
+                        item => item?.isCondition && item?.conditionId === c.id
+                      );
+                      return (
+                        <button key={c.id}
+                          onClick={() => hasIt ? removeConditionFromSlots(c.id) : addConditionToFirstFreeSlot(c.id, c.name)}
+                          className={`px-2 py-1 rounded text-xs border transition-colors ${
+                            hasIt
+                              ? 'bg-red-200 border-red-400 text-red-800 hover:bg-red-300'
+                              : 'bg-red-50 border-red-200 text-red-700 hover:bg-red-100'
+                          }`}
+                          title={c.effect}
+                        >
+                          {c.name}{hasIt && !inSlot ? ' ⚠️' : ''}
+                        </button>
+                      );
+                    })}
                     </div>
                   </details>
                 </div>

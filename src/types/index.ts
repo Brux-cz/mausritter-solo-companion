@@ -44,7 +44,10 @@ export interface PCInventorySlots {
   pack4: InventoryItem | null;
   pack5: InventoryItem | null;
   pack6: InventoryItem | null;
-  [key: string]: InventoryItem | null;
+  grit1?: InventoryItem | null;  // Kuráž slot 1 (level 2+)
+  grit2?: InventoryItem | null;  // Kuráž slot 2 (level 4+)
+  grit3?: InventoryItem | null;  // Kuráž slot 3 (level 5+)
+  [key: string]: InventoryItem | null | undefined;
 }
 
 export interface HirelingInventorySlots {

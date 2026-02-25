@@ -242,6 +242,28 @@ const CombatPanel = () => {
           STR: { current: finalStr, max: targetCombatant.maxStr }
         });
       }
+
+      // Propagate Poranění (injured) to inventorySlots when STR save fails
+      if (strSave && !strSave.passed && targetCombatant?.isPartyMember && targetCombatant.memberId && activePartyId) {
+        const currentChar = useGameStore.getState().parties
+          .flatMap(p => p.members)
+          .find(m => m.id === targetCombatant.memberId);
+        if (currentChar && !currentChar.conditions?.includes('injured')) {
+          const packSlots = ['pack1','pack2','pack3','pack4','pack5','pack6'];
+          const slots = (currentChar as any).inventorySlots || {};
+          const freeSlot = packSlots.find(s => !slots[s]);
+          const injuryUpdates: any = {
+            conditions: [...((currentChar as any).conditions || []), 'injured']
+          };
+          if (freeSlot) {
+            injuryUpdates.inventorySlots = { ...slots, [freeSlot]: {
+              id: generateId(), name: 'Poranění', isCondition: true,
+              conditionId: 'injured', usageDots: 0, maxUsage: 0
+            }};
+          }
+          storeUpdateChar(activePartyId, targetCombatant.memberId, injuryUpdates);
+        }
+      }
     }
 
     const result = {

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useGameStore } from '../../stores/gameStore';
+import { generateId } from '../../utils/helpers';
 
 const TIMEBAR_SEASONS = [
   { id: 'spring', name: 'Jaro', icon: '🌱' },
@@ -16,7 +17,7 @@ const TIMEBAR_WATCHES = [
 ];
 
 const TimeBar = () => {
-  const { getActiveParty, updateGameTime, timedEvents } = useGameStore();
+  const { getActiveParty, updateGameTime, timedEvents, activePartyId, activeCharacterId, parties, updateCharacterInParty } = useGameStore();
   const activeParty = getActiveParty();
   const gameTime = activeParty?.gameTime;
   const partyName = activeParty?.name;
@@ -30,6 +31,26 @@ const TimeBar = () => {
 
   const currentSeason = TIMEBAR_SEASONS.find(s => s.id === season) || TIMEBAR_SEASONS[0];
   const currentWatch = TIMEBAR_WATCHES.find(w => w.id === watch) || TIMEBAR_WATCHES[0];
+
+  // Přidat podmínku aktivní postavě do prvního volného pack slotu
+  const addConditionToActiveChar = (condId: string, condName: string) => {
+    if (!activePartyId || !activeCharacterId) return;
+    const activeChar = (parties || []).flatMap(p => p.members).find(m => m.id === activeCharacterId);
+    if (!activeChar || (activeChar as any).conditions?.includes(condId)) return;
+    const packSlots = ['pack1','pack2','pack3','pack4','pack5','pack6'];
+    const slots = (activeChar as any).inventorySlots || {};
+    const freeSlot = packSlots.find(s => !slots[s]);
+    const updates: any = {
+      conditions: [...((activeChar as any).conditions || []), condId]
+    };
+    if (freeSlot) {
+      updates.inventorySlots = { ...slots, [freeSlot]: {
+        id: generateId(), name: condName, isCondition: true,
+        conditionId: condId, usageDots: 0, maxUsage: 0
+      }};
+    }
+    updateCharacterInParty(activePartyId, activeCharacterId, updates);
+  };
 
   // Přidat směnu
   const addTurn = () => {
@@ -56,6 +77,21 @@ const TimeBar = () => {
       if (!restedToday) {
         setShowExhaustionWarning(true);
         setTimeout(() => setShowExhaustionWarning(false), 5000);
+        // Přidat Vyčerpání aktivní postavě
+        addConditionToActiveChar('exhausted', 'Vyčerpání');
+      }
+      // Zkontrolovat zásoby aktivní postavy (Hlad při novém dni bez zásob)
+      if (activeCharacterId) {
+        const activeChar = (parties || []).flatMap(p => p.members).find(m => m.id === activeCharacterId);
+        if (activeChar) {
+          const slots = (activeChar as any).inventorySlots || {};
+          const hasSupplies = Object.values(slots).some(
+            (item: any) => item && item.name?.toLowerCase().includes('zásoby') && item.usageDots < item.maxUsage
+          );
+          if (!hasSupplies) {
+            addConditionToActiveChar('hungry', 'Hlad');
+          }
+        }
       }
       updateGameTime({
         ...gameTime,
