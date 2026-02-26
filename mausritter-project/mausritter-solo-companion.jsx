@@ -3047,13 +3047,11 @@ const HowToPlayPanel = () => {
 };
 
 // Input Component
-const Input = ({ value, onChange, placeholder, type = 'text', className = '', onFocus, onBlur }) => (
+const Input = ({ value, onChange, placeholder, type = 'text', className = '' }) => (
   <input
     type={type}
     value={value}
     onChange={(e) => onChange(e.target.value)}
-    onFocus={onFocus}
-    onBlur={onBlur}
     placeholder={placeholder}
     className={`w-full px-4 py-2.5 bg-amber-50 border-2 border-amber-900/30 rounded-lg focus:outline-none focus:border-amber-700 text-stone-800 placeholder-stone-400 ${className}`}
   />
@@ -5424,8 +5422,7 @@ const CharacterPanel = ({
   updateCharacterInParty,
   removeCharacter,
   removeParty,
-  onLogEntry,
-  propagateNameChange
+  onLogEntry 
 }) => {
   // Defensive null checks for props that may be undefined from Firebase
   const safeParties = parties || [];
@@ -6009,13 +6006,6 @@ const CharacterPanel = ({
             <input
               value={party.name}
               onChange={(e) => updateParty(party.id, { name: e.target.value })}
-              onFocus={(e) => { e.target.dataset.originalName = e.target.value; }}
-              onBlur={(e) => {
-                const orig = e.target.dataset.originalName;
-                if (orig && orig !== e.target.value && e.target.value.trim()) {
-                  propagateNameChange(orig, e.target.value);
-                }
-              }}
               className="w-full px-3 py-2 border-2 border-amber-300 rounded-lg mb-4"
               autoFocus
             />
@@ -8140,7 +8130,7 @@ const ItemCardStudio = ({ parties, activePartyId, activeCharacterId, updateChara
 // WORLD GENERATOR PANEL
 // ============================================
 
-const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWorldNPCs, parties, activeParty, activePartyId, updateParty, pendingMentionOpen, setPendingMentionOpen, onDeleteNPC, onDeleteSettlement, propagateNameChange }) => {
+const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWorldNPCs, parties, activeParty, activePartyId, updateParty, pendingMentionOpen, setPendingMentionOpen, onDeleteNPC, onDeleteSettlement }) => {
   const [generated, setGenerated] = useState(null);
   const [activeGen, setActiveGen] = useState('mySettlements');
   const [season, setSeason] = useState('spring');
@@ -8784,13 +8774,6 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
                       <Input
                         value={settlement.name}
                         onChange={(v) => updateSettlement(settlement.id, { name: v })}
-                        onFocus={(e) => { e.target.dataset.originalName = e.target.value; }}
-                        onBlur={(e) => {
-                          const orig = e.target.dataset.originalName;
-                          if (orig && orig !== e.target.value && e.target.value.trim()) {
-                            propagateNameChange(orig, e.target.value);
-                          }
-                        }}
                         placeholder="Jméno osady"
                         className="font-bold"
                       />
@@ -9093,13 +9076,6 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
                         <input
                           value={npc.name}
                           onChange={(e) => updateNPC(npc.id, { name: e.target.value })}
-                          onFocus={(e) => { e.target.dataset.originalName = e.target.value; }}
-                          onBlur={(e) => {
-                            const orig = e.target.dataset.originalName;
-                            if (orig && orig !== e.target.value && e.target.value.trim()) {
-                              propagateNameChange(orig, e.target.value);
-                            }
-                          }}
                           className="text-2xl font-bold text-amber-900 bg-transparent border-b-2 border-amber-300 focus:border-amber-500 outline-none"
                         />
                         <div className="flex gap-2">
@@ -9602,7 +9578,7 @@ const WorldPanel = ({ onLogEntry, settlements, setSettlements, worldNPCs, setWor
 // FACTION PANEL
 // ============================================
 
-const FactionPanel = ({ factions, setFactions, onLogEntry, propagateNameChange }) => {
+const FactionPanel = ({ factions, setFactions, onLogEntry }) => {
   const [editingFaction, setEditingFaction] = useState(null);
 
   const addFaction = () => {
@@ -9733,13 +9709,6 @@ const FactionPanel = ({ factions, setFactions, onLogEntry, propagateNameChange }
                       <Input
                         value={faction.name}
                         onChange={(v) => updateFaction(faction.id, { name: v })}
-                        onFocus={(e) => { e.target.dataset.originalName = e.target.value; }}
-                        onBlur={(e) => {
-                          const orig = e.target.dataset.originalName;
-                          if (orig && orig !== e.target.value && e.target.value.trim()) {
-                            propagateNameChange(orig, e.target.value);
-                          }
-                        }}
                         className="text-xl font-bold"
                       />
                     ) : (
@@ -10469,14 +10438,7 @@ const PartyPanel = ({
                         type="text"
                         value={party.name}
                         onChange={(e) => updateParty(party.id, { name: e.target.value })}
-                        onFocus={(e) => { e.target.dataset.originalName = e.target.value; }}
-                        onBlur={(e) => {
-                          const orig = e.target.dataset.originalName;
-                          if (orig && orig !== e.target.value && e.target.value.trim()) {
-                            propagateNameChange(orig, e.target.value);
-                          }
-                          setEditingPartyId(null);
-                        }}
+                        onBlur={() => setEditingPartyId(null)}
                         onKeyDown={(e) => e.key === 'Enter' && setEditingPartyId(null)}
                         autoFocus
                         className="flex-1 min-w-0 px-2 py-1 border-2 border-amber-500 rounded font-bold text-lg"
@@ -10589,14 +10551,7 @@ const PartyPanel = ({
                                       type="text"
                                       value={member.name}
                                       onChange={(e) => updateCharacterInParty(party.id, member.id, { name: e.target.value })}
-                                      onFocus={(e) => { e.target.dataset.originalName = e.target.value; }}
-                                      onBlur={(e) => {
-                                        const orig = e.target.dataset.originalName;
-                                        if (orig && orig !== e.target.value && e.target.value.trim()) {
-                                          propagateNameChange(orig, e.target.value);
-                                        }
-                                        setEditingCharId(null);
-                                      }}
+                                      onBlur={() => setEditingCharId(null)}
                                       onKeyDown={(e) => e.key === 'Enter' && setEditingCharId(null)}
                                       onClick={(e) => e.stopPropagation()}
                                       autoFocus
@@ -14668,64 +14623,6 @@ function MausritterSoloCompanion() {
     }));
   };
 
-  // Helper: Propagate name change across journal, lexicon, sceneNPCs
-  const propagateNameChange = useCallback((oldName, newName) => {
-    if (!oldName || !newName || oldName === newName || !oldName.trim() || !newName.trim()) return;
-
-    // 1. Update journal entries
-    setJournal(prev => prev.map(entry => {
-      let updated = { ...entry };
-      let changed = false;
-
-      // Exact match on structured fields
-      for (const field of ['attacker', 'target', 'character', 'faction', 'hireling', 'npcName', 'settlementName']) {
-        if (updated[field] === oldName) {
-          updated[field] = newName;
-          changed = true;
-        }
-      }
-
-      // data object fields
-      if (updated.data) {
-        const newData = { ...updated.data };
-        let dc = false;
-        if (newData.name === oldName) { newData.name = newName; dc = true; }
-        if (newData.npc === oldName) { newData.npc = newName; dc = true; }
-        if (newData.settlement === oldName) { newData.settlement = newName; dc = true; }
-        if (dc) { updated.data = newData; changed = true; }
-      }
-
-      // content string - interpolated names in narrative text
-      if (typeof updated.content === 'string' && updated.content.includes(oldName)) {
-        updated.content = updated.content.replaceAll(oldName, newName);
-        changed = true;
-      }
-
-      return changed ? updated : entry;
-    }));
-
-    // 2. Update lexicon
-    setLexicon(prev => prev.map(item =>
-      item.name === oldName ? { ...item, name: newName } : item
-    ));
-
-    // 3. Update sceneNPCs in parties
-    setParties(prev => prev.map(p => {
-      if (!p.sceneState?.sceneNPCs) return p;
-      const hasMatch = p.sceneState.sceneNPCs.some(sn => sn.name === oldName);
-      if (!hasMatch) return p;
-      return {
-        ...p,
-        sceneState: {
-          ...p.sceneState,
-          sceneNPCs: p.sceneState.sceneNPCs.map(sn =>
-            sn.name === oldName ? { ...sn, name: newName } : sn
-          )
-        }
-      };
-    }));
-  }, []);
-
   // Helper: Safe localStorage.setItem with QuotaExceededError handling
   const safeLocalStorageSet = useCallback((key, value) => {
     try {
@@ -18116,7 +18013,6 @@ function MausritterSoloCompanion() {
             removeCharacter={removeCharacter}
             removeParty={removeParty}
             onLogEntry={handleLogEntry}
-            propagateNameChange={propagateNameChange}
           />
         )}
 
@@ -18147,16 +18043,14 @@ function MausritterSoloCompanion() {
               setWorldNPCs(worldNPCs.map(n => n.settlementId === settlementId ? { ...n, settlementId: null } : n));
               setJournal(journal.filter(e => e.settlementId !== settlementId && e.data?.id !== settlementId));
             }}
-            propagateNameChange={propagateNameChange}
           />
         )}
-
+        
         {activePanel === 'factions' && (
           <FactionPanel
             factions={factions}
             setFactions={setFactions}
             onLogEntry={handleLogEntry}
-            propagateNameChange={propagateNameChange}
           />
         )}
 

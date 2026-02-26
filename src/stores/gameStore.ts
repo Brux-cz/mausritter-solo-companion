@@ -60,6 +60,7 @@ interface GameStoreState extends GameState {
   deleteSettlement: (settlementId: string) => void;
   promoteToNPC: (creatureData: CreatureData) => WorldNPC;
   updateNPC: (npcId: string, updates: Partial<WorldNPC>) => WorldNPC | undefined;
+  propagateNameChange: (oldName: string, newName: string) => void;
 
   // --- Scene actions ---
   getSceneState: () => SceneState;
@@ -390,6 +391,65 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       worldNPCs: (s.worldNPCs || []).map(n => n.id === npcId ? { ...n, ...updates } : n)
     }));
     return get().worldNPCs.find(n => n.id === npcId);
+  },
+
+  propagateNameChange: (oldName, newName) => {
+    if (!oldName || !newName || oldName === newName || !oldName.trim() || !newName.trim()) return;
+
+    set(s => ({
+      // 1. Journal entries
+      journal: s.journal.map(entry => {
+        let updated = { ...entry } as any;
+        let changed = false;
+
+        // Exact match on structured fields
+        for (const field of ['attacker', 'target', 'character', 'faction', 'hireling', 'npcName', 'settlementName']) {
+          if (updated[field] === oldName) {
+            updated[field] = newName;
+            changed = true;
+          }
+        }
+
+        // data object fields
+        if (updated.data) {
+          const newData = { ...updated.data };
+          let dc = false;
+          if (newData.name === oldName) { newData.name = newName; dc = true; }
+          if (newData.npc === oldName) { newData.npc = newName; dc = true; }
+          if (newData.settlement === oldName) { newData.settlement = newName; dc = true; }
+          if (dc) { updated.data = newData; changed = true; }
+        }
+
+        // content string - interpolated names in narrative text
+        if (typeof updated.content === 'string' && updated.content.includes(oldName)) {
+          updated.content = updated.content.replaceAll(oldName, newName);
+          changed = true;
+        }
+
+        return changed ? updated : entry;
+      }),
+
+      // 2. Lexicon
+      lexicon: s.lexicon.map(item =>
+        item.name === oldName ? { ...item, name: newName } : item
+      ),
+
+      // 3. SceneNPCs in parties
+      parties: s.parties.map(p => {
+        if (!p.sceneState?.sceneNPCs) return p;
+        const hasMatch = p.sceneState.sceneNPCs.some(sn => sn.name === oldName);
+        if (!hasMatch) return p;
+        return {
+          ...p,
+          sceneState: {
+            ...p.sceneState,
+            sceneNPCs: p.sceneState.sceneNPCs.map(sn =>
+              sn.name === oldName ? { ...sn, name: newName } : sn
+            )
+          }
+        };
+      })
+    }));
   },
 
   // --- Map actions ---

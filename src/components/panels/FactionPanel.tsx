@@ -4,7 +4,7 @@ import { rollD6, generateId, formatTimestamp } from '../../utils/helpers';
 import { SectionHeader, ResultCard, Button, HelpHeader, Input } from '../ui/common';
 
 const FactionPanel = () => {
-  const { factions, setFactions, handleLogEntry } = useGameStore();
+  const { factions, setFactions, handleLogEntry, propagateNameChange } = useGameStore();
   const onLogEntry = handleLogEntry;
   const [editingFaction, setEditingFaction] = useState(null);
 
@@ -136,6 +136,13 @@ const FactionPanel = () => {
                       <Input
                         value={faction.name}
                         onChange={(v) => updateFaction(faction.id, { name: v })}
+                        onFocus={(e) => { e.target.dataset.originalName = e.target.value; }}
+                        onBlur={(e) => {
+                          const orig = e.target.dataset.originalName;
+                          if (orig && orig !== e.target.value && e.target.value.trim()) {
+                            propagateNameChange(orig, e.target.value);
+                          }
+                        }}
                         className="text-xl font-bold"
                       />
                     ) : (
