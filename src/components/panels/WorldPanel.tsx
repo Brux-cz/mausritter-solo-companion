@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { useUIStore } from '../../stores/uiStore';
 import { WEATHER_TABLE, CREATURE_CATEGORIES, BESTIARY, LANDMARKS, SETTLEMENT_FEATURES, SETTLEMENT_SIZES, SETTLEMENT_GOVERNANCE, SETTLEMENT_TRADES, SETTLEMENT_EVENTS, SETTLEMENT_NAME_STARTS, SETTLEMENT_NAME_ENDS, INN_NAME_FIRST, INN_NAME_SECOND, INN_SPECIALTIES, MALE_FIRST_NAMES, FEMALE_FIRST_NAMES, FAMILY_NAMES, BIRTHSIGNS, NPC_BEHAVIOR_MOODS, NPC_BEHAVIOR_ACTIONS, NPC_BEHAVIOR_MOTIVATIONS, NPC_SECRETS, NPC_REACTIONS, NPC_ROLES, EVENT_FOCUS, EVENT_ACTIONS, EVENT_SUBJECTS, EVENT_COMPLICATIONS, SETTLEMENT_RUMORS, SETTLEMENT_HAPPENINGS, PHYSICAL_DETAILS, NPC_QUIRKS, NPC_GOALS, DUNGEON_THEMES, DUNGEON_DENIZENS } from '../../data/constants';
@@ -26,6 +26,32 @@ const WorldPanel = () => {
   const [expandedNPCs, setExpandedNPCs] = useState({});
   const [npcBehaviors, setNpcBehaviors] = useState({});
   const [settlementEvents, setSettlementEvents] = useState({}); // Pro zobrazení událostí osad
+  const [npcSearch, setNpcSearch] = useState('');
+  const [npcSettlementFilter, setNpcSettlementFilter] = useState<string | null>(null); // null = všechny, 'homeless' = bez domova, string = settlementId
+  const [showDeadNPCs, setShowDeadNPCs] = useState(false);
+
+  const filteredNPCs = useMemo(() => {
+    let result = worldNPCs;
+    if (!showDeadNPCs) {
+      result = result.filter(npc => !(npc as any).isDead);
+    }
+    if (npcSettlementFilter === 'homeless') {
+      result = result.filter(npc => !npc.settlementId);
+    } else if (npcSettlementFilter) {
+      result = result.filter(npc => npc.settlementId === npcSettlementFilter);
+    }
+    if (npcSearch.trim()) {
+      const q = npcSearch.trim().toLowerCase();
+      result = result.filter(npc =>
+        npc.name?.toLowerCase().includes(q) ||
+        npc.role?.toLowerCase().includes(q) ||
+        npc.notes?.toLowerCase().includes(q) ||
+        npc.quirk?.toLowerCase().includes(q) ||
+        npc.goal?.toLowerCase().includes(q)
+      );
+    }
+    return result;
+  }, [worldNPCs, npcSearch, npcSettlementFilter, showDeadNPCs]);
 
   // Handle pending mention open from journal
   useEffect(() => {
@@ -926,6 +952,69 @@ const WorldPanel = () => {
             </ResultCard>
           )}
 
+          {/* Hledání a filtry NPC */}
+          {worldNPCs.length > 0 && (
+            <div className="space-y-2">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={npcSearch}
+                  onChange={(e) => setNpcSearch(e.target.value)}
+                  placeholder="Hledat NPC..."
+                  className="w-full pl-8 pr-8 py-2 border border-stone-300 rounded-lg text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none"
+                />
+                <span className="absolute left-2.5 top-2.5 text-stone-400 text-sm pointer-events-none">🔍</span>
+                {npcSearch && (
+                  <button onClick={() => setNpcSearch('')} className="absolute right-2.5 top-2.5 text-stone-400 hover:text-stone-600 text-sm">✕</button>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                <button
+                  onClick={() => setNpcSettlementFilter(null)}
+                  className={`px-2.5 py-1 text-xs rounded-full border transition-colors ${
+                    !npcSettlementFilter ? 'bg-amber-500 text-white border-amber-500' : 'bg-white text-stone-600 border-stone-300 hover:border-amber-400'
+                  }`}
+                >
+                  Všechny ({worldNPCs.filter(n => !(n as any).isDead || showDeadNPCs).length})
+                </button>
+                {settlements.map(s => {
+                  const count = worldNPCs.filter(n => n.settlementId === s.id && (!(n as any).isDead || showDeadNPCs)).length;
+                  if (count === 0) return null;
+                  return (
+                    <button key={s.id}
+                      onClick={() => setNpcSettlementFilter(npcSettlementFilter === s.id ? null : s.id)}
+                      className={`px-2.5 py-1 text-xs rounded-full border transition-colors ${
+                        npcSettlementFilter === s.id ? 'bg-amber-500 text-white border-amber-500' : 'bg-white text-stone-600 border-stone-300 hover:border-amber-400'
+                      }`}
+                    >
+                      {s.name} ({count})
+                    </button>
+                  );
+                })}
+                {worldNPCs.some(n => !n.settlementId) && (
+                  <button
+                    onClick={() => setNpcSettlementFilter(npcSettlementFilter === 'homeless' ? null : 'homeless')}
+                    className={`px-2.5 py-1 text-xs rounded-full border transition-colors ${
+                      npcSettlementFilter === 'homeless' ? 'bg-amber-500 text-white border-amber-500' : 'bg-white text-stone-600 border-stone-300 hover:border-amber-400'
+                    }`}
+                  >
+                    Bez domova ({worldNPCs.filter(n => !n.settlementId && (!(n as any).isDead || showDeadNPCs)).length})
+                  </button>
+                )}
+                {worldNPCs.some(n => (n as any).isDead) && (
+                  <button
+                    onClick={() => setShowDeadNPCs(!showDeadNPCs)}
+                    className={`px-2.5 py-1 text-xs rounded-full border transition-colors ${
+                      showDeadNPCs ? 'bg-stone-500 text-white border-stone-500' : 'bg-white text-stone-400 border-stone-300 hover:border-stone-400'
+                    }`}
+                  >
+                    💀 Mrtvé ({worldNPCs.filter(n => (n as any).isDead).length})
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Seznam NPC */}
           {worldNPCs.length === 0 ? (
             <ResultCard>
@@ -934,9 +1023,16 @@ const WorldPanel = () => {
                 <span className="text-sm">Vygeneruj novou pomocí tlačítka výše.</span>
               </p>
             </ResultCard>
+          ) : filteredNPCs.length === 0 ? (
+            <ResultCard>
+              <p className="text-center text-stone-500 py-4">
+                Žádné NPC neodpovídá filtru.<br/>
+                <button onClick={() => { setNpcSearch(''); setNpcSettlementFilter(null); }} className="text-amber-600 underline text-sm">Zrušit filtry</button>
+              </p>
+            </ResultCard>
           ) : (
             <div className="space-y-3">
-              {worldNPCs.map(npc => (
+              {filteredNPCs.map(npc => (
                 <ResultCard key={npc.id}>
                   {editingNPC === npc.id ? (
                     // Edit mode - karta jako v generátoru
