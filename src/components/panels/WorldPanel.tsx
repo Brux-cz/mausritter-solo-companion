@@ -1031,9 +1031,9 @@ const WorldPanel = () => {
               </p>
             </ResultCard>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {filteredNPCs.map(npc => (
-                <ResultCard key={npc.id}>
+                <ResultCard key={npc.id} className={editingNPC === npc.id ? '' : '!p-3'}>
                   {editingNPC === npc.id ? (
                     // Edit mode - karta jako v generátoru
                     <div className="space-y-3">
@@ -1145,43 +1145,44 @@ const WorldPanel = () => {
                   ) : (
                     // View mode - kompaktní
                     <div className="overflow-hidden">
-                      <div className="flex justify-between items-start gap-2">
+                      <div className="flex items-center gap-2">
                         <div
-                          className="min-w-0 flex-1 cursor-pointer hover:bg-amber-50 -m-3 p-3 rounded-lg transition-colors"
+                          className="min-w-0 flex-1 cursor-pointer hover:bg-amber-50 -m-2 p-2 rounded-lg transition-colors"
                           onClick={() => setEditingNPC(npc.id)}
                         >
-                          <div className="flex justify-between items-start gap-2">
-                            <div className="min-w-0 flex-1">
-                              <h3 className="font-bold text-amber-900 truncate">{npc.name}</h3>
-                              <p className="text-sm text-stone-600 truncate">{npc.role && `${npc.role} • `}{npc.settlementId ? settlements.find(s => s.id === npc.settlementId)?.name : 'Bez domova'}</p>
-                            </div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-bold text-amber-900 truncate flex-shrink-0" style={{ maxWidth: '45%' }}>{npc.name}</h3>
+                            <span className="text-sm text-stone-500 truncate">{npc.role && `${npc.role} · `}{npc.settlementId ? settlements.find(s => s.id === npc.settlementId)?.name : 'Bez domova'}</span>
                             {(npc.hp || npc.str) && (
-                              <div className="text-xs font-mono text-stone-500 flex-shrink-0 whitespace-nowrap hidden sm:block">
-                                BO:{npc.hp?.current}/{npc.hp?.max} SÍL:{npc.str?.max}
-                              </div>
+                              <span className="text-xs font-mono text-stone-400 flex-shrink-0 whitespace-nowrap ml-auto hidden sm:inline">
+                                BO:{npc.hp?.current}/{npc.hp?.max}
+                              </span>
                             )}
                           </div>
-                          {(npc.birthsign || npc.physicalDetail || npc.quirk || npc.goal) && (
-                            <div className="mt-2 text-sm text-stone-600 space-y-1">
-                              {npc.birthsign && <p className="truncate">⭐ {npc.birthsign}</p>}
-                              {npc.physicalDetail && <p className="truncate">👁️ {npc.physicalDetail}</p>}
-                              {npc.quirk && <p className="truncate">🎭 {npc.quirk}</p>}
-                              {npc.goal && <p className="truncate">🎯 {npc.goal}</p>}
-                            </div>
-                          )}
-                          {npc.notes && <p className="mt-2 text-sm italic text-stone-500 line-clamp-2">{npc.notes}</p>}
+                          {(() => {
+                            const traits = [
+                              npc.birthsign && `⭐${npc.birthsign}`,
+                              npc.physicalDetail && `👁️${npc.physicalDetail}`,
+                              npc.quirk && `🎭${npc.quirk}`,
+                              npc.goal && `🎯${npc.goal}`,
+                            ].filter(Boolean);
+                            return traits.length > 0 ? (
+                              <p className="text-xs text-stone-500 truncate mt-0.5">{traits.join(' · ')}</p>
+                            ) : null;
+                          })()}
+                          {npc.notes && <p className="text-xs italic text-stone-400 truncate mt-0.5">{npc.notes}</p>}
                         </div>
-                        <div className="flex flex-col gap-1 flex-shrink-0">
+                        <div className="flex gap-0.5 flex-shrink-0">
                           <button
                             onClick={() => setEditingNPC(npc.id)}
-                            className="p-2 text-stone-400 hover:text-amber-600 hover:bg-amber-100 rounded transition-colors"
+                            className="p-1.5 text-stone-400 hover:text-amber-600 hover:bg-amber-100 rounded transition-colors text-sm"
                             title="Upravit"
                           >
                             ✏️
                           </button>
                           <button
                             onClick={() => deleteNPC(npc.id)}
-                            className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-100 rounded transition-colors"
+                            className="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-100 rounded transition-colors text-sm"
                             title="Smazat"
                           >
                             🗑️
