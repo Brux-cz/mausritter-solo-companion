@@ -32,6 +32,15 @@ const JournalPanel = ({ onExport }) => {
   const [editText, setEditText] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [collapsedScenes, setCollapsedScenes] = useState<Set<string>>(new Set());
+  const [expandedNotes, setExpandedNotes] = useState<Set<string>>(new Set());
+  const toggleNote = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setExpandedNotes(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
 
   // Modal pro zobrazení detailu NPC/osady
   const [detailModal, setDetailModal] = useState(null); // { type: 'npc'|'settlement', data: ... }
@@ -954,22 +963,70 @@ const JournalPanel = ({ onExport }) => {
             </p>
             {!npcIsDead && (currentNPC?.birthsign || entry.data?.birthsign) && <p className="text-amber-800/70 text-sm truncate">{currentNPC?.birthsign || entry.data?.birthsign}</p>}
             {!npcIsDead && (currentNPC?.physicalDetail || entry.data?.physicalDetail) && <p className="text-amber-700 text-sm truncate">{currentNPC?.physicalDetail || entry.data?.physicalDetail}</p>}
-            {entry.note && <p className="text-amber-900/80 italic text-sm mt-1 border-t border-amber-200 pt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
+            {entry.note && (() => {
+              const isExpanded = expandedNotes.has(entry.id);
+              const preview = entry.note.replace(/<[^>]*>/g, '').slice(0, 50);
+              return (
+                <div
+                  className="mt-1.5"
+                  onClick={(e) => toggleNote(entry.id, e)}
+                  title={isExpanded ? 'Sbalit poznámku' : 'Rozbalit poznámku'}
+                >
+                  <div className="flex items-center gap-1 text-xs text-amber-600/70 hover:text-amber-700 cursor-pointer transition-colors select-none">
+                    <span className="font-mono text-[10px]">{isExpanded ? '▾' : '▸'}</span>
+                    {!isExpanded &&
+                      <span className="italic truncate opacity-80">{preview}{preview.length >= 50 ? '…' : ''}</span>
+                    }
+                  </div>
+                  {isExpanded && (
+                    <p className="mt-1 pl-2 text-amber-900/80 italic text-sm whitespace-pre-wrap border-l border-amber-300/60">
+                      {parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}
+                    </p>
+                  )}
+                </div>
+              );
+            })()}
           </div>
         );
 
-      case 'saved_settlement':
+      case 'saved_settlement': {
         const currentSettlement = settlements.find(s => s.id === entry.data?.id) || entry.data;
+        const isNoteExpanded = expandedNotes.has(entry.id);
+        const notePreview = entry.note?.replace(/<[^>]*>/g, '').slice(0, 50) || '';
         return (
-          <p
-            className="my-1 text-sm cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors truncate"
-            onClick={() => setDetailModal({ type: 'settlement', data: currentSettlement })}
-            title="Klikni pro detail"
+          <div
+            className="my-2 pl-4 border-l-2 border-teal-400 rounded overflow-hidden"
           >
-            🏘️ <span className="font-medium text-amber-900">{currentSettlement?.name || entry.data?.name}</span>
-            <span className="text-amber-700 ml-1">— {currentSettlement?.size || entry.data?.size}</span>
-          </p>
+            <p
+              className="text-sm cursor-pointer hover:text-teal-700 transition-colors truncate text-teal-900"
+              onClick={() => setDetailModal({ type: 'settlement', data: currentSettlement })}
+              title="Klikni pro detail"
+            >
+              🏘️ <span className="font-medium">{currentSettlement?.name || entry.data?.name}</span>
+              <span className="text-teal-700 ml-1">— {currentSettlement?.size || entry.data?.size}</span>
+            </p>
+            {entry.note && (
+              <div
+                className="mt-1"
+                onClick={(e) => toggleNote(entry.id, e)}
+                title={isNoteExpanded ? 'Sbalit poznámku' : 'Rozbalit poznámku'}
+              >
+                <div className="flex items-center gap-1 text-xs text-teal-600/70 hover:text-teal-700 cursor-pointer transition-colors select-none">
+                  <span className="font-mono text-[10px]">{isNoteExpanded ? '▾' : '▸'}</span>
+                  {!isNoteExpanded &&
+                    <span className="italic truncate opacity-80">{notePreview}{notePreview.length >= 50 ? '…' : ''}</span>
+                  }
+                </div>
+                {isNoteExpanded && (
+                  <p className="mt-1 pl-2 text-teal-900/80 italic text-sm whitespace-pre-wrap border-l border-teal-300/60">
+                    {parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
         );
+      }
 
       default:
         // For any other type, show as mechanical note
