@@ -1,0 +1,72 @@
+--------(změním jméno postavy a nezmění se mi to v deníku to jmeno te postavy, ktera je tam zaznamenana. vytvorit propojení teto funkce skrz aplikaci, že kdýž přepíšu jmeno postavy tak se mi to propíše všude kde se jmeno te postavy vyskytuje.
+to same platí pro jakekoliv nazvy, npc, hracske postavy, predmety, osady a dalsi)
+
+------------------------------------------------
+
+když kliknu na npc v deníku a dám upravit nic se mi neobjeví
+
+------------------------------------------------
+
+errory nejaky v f12:
+Unchecked runtime.lastError: The message port closed before a response was received.Understand this error
+index-BcYcAiyX.js:32 Migrating save from v4 to v5
+index-BcYcAiyX.js:32 Migrating save from v5 to v6
+index-BcYcAiyX.js:217 Save migrated from v4 to v6
+favicon.ico:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+index-BcYcAiyX.js:219 Saved folder from localStorage: null null
+about:blank:1 Unchecked runtime.lastError: The message port closed before a response was received.Understand this error
+docs.google.com/picker?protocol=gadgets&origin=https%3A%2F%2Fbrux-cz.github.io&title=Vyber%20slo%C5%BEku%20pro%20ukl%C3%A1d%C3%A1n%C3%AD&oauth_token=ya29.a0ATkoCc6EeVM51dvJ8O5FxyO2gXT39-wn67rjDu0-LfMx1fYz8cfizi73WhmWpi49IGbvYr57m4oiyIeMAc2tRxSChXG03G0nAYdWD6PoK0EXpxtKiwaTCK60xmr7sQSTy5t0YCARR3d90xJD9DaXk4fdke95XKBlnRZolY2wrq4MsnztX890GOKWaen8WQPUC7M5CH4aCgYKAaUSARUSFQHGX2Mi9OcqWPrkTH1Q99IL0a0Ozg0206&developerKey=AIzaSyDorqiiGhrfkdg_fO6dqjjHsnpeioNSL-s&hostId=brux-cz.github.io&parent=https%3A%2F%2Fbrux-cz.github.io%2Ffavicon.ico&ifls=1772095467030&nav=((%22all%22%2C%2C%7B%22includeFolders%22%3Atrue%2C%22selectFolder%22%3Atrue%2C%22mimeTypes%22%3A%22application%2Fvnd.google-apps.folder%22%7D))&rpcService=9p8oytn5wlg1&rpctoken=y0xyj4jj9d5r&thirdParty=true&usegapi=1&jsh=m%3B%2F_%2Fscs%2Fabc-static%2F_%2Fjs%2Fk%3Dgapi.lb.en.PCvl17LujMs.O%2Fd%3D1%2Frs%3DAHpOoo-sAn5Asuf3MvShXCH_dsg8tE46Tw%2Fm%3D__features__#rpctoken=y0xyj4jj9d5r&id=9p8oytn5wlg1&_gfid=9p8oytn5wlg1&parent=https%3A%2F%2Fbrux-cz.github.io&pfname=:370 Unchecked runtime.lastError: The message port closed before a response was received.Understand this error
+1868717903-picker_modularized_opc.js:214 [Intervention] Unable to preventDefault inside passive event listener due to target being treated as passive. See https://www.chromestatus.com/feature/6662647093133312
+u.preventDefault @ 1868717903-picker_modularized_opc.js:214Understand this error
+1868717903-picker_modularized_opc.js:214 [Intervention] Unable to preventDefault inside passive event listener due to target being treated as passive. See https://www.chromestatus.com/feature/6662647093133312
+u.preventDefault @ 1868717903-picker_modularized_opc.js:214Understand this error
+1868717903-picker_modularized_opc.js:214 [Intervention] Unable to preventDefault inside passive event listener due to target being treated as passive. See https://www.chromestatus.com/feature/6662647093133312
+u.preventDefault @ 1868717903-picker_modularized_opc.js:214Understand this error
+1868717903-picker_modularized_opc.js:214 [Intervention] Unable to preventDefault inside passive event listener due to target being treated as passive. See https://www.chromestatus.com/feature/6662647093133312
+u.preventDefault @ 1868717903-picker_modularized_opc.js:214Understand this error
+index-BcYcAiyX.js:32 Migrating save from v4 to v5
+index-BcYcAiyX.js:32 Migrating save from v5 to v6
+
+------------------------------------------------
+
+když kliknu na mapu a dam kreslit tak mi zmizi mapa
+reloadnu stranku a zase to funguje kdyz to rokliknu a zmizi pak ta mapa jenom kdyz treba skrolnu obrazovku ... nebo kdyz nekam kliknu.. jo zmizi to i po chvili samo kdyz na nic neklikam. dale je potreba pridat ukladani ruznych boardu.. tak jak to ma https://www.tldraw.com/ po strane v menicku
+
+------------------------------------------------
+
+pokud chci davat v deniku poznamku k postave nebo k te "karte" noc, nebo osady tak bych chtel aby to graficky k tomu patrilu. ted je to oddeleny a je to i jinou barvou. chtel bych aby to k tomu bylo pripojeny a dalo se to sipkou otevrit nebo nejak esteticky rozrolovat
+
+------------------------------------------------
+
+TOTO vyresit jestli to neni spatne nebo problém a nebo zytecnost která nam to jenom komplikuje
+Dobrý dotaz, vysvětlím co se stalo:
+
+Co se stalo
+Problém č.1: Starý vs. nový zdrojový kód
+Tvůj projekt má dvě verze kódu:
+
+Starý: mausritter-project/mausritter-solo-companion.jsx — monolitický JSX soubor, který se buildil přes build-html.js. Už se nepoužívá.
+
+Nový: src/ — Vite + React + Zustand + TypeScript. Tohle je to, co ti aktuálně běží. Stav se drží v src/stores/gameStore.ts, panely jsou v src/components/panels/.
+
+Co jsem udělal napoprvé (špatně)
+Moje první změny jsem omylem napsal do starého JSX souboru (mausritter-project/). Proto se ti nic neprojevilo — ten soubor se už nepoužívá.
+
+Co jsem udělal napodruhé (správně)
+Revertoval jsem starý JSX a implementoval stejnou logiku ve správných src/ souborech:
+
+src/stores/gameStore.ts — nová akce propagateNameChange
+src/components/ui/common.tsx — Input komponenta rozšířena o onFocus/onBlur
+src/components/panels/WorldPanel.tsx — NPC + osada
+src/components/panels/FactionPanel.tsx — frakce
+src/components/panels/PartyPanel.tsx — družina + postava
+src/components/panels/CharacterPanel.tsx — družina rename modal
+Co ta změna dělá (logika je stejná)
+Když klikneš do pole s jménem entity → onFocus si zapamatuje původní jméno
+Přepíšeš jméno
+Když opustíš pole (klikneš jinam / tab) → onBlur porovná staré a nové jméno
+Pokud se liší → propagateNameChange(staréJméno, novéJméno) projde deník, lexikon a scénové NPC a nahradí staré jméno novým
+V architektuře jsem nic nepředělával — jen přidal jednu novou funkci do storu a na 6 inputech přidal onFocus/onBlur. Žádný refaktoring, žádná změna struktury.
+
+------------------------------------------------
+
