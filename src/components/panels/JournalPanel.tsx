@@ -949,24 +949,25 @@ const JournalPanel = ({ onExport }) => {
             title="Klikni pro detail"
           >
             <p className={`font-bold truncate ${npcIsDead ? 'text-amber-400 line-through' : 'text-amber-900'}`}>
-              {npcIsDead ? '💀' : '🐭'} {entry.data?.name} {entry.data?.role && <span className="font-normal text-amber-700">— {entry.data.role}</span>}
+              {npcIsDead ? '💀' : '🐭'} {currentNPC?.name || entry.data?.name} {(currentNPC?.role || entry.data?.role) && <span className="font-normal text-amber-700">— {currentNPC?.role || entry.data?.role}</span>}
               {npcIsDead && <span className="ml-2 text-xs text-red-600 font-normal no-underline">† mrtvý</span>}
             </p>
-            {!npcIsDead && entry.data?.birthsign && <p className="text-amber-800/70 text-sm truncate">{entry.data.birthsign}</p>}
-            {!npcIsDead && entry.data?.physicalDetail && <p className="text-amber-700 text-sm truncate">{entry.data.physicalDetail}</p>}
+            {!npcIsDead && (currentNPC?.birthsign || entry.data?.birthsign) && <p className="text-amber-800/70 text-sm truncate">{currentNPC?.birthsign || entry.data?.birthsign}</p>}
+            {!npcIsDead && (currentNPC?.physicalDetail || entry.data?.physicalDetail) && <p className="text-amber-700 text-sm truncate">{currentNPC?.physicalDetail || entry.data?.physicalDetail}</p>}
             {entry.note && <p className="text-amber-900/80 italic text-sm mt-1 border-t border-amber-200 pt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
           </div>
         );
 
       case 'saved_settlement':
+        const currentSettlement = settlements.find(s => s.id === entry.data?.id) || entry.data;
         return (
           <p
             className="my-1 text-sm cursor-pointer hover:bg-amber-50 rounded px-1 -mx-1 transition-colors truncate"
-            onClick={() => setDetailModal({ type: 'settlement', data: entry.data })}
+            onClick={() => setDetailModal({ type: 'settlement', data: currentSettlement })}
             title="Klikni pro detail"
           >
-            🏘️ <span className="font-medium text-amber-900">{entry.data?.name}</span>
-            <span className="text-amber-700 ml-1">— {entry.data?.size}</span>
+            🏘️ <span className="font-medium text-amber-900">{currentSettlement?.name || entry.data?.name}</span>
+            <span className="text-amber-700 ml-1">— {currentSettlement?.size || entry.data?.size}</span>
           </p>
         );
 
