@@ -10,7 +10,7 @@ const WorldPanel = () => {
   const {
     settlements, setSettlements, worldNPCs, setWorldNPCs,
     parties, activePartyId, getActiveParty, updateParty,
-    handleLogEntry, deleteNPC, deleteSettlement,
+    handleLogEntry, deleteNPC, deleteSettlement, propagateNameChange,
   } = useGameStore();
   const { pendingMentionOpen, setPendingMentionOpen } = useUIStore();
   const activeParty = getActiveParty();
@@ -636,6 +636,13 @@ const WorldPanel = () => {
                       <Input
                         value={settlement.name}
                         onChange={(v) => updateSettlement(settlement.id, { name: v })}
+                        onFocus={(e) => { e.target.dataset.originalName = e.target.value; }}
+                        onBlur={(e) => {
+                          const orig = e.target.dataset.originalName;
+                          if (orig && orig !== e.target.value && e.target.value.trim()) {
+                            propagateNameChange(orig, e.target.value);
+                          }
+                        }}
                         placeholder="Jméno osady"
                         className="font-bold"
                       />
@@ -938,6 +945,13 @@ const WorldPanel = () => {
                         <input
                           value={npc.name}
                           onChange={(e) => updateNPC(npc.id, { name: e.target.value })}
+                          onFocus={(e) => { e.target.dataset.originalName = e.target.value; }}
+                          onBlur={(e) => {
+                            const orig = e.target.dataset.originalName;
+                            if (orig && orig !== e.target.value && e.target.value.trim()) {
+                              propagateNameChange(orig, e.target.value);
+                            }
+                          }}
                           className="text-2xl font-bold text-amber-900 bg-transparent border-b-2 border-amber-300 focus:border-amber-500 outline-none"
                         />
                         <div className="flex gap-2">

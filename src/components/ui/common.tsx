@@ -443,11 +443,13 @@ export const parseMentions = (text, onMentionClick, worldNPCs = [], settlements 
   return parts;
 };
 
-export const Input = ({ value, onChange, placeholder, type = 'text', className = '' }) => (
+export const Input = ({ value, onChange, placeholder, type = 'text', className = '', onFocus, onBlur }) => (
   <input
     type={type}
     value={value}
     onChange={(e) => onChange(e.target.value)}
+    onFocus={onFocus}
+    onBlur={onBlur}
     placeholder={placeholder}
     className={`w-full px-4 py-2.5 bg-amber-50 border-2 border-amber-900/30 rounded-lg focus:outline-none focus:border-amber-700 text-stone-800 placeholder-stone-400 ${className}`}
   />

@@ -10,7 +10,8 @@ const PartyPanel = () => {
     activeCharacterId, setActiveCharacterId,
     getActiveParty, createParty, createPC, createHireling,
     addHirelingsToParty, updateParty, removeParty,
-    handleLogEntry,
+    updateCharacterInParty, removeCharacter,
+    handleLogEntry, propagateNameChange,
   } = useGameStore();
   const party = getActiveParty();
   const onLogEntry = handleLogEntry;
@@ -215,7 +216,14 @@ const PartyPanel = () => {
                         type="text"
                         value={party.name}
                         onChange={(e) => updateParty(party.id, { name: e.target.value })}
-                        onBlur={() => setEditingPartyId(null)}
+                        onFocus={(e) => { e.target.dataset.originalName = e.target.value; }}
+                        onBlur={(e) => {
+                          const orig = e.target.dataset.originalName;
+                          if (orig && orig !== e.target.value && e.target.value.trim()) {
+                            propagateNameChange(orig, e.target.value);
+                          }
+                          setEditingPartyId(null);
+                        }}
                         onKeyDown={(e) => e.key === 'Enter' && setEditingPartyId(null)}
                         autoFocus
                         className="flex-1 min-w-0 px-2 py-1 border-2 border-amber-500 rounded font-bold text-lg"
@@ -328,7 +336,14 @@ const PartyPanel = () => {
                                       type="text"
                                       value={member.name}
                                       onChange={(e) => updateCharacterInParty(party.id, member.id, { name: e.target.value })}
-                                      onBlur={() => setEditingCharId(null)}
+                                      onFocus={(e) => { e.target.dataset.originalName = e.target.value; }}
+                                      onBlur={(e) => {
+                                        const orig = e.target.dataset.originalName;
+                                        if (orig && orig !== e.target.value && e.target.value.trim()) {
+                                          propagateNameChange(orig, e.target.value);
+                                        }
+                                        setEditingCharId(null);
+                                      }}
                                       onKeyDown={(e) => e.key === 'Enter' && setEditingCharId(null)}
                                       onClick={(e) => e.stopPropagation()}
                                       autoFocus

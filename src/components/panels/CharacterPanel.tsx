@@ -587,7 +587,7 @@ const CharacterPanel = () => {
     createParty, createPC, createHireling,
     addHirelingsToParty, updateParty,
     updateCharacterInParty, removeCharacter, removeParty,
-    handleLogEntry,
+    handleLogEntry, propagateNameChange,
   } = useGameStore();
   const party = getActiveParty();
   const character = getActiveCharacter();
@@ -1192,6 +1192,13 @@ const CharacterPanel = () => {
             <input
               value={party.name}
               onChange={(e) => updateParty(party.id, { name: e.target.value })}
+              onFocus={(e) => { e.target.dataset.originalName = e.target.value; }}
+              onBlur={(e) => {
+                const orig = e.target.dataset.originalName;
+                if (orig && orig !== e.target.value && e.target.value.trim()) {
+                  propagateNameChange(orig, e.target.value);
+                }
+              }}
               className="w-full px-3 py-2 border-2 border-amber-300 rounded-lg mb-4"
               autoFocus
             />
