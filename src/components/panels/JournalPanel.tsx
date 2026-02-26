@@ -16,7 +16,7 @@ const JournalPanel = ({ onExport }) => {
   const { setActivePanel, setPendingMentionOpen } = useUIStore();
   const { myUserId, roomPlayers, roomConnected } = useMultiplayerStore();
   const gameTime = getActiveParty()?.gameTime;
-  const onMentionClick = (type, id) => { setPendingMentionOpen({ type, id }); setActivePanel('world'); };
+  const onMentionClick = (type, id) => { setPendingMentionOpen({ type, id }); setActivePanel('worldhub'); };
   const onOpenEvents = () => setActivePanel('events');
   const onDeleteNPC = deleteNPC;
   const onDeleteSettlement = deleteSettlement;
