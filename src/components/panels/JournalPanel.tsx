@@ -498,6 +498,7 @@ const JournalPanel = ({ onExport }) => {
                 {renderContent(entry.content)}
                 {entry.edited && <span className="text-xs ml-1" style={{ color:'#C09A80' }}>✎</span>}
               </p>
+              <EntryNote note={entry.note} entryId={entry.id} />
             </div>
           );
         }
@@ -515,6 +516,7 @@ const JournalPanel = ({ onExport }) => {
             )}
             {renderContent(entry.content)}
             {entry.edited && <span className="text-xs ml-1" style={{ color:'#C09A80' }}>✎</span>}
+            <EntryNote note={entry.note} entryId={entry.id} />
           </div>
         );
 
@@ -984,7 +986,7 @@ const JournalPanel = ({ onExport }) => {
         const npcIsDead = currentNPC?.isDead;
         return (
           <div
-            className={`my-2 pl-4 border-l-2 cursor-pointer hover:bg-amber-50 rounded transition-colors overflow-hidden ${
+            className={`my-2 pl-4 border-l-2 cursor-pointer hover:bg-amber-50 rounded transition-colors ${
               npcIsDead ? 'border-amber-300 bg-amber-100/30' : 'border-amber-500'
             }`}
             onClick={() => setDetailModal({ type: 'npc', data: currentNPC })}
@@ -996,6 +998,7 @@ const JournalPanel = ({ onExport }) => {
             </p>
             {!npcIsDead && (currentNPC?.birthsign || entry.data?.birthsign) && <p className="text-amber-800/70 text-sm truncate">{currentNPC?.birthsign || entry.data?.birthsign}</p>}
             {!npcIsDead && (currentNPC?.physicalDetail || entry.data?.physicalDetail) && <p className="text-amber-700 text-sm truncate">{currentNPC?.physicalDetail || entry.data?.physicalDetail}</p>}
+            <EntryNote note={entry.note} entryId={entry.id} />
           </div>
         );
 
