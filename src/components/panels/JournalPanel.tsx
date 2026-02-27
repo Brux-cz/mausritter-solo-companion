@@ -723,6 +723,20 @@ const JournalPanel = ({ onExport }) => {
               <span className="text-sm">{outcomeLabel}</span>
               <span className="text-xs text-amber-700">Chaos: {entry.chaosBefore} → {entry.chaosAfter}</span>
             </div>
+            {entry.note
+              ? <EntryNote note={entry.note} entryId={entry.id} />
+              : (
+                <button
+                  className="mt-1.5 block text-[11px] italic transition-colors cursor-pointer"
+                  style={{ color: '#A0875060' }}
+                  onMouseEnter={e => (e.currentTarget.style.color = '#8A5A4A')}
+                  onMouseLeave={e => (e.currentTarget.style.color = '#A0875060')}
+                  onClick={(e) => { e.stopPropagation(); setEditingNoteForId(entry.id); }}
+                >
+                  ✎ Zapsat shrnutí scény...
+                </button>
+              )
+            }
           </div>
         );
       }
