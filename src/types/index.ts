@@ -301,6 +301,7 @@ export interface BaseJournalEntry {
 export interface NarrativeEntry extends BaseJournalEntry {
   type: 'narrative';
   content: string;
+  isAnnotation?: boolean;
 }
 
 export interface CharacterCreatedEntry extends BaseJournalEntry {
@@ -387,8 +388,15 @@ export interface ChaosAdjustEntry extends BaseJournalEntry {
   content: string;
 }
 
+export interface HookEntry extends BaseJournalEntry {
+  type: 'hook';
+  content: string;
+  resolved: boolean;
+}
+
 export type JournalEntry =
   | NarrativeEntry
+  | HookEntry
   | CharacterCreatedEntry
   | SavedNPCEntry
   | SavedSettlementEntry

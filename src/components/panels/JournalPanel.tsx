@@ -63,6 +63,32 @@ const JournalPanel = ({ onExport }) => {
   const [insertAfterIndex, setInsertAfterIndex] = useState(null); // Index záznamu, ZA který vložíme nový
   const [insertText, setInsertText] = useState('');
 
+  // Hooksy — otevřené otázky
+  const [hookingEntryId, setHookingEntryId] = useState<string | null>(null);
+
+  const createHook = (afterEntryId: string, content: string) => {
+    if (!content.trim()) { setHookingEntryId(null); return; }
+    const targetIndex = journal.findIndex(e => e.id === afterEntryId);
+    if (targetIndex === -1) return;
+    const targetEntry = journal[targetIndex];
+    const newHook = {
+      id: generateId(),
+      type: 'hook' as const,
+      content,
+      resolved: false,
+      timestamp: targetEntry.timestamp,
+      partyId: partyFilter !== 'all' ? partyFilter : targetEntry.partyId,
+    };
+    const newJournal = [...journal];
+    newJournal.splice(targetIndex + 1, 0, newHook);
+    setJournal(newJournal);
+    setHookingEntryId(null);
+  };
+
+  const resolveHook = (id: string) => {
+    setJournal(journal.map(e => e.id === id ? { ...e, resolved: true } : e));
+  };
+
   // Mention items pro TiptapEditor
   const allMentions = [
     ...worldNPCs.map(n => ({ type: 'npc', id: n.id, name: n.name, icon: '🐭' })),
@@ -387,6 +413,7 @@ const JournalPanel = ({ onExport }) => {
     const newEntry = {
       id: generateId(),
       type: 'narrative',
+      isAnnotation: true,
       timestamp: targetEntry.timestamp,
       content: insertText,
       partyId: partyFilter !== 'all' ? partyFilter : targetEntry.partyId,
@@ -405,6 +432,7 @@ const JournalPanel = ({ onExport }) => {
 
   const filteredJournal = journal.filter(entry => {
     if (partyFilter !== 'all' && entry.partyId && entry.partyId !== partyFilter) return false;
+    if (filter === 'hook_open') return entry.type === 'hook' && !(entry as any).resolved;
     if (filter !== 'all' && entry.type !== filter) return false;
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
@@ -460,12 +488,39 @@ const JournalPanel = ({ onExport }) => {
       );
     }
 
+    // Poznámka k záznamu — vizuálně jako sub-záznam (indent, menší, kurzíva)
+    const EntryNote = ({ note }: { note?: string }) => {
+      if (!note) return null;
+      return (
+        <div className="mt-1.5" style={{ borderLeft: '2px solid #C09A8050', paddingLeft: 8, paddingTop: 2 }}>
+          <p className="italic whitespace-pre-wrap" style={{ color: '#8A5A4A', fontSize: 12, lineHeight: 1.55 }}>
+            {renderContent(note)}
+          </p>
+        </div>
+      );
+    };
+
     switch (entry.type) {
       case 'narrative':
+        if (entry.isAnnotation) {
+          return (
+            <div
+              className="my-1 ml-1 cursor-pointer hover:opacity-90 transition-opacity"
+              style={{ borderLeft: '2px solid #C09A8050', paddingLeft: 8, paddingTop: 2, paddingBottom: 2 }}
+              onClick={() => startEdit(entry)}
+              title="Kontextová poznámka — klikni pro úpravu"
+            >
+              <p className="italic whitespace-pre-wrap" style={{ color: '#8A5A4A', fontSize: 12, lineHeight: 1.55 }}>
+                {renderContent(entry.content)}
+                {entry.edited && <span className="text-xs ml-1" style={{ color:'#C09A80' }}>✎</span>}
+              </p>
+            </div>
+          );
+        }
         return (
           <div
             className="my-2 cursor-pointer hover:opacity-90 transition-opacity"
-            style={{ padding:'8px 12px', borderRadius:6, borderLeft:'2px solid #FFC090', background:'#FFFBF1', fontSize:13, lineHeight:1.65, color:'#8A5A4A', fontFamily:'ui-serif, Georgia, serif' }}
+            style={{ padding:'10px 14px', borderRadius:6, background:'#FFFCF7', fontSize:14, lineHeight:1.7, color:'#5A3830', fontFamily:'ui-serif, Georgia, serif' }}
             onClick={() => startEdit(entry)}
             title="Klikni pro úpravu"
           >
@@ -474,9 +529,7 @@ const JournalPanel = ({ onExport }) => {
                 {entry.authorName}
               </span>
             )}
-            <span className="italic">
-              {renderContent(entry.content)}
-            </span>
+            {renderContent(entry.content)}
             {entry.edited && <span className="text-xs ml-1" style={{ color:'#C09A80' }}>✎</span>}
           </div>
         );
@@ -493,7 +546,7 @@ const JournalPanel = ({ onExport }) => {
                 {c.type?.icon || '🐭'} {c.name} <span className="font-normal text-amber-800/60">— {c.type?.name}</span>
               </p>
               <p className="text-amber-800/70 text-sm truncate">Je {c.personality}</p>
-              {entry.note && <p className="text-amber-900/80 italic text-sm mt-1 border-t border-amber-200 pt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
+              <EntryNote note={entry.note} />
             </div>
           );
         }
@@ -521,7 +574,7 @@ const JournalPanel = ({ onExport }) => {
                 🐭 {name} {typePart && <span className="font-normal text-amber-800/60">— {typePart}</span>}
               </p>
               {personality && <p className="text-amber-800/70 text-sm truncate">{personality}</p>}
-              {entry.note && <p className="text-amber-900/80 italic text-sm mt-1 border-t border-amber-200 pt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
+              <EntryNote note={entry.note} />
             </div>
           );
         }
@@ -536,7 +589,7 @@ const JournalPanel = ({ onExport }) => {
                 {e.danger ? '⚠️' : '👁️'} {e.creature?.name}
               </p>
               <p className="text-amber-800/70 text-sm truncate">{e.activity}</p>
-              {entry.note && <p className="text-amber-900/80 italic text-sm mt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
+              <EntryNote note={entry.note} />
             </div>
           );
         }
@@ -547,7 +600,7 @@ const JournalPanel = ({ onExport }) => {
                  onClick={() => startEdit(entry)}
                  title="Klikni pro úpravu">
               <p className="font-medium text-amber-800 truncate">{entry.result}</p>
-              {entry.note && <p className="text-amber-900/80 italic text-sm mt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
+              <EntryNote note={entry.note} />
             </div>
           );
         }
@@ -572,7 +625,7 @@ const JournalPanel = ({ onExport }) => {
                 {d.isAltered && d.complication && (
                   <p className="text-amber-700 text-sm font-medium"><span className="text-amber-600">⚡</span> {d.complication}</p>
                 )}
-                {entry.note && <p className="text-amber-900/80 italic text-sm mt-1 border-t border-amber-200 pt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
+                <EntryNote note={entry.note} />
               </div>
             );
           }
@@ -590,7 +643,7 @@ const JournalPanel = ({ onExport }) => {
               {entry.narrative && (
                 <div className="text-amber-900/80 text-sm whitespace-pre-line">{entry.narrative}</div>
               )}
-              {entry.note && <p className="text-amber-900/80 italic text-sm mt-1 border-t border-amber-200 pt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
+              <EntryNote note={entry.note} />
             </div>
           );
         }
@@ -606,7 +659,7 @@ const JournalPanel = ({ onExport }) => {
                 <span className="font-bold">[{entry.dice?.join(', ')}]</span>
                 {entry.count > 1 && <span className="font-bold"> = {entry.total}</span>}
               </p>
-              {entry.note && <p className="text-amber-900/80 italic text-sm mt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
+              <EntryNote note={entry.note} />
             </div>
           );
         }
@@ -628,11 +681,11 @@ const JournalPanel = ({ onExport }) => {
                 <span className="ml-auto" style={{ fontSize:10, color:'#C09A80' }}>{probLabel(entry.probability)}</span>
               )}
             </div>
-            {entry.note && <p className="italic text-sm mt-1 whitespace-pre-wrap" style={{ color:'#8A5A4A' }}>{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
+            <EntryNote note={entry.note} />
             {entry.edited && <span className="text-xs" style={{ color:'#C09A80' }}>✎</span>}
           </div>
         );
-      
+
       case 'scene_start': {
         const checkColors: Record<string, string> = {
           normal: 'border-green-400 bg-green-50',
@@ -735,7 +788,7 @@ const JournalPanel = ({ onExport }) => {
             <p className="font-bold text-amber-900 truncate">{entry.subtype}: {entry.data?.name}</p>
             {entry.data?.trait && <p className="text-amber-800/70 text-sm italic truncate">{entry.data.trait}</p>}
             {entry.data?.appearance && <p className="text-amber-800/70 text-sm truncate">{entry.data.appearance}</p>}
-            {entry.note && <p className="text-amber-900/80 italic text-sm mt-1 border-t border-amber-200 pt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
+            <EntryNote note={entry.note} />
           </div>
         );
       
@@ -845,7 +898,7 @@ const JournalPanel = ({ onExport }) => {
                onClick={() => startEdit(entry)}
                title="Klikni pro úpravu">
             <p className="text-red-700 font-bold">⚠️ Náhodné setkání!</p>
-            {entry.note && <p className="italic text-amber-900/80 text-sm whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
+            <EntryNote note={entry.note} />
           </div>
         );
 
@@ -866,7 +919,7 @@ const JournalPanel = ({ onExport }) => {
                onClick={() => startEdit(entry)}
                title="Klikni pro úpravu">
             <p className="text-red-700 font-bold">👹 Něco se blíží!</p>
-            {entry.note && <p className="italic text-amber-900/80 text-sm whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
+            <EntryNote note={entry.note} />
           </div>
         );
 
@@ -980,7 +1033,7 @@ const JournalPanel = ({ onExport }) => {
                   </div>
                   {isExpanded && (
                     <p className="mt-1 pl-2 text-amber-900/80 italic text-sm whitespace-pre-wrap border-l border-amber-300/60">
-                      {parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}
+                      {renderContent(entry.note)}
                     </p>
                   )}
                 </div>
@@ -1019,7 +1072,7 @@ const JournalPanel = ({ onExport }) => {
                 </div>
                 {isNoteExpanded && (
                   <p className="mt-1 pl-2 text-teal-900/80 italic text-sm whitespace-pre-wrap border-l border-teal-300/60">
-                    {parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}
+                    {renderContent(entry.note)}
                   </p>
                 )}
               </div>
@@ -1046,6 +1099,33 @@ const JournalPanel = ({ onExport }) => {
               {typeof content === 'string' ? content : JSON.stringify(content)}
             </p>
             {entry.note && <p className="text-sm text-amber-900/80 italic mt-1 whitespace-pre-wrap">{parseMentions(entry.note, onMentionClick, worldNPCs, settlements, lexicon)}</p>}
+          </div>
+        );
+
+      case 'hook':
+        return (
+          <div
+            className={`my-2 pl-3 pr-2 py-2 border-l-4 rounded-r transition-all ${
+              entry.resolved
+                ? 'border-l-amber-200 bg-amber-50/40 opacity-50'
+                : 'border-l-yellow-400 bg-yellow-50'
+            }`}
+            onClick={() => !entry.resolved && startEdit(entry)}
+            title={entry.resolved ? 'Vyřešeno' : 'Klikni pro úpravu'}
+          >
+            <div className="flex items-center gap-2">
+              <span className="flex-shrink-0 text-base">{entry.resolved ? '✅' : '❓'}</span>
+              <p className={`text-sm flex-1 font-medium leading-snug ${entry.resolved ? 'line-through text-amber-400' : 'text-amber-900'}`}>
+                {renderContent(entry.content)}
+              </p>
+              {!entry.resolved && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); resolveHook(entry.id); }}
+                  className="flex-shrink-0 text-xs text-amber-400 hover:text-green-600 transition-colors px-1"
+                  title="Označit jako vyřešeno"
+                >✓</button>
+              )}
+            </div>
           </div>
         );
     }
@@ -1078,7 +1158,21 @@ const JournalPanel = ({ onExport }) => {
       {/* Header */}
       <div className="text-center mb-3 pt-2">
         <h1 className="text-2xl font-serif text-[#2A1810] mb-1">Kronika dobrodružství</h1>
-        <p className="text-[#C09A80] text-xs">{journal.length} záznamů</p>
+        <p className="text-[#C09A80] text-xs">
+          {journal.length} záznamů
+          {(() => {
+            const openHooks = journal.filter(e => e.type === 'hook' && !(e as any).resolved).length;
+            return openHooks > 0 ? (
+              <button
+                onClick={() => setFilter(filter === 'hook_open' ? 'all' : 'hook_open')}
+                className="ml-2 text-yellow-600 hover:text-yellow-800 font-medium transition-colors"
+                title="Zobrazit jen otevřené otázky"
+              >
+                · {openHooks} ❓
+              </button>
+            ) : null;
+          })()}
+        </p>
       </div>
 
       {/* Widget nadcházejících událostí */}
@@ -1141,6 +1235,7 @@ const JournalPanel = ({ onExport }) => {
               className="px-2 py-1 border border-amber-200 rounded text-sm bg-amber-50"
             >
               <option value="all">Vše</option>
+              <option value="hook_open">❓ Otevřené otázky</option>
               <option value="narrative">Příběh</option>
               <option value="oracle">Oracle</option>
               <option value="combat_action">Boj</option>
@@ -1278,11 +1373,24 @@ const JournalPanel = ({ onExport }) => {
                       )}
                       <div className="flex-1 min-w-0">{content}</div>
                       {!selectionMode && editingId !== entry.id && (
-                        <button
-                          onClick={() => setInsertAfterIndex(insertAfterIndex === entry.id ? null : entry.id)}
-                          className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 text-amber-400 hover:text-amber-600 pt-2 px-1 transition-opacity"
-                          title="Vložit poznámku pod"
-                        >+</button>
+                        <div className="flex flex-col items-center">
+                          <button
+                            onClick={() => {
+                              if (entry.type === 'narrative') {
+                                setInsertAfterIndex(insertAfterIndex === entry.id ? null : entry.id);
+                              } else {
+                                startEdit(entry);
+                              }
+                            }}
+                            className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 text-amber-400 hover:text-amber-600 pt-2 px-1 transition-opacity"
+                            title={entry.type === 'narrative' ? 'Vložit poznámku pod' : 'Přidat poznámku k záznamu'}
+                          >+</button>
+                          <button
+                            onClick={() => setHookingEntryId(hookingEntryId === entry.id ? null : entry.id)}
+                            className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 text-yellow-500 hover:text-yellow-700 pb-2 px-1 transition-opacity text-base font-bold"
+                            title="Přidat otevřenou otázku"
+                          >?</button>
+                        </div>
                       )}
                     </div>
                     {insertAfterIndex === entry.id && (
@@ -1312,6 +1420,21 @@ const JournalPanel = ({ onExport }) => {
                           />
                         </div>
                         <button type="button" onClick={() => { setInsertAfterIndex(null); setInsertText(''); }} className="text-amber-400 hover:text-amber-600 p-2 text-lg" title="Zrušit">×</button>
+                      </div>
+                    )}
+                    {hookingEntryId === entry.id && (
+                      <div className="ml-5 mt-1 flex items-start gap-1">
+                        <div className="flex-1">
+                          <TiptapEditor
+                            content=""
+                            onSubmit={(html) => createHook(entry.id, html)}
+                            placeholder="❓ Otevřená otázka... (Enter ↵)"
+                            mentionItems={allMentions}
+                            autoFocus compact submitOnEnter
+                            onCancel={() => setHookingEntryId(null)}
+                          />
+                        </div>
+                        <button type="button" onClick={() => setHookingEntryId(null)} className="text-yellow-400 hover:text-yellow-600 p-2 text-lg" title="Zrušit">×</button>
                       </div>
                     )}
                   </React.Fragment>

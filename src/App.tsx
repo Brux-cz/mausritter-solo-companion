@@ -113,6 +113,7 @@ function MausritterSoloCompanion() {
   const lastSyncTimestampRef = useRef(null);
   const isLoadingFromFirebaseRef = useRef(false);
   const isSyncingFromRemoteRef = useRef(false);
+  const diskSaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Session flow
   const [showSessionStart, setShowSessionStart] = useState(false);
@@ -128,27 +129,37 @@ function MausritterSoloCompanion() {
 
   // Load saved data with migration
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('mausritter-save');
-      if (saved) {
-        const rawData = JSON.parse(saved);
-        const data = migrateSaveData(rawData);
-        loadGameState(data);
-
-        const oldVersion = rawData.version || 1;
-        if (oldVersion < SAVE_VERSION) {
-          console.log(`Save migrated from v${oldVersion} to v${SAVE_VERSION}`);
+    const loadSave = async () => {
+      // Nejdřív zkus server (funguje v dev i Playwright)
+      try {
+        const res = await fetch('/api/load');
+        if (res.ok) {
+          const rawData = await res.json();
+          const data = migrateSaveData(rawData);
+          loadGameState(data);
+          const hasData = (data.journal?.length ?? 0) > 0 || (data.parties?.length ?? 0) > 0;
+          if (hasData) setShowSessionStart(true);
+          return;
         }
-
-        // Show session start screen for returning players
-        const hasData = (data.journal?.length ?? 0) > 0 || (data.parties?.length ?? 0) > 0;
-        if (hasData) {
-          setShowSessionStart(true);
-        }
+      } catch (e) {
+        // Server neběží (produkce/GitHub Pages) — fall through na localStorage
       }
-    } catch (e) {
-      console.error('Failed to load save:', e);
-    }
+
+      // Fallback: localStorage
+      try {
+        const saved = localStorage.getItem('mausritter-save');
+        if (saved) {
+          const rawData = JSON.parse(saved);
+          const data = migrateSaveData(rawData);
+          loadGameState(data);
+          const hasData = (data.journal?.length ?? 0) > 0 || (data.parties?.length ?? 0) > 0;
+          if (hasData) setShowSessionStart(true);
+        }
+      } catch (e) {
+        console.error('Failed to load save:', e);
+      }
+    };
+    loadSave();
   }, []);
 
   // Auto-save - separate localStorage key per room
@@ -161,6 +172,24 @@ function MausritterSoloCompanion() {
       : 'mausritter-save';
     localStorage.setItem(saveKey, JSON.stringify(saveData));
   }, [parties, activePartyId, activeCharacterId, journal, factions, settlements, worldNPCs, timedEvents, lexicon, maps, activeMapId, roomConnected, roomCode]);
+
+  // Disk auto-save — zapisuje do saves/autosave.json přes Vite server (debounce 2s)
+  useEffect(() => {
+    if (isLoadingFromFirebaseRef.current) return;
+    if (diskSaveTimeoutRef.current) clearTimeout(diskSaveTimeoutRef.current);
+    diskSaveTimeoutRef.current = setTimeout(async () => {
+      try {
+        const saveData = { version: SAVE_VERSION, ...getGameState() };
+        await fetch('/api/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(saveData),
+        });
+      } catch (e) {
+        // Server neběží (produkce) — localStorage stačí
+      }
+    }, 2000);
+  }, [parties, activePartyId, activeCharacterId, journal, factions, settlements, worldNPCs, timedEvents, lexicon, maps, activeMapId]);
 
   const handleLogEntry = useCallback((entry) => {
     useGameStore.getState().addJournalEntry({
