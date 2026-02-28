@@ -2658,6 +2658,115 @@ export const LORE_TWIST = [
   'Někdo ho pravidelně krmí — myš z osady, která to tají.',
 ];
 
+// ============================================
+// CREATURE-SPECIFIC ENCOUNTER GENERATORS
+// ============================================
+
+export const CREATURE_STATES = [
+  'klidné — bezprostřední hrozba nehrozí, odpočívá bez zájmu',
+  'agresivní — zaujalo útočnou pozici, nechce být rušeno',
+  'hladové — intenzivně hledá potravu, soustředěné jen na jídlo',
+  'vystrašené — rychle prchá, reaguje na každý pohyb panikou',
+  'mateřské — chrání mláďata v blízkém hnízdu, dvakrát nebezpečné',
+  'zaneprázdněné lovem — sleduje jinou kořist, party si nevšímá',
+  'v říji — nepředvídatelné, řídí ho pud, nereaguje na výstrahy',
+  'zraněné — pohybuje se pomalu, bolestivé a dvojnásobně zuřivé',
+  'nemocné — pohybuje se divně, slintá, nebo třepe se',
+  'pod vlivem houby-parazita — jedná nekontrolovaně, zombie-like',
+  'prochází metamorfózou — zalezlo do kokonu, chrání vše kolem',
+  'střeží potravu — nechá se zabít spíš než jídlo vzdát',
+  'zvědavé — zkoumá skupinu beze strachu, pomalu se přibližuje',
+  'sytě a líné — nic ho nezajímá, těžce oddychuje na zemi',
+  'v hibernaci — téměř nereaguje, ale probuzení je katastrofální',
+  'truchlící — ztratilo partnera nebo mládě, nepředvídatelně divoké',
+  'teritoriální — obchází hranice svého území a označkuje je',
+  'migrace — pohybuje se cílevědomě jedním směrem, nelze ho zastavit',
+  'ochromené strachem — ztuhlo, oči dokořán, vydává tichý skřek',
+  'po nočním lovu — pomalu trávící, ospalé, ale bude se bránit',
+];
+
+export const CREATURE_ACTIONS_ANIMAL = [
+  'loví aktivně — pohybuje se tiše a soustředěně za kořistí',
+  'čeká v záloze — nehybně sedí na vyvýšené pozici a čeká',
+  'vymezuje teritorium — značkuje hranice škrábance nebo pachem',
+  'buduje nebo opravuje hnízdo — sbírá větví, trávu, srstě',
+  'krmí mláďata — přináší kousky potravy do skrytého hnízda',
+  'se koupe nebo se čistí — je zaneprázdněné, ignoruje okolí',
+  'hledá vodu — pohybuje se k vodnímu zdroji, nic jiné ho nezajímá',
+  'sbírá zásoby — unáší kousky jídla do skrytého úložiště',
+  'stráží vstup do doupěte — stojí v průchodu a nepustí dovnitř nikoho',
+  'napodobuje zvuky z okolí — mystifikuje kořist nebo vetřelce',
+  'sbírá a třídí předměty — fascinovaně seřazuje lidské harampádí',
+  'tančí rituální tanec — každodenní chování, nepřerušovat',
+  'hraje si — mladý jedinec, skáče, kouše vzduch, tahá za trávu',
+  'učí mládě — opakovaně ukazuje jak se loví nebo ukrývá',
+  'pátrá po zápachu — nos u země, ostatní smysly vypnuté',
+  'migruje — pohybuje se cílevědomě jedním směrem',
+  'vydává territoriální volání — hluboký zvuk nese daleko',
+  'vyhřívá se na kameni — teplokrevný nebo ne, je mu dobře',
+  'ukazuje hierarchii — dominantní postoj vůči jiné bytosti poblíž',
+  'přemisťuje mláďata — bere je v tlamě na bezpečnější místo',
+];
+
+export const CREATURE_REACTIONS_ANIMAL = [
+  'útočí bez varování — vidělo v party okamžitou hrozbu',
+  'útočí po varování — zaujalo výhružnou pozici a dalo šanci odejít',
+  'prchá maximální rychlostí — bez jediné vteřiny váhání',
+  'zmrzne a doufá, že ho party nezpozoruje',
+  'ignoruje — party pro něj není zajímavá ani hrozba',
+  'předstírá mrtvolu — nehybně leží, nereaguje na nic',
+  'zvědavě se přibližuje — bez strachu, čistě ze zájmu',
+  'vydává hlasitý teritoriální zvuk — varuje ostatní v okolí',
+  'obchází party z dálky — sleduje, ale neútočí',
+  'přinese „dar" — položí kousek jídla nebo předmět k nohám party',
+  'zavolá na pomoc — hlasem přivolá ostatní ze smečky nebo hnízda',
+  'zaujme obrannou pozici — chrání doupě nebo mláďata za zády',
+  'testuje party — zaútočí jen trochu, testuje reakci',
+  'kopíruje pohyby party — fascinovaně napodobuje gesta',
+  'obrátí se na útěk a vede party do pasti — instinktivně',
+  'ztuhne jako socha — paralýza ze strachu, ale v kteroukoli chvíli se zlomí',
+  'pouští obranný pach — odpuzuje bez přímého kontaktu',
+  'pokloní se nízkým obloukem — znepokojivé a záhadné',
+  'otočí záda a odejde — naznačuje, že party za pozornost nestojí',
+  'sdělí informaci (umí-li mluvit) — výměnou za pokoj nebo průchod',
+];
+
+// Kritická zranění — co se stane při kritickém zásahu tvorem
+export const CREATURE_CRITICAL_DAMAGE = [
+  'Spolknutí — cíl je polknut zaživa, každé kolo k4 zranění síly až do smrti nebo vysvobození',
+  'Odnesen v kokonu — tvor zabalí cíl do pavučiny a odnese ho jako zásobu',
+  'Ovládnutí — duch nebo zjevení obsadí tělo cíle a řídí ho',
+  'Jed do krevního oběhu — k12 zranění síly se projeví za k6 kol',
+  'Zlomení — cíl je sražen na zem a na chvíli nemůže vstát',
+  'Ochromení jedem — zranění mrštnosti místo síly, cíl zpomalí',
+  'Strháni z koně/výšky — cíl padá, k6 pádové zranění navíc',
+  'Vyrváno z ruky — zbraň nebo štít odletí k6 stop pryč',
+  'Zaslepit — tvor prský šťávu do očí, cíl je slepý dokud si je nevyčistí',
+  'Trhnutí šlach — cíl ztratí jeden útok, pohybuje se s bolestí',
+  'Zachycen past — malé pasti nebo sítě imobilizují cíl na kolo',
+  'Strach — cíl musí ihned ustoupit nebo selhat v příštím útoku',
+];
+
+// Zvláštní vlastnosti tvorů (přirozené schopnosti)
+export const CREATURE_SPECIAL_TRAITS = [
+  'Létá trojnásobnou rychlostí — nelze ho dostihnout po zemi',
+  'Skáče dvojnásobnou rychlostí — hraje vždy jako první, pokud ho nepřekvapíš',
+  'Jedovaté kousnutí — zranění mrštnosti místo síly',
+  'Zranitelný jen stříbrnými nebo kouzelnými zbraněmi',
+  'Zná dvě kouzla — použije je v nouzi nebo pro dominanci',
+  'Zbroj jako kámen — přirozená ochrana 2 nebo 3, těžko proniknout',
+  'Mimikry — splyne s okolím, těžko spatřit dříve než zaútočí',
+  'Skupinový tvor (tlupa) — boj se smečkou jako s jednou bytostí',
+  'Regeneruje — obnovuje k4 BO každé kolo, pokud není mrtvý',
+  'Odráží magii — kouzla na něj nemají efekt nebo se odrazí',
+  'Paralyzující dotyk — dotyk způsobí dočasnou nehybnost',
+  'Hypnotický pohled — kdo se zadívá do očí, musí uspět nebo ztuhne',
+  'Zavolá posilu — zvukem nebo feromonem přivolá k4 dalších jedinců',
+  'Šíří nemoc — kritické zranění přenáší nemoc se symptomy za k6 dní',
+  'Velká velikost (tlupa) — každý útok zasáhne více cílů najednou',
+  'Nehlučný pohyb — nelze ho slyšet přicházet, vždy překvapí',
+];
+
 export const LORE_ASPECTS = [
   { key: 'origin',      label: 'Původ',         icon: '🌱', borderColor: 'border-amber-400',   labelColor: 'text-amber-700',   table: LORE_ORIGIN },
   { key: 'motivation',  label: 'Motivace',       icon: '🎯', borderColor: 'border-blue-400',    labelColor: 'text-blue-600',    table: LORE_MOTIVATION },
