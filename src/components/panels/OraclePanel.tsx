@@ -104,6 +104,7 @@ const OraclePanel = () => {
 
   // State pro generátor tvorů/NPC
   const [creatureResult, setCreatureResult] = useState(null);
+  const [creatureLore, setCreatureLore] = useState<Record<string, string>>({}); // lore aspekty inline v kartě tvora
   const [creatureOptions, setCreatureOptions] = useState({
     includeSecret: true,
     includeQuirk: true,
@@ -237,6 +238,15 @@ const OraclePanel = () => {
     const secret = creatureOptions.includeSecret ? randomFrom(CREATURE_SECRETS) : null;
     const quirk = creatureOptions.includeQuirk ? randomFrom(CREATURE_QUIRKS) : null;
 
+    // Bojové statistiky
+    const CREATURE_ATTACK_TYPES = ['d4 kousnutí', 'd6 drápy', 'd6 kousnutí', 'd8 silný útok', 'd4 žihadlo', 'd8 kousnutí', 'd10 tlama', 'd6 magický výboj', 'd4 osten', 'd6 uštknutí', 'd8 šlápnutí', 'd6 mlácení'];
+    const hpDie = type.category === 'predator' ? rollDice(2, 6).reduce((a, b) => a + b, 0) + 2
+                : type.category === 'construct' || type.category === 'spirit' ? rollD6() + 1
+                : rollD6();
+    const armorRoll = rollD6();
+    const armor = armorRoll <= 3 ? 0 : armorRoll <= 5 ? 1 : 2;
+    const attack = randomFrom(CREATURE_ATTACK_TYPES);
+
     // Generuj jméno (české myší jméno)
     const firstNames = ['Křemílek', 'Lístek', 'Proutek', 'Bělouš', 'Stínek', 'Chlupáč', 'Tichošlap', 'Bystrozrak',
       'Šedivka', 'Ořech', 'Zrnko', 'Kapka', 'Mech', 'Korál', 'Jiskra', 'Pírko', 'Hvězdička', 'Kvítek',
@@ -270,10 +280,14 @@ const OraclePanel = () => {
       mood,
       secret,
       quirk,
-      narrative
+      narrative,
+      hp: hpDie,
+      armor,
+      attack,
     };
 
     setCreatureResult(result);
+    setCreatureLore({}); // reset lore při novém tvorovi
 
     const entry = {
       type: 'oracle',
@@ -904,6 +918,15 @@ const OraclePanel = () => {
                 </div>
               </div>
 
+              {/* Bojové statistiky */}
+              {creatureResult.hp !== undefined && (
+                <div className="flex gap-3 text-sm font-mono bg-amber-100 rounded px-3 py-2 mb-3 justify-around">
+                  <span>❤️ <b>{creatureResult.hp}</b> HP</span>
+                  <span>🛡️ <b>{creatureResult.armor}</b> Armor</span>
+                  <span>⚔️ <b>{creatureResult.attack}</b></span>
+                </div>
+              )}
+
               {/* Aktivita a nálada */}
               <p className="text-stone-700 mb-3">
                 {creatureResult.name} {creatureResult.doing}.
@@ -938,6 +961,59 @@ const OraclePanel = () => {
                   <p className="text-stone-300 italic">{creatureResult.secret.charAt(0).toUpperCase() + creatureResult.secret.slice(1)}.</p>
                 </div>
               )}
+
+              {/* Lore aspekty — dodatečné generátory */}
+              <div className="mt-3 pt-3 border-t border-amber-200">
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {LORE_ASPECTS.map(aspect => (
+                    <button
+                      key={aspect.key}
+                      onClick={() => {
+                        const val = randomFrom(aspect.table);
+                        setCreatureLore(prev => ({ ...prev, [aspect.key]: val }));
+                      }}
+                      className={`px-1.5 py-0.5 text-xs rounded border transition-colors ${
+                        creatureLore[aspect.key]
+                          ? 'bg-amber-200 border-amber-400 text-amber-900'
+                          : 'bg-white border-amber-200 text-amber-700 hover:bg-amber-100'
+                      }`}
+                      title={aspect.label}
+                    >
+                      {aspect.icon}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => {
+                      const all: Record<string, string> = {};
+                      for (const a of LORE_ASPECTS) all[a.key] = randomFrom(a.table);
+                      setCreatureLore(all);
+                    }}
+                    className="px-2 py-0.5 text-xs rounded border bg-amber-600 border-amber-700 text-white hover:bg-amber-700"
+                    title="Generuj vše"
+                  >
+                    📖 vše
+                  </button>
+                  {Object.keys(creatureLore).length > 0 && (
+                    <button
+                      onClick={() => setCreatureLore({})}
+                      className="px-2 py-0.5 text-xs rounded border border-stone-200 text-stone-400 hover:bg-stone-100"
+                      title="Vymazat lore"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+                {Object.keys(creatureLore).length > 0 && (
+                  <div className="space-y-1">
+                    {LORE_ASPECTS.filter(a => creatureLore[a.key]).map(aspect => (
+                      <div key={aspect.key} className={`flex gap-2 items-start text-xs p-1.5 rounded border-l-4 bg-amber-50 ${aspect.borderColor}`}>
+                        <span className={`shrink-0 ${aspect.labelColor}`}>{aspect.icon}</span>
+                        <span className="text-amber-800">{creatureLore[aspect.key]}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
 
               {/* Meta info + Save button */}
               <div className="mt-4 pt-3 border-t border-stone-200 flex flex-wrap items-center justify-between gap-2">

@@ -60,8 +60,8 @@ const JournalPanel = ({ onExport }) => {
   // Touch drag & drop pro mobilní zařízení
   const [touchDragId, setTouchDragId] = useState(null);
 
-  // Editace poznámky připnuté k záznamu
-  const [editingNoteForId, setEditingNoteForId] = useState<string | null>(null);
+  // Editace poznámky připnuté k záznamu (idx = index do notes[], 'new' = přidat novou)
+  const [editingNote, setEditingNote] = useState<{ entryId: string; idx: number | 'new' } | null>(null);
 
   // Hooksy — otevřené otázky
   const [hookingEntryId, setHookingEntryId] = useState<string | null>(null);
@@ -89,11 +89,24 @@ const JournalPanel = ({ onExport }) => {
     setJournal(journal.map(e => e.id === id ? { ...e, resolved: true } : e));
   };
 
-  const saveNote = (entryId: string, html: string) => {
+  const saveNote = (entryId: string, html: string, idx: number | 'new') => {
     const trimmed = html.replace(/<[^>]*>/g, '').trim();
-    setJournal(journal.map(e => e.id === entryId ? { ...e, note: trimmed ? html : undefined } : e));
+    setJournal(journal.map(e => {
+      if (e.id !== entryId) return e;
+      // Sluč legacy note + notes[] do jednoho pole
+      const existing: string[] = e.notes ?? (e.note ? [e.note] : []);
+      let updated: string[];
+      if (idx === 'new') {
+        updated = trimmed ? [...existing, html] : existing;
+      } else {
+        updated = trimmed
+          ? existing.map((n, i) => i === idx ? html : n)
+          : existing.filter((_, i) => i !== idx);
+      }
+      return { ...e, notes: updated, note: undefined, edited: true };
+    }));
     if (trimmed) setExpandedNotes(prev => { const next = new Set(prev); next.add(entryId); return next; });
-    setEditingNoteForId(null);
+    setEditingNote(null);
   };
 
   // Mention items pro TiptapEditor
@@ -464,22 +477,33 @@ const JournalPanel = ({ onExport }) => {
       );
     }
 
-    // Poznámka k záznamu — collapsible
-    const EntryNote = ({ note, entryId }: { note?: string; entryId: string }) => {
-      if (!note) return null;
+    // Poznámky k záznamu — collapsible, více poznámek
+    const EntryNote = ({ entry }: { entry: { id: string; note?: string; notes?: string[] } }) => {
+      const allNotes: string[] = entry.notes ?? (entry.note ? [entry.note] : []);
+      if (allNotes.length === 0) return null;
+      const entryId = entry.id;
       const isExpanded = expandedNotes.has(entryId);
-      const preview = note.replace(/<[^>]*>/g, '').slice(0, 60);
+      const preview = allNotes[0].replace(/<[^>]*>/g, '').slice(0, 60);
       return (
-        <div className="mt-1.5 cursor-pointer" onClick={(e) => { e.stopPropagation(); toggleNote(entryId, e); }}>
-          <div className="flex items-center gap-1 text-[11px] select-none" style={{ color: '#C09A8090' }}>
+        <div className="mt-1.5" onClick={(e) => { e.stopPropagation(); toggleNote(entryId, e); }}>
+          <div className="flex items-center gap-1 text-[11px] select-none cursor-pointer" style={{ color: '#C09A8090' }}>
             <span className="font-mono text-[10px]">{isExpanded ? '▾' : '▸'}</span>
             {!isExpanded && <span className="italic truncate opacity-80">{preview}{preview.length >= 60 ? '…' : ''}</span>}
+            {allNotes.length > 1 && <span className="text-[10px] opacity-60 ml-1">({allNotes.length})</span>}
           </div>
           {isExpanded && (
-            <div className="mt-0.5" style={{ borderLeft: '2px solid #C09A8050', paddingLeft: 8, paddingTop: 2 }}>
-              <p className="italic whitespace-pre-wrap" style={{ color: '#8A5A4A', fontSize: 12, lineHeight: 1.55 }}>
-                {renderContent(note)}
-              </p>
+            <div className="mt-0.5 space-y-1" style={{ borderLeft: '2px solid #C09A8050', paddingLeft: 8, paddingTop: 2 }}>
+              {allNotes.map((note, idx) => (
+                <p
+                  key={idx}
+                  className="italic whitespace-pre-wrap cursor-pointer hover:opacity-70 transition-opacity"
+                  style={{ color: '#8A5A4A', fontSize: 12, lineHeight: 1.55 }}
+                  onClick={(e) => { e.stopPropagation(); setEditingNote({ entryId, idx }); }}
+                  title="Klikni pro úpravu"
+                >
+                  {renderContent(note)}
+                </p>
+              ))}
             </div>
           )}
         </div>
@@ -500,7 +524,7 @@ const JournalPanel = ({ onExport }) => {
                 {renderContent(entry.content)}
                 {entry.edited && <span className="text-xs ml-1" style={{ color:'#C09A80' }}>✎</span>}
               </p>
-              <EntryNote note={entry.note} entryId={entry.id} />
+              <EntryNote entry={entry} />
             </div>
           );
         }
@@ -518,7 +542,7 @@ const JournalPanel = ({ onExport }) => {
             )}
             {renderContent(entry.content)}
             {entry.edited && <span className="text-xs ml-1" style={{ color:'#C09A80' }}>✎</span>}
-            <EntryNote note={entry.note} entryId={entry.id} />
+            <EntryNote entry={entry} />
           </div>
         );
 
@@ -534,7 +558,7 @@ const JournalPanel = ({ onExport }) => {
                 {c.type?.icon || '🐭'} {c.name} <span className="font-normal text-amber-800/60">— {c.type?.name}</span>
               </p>
               <p className="text-amber-800/70 text-sm truncate">Je {c.personality}</p>
-              <EntryNote note={entry.note} entryId={entry.id} />
+              <EntryNote entry={entry} />
             </div>
           );
         }
@@ -562,7 +586,7 @@ const JournalPanel = ({ onExport }) => {
                 🐭 {name} {typePart && <span className="font-normal text-amber-800/60">— {typePart}</span>}
               </p>
               {personality && <p className="text-amber-800/70 text-sm truncate">{personality}</p>}
-              <EntryNote note={entry.note} entryId={entry.id} />
+              <EntryNote entry={entry} />
             </div>
           );
         }
@@ -579,7 +603,7 @@ const JournalPanel = ({ onExport }) => {
                   {(e.danger || e.creature?.danger) ? '⚠️' : '👁️'} {creatureName}
                 </p>
                 <p className="text-amber-800/70 text-sm truncate">{e.activity}</p>
-                <EntryNote note={entry.note} entryId={entry.id} />
+                <EntryNote entry={entry} />
               </div>
             );
           }
@@ -590,7 +614,7 @@ const JournalPanel = ({ onExport }) => {
                  title="Klikni pro úpravu">
               <p className="text-xs text-red-600 font-medium mb-1">👁️ Setkání</p>
               <p className="text-sm text-amber-900/80 line-clamp-2">{entry.result?.replace(/\*\*/g, '').replace(/\*/g, '')}</p>
-              <EntryNote note={entry.note} entryId={entry.id} />
+              <EntryNote entry={entry} />
             </div>
           );
         }
@@ -601,7 +625,7 @@ const JournalPanel = ({ onExport }) => {
                  onClick={() => startEdit(entry)}
                  title="Klikni pro úpravu">
               <p className="font-medium text-amber-800 truncate">{entry.result}</p>
-              <EntryNote note={entry.note} entryId={entry.id} />
+              <EntryNote entry={entry} />
             </div>
           );
         }
@@ -626,7 +650,7 @@ const JournalPanel = ({ onExport }) => {
                 {d.isAltered && d.complication && (
                   <p className="text-amber-700 text-sm font-medium"><span className="text-amber-600">⚡</span> {d.complication}</p>
                 )}
-                <EntryNote note={entry.note} entryId={entry.id} />
+                <EntryNote entry={entry} />
               </div>
             );
           }
@@ -644,7 +668,7 @@ const JournalPanel = ({ onExport }) => {
               {entry.narrative && (
                 <div className="text-amber-900/80 text-sm whitespace-pre-line">{entry.narrative}</div>
               )}
-              <EntryNote note={entry.note} entryId={entry.id} />
+              <EntryNote entry={entry} />
             </div>
           );
         }
@@ -660,7 +684,7 @@ const JournalPanel = ({ onExport }) => {
                 <span className="font-bold">[{entry.dice?.join(', ')}]</span>
                 {entry.count > 1 && <span className="font-bold"> = {entry.total}</span>}
               </p>
-              <EntryNote note={entry.note} entryId={entry.id} />
+              <EntryNote entry={entry} />
             </div>
           );
         }
@@ -682,7 +706,7 @@ const JournalPanel = ({ onExport }) => {
                 <span className="ml-auto" style={{ fontSize:10, color:'#C09A80' }}>{probLabel(entry.probability)}</span>
               )}
             </div>
-            <EntryNote note={entry.note} entryId={entry.id} />
+            <EntryNote entry={entry} />
             {entry.edited && <span className="text-xs" style={{ color:'#C09A80' }}>✎</span>}
           </div>
         );
@@ -739,14 +763,14 @@ const JournalPanel = ({ onExport }) => {
               <span className="text-xs text-amber-700">Chaos: {entry.chaosBefore} → {entry.chaosAfter}</span>
             </div>
             {entry.note
-              ? <EntryNote note={entry.note} entryId={entry.id} />
+              ? <EntryNote entry={entry} />
               : (
                 <button
                   className="mt-1.5 block text-[11px] italic transition-colors cursor-pointer"
                   style={{ color: '#A0875060' }}
                   onMouseEnter={e => (e.currentTarget.style.color = '#8A5A4A')}
                   onMouseLeave={e => (e.currentTarget.style.color = '#A0875060')}
-                  onClick={(e) => { e.stopPropagation(); setEditingNoteForId(entry.id); }}
+                  onClick={(e) => { e.stopPropagation(); setEditingNote({ entryId: entry.id, idx: 'new' }); }}
                 >
                   ✎ Zapsat shrnutí scény...
                 </button>
@@ -781,7 +805,7 @@ const JournalPanel = ({ onExport }) => {
                 {entry.damage} dmg
               </span>
             </div>
-            <EntryNote note={entry.note} entryId={entry.id} />
+            <EntryNote entry={entry} />
           </div>
         );
 
@@ -791,7 +815,7 @@ const JournalPanel = ({ onExport }) => {
             <p className="my-2 text-sm font-bold text-amber-800 border-t border-b border-amber-200 py-1">
               🏁 Boj skončil
             </p>
-            <EntryNote note={entry.note} entryId={entry.id} />
+            <EntryNote entry={entry} />
           </div>
         );
       
@@ -803,7 +827,7 @@ const JournalPanel = ({ onExport }) => {
             <p className="font-bold text-amber-900 truncate">{entry.subtype}: {entry.data?.name}</p>
             {entry.data?.trait && <p className="text-amber-800/70 text-sm italic truncate">{entry.data.trait}</p>}
             {entry.data?.appearance && <p className="text-amber-800/70 text-sm truncate">{entry.data.appearance}</p>}
-            <EntryNote note={entry.note} entryId={entry.id} />
+            <EntryNote entry={entry} />
           </div>
         );
       
@@ -814,7 +838,7 @@ const JournalPanel = ({ onExport }) => {
               <span className="font-medium text-amber-900">{entry.faction}</span>: {entry.success ? '✓ pokrok' : '– beze změny'}
               <span className="opacity-60"> (d6={entry.roll}+{entry.bonus})</span>
             </p>
-            <EntryNote note={entry.note} entryId={entry.id} />
+            <EntryNote entry={entry} />
           </div>
         );
 
@@ -826,7 +850,7 @@ const JournalPanel = ({ onExport }) => {
               {entry.events?.includes('new_day') && ' — Nový den'}
               {entry.events?.includes('new_week') && ' — Nový týden'}
             </p>
-            <EntryNote note={entry.note} entryId={entry.id} />
+            <EntryNote entry={entry} />
           </div>
         );
 
@@ -873,7 +897,7 @@ const JournalPanel = ({ onExport }) => {
               <p className="my-1 text-sm text-amber-800">
                 <span className="text-amber-600">{entry.data?.icon || '☁️'}</span> Počasí: <em>{entry.data?.type || entry.data?.weather || entry.weather || 'neznámé'}</em>
               </p>
-              <EntryNote note={entry.note} entryId={entry.id} />
+              <EntryNote entry={entry} />
             </div>
           );
         }
@@ -883,7 +907,7 @@ const JournalPanel = ({ onExport }) => {
             <p className="my-1 text-sm text-amber-800">
               🌍 {entry.data?.name || entry.content || JSON.stringify(entry.data)}
             </p>
-            <EntryNote note={entry.note} entryId={entry.id} />
+            <EntryNote entry={entry} />
           </div>
         );
 
@@ -893,7 +917,7 @@ const JournalPanel = ({ onExport }) => {
             <p className="my-1 text-sm text-green-700">
               {entry.subtype === 'short' ? '☕ Krátký odpočinek' : '🏕️ Dlouhý odpočinek v bezpečí'}
             </p>
-            <EntryNote note={entry.note} entryId={entry.id} />
+            <EntryNote entry={entry} />
           </div>
         );
 
@@ -903,7 +927,7 @@ const JournalPanel = ({ onExport }) => {
             <p className="my-1 text-xs text-amber-700">
               📦 {entry.item}: {entry.consumed ? <span className="text-red-600">spotřebováno!</span> : <span className="text-green-600">OK</span>}
             </p>
-            <EntryNote note={entry.note} entryId={entry.id} />
+            <EntryNote entry={entry} />
           </div>
         );
 
@@ -913,7 +937,7 @@ const JournalPanel = ({ onExport }) => {
                onClick={() => startEdit(entry)}
                title="Klikni pro úpravu">
             <p className="text-red-700 font-bold">⚠️ Náhodné setkání!</p>
-            <EntryNote note={entry.note} entryId={entry.id} />
+            <EntryNote entry={entry} />
           </div>
         );
 
@@ -923,7 +947,7 @@ const JournalPanel = ({ onExport }) => {
             <p className="my-1 text-xs text-amber-600 uppercase tracking-wider">
               ⛏️ Tah {entry.turn} — pochodeň: {6 - entry.torchTurns}/6
             </p>
-            <EntryNote note={entry.note} entryId={entry.id} />
+            <EntryNote entry={entry} />
           </div>
         );
 
@@ -934,7 +958,7 @@ const JournalPanel = ({ onExport }) => {
                onClick={() => startEdit(entry)}
                title="Klikni pro úpravu">
             <p className="text-red-700 font-bold">👹 Něco se blíží!</p>
-            <EntryNote note={entry.note} entryId={entry.id} />
+            <EntryNote entry={entry} />
           </div>
         );
 
@@ -942,7 +966,7 @@ const JournalPanel = ({ onExport }) => {
         return (
           <div>
             <p className="my-1 text-xs text-amber-600">🔥 Nová pochodeň</p>
-            <EntryNote note={entry.note} entryId={entry.id} />
+            <EntryNote entry={entry} />
           </div>
         );
 
@@ -954,7 +978,7 @@ const JournalPanel = ({ onExport }) => {
                 ? <span className="text-green-700">zůstává věrný</span>
                 : <span className="text-red-700 font-bold">ZRADA!</span>}
             </p>
-            <EntryNote note={entry.note} entryId={entry.id} />
+            <EntryNote entry={entry} />
           </div>
         );
 
@@ -964,7 +988,7 @@ const JournalPanel = ({ onExport }) => {
             <p className="my-2 text-amber-800 font-medium">
               🐭 Na scénu vstupuje <strong>{entry.character}</strong>
             </p>
-            <EntryNote note={entry.note} entryId={entry.id} />
+            <EntryNote entry={entry} />
           </div>
         );
 
@@ -977,7 +1001,7 @@ const JournalPanel = ({ onExport }) => {
               <span className="text-xs text-amber-600">
                 {entry.change > 0 ? '💚' : '💔'} {sign}{entry.change} HP
               </span>
-              <EntryNote note={entry.note} entryId={entry.id} />
+              <EntryNote entry={entry} />
             </div>
           );
         }
@@ -1005,7 +1029,7 @@ const JournalPanel = ({ onExport }) => {
         return (
           <div>
             <p className="my-1 text-sm text-amber-700">💰 {entry.description}</p>
-            <EntryNote note={entry.note} entryId={entry.id} />
+            <EntryNote entry={entry} />
           </div>
         );
 
@@ -1027,7 +1051,7 @@ const JournalPanel = ({ onExport }) => {
             </p>
             {!npcIsDead && (currentNPC?.birthsign || entry.data?.birthsign) && <p className="text-amber-800/70 text-sm truncate">{currentNPC?.birthsign || entry.data?.birthsign}</p>}
             {!npcIsDead && (currentNPC?.physicalDetail || entry.data?.physicalDetail) && <p className="text-amber-700 text-sm truncate">{currentNPC?.physicalDetail || entry.data?.physicalDetail}</p>}
-            <EntryNote note={entry.note} entryId={entry.id} />
+            <EntryNote entry={entry} />
           </div>
         );
 
@@ -1043,7 +1067,7 @@ const JournalPanel = ({ onExport }) => {
               🏘️ <span className="font-medium">{currentSettlement?.name || entry.data?.name}</span>
               <span className="text-teal-700 ml-1">— {currentSettlement?.size || entry.data?.size}</span>
             </p>
-            <EntryNote note={entry.note} entryId={entry.id} />
+            <EntryNote entry={entry} />
           </div>
         );
       }
@@ -1056,8 +1080,8 @@ const JournalPanel = ({ onExport }) => {
         return (
           <div
             className="my-2 pl-3 border-l-2 border-amber-500 cursor-pointer hover:bg-amber-50 rounded-r transition-colors"
-            onClick={() => creature && setDetailModal({ type: 'creature_lore', data: creature })}
-            title={creature ? 'Klikni pro detail' : undefined}
+            onClick={() => setDetailModal({ type: 'creature_lore', data: creature || { id: d?.creatureId, name, lore: d?.lore || {} } })}
+            title="Klikni pro detail"
           >
             <p className="text-sm font-bold text-amber-900">📖 {name}</p>
             {filledAspects.slice(0, 3).map(([key, val]) => {
@@ -1071,7 +1095,7 @@ const JournalPanel = ({ onExport }) => {
             {filledAspects.length > 3 && (
               <p className="text-xs text-amber-500">+{filledAspects.length - 3} dalších aspektů</p>
             )}
-            <EntryNote note={entry.note} entryId={entry.id} />
+            <EntryNote entry={entry} />
           </div>
         );
       }
@@ -1091,7 +1115,7 @@ const JournalPanel = ({ onExport }) => {
             <p className="text-xs text-amber-700 font-mono">
               {typeof content === 'string' ? content : JSON.stringify(content)}
             </p>
-            <EntryNote note={entry.note} entryId={entry.id} />
+            <EntryNote entry={entry} />
           </div>
         );
 
@@ -1368,9 +1392,9 @@ const JournalPanel = ({ onExport }) => {
                       {!selectionMode && editingId !== entry.id && (
                         <div className="flex flex-col items-center">
                           <button
-                            onClick={(e) => { e.stopPropagation(); setEditingNoteForId(editingNoteForId === entry.id ? null : entry.id); }}
+                            onClick={(e) => { e.stopPropagation(); setEditingNote(editingNote?.entryId === entry.id && editingNote.idx === 'new' ? null : { entryId: entry.id, idx: 'new' }); }}
                             className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 text-amber-400 hover:text-amber-600 pt-2 px-1 transition-opacity"
-                            title="Připnout"
+                            title="Přidat poznámku"
                           >+</button>
                           <button
                             onClick={() => setHookingEntryId(hookingEntryId === entry.id ? null : entry.id)}
@@ -1380,19 +1404,19 @@ const JournalPanel = ({ onExport }) => {
                         </div>
                       )}
                     </div>
-                    {editingNoteForId === entry.id && (
+                    {editingNote?.entryId === entry.id && (
                       <div className="ml-5 mt-0.5 flex items-start gap-1" onClick={(e) => e.stopPropagation()}>
                         <div className="flex-1">
                           <TiptapEditor
-                            content={entry.note || ''}
-                            onSubmit={(html) => saveNote(entry.id, html)}
+                            content={editingNote.idx === 'new' ? '' : ((entry.notes ?? (entry.note ? [entry.note] : []))[editingNote.idx as number] || '')}
+                            onSubmit={(html) => saveNote(entry.id, html, editingNote.idx)}
                             placeholder="(@ pro zmínku, Enter ↵)"
                             mentionItems={allMentions}
                             autoFocus compact submitOnEnter
-                            onCancel={() => setEditingNoteForId(null)}
+                            onCancel={() => setEditingNote(null)}
                           />
                         </div>
-                        <button type="button" onClick={() => setEditingNoteForId(null)} className="text-amber-400 hover:text-amber-600 p-2 text-lg" title="Zrušit">×</button>
+                        <button type="button" onClick={() => setEditingNote(null)} className="text-amber-400 hover:text-amber-600 p-2 text-lg" title="Zrušit">×</button>
                       </div>
                     )}
                     {hookingEntryId === entry.id && (
@@ -1908,6 +1932,33 @@ const JournalPanel = ({ onExport }) => {
                     <p className="text-xs text-amber-700 text-center mt-1">Vytvoří plnohodnotné NPC se statistikami</p>
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Modal pro creature_lore — lore profil uloženého tvora */}
+            {detailModal.type === 'creature_lore' && detailModal.data && (
+              <div className="p-4 space-y-3">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="text-2xl font-bold text-amber-900">🐾 {detailModal.data.name}</h3>
+                    <p className="text-sm text-amber-600">Lore profil bytosti</p>
+                  </div>
+                  <button onClick={() => setDetailModal(null)} className="text-amber-400 hover:text-amber-600 text-xl">✕</button>
+                </div>
+                <div className="space-y-2 max-h-[60vh] overflow-y-auto pr-1">
+                  {LORE_ASPECTS.map(aspect => {
+                    const value = detailModal.data.lore?.[aspect.key];
+                    if (!value) return null;
+                    return (
+                      <div key={aspect.key} className="p-2.5 rounded-lg border-l-4" style={{ borderColor: aspect.borderColor, background: '#FFFCF7' }}>
+                        <span className="text-xs font-semibold uppercase tracking-wide block mb-0.5" style={{ color: aspect.labelColor }}>
+                          {aspect.icon} {aspect.label}
+                        </span>
+                        <p className="text-sm text-amber-900">{value}</p>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
 

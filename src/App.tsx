@@ -34,6 +34,7 @@ import { TimeHub } from './components/panels/TimeHub';
 import { WorldHub } from './components/panels/WorldHub';
 import { ToolsHub } from './components/panels/ToolsHub';
 import { RightSidebar } from './components/panels/RightSidebar';
+import { BestiaryPanel } from './components/panels/BestiaryPanel';
 
 
 // ============================================
@@ -1614,6 +1615,7 @@ function MausritterSoloCompanion() {
     { id: 'timehub',   label: 'Čas',            icon: '🗓️' },
     { id: 'worldhub',  label: 'Svět',           icon: '🌍' },
     { id: 'tools',     label: 'Nástroje',       icon: '🗺️' },
+    { id: 'bestiary',  label: 'Bestiář',        icon: '🐉' },
   ];
 
   return (
@@ -2736,6 +2738,7 @@ function MausritterSoloCompanion() {
           {activePanel === 'timehub'   && <TimeHub />}
           {activePanel === 'worldhub'  && <WorldHub />}
           {activePanel === 'tools'     && <ToolsHub />}
+          {activePanel === 'bestiary'  && <BestiaryPanel />}
         </main>
         <RightSidebar activePanel={activePanel} />
       </div>
