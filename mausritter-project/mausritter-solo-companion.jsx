@@ -783,6 +783,365 @@ const CREATURE_QUIRKS = [
 ];
 
 // ============================================
+// MONSTER LORE GENERATOR TABLES
+// Hloubkový profiler bytostí - 12 aspektů lore
+// ============================================
+
+const LORE_ORIGIN = [
+  'Prostě tu žije — tady je voda, jídlo, bezpečí. Nic víc.',
+  'Žije tu od nepaměti — starší než jakákoliv myší osada v okolí.',
+  'Přišlo sem z daleka, vyhnáno z původního domova katastrofou.',
+  'Přišlo po stopách kořisti a už neodešlo.',
+  'Narodilo se tu — toto místo je jeho rodný domov.',
+  'Je posledním přeživším svého druhu — sem uteklo ze zoufalství.',
+  'Přišlo sem s karavanou, ale zůstalo když karavana odešla.',
+  'Migrovalo sem spolu s ročním obdobím — ale tentokrát neodešlo.',
+  'Spadlo sem — doslova — z ptačího hnízda vysoko nahoře.',
+  'Bylo sem přineseno vichřicí, která tu řádila minulou sezónu.',
+  'Přilezlo sem z Podzemí, ze sítě tunelů pod kořeny.',
+  'Přišlo sem za vodou — starý zdroj vyschl.',
+  'Vyhnáno z původního teritoria silnějším tvorem.',
+  'Přitáhla ho hojnost potravy v okolí osady.',
+  'Vylíhlo se tu z vajec, která sem nakladla matka.',
+  'Přišlo sem po proudu řeky nebo potoka.',
+  'Zabydlelo se tu po smrti předchozího alfa tvora v okolí.',
+  'Přežilo požár nebo povodeň a toto bylo nejbližší útočiště.',
+  'Vytlačeno lidskou aktivitou ze starého domova.',
+  'Sledovalo kořist a zjistilo, že se tu loví snadno.',
+  'Sem se uchýlilo po zradě blízkého společníka.',
+  'Připlulo po podzemní řece, která tu ústí.',
+  'Uprchlo z laboratoře sovího čaroděje.',
+  'Přišlo sem jako strážce něčeho ukrytého.',
+  'Přitáhl ho pach krve z dávné bitvy, která tu proběhla.'
+];
+
+const LORE_MOTIVATION = [
+  'Hlídá vstup do svého teritoria — nechce vetřelce.',
+  'Hledá konkrétní druh potravy, který roste jen tady.',
+  'Chrání svá mláďata ukrytá poblíž.',
+  'Hromadí zásoby na blížící se zimu nebo pohromu.',
+  'Touží po klidu — chce být prostě ponecháno na pokoji.',
+  'Hledá partnera ke spáření — je v období námluv.',
+  'Chce ovládnout toto území a vyhnat všechny ostatní.',
+  'Hledá cestu zpět domů, ale neví kudy.',
+  'Shromažďuje materiály na stavbu hnízda nebo doupěte.',
+  'Touží po pomstě — někdo mu ublížil a ono to nezapomnělo.',
+  'Chce komunikovat, ale neví jak — pokouší se předat zprávu.',
+  'Hledá léčivou bylinu nebo vodu pro své nemocné mládě.',
+  'Touží po společnosti — je osamělé a zoufalé.',
+  'Plní příkaz mocnější bytosti, které se bojí.',
+  'Chce být krmeno a obsluhováno — považuje se za šlechtu.',
+  'Prostě loví — má hlad a tohle je jeho loviště.',
+  'Brání si noru nebo hnízdo — je to jeho domov.',
+  'Hledá bezpečné místo k přezimování.',
+  'Vysedává na slunci a čeká na kořist.',
+  'Střeží zásoby potravy, které nashromáždilo.',
+  'Snaží se přežít zimu, sucho nebo povodeň.',
+  'Rozšiřuje své teritorium na úkor sousedů.',
+  'Učí svá mláďata lovit a přežít.',
+  'Střeží průchod nebo stezku, o které myši nevědí.',
+  'Touží po lidském artefaktu, který spatřilo — neví co to je, ale chce to.'
+];
+
+const LORE_SOCIAL = [
+  'Naprostý samotář — nesnáší společnost jakéhokoliv druhu.',
+  'Vůdce malé skupiny 3–5 jedinců, které drží pohromadě strachem.',
+  'Člen smečky, ale snaží se osamostatnit.',
+  'Buduje si gang — aktivně rekrutuje spojence a poddané.',
+  'Páreček — má partnera, se kterým se dělí o teritorium.',
+  'Poslední ze svého druhu — nedobrovolný samotář.',
+  'Alfa velké skupiny 10+ jedinců, kteří terorizují okolí.',
+  'Žije v symbióze s jiným druhem tvora.',
+  'Vyhnanec — byl vyhozen ze své skupiny za přestupek.',
+  'Osamělý tulák — putuje sám od místa k místu.',
+  'Matriarchát — samice vede skupinu, samci slouží.',
+  'Má jednoho věrného společníka, se kterým je neoddělitelné.',
+  'Hledá si skupinu — chce někam patřit, ale neumí to.',
+  'Vůdce kultu — jeho následovníci ho uctívají jako božstvo.',
+  'Žije v kolonii stovek jedinců, ale tahle skupina se odtrhla.',
+  'Parazituje na jiném tvorovi — žije na jeho úkor.',
+  'Rodič s mláďaty — chrání potomky za každou cenu.',
+  'Rival jiného tvora — soupeří o stejné území.',
+  'Spojenec myší osady — má s nimi tajnou dohodu.',
+  'Žoldnéř — slouží tomu, kdo zaplatí nejlépe.',
+  'Teritoriální — žije samo na přesně vymezeném území, které značkuje.',
+  'Sezónní společník — v létě samotář, v zimě se sdružuje s ostatními.',
+  'Toleruje ostatní tvory, pokud mu neberou potravu.',
+  'Podřízený člen skupiny — dělá špinavou práci za ochranu.',
+  'Rodina — žije s partnerem a letošními mláďaty, nic víc.'
+];
+
+const LORE_LAIR = [
+  'Prostá díra v zemi, nic zvláštního — funguje to.',
+  'Propracovaný systém tunelů se zásobárnou a strážní místností.',
+  'Staré myší obydlí, které si přivlastnilo a zdevastovalo.',
+  'Mělká tůňka v bahně u potoka — vždy vlhká, vždy plná hmyzu.',
+  'Hnízdo vysoko v korunách, dostupné jen pro létající tvory.',
+  'Podmáčená nora u vody, napůl zaplavená.',
+  'V doupěti má sbírku podivných předmětů z lidského světa.',
+  'Skrýš pod plochým kamenem u vody — chladná a vlhká.',
+  'Žádné stálé doupě — stěhuje se každých pár dní.',
+  'Nora pod kořeny starého dubu, plná hub a mechu.',
+  'Opuštěná lidská bota, přestavěná na pevnost.',
+  'Jeskyně plná krápníků a podivného světla.',
+  'Hnízdo utkané z pavučin, hedvábné a děsivé zároveň.',
+  'Dutina ve starém pařezu, plná zásobáren a chodeb.',
+  'Vybudovalo si doupě z kostí a lebek svých obětí.',
+  'Doupě pod vodní hladinou — vstup je ponořený.',
+  'Kamenná dutina s překvapivě příjemnou teplotou.',
+  'V doupěti má primitivní oltář s podivnými obětinami.',
+  'Opevněné místo s pastmi a hlídkami na přístupových cestách.',
+  'Doupě v trhlině ve skále, téměř neviditelné.',
+  'Opuštěný hmyzí úl, přebudovaný na pevnost.',
+  'Doupě v koruně stromu, spojené můstky z větviček.',
+  'Využívá starý lidský odpad jako stavební materiál — plechovka, lahev.',
+  'Hnízdo z listí a trávy schované v hustém křoví.',
+  'Doupě je prázdné a spartánské — žije asketicky.'
+];
+
+const LORE_BEHAVIOR = [
+  'Zcela mírumilovné — ignoruje kolemjdoucí, pokud ho neohrožují.',
+  'Terorizuje okolí — pravidelně přepadá zásobovací cesty.',
+  'Obchoduje s místními — nabízí vzácné byliny za jídlo.',
+  'Vybírá „daň" od každého, kdo projde jeho územím.',
+  'Nechá projít, ale sleduje — vždy ví, kdo prošel.',
+  'Agresivní jen v noci — ve dne je klidné a přátelské.',
+  'Nabízí služby za protislužby — má smysl pro obchod.',
+  'Hlídá přístupovou cestu jako samozvaný strážce.',
+  'Loví jen když má hlad — jinak nikoho neobtěžuje.',
+  'Krade zásoby z osady, ale nikdy nikomu neublíží.',
+  'Vyměňuje informace za jídlo — ví věci o okolí.',
+  'Útočí na každého, kdo se přiblíží na dohled.',
+  'Přátelské k dětem a mláďatům, agresivní k dospělým.',
+  'Varuje vetřelce třikrát, pak útočí bez milosti.',
+  'Nabízí ochranu za pravidelný tribut potravy.',
+  'Ignoruje myši, ale útočí na jiné tvory.',
+  'Loví za úsvitu a soumraku — ve dne i v noci spí.',
+  'Obchoduje s předměty, které nachází v okolí.',
+  'Pomáhá ztraceným cestovatelům najít cestu — za úplatu.',
+  'Sabotuje pasti a nástrahy lovců v okolí.',
+  'Zanechává výstražná znamení na hranicích svého území.',
+  'Chodí na stejná místa ve stejný čas — má přísný rituál.',
+  'Značkuje si teritorium a pravidelně ho obchází.',
+  'Mění chování podle počasí — v dešti je zuřivé, za slunce klidné.',
+  'Tiše pozoruje a sbírá informace — nikdo neví proč.'
+];
+
+const LORE_RUMOR = [
+  '„Prý kdokoliv, kdo na něj pohlédne přímo do očí, dostane horečku."',
+  '„Starý Bodlák říkal, že to viděl před dvaceti lety — a vypadá to pořád stejně."',
+  '„Nikdo, kdo šel blíž než na dohled, se nevrátil celý."',
+  '„Říká se, že hlídá poklad z dob před Velkou bouří."',
+  '„Prý ho můžeš uklidnit, když mu dáš med."',
+  '„Moje babička říkala, že to dřív bývalo jiné — přátelské."',
+  '„Jednou za měsíc vydává zvuky, ze kterých mrazí."',
+  '„Ten starý mlynář tvrdí, že s ním jednou mluvil."',
+  '„Prý žere třikrát denně — a ještě mu nestačí."',
+  '„Kdosi viděl, jak nechalo koš hub u cesty — jako dar."',
+  '„Prý je prokleté — a každý, kdo ho zabije, zdědí tu kletbu."',
+  '„Objevuje se vždycky před neštěstím — jako zlé znamení."',
+  '„Říkají, že zná tajné cesty, které myši dávno zapomněly."',
+  '„Jedna stará myš přísahá, že ho viděla plakat."',
+  '„Prý sežere cokoliv — i železo a kámen."',
+  '„Říká se, že je starší než nejstarší dub v lese."',
+  '„Kdosi tvrdí, že v jeho doupěti svítí podivné světlo."',
+  '„Místní věří, že přináší déšť — a proto ho nechávají být."',
+  '„Prý ho jednou porazil jediný myší válečník, ale nikdo neví kdo."',
+  '„Říkají, že tu bylo dřív než osada — a přežije nás všechny."',
+  '„Babička varovala: nikdy ho nekrm po setmění."',
+  '„Prý zná jméno každého, kdo tu kdy žil."',
+  '„Říkají, že je to vlastně strážný duch tohoto místa."',
+  '„Kdosi viděl, jak tančí za úplňku na mýtině."',
+  '„Prý má lidský předmět — říkají tomu ‚zrcadlo'."'
+];
+
+const LORE_MAGIC = [
+  // Žádná magie (12 položek — ~50%)
+  'Nemá žádnou magii — čistě přírodní tvor bez nadpřirozených schopností.',
+  'Žádná magie — je to prostě zvíře, silné a nebezpečné svou povahou.',
+  'Žádná magie, ale má výjimečně vyvinutý čich — cítí myš na sto kroků.',
+  'Žádná magie, ale je nezvykle chytré — učí se z chyb.',
+  'Žádná magie — jeho síla je v rychlosti a překvapení.',
+  'Žádná magie — spoléhá na jed, kousnutí nebo drápy.',
+  'Žádná magie, ale má neuvěřitelnou výdrž — prostě se nevzdá.',
+  'Žádná magie — je tiché jako stín, nikdy ho neslyšíš přicházet.',
+  'Žádná magie, ale jeho krunýř, kůže nebo šupiny jsou tvrdé jako kámen.',
+  'Žádná magie — zato má dokonalé maskování, splyne s okolím.',
+  'Žádná magie, ale je tak staré, že se mu ostatní přirozeně vyhýbají.',
+  'Žádná magie, ale má nadpřirozeně vyvinutý jeden smysl.',
+  // Lehká magie (8 položek — ~30%)
+  'Ovládá jedno kouzlo, které použije jen v krajní nouzi.',
+  'Má magický předmět, který neumí plně ovládat.',
+  'Přirozeně ruší magii v okolí — kouzelníci v jeho blízkosti selhávají.',
+  'Dokáže mluvit myší řečí, i když by nemělo umět.',
+  'Má hypnotický pohled — kdo se mu zadívá do očí, ztuhne.',
+  'Má léčivé schopnosti — jeho sliny hojí rány.',
+  'Dokáže měnit barvu a splynout s okolím.',
+  'Jeho hlas má zvláštní moc — dokáže uklidnit nebo vyděsit.',
+  // Silná magie (5 položek — ~20%)
+  'Je napojeno na Vílí říši — občas kolem něj poletují podivná světla.',
+  'Ovládá jeden živel — vodu, vítr, oheň nebo zem — ale jen slabě.',
+  'Dokáže přivolat mlhu nebo tmu ve svém okolí.',
+  'Je prokleté — a kletba se přenáší na ty, kdo ho zraní.',
+  'Vnímá magické předměty v okolí — cítí je jako vůni.'
+];
+
+const LORE_LIKES = [
+  'Miluje med a sladkosti — za med udělá cokoliv.',
+  'Nesnáší hlasité zvuky — panikáří z hřmění a křiku.',
+  'Zbožňuje lesklé předměty — krade vše co se leskne.',
+  'Nenávidí oheň — hrůzu z něj má od malička.',
+  'Miluje hudbu — písničkou ho lze uklidnit.',
+  'Nesnáší myši — měl s nimi špatnou zkušenost.',
+  'Zbožňuje děti a mláďata — nikdy jim neublíží.',
+  'Nenávidí déšť — za deště je podrážděné a agresivní.',
+  'Miluje tmu a stíny — světlo ho děsí.',
+  'Nesnáší zápach kouře — uteče od ohniště.',
+  'Zbožňuje květiny — jeho doupě je jimi vyzdobené.',
+  'Nenávidí ptáky — reaguje panicky na křídla.',
+  'Miluje vodu — tráví hodiny u potoka nebo louže.',
+  'Nesnáší zimu — v chladnu je pomalé a zranitelné.',
+  'Zbožňuje kameny — sbírá je a třídí podle tvaru.',
+  'Nenávidí vetřelce ve svém teritoriu — jinak je klidné.',
+  'Miluje hry a hádanky — lze ho zabavit hlavolamem.',
+  'Nesnáší kočky — při zmínce o nich se roztřese.',
+  'Zbožňuje stará místa — ruiny a zapomenutá obydlí.',
+  'Nenávidí lži — pozná, když někdo klame.',
+  'Miluje východ slunce — vždy ho sleduje.',
+  'Nesnáší změnu — cokoliv nového ho znervózní.',
+  'Zbožňuje vůně — přitahují ho byliny a koření.',
+  'Nenávidí mravence — má s nimi dávný konflikt.',
+  'Miluje příběhy — naslouchá každému, kdo vypráví.'
+];
+
+const LORE_POSSESSIONS = [
+  'Nemá nic — žije jako asketa, vlastnictví pohrdá.',
+  'Hromadí lesklé kamínky a střepy skla v doupěti.',
+  'Vlastní starý myší meč, který někde ukořistilo.',
+  'Střeží tajnou zásobu vzácných léčivých bylin.',
+  'Má lidský knoflík, který používá jako štít.',
+  'Vlastní magický předmět, jehož sílu nechápe.',
+  'Hromadí kosti svých obětí jako trofeje.',
+  'Má sbírku peříček z různých ptáků.',
+  'Střeží mapu — starou, otřepanou, ale cennou.',
+  'Vlastní zrcátko z lidského světa — dívá se do něj denně.',
+  'Hromadí jídlo obsesivně — mnohem víc než spotřebuje.',
+  'Má korálkový náhrdelník, pravděpodobně ukradený.',
+  'Vlastní klíč, ale neví k čemu je.',
+  'Střeží vejce — možná vlastní, možná cizí.',
+  'Má sbírku uzlíků z provázků — každý znamená něco.',
+  'Vlastní kousek jantaru se zachyceným hmyzem uvnitř.',
+  'Hromadí myší mince — má překvapivě velký poklad.',
+  'Má podivnou sošku vyřezanou ze dřeva — připomíná sovu.',
+  'Vlastní zvonček, který zvoní sám od sebe za úplňku.',
+  'Střeží studánku nebo pramen s neobvykle čistou vodou.',
+  'Má kus látky s vyšitým symbolem — erb neznámého rodu.',
+  'Vlastní knihu — nemůže ji přečíst, ale odmítá se jí vzdát.',
+  'Hromadí semínka všeho druhu — buduje podivnou zahradu.',
+  'Má korálek z Vílí říše — září slabým světlem.',
+  'Vlastní lidský náprstek, který používá jako helmu.'
+];
+
+const LORE_VIRTUE = [
+  'Jeho přítomnost odpuzuje mnohem nebezpečnější predátory z okolí.',
+  'Varuje okolí před blížícím se nebezpečím svým chováním.',
+  'Lze s ním obchodovat — má cenné věci a je férové.',
+  'Čistí okolí od jedovatých rostlin a hub.',
+  'Chrání malé a slabé tvory ve svém teritoriu.',
+  'Je ochotné pomoci, pokud se k němu někdo chová s respektem.',
+  'Jednou zachránilo skupinu myší před povodní.',
+  'Má neuvěřitelné znalosti o lécích a bylinách.',
+  'Udržuje rovnováhu v ekosystému — bez něj by se vše zhroutilo.',
+  'Dokáže najít vodu i v tom nejsušším období.',
+  'Nikdy nezaútočí jako první — vždy dá šanci k ústupu.',
+  'Sdílí potravu s hladovými, pokud mu zbude.',
+  'Pamatuje si staré příběhy, které žádná myš nezná.',
+  'Hlídá starou stezku, která je mnohem bezpečnější než hlavní cesta.',
+  'Jeho doupě je bezpečné útočiště za bouřky.',
+  'Zná tajný průchod, který zkracuje cestu o celý den.',
+  'Je loajální k těm, kdo mu prokáží laskavost.',
+  'Opyluje vzácné rostliny, které jinak vymírají.',
+  'Dokáže předpovídat počasí s neuvěřitelnou přesností.',
+  'Je živoucí památkou na staré časy — zná zapomenuté tradice.',
+  'Loví škůdce — bez něj by se tu přemnožili.',
+  'Upozorňuje svou přítomností na skryté nebezpečí v okolí.',
+  'Respektuje hranice — nikdy neloví v blízkosti osady.',
+  'Jeho nora stabilizuje břeh potoka a brání erozi.',
+  'Je klidné a předvídatelné — když ho necháš, nechá tě na pokoji.'
+];
+
+const LORE_DARKNESS = [
+  'Má temnou minulost — bylo zodpovědné za zánik celé osady.',
+  'Má neukojitelný hlad, který se s časem zhoršuje.',
+  'Nenávidí všechny myši kvůli křivdě, která se mu stala.',
+  'Šíří kolem sebe chorobu, o které samo neví.',
+  'Postupně šílí — jeho chování je čím dál nepředvídatelnější.',
+  'Zanechalo za sebou řadu obětí, které nikdo nenašel.',
+  'Bylo kdysi dobré, ale kletba ho proměnila v něco děsivého.',
+  'Loví pro zábavu, nejen z hladu — užívá si strach obětí.',
+  'Otravuje vodní zdroje svou přítomností.',
+  'Manipuluje slabšími tvory a nutí je pracovat pro sebe.',
+  'Nese v sobě parazita, který ovládá jeho chování.',
+  'Učí se od každého setkání — každým dnem je nebezpečnější.',
+  'Má teritorium poseto pastmi, které zabíjí bez varování.',
+  'Sbírá „suvenýry" ze svých obětí jako morbidní trofeje.',
+  'Mstí se za křivdy, které si jen představuje.',
+  'Jeho přítomnost kazí úrodu a plaší zvěř.',
+  'Roste — pomalu ale jistě. A s velikostí roste i jeho nebezpečnost.',
+  'Má schopnost, o které nikdo neví — a čeká na správný moment.',
+  'Zabíjí víc než sežere — zbytek nechá hnít.',
+  'Ničí zásoby a hnízda ostatních tvorů ze zlomyslnosti.',
+  'Je nepředvídatelné — bez varování přepne z klidu do zuřivosti.',
+  'Přenáší parazity, kteří napadají myší populaci.',
+  'Vytlačuje ostatní tvory z jejich teritoria systematicky.',
+  'Jeho přítomnost znečišťuje okolí — puch, zbytky kořisti, výkaly.',
+  'Učí se otevírat myší obydlí — jednoho dne to zvládne.'
+];
+
+const LORE_TWIST = [
+  'Má tajnou dohodu se starostou nejbližší osady.',
+  'Ve skutečnosti chrání osadu, ale nikdo to neví a myši ho nenávidí.',
+  'Je smrtelně nemocné a jeho agresivita je projev zoufalství.',
+  'Ve skutečnosti se bojí myší víc než ony jeho.',
+  'Je dvojče — existují dva identické tvory, ale všichni si myslí, že je jeden.',
+  'Bylo kdysi mazlíčkem lidského dítěte — a stýská se mu.',
+  'Někdo ho sem záměrně přivedl, aby odlákal pozornost od něčeho jiného.',
+  'Kdysi mělo rodinu — a celou ji ztratilo kvůli myší výpravě.',
+  'Jeho příběh je propojen s příběhem hráčovy postavy — jen o tom ještě neví.',
+  'Je samice — a právě teď je březí nebo sedí na vejcích.',
+  'Ve skutečnosti je mladé — jeho velikost klame, je to jen teenager.',
+  'Je slepé nebo hluché — kompenzuje to jinými smysly.',
+  'Není agresivní — je vyděšené a útočí ze strachu.',
+  'Má zranění, které si nikdo nevšiml — je zranitelné.',
+  'Je zvyklé na myši — někdo ho v minulosti krmil a ochočil.',
+  'Právě se probouzí ze zimního spánku — je hladové a zmatené.',
+  'Za pár dní odtud odejde — je tu jen dočasně.',
+  'Je starší než vypadá — pamatuje si časy před osadou.',
+  'Patří někomu — má na sobě stopy po obojku nebo řemínku.',
+  'Není tu samo — někde poblíž je další, větší exemplář.',
+  'Tohle území ve skutečnosti nepatří jemu — ukradlo ho jinému tvorovi.',
+  'Dřív bylo krotké a klidné — něco ho změnilo, ale nikdo neví co.',
+  'Má v doupěti mláďata jiného druhu — adoptovalo je.',
+  'Je albín nebo neobvykle zbarvené — proto je místní považují za zvláštní.',
+  'Někdo ho pravidelně krmí — myš z osady, která to tají.'
+];
+
+const LORE_ASPECTS = [
+  { key: 'origin', label: 'Původ', icon: '🌱', borderColor: 'border-amber-400', labelColor: 'text-amber-700', table: 'LORE_ORIGIN' },
+  { key: 'motivation', label: 'Motivace', icon: '🎯', borderColor: 'border-blue-400', labelColor: 'text-blue-600', table: 'LORE_MOTIVATION' },
+  { key: 'social', label: 'Společenství', icon: '👥', borderColor: 'border-orange-400', labelColor: 'text-orange-600', table: 'LORE_SOCIAL' },
+  { key: 'lair', label: 'Doupě', icon: '🏚️', borderColor: 'border-stone-400', labelColor: 'text-stone-600', table: 'LORE_LAIR' },
+  { key: 'behavior', label: 'Chování', icon: '⚖️', borderColor: 'border-teal-400', labelColor: 'text-teal-600', table: 'LORE_BEHAVIOR' },
+  { key: 'rumor', label: 'Zvěst', icon: '💬', borderColor: 'border-violet-400', labelColor: 'text-violet-600', table: 'LORE_RUMOR' },
+  { key: 'magic', label: 'Magie', icon: '✨', borderColor: 'border-purple-400', labelColor: 'text-purple-600', table: 'LORE_MAGIC' },
+  { key: 'likes', label: 'Záliby & Odpor', icon: '❤️‍🔥', borderColor: 'border-pink-400', labelColor: 'text-pink-600', table: 'LORE_LIKES' },
+  { key: 'possessions', label: 'Vlastnictví', icon: '💎', borderColor: 'border-yellow-400', labelColor: 'text-yellow-600', table: 'LORE_POSSESSIONS' },
+  { key: 'virtue', label: 'Skrytá ctnost', icon: '🌿', borderColor: 'border-emerald-400', labelColor: 'text-emerald-600', table: 'LORE_VIRTUE' },
+  { key: 'darkness', label: 'Temná stránka', icon: '🌑', borderColor: 'border-red-400', labelColor: 'text-red-600', table: 'LORE_DARKNESS' },
+  { key: 'twist', label: 'Zvrat', icon: '🔄', borderColor: 'border-stone-600', labelColor: 'text-stone-400', table: 'LORE_TWIST' }
+];
+
+// ============================================
 // NARRATIVE GENERATOR TABLES
 // Čistě narativní generátor scén a situací
 // ============================================
@@ -3306,6 +3665,9 @@ const OraclePanel = ({ onLogEntry }) => {
     includeFocus: true
   });
 
+  // State pro Monster Lore Profiler
+  const [loreResult, setLoreResult] = useState(null);
+
   // Abstraktní koncepty pro inspiraci
   const INSPIRE_WORDS = [
     'strach', 'naděje', 'ztráta', 'radost', 'smutek', 'hněv', 'klid', 'úzkost', 'odvaha', 'zoufalství',
@@ -3468,6 +3830,55 @@ const OraclePanel = ({ onLogEntry }) => {
     logEntry(entry);
   };
 
+  // ========== MONSTER LORE PROFILER ==========
+
+  const LORE_TABLES = {
+    origin: LORE_ORIGIN,
+    motivation: LORE_MOTIVATION,
+    social: LORE_SOCIAL,
+    lair: LORE_LAIR,
+    behavior: LORE_BEHAVIOR,
+    rumor: LORE_RUMOR,
+    magic: LORE_MAGIC,
+    likes: LORE_LIKES,
+    possessions: LORE_POSSESSIONS,
+    virtue: LORE_VIRTUE,
+    darkness: LORE_DARKNESS,
+    twist: LORE_TWIST
+  };
+
+  const generateLore = (aspectKey = null) => {
+    let newResult;
+
+    if (aspectKey && loreResult) {
+      // Přehoď jen jeden aspekt
+      newResult = { ...loreResult, [aspectKey]: randomFrom(LORE_TABLES[aspectKey]) };
+    } else {
+      // Generuj vše
+      newResult = {};
+      for (const [key, table] of Object.entries(LORE_TABLES)) {
+        newResult[key] = randomFrom(table);
+      }
+    }
+
+    setLoreResult(newResult);
+
+    // Sestav narativní text pro deník
+    const narrative = LORE_ASPECTS.map(a =>
+      `**${a.icon} ${a.label}:** ${newResult[a.key]}`
+    ).join('\n');
+
+    const entry = {
+      type: 'oracle',
+      subtype: 'monster_lore',
+      timestamp: formatTimestamp(),
+      result: narrative,
+      data: newResult
+    };
+    setLastResult(entry);
+    if (!silentMode) logEntry(entry);
+  };
+
   // ========== GENERÁTOR UDÁLOSTÍ ==========
 
   // Plný generátor událostí (Focus + Akce + Subjekt + volitelně Komplikace)
@@ -3599,6 +4010,7 @@ const OraclePanel = ({ onLogEntry }) => {
     { id: 'narrative', label: 'Inspirace', icon: '💭' },
     { id: 'encounter', label: 'Setkání', icon: '👁️' },
     { id: 'creature', label: 'Tvor', icon: '🐭' },
+    { id: 'lore', label: 'Lore', icon: '📖' },
     { id: 'dice', label: 'Kostky', icon: '🎯' },
     { id: 'scene', label: 'Scéna', icon: '🎭' },
     { id: 'prompt', label: 'Prompt', icon: '💡' },
@@ -4131,6 +4543,140 @@ const OraclePanel = ({ onLogEntry }) => {
           {/* Statistiky */}
           <p className="text-center text-xs text-stone-400 mt-4">
             50 × 40 × 45 × 50 × 40 × 35 × 35 × 40 = ~25,200,000,000,000 kombinací
+          </p>
+        </ResultCard>
+      )}
+
+      {/* ========== MONSTER LORE PROFILER ========== */}
+      {activeOracle === 'lore' && (
+        <ResultCard>
+          <HelpHeader
+            title="Generátor Lore Bytosti"
+            icon="📖"
+            tooltip={
+              <div>
+                <p className="font-bold mb-2">📖 Co je tohle?</p>
+                <p className="text-xs mb-2">
+                  Hloubkový profiler pro jakoukoliv bytost. Generuje 12 aspektů lore:
+                  původ, motivaci, společenství, doupě, chování, zvěsti, magii,
+                  záliby, vlastnictví, ctnosti, temné stránky a nečekané zvraty.
+                </p>
+
+                <p className="font-bold mb-1">🎲 Jak to funguje:</p>
+                <ul className="text-xs space-y-1">
+                  <li>• <b>Hodit vše</b> — vygeneruje všech 12 aspektů najednou</li>
+                  <li>• <b>🔄</b> — přehodí jen jeden aspekt, zbytek zůstane</li>
+                  <li>• <b>Individuální tlačítka</b> — hodí jen jeden konkrétní aspekt</li>
+                  <li>• Postupně si sestav profil bytosti jak se ti líbí</li>
+                </ul>
+
+                <p className="font-bold mt-2 mb-1">📊 Rozsah:</p>
+                <p className="text-xs text-stone-300">
+                  300 položek ve 12 tabulkách. ~59 biliard unikátních kombinací.
+                </p>
+              </div>
+            }
+          />
+
+          {/* Hlavní tlačítko */}
+          <Button onClick={() => generateLore()} variant="primary" size="large" className="w-full mb-4">
+            📖 Generovat lore bytosti
+          </Button>
+
+          {/* Individuální tlačítka pro jednotlivé aspekty */}
+          <div className="mb-4 grid grid-cols-3 sm:grid-cols-4 gap-2">
+            {LORE_ASPECTS.map(aspect => (
+              <button
+                key={aspect.key}
+                onClick={() => generateLore(aspect.key)}
+                className="px-2 py-1.5 bg-stone-100 hover:bg-stone-200 rounded text-xs text-stone-600 hover:text-stone-800 transition-colors border border-stone-200 flex items-center gap-1 justify-center"
+                title={`Hodit jen: ${aspect.label}`}
+              >
+                <span>{aspect.icon}</span>
+                <span className="truncate">{aspect.label}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Výsledky */}
+          {loreResult && (
+            <div className="p-4 rounded-lg border-2 bg-amber-50 border-amber-300 space-y-2">
+              <h3 className="font-bold text-lg text-amber-900 mb-3">📖 Profil bytosti</h3>
+
+              {LORE_ASPECTS.map(aspect => {
+                const isTwist = aspect.key === 'twist';
+                const isDark = aspect.key === 'darkness';
+                const value = loreResult[aspect.key];
+                if (!value) return null;
+
+                return (
+                  <div
+                    key={aspect.key}
+                    className={`p-2 rounded border-l-4 flex items-start gap-2 ${
+                      isTwist ? `bg-stone-800 ${aspect.borderColor}` :
+                      isDark ? `bg-red-50 ${aspect.borderColor}` :
+                      `bg-white/50 ${aspect.borderColor}`
+                    }`}
+                  >
+                    <div className="flex-1">
+                      <span className={`text-xs font-medium block mb-1 ${
+                        isTwist ? 'text-stone-400' : aspect.labelColor
+                      }`}>
+                        {aspect.icon} {aspect.label.toUpperCase()}
+                      </span>
+                      <p className={`text-sm ${
+                        isTwist ? 'text-stone-300 italic' :
+                        isDark ? 'text-red-800' :
+                        'text-stone-700'
+                      }`}>
+                        {value}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => generateLore(aspect.key)}
+                      className={`flex-shrink-0 w-7 h-7 rounded flex items-center justify-center transition-colors ${
+                        isTwist ? 'bg-stone-700 hover:bg-stone-600 text-stone-300' :
+                        'bg-stone-100 hover:bg-stone-200 text-stone-500'
+                      }`}
+                      title={`Přehodit: ${aspect.label}`}
+                    >
+                      🔄
+                    </button>
+                  </div>
+                );
+              })}
+
+              {/* Meta info + Save */}
+              <div className="mt-4 pt-3 border-t border-stone-200 flex flex-wrap items-center justify-between gap-2">
+                <span className="px-2 py-1 bg-stone-100 rounded text-xs text-stone-500">
+                  12 aspektů lore
+                </span>
+                {silentMode && (
+                  <button
+                    onClick={() => {
+                      const narrative = LORE_ASPECTS.map(a =>
+                        loreResult[a.key] ? `**${a.icon} ${a.label}:** ${loreResult[a.key]}` : null
+                      ).filter(Boolean).join('\n');
+                      const entry = {
+                        type: 'oracle',
+                        subtype: 'monster_lore',
+                        timestamp: formatTimestamp(),
+                        result: narrative,
+                        data: loreResult
+                      };
+                      onLogEntry(entry);
+                    }}
+                    className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded text-sm font-medium transition-colors"
+                  >
+                    📥 Uložit do deníku
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
+          <p className="text-center text-xs text-stone-400 mt-4">
+            300 položek ve 12 tabulkách = ~59,604,644,775,390,625 kombinací
           </p>
         </ResultCard>
       )}
