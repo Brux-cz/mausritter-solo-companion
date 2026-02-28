@@ -215,6 +215,14 @@ export interface WorldNPC {
   createdAt?: string;
 }
 
+export interface WorldCreature {
+  id: string;
+  name: string;
+  notes?: string;
+  lore: Record<string, string>; // key → generated lore text (origin, motivation, etc.)
+  createdAt?: string;
+}
+
 export interface SettlementInn {
   name: string;
   specialty: string;
@@ -430,6 +438,7 @@ export interface GameState {
   factions: Faction[];
   settlements: Settlement[];
   worldNPCs: WorldNPC[];
+  worldCreatures: WorldCreature[];
   timedEvents: TimedEvent[];
   lexicon: LexiconEntry[];
   maps: DungeonMap[];

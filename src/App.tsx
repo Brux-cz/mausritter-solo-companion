@@ -47,7 +47,7 @@ function MausritterSoloCompanion() {
     parties, setParties, activePartyId, setActivePartyId,
     activeCharacterId, setActiveCharacterId,
     journal, setJournal, factions, setFactions,
-    settlements, setSettlements, worldNPCs, setWorldNPCs,
+    settlements, setSettlements, worldNPCs, setWorldNPCs, worldCreatures,
     timedEvents, setTimedEvents, lexicon, setLexicon,
     maps, activeMapId,
     journalPartyFilter, setJournalPartyFilter,
@@ -171,7 +171,7 @@ function MausritterSoloCompanion() {
       ? `mausritter-save-${roomCode}`
       : 'mausritter-save';
     localStorage.setItem(saveKey, JSON.stringify(saveData));
-  }, [parties, activePartyId, activeCharacterId, journal, factions, settlements, worldNPCs, timedEvents, lexicon, maps, activeMapId, roomConnected, roomCode]);
+  }, [parties, activePartyId, activeCharacterId, journal, factions, settlements, worldNPCs, worldCreatures, timedEvents, lexicon, maps, activeMapId, roomConnected, roomCode]);
 
   // Disk auto-save — zapisuje do saves/autosave.json přes Vite server (debounce 2s)
   useEffect(() => {
@@ -189,7 +189,7 @@ function MausritterSoloCompanion() {
         // Server neběží (produkce) — localStorage stačí
       }
     }, 2000);
-  }, [parties, activePartyId, activeCharacterId, journal, factions, settlements, worldNPCs, timedEvents, lexicon, maps, activeMapId]);
+  }, [parties, activePartyId, activeCharacterId, journal, factions, settlements, worldNPCs, worldCreatures, timedEvents, lexicon, maps, activeMapId]);
 
   const handleLogEntry = useCallback((entry) => {
     useGameStore.getState().addJournalEntry({
@@ -359,7 +359,7 @@ function MausritterSoloCompanion() {
         console.error('Sync to Firebase failed:', err);
       });
     }, 500);
-  }, [roomConnected, roomCode, myUserId, parties, activePartyId, activeCharacterId, journal, factions, settlements, worldNPCs, timedEvents, lexicon]);
+  }, [roomConnected, roomCode, myUserId, parties, activePartyId, activeCharacterId, journal, factions, settlements, worldNPCs, worldCreatures, timedEvents, lexicon]);
 
   // Create a new room as GM
   const createRoom = async (playerName, playerPin, roomTitle = '') => {
@@ -671,7 +671,7 @@ function MausritterSoloCompanion() {
     if (roomConnected) {
       syncToFirebase();
     }
-  }, [roomConnected, parties, activePartyId, journal, factions, settlements, worldNPCs, timedEvents, lexicon]);
+  }, [roomConnected, parties, activePartyId, journal, factions, settlements, worldNPCs, worldCreatures, timedEvents, lexicon]);
 
   // Check URL for room code on mount
   useEffect(() => {
@@ -703,10 +703,11 @@ function MausritterSoloCompanion() {
     factions,
     settlements,
     worldNPCs,
+    worldCreatures,
     timedEvents,
     lexicon,
     lastModified: new Date().toISOString()
-  }), [parties, activePartyId, activeCharacterId, journal, factions, settlements, worldNPCs, timedEvents, lexicon]);
+  }), [parties, activePartyId, activeCharacterId, journal, factions, settlements, worldNPCs, worldCreatures, timedEvents, lexicon]);
 
   // Save to connected file
   const saveToFile = useCallback(async () => {
@@ -817,7 +818,7 @@ function MausritterSoloCompanion() {
         clearTimeout(saveTimeoutRef.current);
       }
     };
-  }, [parties, journal, factions, settlements, worldNPCs, fileHandle, syncStatus, saveToFile]);
+  }, [parties, journal, factions, settlements, worldNPCs, worldCreatures, fileHandle, syncStatus, saveToFile]);
 
   // Manual sync button
   const handleManualSync = async () => {
@@ -1596,7 +1597,7 @@ function MausritterSoloCompanion() {
         clearTimeout(googleSaveTimeoutRef.current);
       }
     };
-  }, [parties, journal, factions, settlements, worldNPCs, googleAccessToken, googleSyncStatus, googleDriveFileId]);
+  }, [parties, journal, factions, settlements, worldNPCs, worldCreatures, googleAccessToken, googleSyncStatus, googleDriveFileId]);
 
   // Manual Google Drive sync
   const handleGoogleDriveSync = async () => {

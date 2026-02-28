@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { useUIStore } from '../../stores/uiStore';
-import { WEATHER_TABLE, CREATURE_CATEGORIES, BESTIARY, LANDMARKS, SETTLEMENT_FEATURES, SETTLEMENT_SIZES, SETTLEMENT_GOVERNANCE, SETTLEMENT_TRADES, SETTLEMENT_EVENTS, SETTLEMENT_NAME_STARTS, SETTLEMENT_NAME_ENDS, INN_NAME_FIRST, INN_NAME_SECOND, INN_SPECIALTIES, MALE_FIRST_NAMES, FEMALE_FIRST_NAMES, FAMILY_NAMES, BIRTHSIGNS, NPC_BEHAVIOR_MOODS, NPC_BEHAVIOR_ACTIONS, NPC_BEHAVIOR_MOTIVATIONS, NPC_SECRETS, NPC_REACTIONS, NPC_ROLES, EVENT_FOCUS, EVENT_ACTIONS, EVENT_SUBJECTS, EVENT_COMPLICATIONS, SETTLEMENT_RUMORS, SETTLEMENT_HAPPENINGS, PHYSICAL_DETAILS, NPC_QUIRKS, NPC_GOALS, DUNGEON_THEMES, DUNGEON_DENIZENS } from '../../data/constants';
+import { WEATHER_TABLE, CREATURE_CATEGORIES, BESTIARY, LANDMARKS, SETTLEMENT_FEATURES, SETTLEMENT_SIZES, SETTLEMENT_GOVERNANCE, SETTLEMENT_TRADES, SETTLEMENT_EVENTS, SETTLEMENT_NAME_STARTS, SETTLEMENT_NAME_ENDS, INN_NAME_FIRST, INN_NAME_SECOND, INN_SPECIALTIES, MALE_FIRST_NAMES, FEMALE_FIRST_NAMES, FAMILY_NAMES, BIRTHSIGNS, NPC_BEHAVIOR_MOODS, NPC_BEHAVIOR_ACTIONS, NPC_BEHAVIOR_MOTIVATIONS, NPC_SECRETS, NPC_REACTIONS, NPC_ROLES, EVENT_FOCUS, EVENT_ACTIONS, EVENT_SUBJECTS, EVENT_COMPLICATIONS, SETTLEMENT_RUMORS, SETTLEMENT_HAPPENINGS, PHYSICAL_DETAILS, NPC_QUIRKS, NPC_GOALS, DUNGEON_THEMES, DUNGEON_DENIZENS, LORE_ASPECTS } from '../../data/constants';
 import { rollDice, rollD6, roll2D6, randomFrom, generateId, formatTimestamp } from '../../utils/helpers';
 import { DiceDisplay, SectionHeader, ResultCard, Button, HelpHeader, Input, Select, TabNav } from '../ui/common';
 import { WEATHER_EFFECTS } from './TimePanel';
@@ -9,6 +9,7 @@ import { WEATHER_EFFECTS } from './TimePanel';
 const WorldPanel = () => {
   const {
     settlements, setSettlements, worldNPCs, setWorldNPCs,
+    worldCreatures, createCreature, updateCreature, deleteCreature,
     parties, activePartyId, getActiveParty, updateParty,
     handleLogEntry, deleteNPC, deleteSettlement, propagateNameChange,
   } = useGameStore();
@@ -29,6 +30,7 @@ const WorldPanel = () => {
   const [npcSearch, setNpcSearch] = useState('');
   const [npcSettlementFilter, setNpcSettlementFilter] = useState<string | null>(null); // null = všechny, 'homeless' = bez domova, string = settlementId
   const [showDeadNPCs, setShowDeadNPCs] = useState(false);
+  const [editingCreature, setEditingCreature] = useState<string | null>(null);
 
   const filteredNPCs = useMemo(() => {
     let result = worldNPCs;
@@ -541,6 +543,7 @@ const WorldPanel = () => {
   const genTabs = [
     { id: 'mySettlements', label: 'Osady', icon: '🏘️' },
     { id: 'myNPCs', label: 'NPC', icon: '🐭' },
+    { id: 'myCreatures', label: 'Tvorové', icon: '📖' },
     { id: 'dungeon', label: 'Dungeon', icon: '🗝️' },
     { id: 'bestiary', label: 'Bestiář', icon: '🐛' },
     { id: 'weather', label: 'Počasí', icon: '☀️' }
@@ -1198,10 +1201,216 @@ const WorldPanel = () => {
         </div>
       )}
 
+      {/* ========== MY CREATURES ========== */}
+      {activeGen === 'myCreatures' && (
+        <div className="space-y-4">
+          {/* Generátor */}
+          <ResultCard>
+            <HelpHeader
+              title="Tvorové & Bytosti"
+              icon="📖"
+              tooltip={
+                <div>
+                  <p className="font-bold mb-2">📖 Co je tohle?</p>
+                  <p className="text-xs mb-2">
+                    Profiler bytostí — vytvoř kartu tvora s 12 aspekty lore.
+                    Každý tvor se uloží a můžeš ho kdykoliv upravit, přidat poznámky nebo přehodit jednotlivé aspekty.
+                  </p>
+                  <p className="font-bold mb-1">🎲 Jak to funguje:</p>
+                  <ul className="text-xs space-y-1">
+                    <li>• <b>Generovat tvora</b> — vytvoří novou kartu se všemi 12 aspekty</li>
+                    <li>• <b>Prázdná karta</b> — vytvoří prázdného tvora k ručnímu vyplnění</li>
+                    <li>• <b>✏️ Upravit</b> — edituj jméno, poznámky, přehazuj aspekty</li>
+                    <li>• <b>🔄</b> — přehodí jen jeden aspekt, zbytek zůstane</li>
+                  </ul>
+                  <p className="text-xs mt-2 text-stone-300">300 položek ve 12 tabulkách = ~59 biliard kombinací.</p>
+                </div>
+              }
+            />
+            <div className="flex gap-2 mt-3">
+              <Button onClick={() => {
+                const lore: Record<string, string> = {};
+                for (const aspect of LORE_ASPECTS) {
+                  lore[aspect.key] = randomFrom(aspect.table);
+                }
+                const creature = createCreature('Nový tvor', lore);
+                setEditingCreature(creature.id);
+              }} size="large" className="flex-1">
+                📖 Generovat tvora
+              </Button>
+              <Button onClick={() => {
+                const creature = createCreature('Nový tvor', {});
+                setEditingCreature(creature.id);
+              }} variant="secondary">
+                + Prázdná
+              </Button>
+            </div>
+          </ResultCard>
+
+          {/* Seznam tvorů */}
+          {(worldCreatures || []).length === 0 ? (
+            <ResultCard>
+              <p className="text-center text-stone-500 py-4">
+                Zatím nemáš žádné uložené tvory.<br/>
+                <span className="text-sm">Vygeneruj nového pomocí tlačítka výše.</span>
+              </p>
+            </ResultCard>
+          ) : (
+            <div className="space-y-2">
+              {(worldCreatures || []).map(creature => (
+                <ResultCard key={creature.id} className={editingCreature === creature.id ? '' : '!p-3'}>
+                  {editingCreature === creature.id ? (
+                    // ===== Edit mode =====
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-start">
+                        <input
+                          value={creature.name}
+                          onChange={(e) => updateCreature(creature.id, { name: e.target.value })}
+                          className="text-2xl font-bold text-amber-900 bg-transparent border-b-2 border-amber-300 focus:border-amber-500 outline-none flex-1 mr-2"
+                          placeholder="Jméno tvora"
+                        />
+                        <div className="flex gap-2 flex-shrink-0">
+                          <Button variant="ghost" size="sm" onClick={() => setEditingCreature(null)}>✓</Button>
+                          <Button variant="ghost" size="sm" className="text-red-500" onClick={() => { deleteCreature(creature.id); setEditingCreature(null); }}>🗑️</Button>
+                        </div>
+                      </div>
+
+                      {/* Lore aspekty */}
+                      <div className="space-y-2">
+                        {LORE_ASPECTS.map(aspect => {
+                          const isTwist = aspect.key === 'twist';
+                          const isDark = aspect.key === 'darkness';
+                          const value = creature.lore?.[aspect.key];
+                          return (
+                            <div
+                              key={aspect.key}
+                              className={`p-2 rounded border-l-4 flex items-start gap-2 ${
+                                isTwist ? `bg-stone-800 ${aspect.borderColor}` :
+                                isDark ? `bg-red-50 ${aspect.borderColor}` :
+                                value ? `bg-white/50 ${aspect.borderColor}` :
+                                `bg-stone-50 ${aspect.borderColor} opacity-50`
+                              }`}
+                            >
+                              <div className="flex-1 min-w-0">
+                                <span className={`text-xs font-medium block mb-1 ${isTwist ? 'text-stone-400' : aspect.labelColor}`}>
+                                  {aspect.icon} {aspect.label.toUpperCase()}
+                                </span>
+                                {value ? (
+                                  <p className={`text-sm ${isTwist ? 'text-stone-300 italic' : isDark ? 'text-red-800' : 'text-stone-700'}`}>
+                                    {value}
+                                  </p>
+                                ) : (
+                                  <p className="text-sm text-stone-400 italic">—</p>
+                                )}
+                              </div>
+                              <button
+                                onClick={() => {
+                                  const newLore = { ...(creature.lore || {}), [aspect.key]: randomFrom(aspect.table) };
+                                  updateCreature(creature.id, { lore: newLore });
+                                }}
+                                className={`flex-shrink-0 w-7 h-7 rounded flex items-center justify-center transition-colors ${
+                                  isTwist ? 'bg-stone-700 hover:bg-stone-600 text-stone-300' :
+                                  'bg-stone-100 hover:bg-stone-200 text-stone-500'
+                                }`}
+                                title={`Přehodit: ${aspect.label}`}
+                              >🔄</button>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* Poznámky */}
+                      <textarea
+                        value={creature.notes || ''}
+                        onChange={(e) => updateCreature(creature.id, { notes: e.target.value })}
+                        placeholder="Poznámky..."
+                        className="w-full h-20 px-3 py-2 border border-stone-300 rounded-lg resize-none text-sm"
+                      />
+
+                      {/* Generátory dole */}
+                      <div className="border-t pt-3 space-y-3">
+                        <p className="text-sm font-medium text-stone-600">🎲 Generátory:</p>
+                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                          {LORE_ASPECTS.map(aspect => (
+                            <button
+                              key={aspect.key}
+                              onClick={() => {
+                                const newLore = { ...(creature.lore || {}), [aspect.key]: randomFrom(aspect.table) };
+                                updateCreature(creature.id, { lore: newLore });
+                              }}
+                              className="px-2 py-1.5 bg-stone-100 hover:bg-stone-200 rounded text-xs text-stone-600 hover:text-stone-800 transition-colors border border-stone-200 flex items-center gap-1 justify-center"
+                              title={`Hodit: ${aspect.label}`}
+                            >
+                              <span>{aspect.icon}</span>
+                              <span className="truncate">{aspect.label}</span>
+                            </button>
+                          ))}
+                        </div>
+                        <Button
+                          onClick={() => {
+                            const lore: Record<string, string> = {};
+                            for (const aspect of LORE_ASPECTS) {
+                              lore[aspect.key] = randomFrom(aspect.table);
+                            }
+                            updateCreature(creature.id, { lore });
+                          }}
+                          variant="secondary"
+                          className="w-full"
+                        >
+                          🎲 Přehodit vše
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    // ===== View mode - kompaktní =====
+                    <div className="overflow-hidden">
+                      <div className="flex justify-between items-start gap-2">
+                        <div
+                          className="min-w-0 flex-1 cursor-pointer hover:bg-amber-50 -m-3 p-3 rounded-lg transition-colors"
+                          onClick={() => setEditingCreature(creature.id)}
+                        >
+                          <h3 className="font-bold text-amber-900 truncate">{creature.name}</h3>
+                          {/* Zobraz první 3 neprázdné lore aspekty */}
+                          {Object.keys(creature.lore || {}).length > 0 && (
+                            <div className="mt-2 text-sm text-stone-600 space-y-1">
+                              {LORE_ASPECTS.filter(a => creature.lore?.[a.key]).slice(0, 3).map(aspect => (
+                                <p key={aspect.key} className="truncate">
+                                  {aspect.icon} {creature.lore[aspect.key]}
+                                </p>
+                              ))}
+                              {Object.keys(creature.lore).filter(k => creature.lore[k]).length > 3 && (
+                                <p className="text-stone-400 text-xs">+{Object.keys(creature.lore).filter(k => creature.lore[k]).length - 3} dalších aspektů</p>
+                              )}
+                            </div>
+                          )}
+                          {creature.notes && <p className="mt-2 text-sm italic text-stone-500 line-clamp-2">{creature.notes}</p>}
+                        </div>
+                        <div className="flex flex-col gap-1 flex-shrink-0">
+                          <button
+                            onClick={() => setEditingCreature(creature.id)}
+                            className="p-2 text-stone-400 hover:text-amber-600 hover:bg-amber-100 rounded transition-colors"
+                            title="Upravit"
+                          >✏️</button>
+                          <button
+                            onClick={() => deleteCreature(creature.id)}
+                            className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-100 rounded transition-colors"
+                            title="Smazat"
+                          >🗑️</button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </ResultCard>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {activeGen === 'dungeon' && (
         <ResultCard>
-          <HelpHeader 
-            title="Generátor dungeonu" 
+          <HelpHeader
+            title="Generátor dungeonu"
             icon="🗝️"
             tooltip={
               <div>

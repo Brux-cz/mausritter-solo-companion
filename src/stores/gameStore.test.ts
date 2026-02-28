@@ -251,13 +251,13 @@ describe('World management', () => {
 });
 
 describe('Serialization', () => {
-  it('getGameState — vrátí 11 polí, nevrátí interní', () => {
+  it('getGameState — vrátí 12 polí, nevrátí interní', () => {
     useGameStore.getState().createParty();
     const gameState = useGameStore.getState().getGameState();
     expect(Object.keys(gameState).sort()).toEqual([
       'activeCharacterId', 'activeMapId', 'activePartyId', 'factions',
       'journal', 'lexicon', 'maps', 'parties', 'settlements',
-      'timedEvents', 'worldNPCs',
+      'timedEvents', 'worldCreatures', 'worldNPCs',
     ]);
     expect(gameState).not.toHaveProperty('journalPartyFilter');
     expect(gameState).not.toHaveProperty('getActiveParty');
