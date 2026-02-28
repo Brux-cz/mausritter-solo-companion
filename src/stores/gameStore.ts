@@ -7,7 +7,7 @@ import {
 } from '../data/constants';
 import type {
   Party, Character, PC, Hireling, GameTime, GameState,
-  JournalEntry, Faction, Settlement, WorldNPC, TimedEvent, LexiconEntry,
+  JournalEntry, Faction, Settlement, WorldNPC, WorldCreature, TimedEvent, LexiconEntry,
   SceneState, SceneType, SceneCheckResult, SceneOutcome, Scene, DungeonMap
 } from '../types';
 
@@ -36,6 +36,7 @@ interface GameStoreState extends GameState {
   setFactions: (factions: Faction[]) => void;
   setSettlements: (settlements: Settlement[]) => void;
   setWorldNPCs: (worldNPCs: WorldNPC[]) => void;
+  setWorldCreatures: (worldCreatures: WorldCreature[]) => void;
   setTimedEvents: (timedEvents: TimedEvent[]) => void;
   setLexicon: (lexicon: LexiconEntry[]) => void;
   setJournalPartyFilter: (journalPartyFilter: string) => void;
@@ -61,6 +62,11 @@ interface GameStoreState extends GameState {
   promoteToNPC: (creatureData: CreatureData) => WorldNPC;
   updateNPC: (npcId: string, updates: Partial<WorldNPC>) => WorldNPC | undefined;
   propagateNameChange: (oldName: string, newName: string) => void;
+
+  // --- Creature actions ---
+  createCreature: (name?: string, lore?: Record<string, string>) => WorldCreature;
+  updateCreature: (id: string, updates: Partial<WorldCreature>) => void;
+  deleteCreature: (id: string) => void;
 
   // --- Scene actions ---
   getSceneState: () => SceneState;
@@ -99,6 +105,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   factions: [],
   settlements: [],
   worldNPCs: [],
+  worldCreatures: [],
   timedEvents: [],
   lexicon: [],
   maps: [],
@@ -127,6 +134,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   setFactions: (factions) => set({ factions }),
   setSettlements: (settlements) => set({ settlements }),
   setWorldNPCs: (worldNPCs) => set({ worldNPCs }),
+  setWorldCreatures: (worldCreatures) => set({ worldCreatures }),
   setTimedEvents: (timedEvents) => set({ timedEvents }),
   setLexicon: (lexicon) => set({ lexicon }),
   setMaps: (maps) => set({ maps }),
@@ -452,6 +460,34 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     }));
   },
 
+  // --- Creature actions ---
+
+  createCreature: (name = 'Nový tvor', lore = {}) => {
+    const creature: WorldCreature = {
+      id: generateId(),
+      name,
+      lore,
+      notes: '',
+      createdAt: new Date().toISOString(),
+    };
+    set(s => ({ worldCreatures: [...(s.worldCreatures || []), creature] }));
+    return creature;
+  },
+
+  updateCreature: (id, updates) => {
+    set(s => ({
+      worldCreatures: (s.worldCreatures || []).map(c =>
+        c.id === id ? { ...c, ...updates } : c
+      )
+    }));
+  },
+
+  deleteCreature: (id) => {
+    set(s => ({
+      worldCreatures: (s.worldCreatures || []).filter(c => c.id !== id)
+    }));
+  },
+
   // --- Map actions ---
 
   createMap: (name = 'Nová mapa') => {
@@ -683,11 +719,11 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   // --- Serialization ---
   getGameState: () => {
     const { parties, activePartyId, activeCharacterId, journal,
-      factions, settlements, worldNPCs, timedEvents, lexicon,
+      factions, settlements, worldNPCs, worldCreatures, timedEvents, lexicon,
       maps, activeMapId } = get();
     return {
       parties, activePartyId, activeCharacterId,
-      journal, factions, settlements, worldNPCs, timedEvents, lexicon,
+      journal, factions, settlements, worldNPCs, worldCreatures, timedEvents, lexicon,
       maps, activeMapId
     };
   },
@@ -701,6 +737,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       factions: data.factions || [],
       settlements: data.settlements || [],
       worldNPCs: data.worldNPCs || [],
+      worldCreatures: data.worldCreatures || [],
       timedEvents: data.timedEvents || [],
       lexicon: data.lexicon || [],
       maps: data.maps || [],
@@ -719,6 +756,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     if (state.factions) updates.factions = state.factions;
     if (state.settlements) updates.settlements = state.settlements;
     if (state.worldNPCs) updates.worldNPCs = state.worldNPCs;
+    if (state.worldCreatures) updates.worldCreatures = state.worldCreatures;
     if (state.timedEvents) updates.timedEvents = state.timedEvents;
     if (state.lexicon) updates.lexicon = state.lexicon;
     if (state.maps) updates.maps = state.maps;

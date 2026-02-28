@@ -3,7 +3,7 @@ import { SAVE_VERSION, migrations, migrateSaveData, LORE_ASPECTS } from './const
 
 describe('SAVE_VERSION', () => {
   it('je 6', () => {
-    expect(SAVE_VERSION).toBe(6);
+    expect(SAVE_VERSION).toBe(7);
   });
 });
 
@@ -122,6 +122,25 @@ describe('migrations', () => {
     });
   });
 
+  describe('6→7: worldCreatures', () => {
+    it('přidá worldCreatures', () => {
+      const data = {
+        version: 6,
+        parties: [{ id: 'p1' }],
+      };
+      const result = migrations[6](data);
+      expect(result.version).toBe(7);
+      expect(result.worldCreatures).toEqual([]);
+    });
+
+    it('zachová existující worldCreatures', () => {
+      const existing = [{ id: 'c1', name: 'Dragon', lore: { origin: 'test' } }];
+      const data = { version: 6, worldCreatures: existing };
+      const result = migrations[6](data);
+      expect(result.worldCreatures).toEqual(existing);
+    });
+  });
+
   describe('4→5: sceneState', () => {
     it('party bez sceneState dostane DEFAULT_SCENE_STATE', () => {
       const data = {
@@ -206,18 +225,19 @@ describe('LORE_ASPECTS integrity', () => {
 });
 
 describe('migrateSaveData', () => {
-  it('migruje v1 → v6 kompletně', () => {
+  it('migruje v1 → v7 kompletně', () => {
     const v1 = {
       version: 1,
       character: { name: 'Old Mouse', id: 'c1' },
       journal: [{ id: 'j1', type: 'narrative', content: 'test' }],
     };
     const result = migrateSaveData(v1);
-    expect(result.version).toBe(6);
+    expect(result.version).toBe(7);
     expect(result.parties).toHaveLength(1);
     expect(result.parties[0].members[0].name).toBe('Old Mouse');
     expect(result.settlements).toEqual([]);
     expect(result.worldNPCs).toEqual([]);
+    expect(result.worldCreatures).toEqual([]);
     expect(result.parties[0].gameTime.turn).toBe(0);
     expect(result.parties[0].sceneState).toBeDefined();
     expect(result.parties[0].sceneState.chaosFactor).toBe(5);
@@ -227,7 +247,7 @@ describe('migrateSaveData', () => {
 
   it('prázdný objekt → defaults pro všechna pole', () => {
     const result = migrateSaveData({});
-    expect(result.version).toBe(6);
+    expect(result.version).toBe(7);
     expect(result.parties).toEqual([]);
     expect(result.activePartyId).toBeNull();
     expect(result.activeCharacterId).toBeNull();
@@ -235,13 +255,14 @@ describe('migrateSaveData', () => {
     expect(result.factions).toEqual([]);
     expect(result.settlements).toEqual([]);
     expect(result.worldNPCs).toEqual([]);
+    expect(result.worldCreatures).toEqual([]);
     expect(result.maps).toEqual([]);
     expect(result.activeMapId).toBeNull();
   });
 
-  it('v6 data projdou beze změn (passthrough)', () => {
-    const v6 = {
-      version: 6,
+  it('v7 data projdou beze změn (passthrough)', () => {
+    const v7 = {
+      version: 7,
       parties: [{ id: 'p1', name: 'Party', members: [], gameTime: { day: 1, season: 'spring', watch: 1, turn: 0, restedToday: false }, createdAt: '2025-01-01', sceneState: { chaosFactor: 5, currentScene: null, sceneHistory: [], threads: [], sceneNPCs: [], sceneCount: 0 } }],
       activePartyId: 'p1',
       activeCharacterId: null,
@@ -249,12 +270,13 @@ describe('migrateSaveData', () => {
       factions: [],
       settlements: [],
       worldNPCs: [],
+      worldCreatures: [],
       maps: [],
       activeMapId: null,
     };
-    const result = migrateSaveData(v6);
-    expect(result.version).toBe(6);
-    expect(result.parties).toEqual(v6.parties);
+    const result = migrateSaveData(v7);
+    expect(result.version).toBe(7);
+    expect(result.parties).toEqual(v7.parties);
     expect(result.activePartyId).toBe('p1');
   });
 

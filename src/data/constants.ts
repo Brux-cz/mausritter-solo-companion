@@ -2061,7 +2061,7 @@ export const SPELLS = [
 // SAVE VERSION & MIGRATION SYSTEM
 // ============================================
 // Increment this when save format changes!
-export const SAVE_VERSION = 6;
+export const SAVE_VERSION = 7;
 
 // Migration functions - each upgrades from version N to N+1
 export const migrations = {
@@ -2137,6 +2137,15 @@ export const migrations = {
       maps: data.maps || [],
       activeMapId: data.activeMapId || null
     };
+  },
+
+  // v6 -> v7: Added worldCreatures (creature cards with lore)
+  6: (data) => {
+    return {
+      ...data,
+      version: 7,
+      worldCreatures: data.worldCreatures || []
+    };
   }
 };
 
@@ -2168,11 +2177,12 @@ export const migrateSaveData = (data) => {
     factions: currentData.factions || [],
     settlements: currentData.settlements || [],
     worldNPCs: currentData.worldNPCs || [],
+    worldCreatures: currentData.worldCreatures || [],
     maps: currentData.maps || [],
     activeMapId: currentData.activeMapId || null,
     // Preserve any extra data for forward compatibility
     _extra: Object.keys(currentData)
-      .filter(k => !['version', 'parties', 'activePartyId', 'activeCharacterId', 'journal', 'factions', 'settlements', 'worldNPCs', 'maps', 'activeMapId', 'exportDate', 'character', 'gameTime'].includes(k))
+      .filter(k => !['version', 'parties', 'activePartyId', 'activeCharacterId', 'journal', 'factions', 'settlements', 'worldNPCs', 'worldCreatures', 'maps', 'activeMapId', 'exportDate', 'character', 'gameTime'].includes(k))
       .reduce((acc, k) => ({ ...acc, [k]: currentData[k] }), {})
   };
 };

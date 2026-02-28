@@ -7,6 +7,7 @@ import SceneManager from './SceneManager';
 
 const OraclePanel = () => {
   const handleLogEntry = useGameStore(s => s.handleLogEntry);
+  const createCreature = useGameStore(s => s.createCreature);
   const [question, setQuestion] = useState('');
   const [probability, setProbability] = useState('even');
   const [lastResult, setLastResult] = useState(null);
@@ -1204,15 +1205,23 @@ const OraclePanel = () => {
               })}
               <div className="mt-4 pt-3 border-t border-stone-200 flex flex-wrap items-center justify-between gap-2">
                 <span className="px-2 py-1 bg-stone-100 rounded text-xs text-stone-500">12 aspektů lore</span>
-                {silentMode && (
+                <div className="flex gap-2">
                   <button
                     onClick={() => {
-                      const narrative = LORE_ASPECTS.map(a => loreResult[a.key] ? `**${a.icon} ${a.label}:** ${loreResult[a.key]}` : null).filter(Boolean).join('\n');
-                      logEntry({ type: 'oracle', subtype: 'monster_lore', timestamp: formatTimestamp(), result: narrative, data: loreResult });
+                      createCreature('Nový tvor', { ...loreResult });
                     }}
-                    className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded text-sm font-medium transition-colors"
-                  >📥 Uložit do deníku</button>
-                )}
+                    className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-sm font-medium transition-colors"
+                  >📖 Uložit jako tvora</button>
+                  {silentMode && (
+                    <button
+                      onClick={() => {
+                        const narrative = LORE_ASPECTS.map(a => loreResult[a.key] ? `**${a.icon} ${a.label}:** ${loreResult[a.key]}` : null).filter(Boolean).join('\n');
+                        logEntry({ type: 'oracle', subtype: 'monster_lore', timestamp: formatTimestamp(), result: narrative, data: loreResult });
+                      }}
+                      className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded text-sm font-medium transition-colors"
+                    >📥 Uložit do deníku</button>
+                  )}
+                </div>
               </div>
             </div>
           )}
