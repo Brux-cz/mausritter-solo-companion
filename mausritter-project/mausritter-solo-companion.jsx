@@ -788,31 +788,31 @@ const CREATURE_QUIRKS = [
 // ============================================
 
 const LORE_ORIGIN = [
+  'Prostě tu žije — tady je voda, jídlo, bezpečí. Nic víc.',
   'Žije tu od nepaměti — starší než jakákoliv myší osada v okolí.',
   'Přišlo sem z daleka, vyhnáno z původního domova katastrofou.',
-  'Bylo sem přivoláno starým kouzlem, které nikdo neumí zrušit.',
-  'Uprchlo z laboratoře sovího čaroděje.',
   'Přišlo po stopách kořisti a už neodešlo.',
   'Narodilo se tu — toto místo je jeho rodný domov.',
-  'Bylo prokleto a přesunuto sem proti své vůli.',
-  'Následovalo tajemnou stezku, kterou vidí jen ono.',
-  'Přilákala ho magie ukrytá hluboko pod zemí.',
   'Je posledním přeživším svého druhu — sem uteklo ze zoufalství.',
   'Přišlo sem s karavanou, ale zůstalo když karavana odešla.',
-  'Probudilo se ze zimního spánku trvajícího celé generace.',
-  'Dorazilo z Vílí říše průchodem, který se za ním zavřel.',
-  'Bylo vytvořeno magií tohoto místa — je jeho projevem.',
-  'Přišlo sem jako strážce něčeho ukrytého.',
-  'Přitáhl ho pach krve z dávné bitvy, která tu proběhla.',
-  'Připlulo po podzemní řece, která tu ústí.',
-  'Přilétlo sem za zvukem, který slyší jen ono.',
-  'Bylo sem posláno mocnou bytostí jako trest.',
-  'Sem se uchýlilo po zradě blízkého společníka.',
   'Migrovalo sem spolu s ročním obdobím — ale tentokrát neodešlo.',
   'Spadlo sem — doslova — z ptačího hnízda vysoko nahoře.',
-  'Vylíhlo se tu z vejce, které tu leželo celé věky.',
   'Bylo sem přineseno vichřicí, která tu řádila minulou sezónu.',
-  'Přilezlo sem z Podzemí, ze sítě tunelů pod kořeny.'
+  'Přilezlo sem z Podzemí, ze sítě tunelů pod kořeny.',
+  'Přišlo sem za vodou — starý zdroj vyschl.',
+  'Vyhnáno z původního teritoria silnějším tvorem.',
+  'Přitáhla ho hojnost potravy v okolí osady.',
+  'Vylíhlo se tu z vajec, která sem nakladla matka.',
+  'Přišlo sem po proudu řeky nebo potoka.',
+  'Zabydlelo se tu po smrti předchozího alfa tvora v okolí.',
+  'Přežilo požár nebo povodeň a toto bylo nejbližší útočiště.',
+  'Vytlačeno lidskou aktivitou ze starého domova.',
+  'Sledovalo kořist a zjistilo, že se tu loví snadno.',
+  'Sem se uchýlilo po zradě blízkého společníka.',
+  'Připlulo po podzemní řece, která tu ústí.',
+  'Uprchlo z laboratoře sovího čaroděje.',
+  'Přišlo sem jako strážce něčeho ukrytého.',
+  'Přitáhl ho pach krve z dávné bitvy, která tu proběhla.'
 ];
 
 const LORE_MOTIVATION = [
@@ -822,25 +822,25 @@ const LORE_MOTIVATION = [
   'Hromadí zásoby na blížící se zimu nebo pohromu.',
   'Touží po klidu — chce být prostě ponecháno na pokoji.',
   'Hledá partnera ke spáření — je v období námluv.',
-  'Střeží starobylý artefakt, o kterém samo neví, co je.',
   'Chce ovládnout toto území a vyhnat všechny ostatní.',
   'Hledá cestu zpět domů, ale neví kudy.',
   'Shromažďuje materiály na stavbu hnízda nebo doupěte.',
   'Touží po pomstě — někdo mu ublížil a ono to nezapomnělo.',
   'Chce komunikovat, ale neví jak — pokouší se předat zprávu.',
-  'Sbírá magické předměty, které cítí v okolí.',
   'Hledá léčivou bylinu nebo vodu pro své nemocné mládě.',
   'Touží po společnosti — je osamělé a zoufalé.',
   'Plní příkaz mocnější bytosti, které se bojí.',
-  'Střeží tajný průchod, o kterém myši nevědí.',
-  'Snaží se přerušit magický rituál, který něco uvolní.',
   'Chce být krmeno a obsluhováno — považuje se za šlechtu.',
-  'Hledá specifický zvuk nebo píseň, kterou kdysi slyšelo.',
-  'Touží po lidském artefaktu, který spatřilo v dáli.',
-  'Čeká na znamení — proroctví, které musí splnit.',
-  'Chce zabránit probuzení něčeho strašlivého pod zemí.',
-  'Sbírá kosti padlých tvorů pro neznámý účel.',
-  'Hledá místo, kde se protínají dva proudy magie.'
+  'Prostě loví — má hlad a tohle je jeho loviště.',
+  'Brání si noru nebo hnízdo — je to jeho domov.',
+  'Hledá bezpečné místo k přezimování.',
+  'Vysedává na slunci a čeká na kořist.',
+  'Střeží zásoby potravy, které nashromáždilo.',
+  'Snaží se přežít zimu, sucho nebo povodeň.',
+  'Rozšiřuje své teritorium na úkor sousedů.',
+  'Učí svá mláďata lovit a přežít.',
+  'Střeží průchod nebo stezku, o které myši nevědí.',
+  'Touží po lidském artefaktu, který spatřilo — neví co to je, ale chce to.'
 ];
 
 const LORE_SOCIAL = [
@@ -863,18 +863,23 @@ const LORE_SOCIAL = [
   'Rodič s mláďaty — chrání potomky za každou cenu.',
   'Rival jiného tvora — soupeří o stejné území.',
   'Spojenec myší osady — má s nimi tajnou dohodu.',
-  'Žoldnéř — slouží tomu, kdo zaplatí nejlépe.'
+  'Žoldnéř — slouží tomu, kdo zaplatí nejlépe.',
+  'Teritoriální — žije samo na přesně vymezeném území, které značkuje.',
+  'Sezónní společník — v létě samotář, v zimě se sdružuje s ostatními.',
+  'Toleruje ostatní tvory, pokud mu neberou potravu.',
+  'Podřízený člen skupiny — dělá špinavou práci za ochranu.',
+  'Rodina — žije s partnerem a letošními mláďaty, nic víc.'
 ];
 
 const LORE_LAIR = [
   'Prostá díra v zemi, nic zvláštního — funguje to.',
   'Propracovaný systém tunelů se zásobárnou a strážní místností.',
   'Staré myší obydlí, které si přivlastnilo a zdevastovalo.',
-  'Magicky chráněné místo — kolem doupěte je ochranný kruh.',
+  'Mělká tůňka v bahně u potoka — vždy vlhká, vždy plná hmyzu.',
   'Hnízdo vysoko v korunách, dostupné jen pro létající tvory.',
   'Podmáčená nora u vody, napůl zaplavená.',
   'V doupěti má sbírku podivných předmětů z lidského světa.',
-  'Doupě je živé — stěny dýchají a reagují na vetřelce.',
+  'Skrýš pod plochým kamenem u vody — chladná a vlhká.',
   'Žádné stálé doupě — stěhuje se každých pár dní.',
   'Nora pod kořeny starého dubu, plná hub a mechu.',
   'Opuštěná lidská bota, přestavěná na pevnost.',
@@ -890,7 +895,7 @@ const LORE_LAIR = [
   'Opuštěný hmyzí úl, přebudovaný na pevnost.',
   'Doupě v koruně stromu, spojené můstky z větviček.',
   'Využívá starý lidský odpad jako stavební materiál — plechovka, lahev.',
-  'V doupěti je podivný zdroj tepla, pravděpodobně magický.',
+  'Hnízdo z listí a trávy schované v hustém křoví.',
   'Doupě je prázdné a spartánské — žije asketicky.'
 ];
 
@@ -911,13 +916,13 @@ const LORE_BEHAVIOR = [
   'Varuje vetřelce třikrát, pak útočí bez milosti.',
   'Nabízí ochranu za pravidelný tribut potravy.',
   'Ignoruje myši, ale útočí na jiné tvory.',
-  'Aktivní jen za úplňku — zbytek měsíce spí.',
+  'Loví za úsvitu a soumraku — ve dne i v noci spí.',
   'Obchoduje s předměty, které nachází v okolí.',
   'Pomáhá ztraceným cestovatelům najít cestu — za úplatu.',
   'Sabotuje pasti a nástrahy lovců v okolí.',
   'Zanechává výstražná znamení na hranicích svého území.',
   'Chodí na stejná místa ve stejný čas — má přísný rituál.',
-  'Přináší „dary" k myším osadám — ale podivné a znepokojivé.',
+  'Značkuje si teritorium a pravidelně ho obchází.',
   'Mění chování podle počasí — v dešti je zuřivé, za slunce klidné.',
   'Tiše pozoruje a sbírá informace — nikdo neví proč.'
 ];
@@ -931,7 +936,7 @@ const LORE_RUMOR = [
   '„Moje babička říkala, že to dřív bývalo jiné — přátelské."',
   '„Jednou za měsíc vydává zvuky, ze kterých mrazí."',
   '„Ten starý mlynář tvrdí, že s ním jednou mluvil."',
-  '„Říká se, že má smlouvu s Královnou Víl."',
+  '„Prý žere třikrát denně — a ještě mu nestačí."',
   '„Kdosi viděl, jak nechalo koš hub u cesty — jako dar."',
   '„Prý je prokleté — a každý, kdo ho zabije, zdědí tu kletbu."',
   '„Objevuje se vždycky před neštěstím — jako zlé znamení."',
@@ -942,7 +947,7 @@ const LORE_RUMOR = [
   '„Kdosi tvrdí, že v jeho doupěti svítí podivné světlo."',
   '„Místní věří, že přináší déšť — a proto ho nechávají být."',
   '„Prý ho jednou porazil jediný myší válečník, ale nikdo neví kdo."',
-  '„Říká se, že sní o budoucnosti a někdy ji předpoví."',
+  '„Říkají, že tu bylo dřív než osada — a přežije nás všechny."',
   '„Babička varovala: nikdy ho nekrm po setmění."',
   '„Prý zná jméno každého, kdo tu kdy žil."',
   '„Říkají, že je to vlastně strážný duch tohoto místa."',
@@ -951,26 +956,34 @@ const LORE_RUMOR = [
 ];
 
 const LORE_MAGIC = [
+  // Žádná magie (12 položek — ~50%)
   'Nemá žádnou magii — čistě přírodní tvor bez nadpřirozených schopností.',
-  'Slabá přirozená magie — cítí blížící se nebezpečí.',
+  'Žádná magie — je to prostě zvíře, silné a nebezpečné svou povahou.',
+  'Žádná magie, ale má výjimečně vyvinutý čich — cítí myš na sto kroků.',
+  'Žádná magie, ale je nezvykle chytré — učí se z chyb.',
+  'Žádná magie — jeho síla je v rychlosti a překvapení.',
+  'Žádná magie — spoléhá na jed, kousnutí nebo drápy.',
+  'Žádná magie, ale má neuvěřitelnou výdrž — prostě se nevzdá.',
+  'Žádná magie — je tiché jako stín, nikdy ho neslyšíš přicházet.',
+  'Žádná magie, ale jeho krunýř, kůže nebo šupiny jsou tvrdé jako kámen.',
+  'Žádná magie — zato má dokonalé maskování, splyne s okolím.',
+  'Žádná magie, ale je tak staré, že se mu ostatní přirozeně vyhýbají.',
+  'Žádná magie, ale má nadpřirozeně vyvinutý jeden smysl.',
+  // Lehká magie (8 položek — ~30%)
   'Ovládá jedno kouzlo, které použije jen v krajní nouzi.',
-  'Je magického původu — celé jeho tělo září slabou aurou.',
   'Má magický předmět, který neumí plně ovládat.',
-  'Je imunní vůči jednomu druhu magie.',
   'Přirozeně ruší magii v okolí — kouzelníci v jeho blízkosti selhávají.',
   'Dokáže mluvit myší řečí, i když by nemělo umět.',
   'Má hypnotický pohled — kdo se mu zadívá do očí, ztuhne.',
-  'Ovládá jeden živel — oheň, vodu, vítr nebo zem.',
-  'Dokáže se na krátko stát neviditelným.',
   'Má léčivé schopnosti — jeho sliny hojí rány.',
-  'Vidí do Vílí říše a občas s ní interaguje.',
-  'Ovládá iluze — může vytvářet falešné obrazy.',
-  'Žádná magie, ale má nadpřirozeně vyvinutý jeden smysl.',
-  'Je napojeno na měsíční cykly — za úplňku má magické schopnosti.',
   'Dokáže měnit barvu a splynout s okolím.',
   'Jeho hlas má zvláštní moc — dokáže uklidnit nebo vyděsit.',
-  'Nese v sobě zlomek staré magie, které nerozumí.',
-  'Zanechává magické stopy — kdo je sleduje, najde zvláštní věci.'
+  // Silná magie (5 položek — ~20%)
+  'Je napojeno na Vílí říši — občas kolem něj poletují podivná světla.',
+  'Ovládá jeden živel — vodu, vítr, oheň nebo zem — ale jen slabě.',
+  'Dokáže přivolat mlhu nebo tmu ve svém okolí.',
+  'Je prokleté — a kletba se přenáší na ty, kdo ho zraní.',
+  'Vnímá magické předměty v okolí — cítí je jako vůni.'
 ];
 
 const LORE_LIKES = [
@@ -1049,7 +1062,12 @@ const LORE_VIRTUE = [
   'Je loajální k těm, kdo mu prokáží laskavost.',
   'Opyluje vzácné rostliny, které jinak vymírají.',
   'Dokáže předpovídat počasí s neuvěřitelnou přesností.',
-  'Je živoucí památkou na staré časy — zná zapomenuté tradice.'
+  'Je živoucí památkou na staré časy — zná zapomenuté tradice.',
+  'Loví škůdce — bez něj by se tu přemnožili.',
+  'Upozorňuje svou přítomností na skryté nebezpečí v okolí.',
+  'Respektuje hranice — nikdy neloví v blízkosti osady.',
+  'Jeho nora stabilizuje břeh potoka a brání erozi.',
+  'Je klidné a předvídatelné — když ho necháš, nechá tě na pokoji.'
 ];
 
 const LORE_DARKNESS = [
@@ -1065,42 +1083,47 @@ const LORE_DARKNESS = [
   'Manipuluje slabšími tvory a nutí je pracovat pro sebe.',
   'Nese v sobě parazita, který ovládá jeho chování.',
   'Učí se od každého setkání — každým dnem je nebezpečnější.',
-  'Vyvolává noční můry u těch, kdo spí v jeho blízkosti.',
   'Má teritorium poseto pastmi, které zabíjí bez varování.',
-  'Je závislé na magii — a udělá cokoliv, aby ji získalo.',
   'Sbírá „suvenýry" ze svých obětí jako morbidní trofeje.',
   'Mstí se za křivdy, které si jen představuje.',
   'Jeho přítomnost kazí úrodu a plaší zvěř.',
   'Roste — pomalu ale jistě. A s velikostí roste i jeho nebezpečnost.',
-  'Má schopnost, o které nikdo neví — a čeká na správný moment.'
+  'Má schopnost, o které nikdo neví — a čeká na správný moment.',
+  'Zabíjí víc než sežere — zbytek nechá hnít.',
+  'Ničí zásoby a hnízda ostatních tvorů ze zlomyslnosti.',
+  'Je nepředvídatelné — bez varování přepne z klidu do zuřivosti.',
+  'Přenáší parazity, kteří napadají myší populaci.',
+  'Vytlačuje ostatní tvory z jejich teritoria systematicky.',
+  'Jeho přítomnost znečišťuje okolí — puch, zbytky kořisti, výkaly.',
+  'Učí se otevírat myší obydlí — jednoho dne to zvládne.'
 ];
 
 const LORE_TWIST = [
-  'Ve skutečnosti je to zakletá myš — původně to byl/a někdo z osady.',
   'Má tajnou dohodu se starostou nejbližší osady.',
   'Ve skutečnosti chrání osadu, ale nikdo to neví a myši ho nenávidí.',
   'Je smrtelně nemocné a jeho agresivita je projev zoufalství.',
   'Ve skutečnosti se bojí myší víc než ony jeho.',
-  'Rozumí myší řeči, ale nemluví — jen tiše poslouchá.',
   'Je dvojče — existují dva identické tvory, ale všichni si myslí, že je jeden.',
   'Bylo kdysi mazlíčkem lidského dítěte — a stýská se mu.',
-  'Střeží vstup do zapomenuté myší knihovny plné starých svitků.',
-  'Je napojeno na starostku Madrigu — plní její tajný úkol.',
   'Někdo ho sem záměrně přivedl, aby odlákal pozornost od něčeho jiného.',
-  'Má lidské povědomí — je to proměněný člověk zmenšený kouzlem.',
-  'Pracuje jako špeh pro frakci, o které nikdo neví.',
-  'Pamatuje si předchozí životy — žilo tu už mnohokrát předtím.',
-  'Za úplňku se mění v něco úplně jiného — a nepamatuje si to.',
-  'Je stroj — konstrukt vytvořený dávným myším vynálezcem.',
-  'Živí se magií — a v okolí nějaká silná magie sílí.',
   'Kdysi mělo rodinu — a celou ji ztratilo kvůli myší výpravě.',
-  'Není z tohoto světa — prošlo portálem, který se zavřel.',
-  'Je prorokem — jeho podivné chování jsou ve skutečnosti varování.',
-  'LEGENDÁRNÍ: Je poslední strážce zapomenuté myší civilizace z dob před Velkou bouří.',
-  'LEGENDÁRNÍ: Nese v sobě duši prastarého čaroděje, který odmítá zemřít.',
-  'LEGENDÁRNÍ: Je avatar lesa — fyzický projev vůle přírody v tomto kraji.',
-  'LEGENDÁRNÍ: Zná cestu do Podsvětí a může tam někoho zavést — za cenu.',
-  'Jeho příběh je propojen s příběhem hráčovy postavy — jen o tom ještě neví.'
+  'Jeho příběh je propojen s příběhem hráčovy postavy — jen o tom ještě neví.',
+  'Je samice — a právě teď je březí nebo sedí na vejcích.',
+  'Ve skutečnosti je mladé — jeho velikost klame, je to jen teenager.',
+  'Je slepé nebo hluché — kompenzuje to jinými smysly.',
+  'Není agresivní — je vyděšené a útočí ze strachu.',
+  'Má zranění, které si nikdo nevšiml — je zranitelné.',
+  'Je zvyklé na myši — někdo ho v minulosti krmil a ochočil.',
+  'Právě se probouzí ze zimního spánku — je hladové a zmatené.',
+  'Za pár dní odtud odejde — je tu jen dočasně.',
+  'Je starší než vypadá — pamatuje si časy před osadou.',
+  'Patří někomu — má na sobě stopy po obojku nebo řemínku.',
+  'Není tu samo — někde poblíž je další, větší exemplář.',
+  'Tohle území ve skutečnosti nepatří jemu — ukradlo ho jinému tvorovi.',
+  'Dřív bylo krotké a klidné — něco ho změnilo, ale nikdo neví co.',
+  'Má v doupěti mláďata jiného druhu — adoptovalo je.',
+  'Je albín nebo neobvykle zbarvené — proto je místní považují za zvláštní.',
+  'Někdo ho pravidelně krmí — myš z osady, která to tají.'
 ];
 
 const LORE_ASPECTS = [
@@ -4549,7 +4572,7 @@ const OraclePanel = ({ onLogEntry }) => {
 
                 <p className="font-bold mt-2 mb-1">📊 Rozsah:</p>
                 <p className="text-xs text-stone-300">
-                  280 položek ve 12 tabulkách. ~95 bilionů unikátních kombinací.
+                  300 položek ve 12 tabulkách. ~59 biliard unikátních kombinací.
                 </p>
               </div>
             }
@@ -4653,7 +4676,7 @@ const OraclePanel = ({ onLogEntry }) => {
           )}
 
           <p className="text-center text-xs text-stone-400 mt-4">
-            280 položek ve 12 tabulkách = ~95,000,000,000,000 kombinací
+            300 položek ve 12 tabulkách = ~59,604,644,775,390,625 kombinací
           </p>
         </ResultCard>
       )}
