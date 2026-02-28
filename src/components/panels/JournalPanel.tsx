@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { useUIStore } from '../../stores/uiStore';
 import { useMultiplayerStore } from '../../stores/multiplayerStore';
-import { NPC_BEHAVIOR_MOODS, NPC_BEHAVIOR_ACTIONS, NPC_BEHAVIOR_MOTIVATIONS, NPC_SECRETS, NPC_REACTIONS, SETTLEMENT_RUMORS, SETTLEMENT_HAPPENINGS, NATURE_EVENTS, WILDERNESS_THREATS, DISCOVERIES, ENCOUNTER_ACTIVITIES, ENCOUNTER_DETAILS, ENCOUNTER_MOODS, ENCOUNTER_MOTIVATIONS } from '../../data/constants';
+import { NPC_BEHAVIOR_MOODS, NPC_BEHAVIOR_ACTIONS, NPC_BEHAVIOR_MOTIVATIONS, NPC_SECRETS, NPC_REACTIONS, SETTLEMENT_RUMORS, SETTLEMENT_HAPPENINGS, NATURE_EVENTS, WILDERNESS_THREATS, DISCOVERIES, ENCOUNTER_ACTIVITIES, ENCOUNTER_DETAILS, ENCOUNTER_MOODS, ENCOUNTER_MOTIVATIONS, LORE_ASPECTS } from '../../data/constants';
+const LORE_ASPECTS_MAP = Object.fromEntries(LORE_ASPECTS.map(a => [a.key, a]));
 import { randomFrom, generateId, formatTimestamp } from '../../utils/helpers';
 import { parseMentions, Select } from '../ui/common';
 import { TiptapEditor } from '../ui/TiptapEditor';
@@ -10,7 +11,7 @@ import { TiptapEditor } from '../ui/TiptapEditor';
 const JournalPanel = ({ onExport }) => {
   const {
     journal, setJournal, parties, journalPartyFilter: partyFilter, setJournalPartyFilter: setPartyFilter,
-    worldNPCs, settlements, timedEvents, lexicon, setLexicon,
+    worldNPCs, worldCreatures, settlements, timedEvents, lexicon, setLexicon,
     getActiveParty, deleteNPC, deleteSettlement, promoteToNPC, updateNPC, createCreature,
   } = useGameStore();
   const { setActivePanel, setPendingMentionOpen } = useUIStore();
@@ -420,8 +421,9 @@ const JournalPanel = ({ onExport }) => {
   const groupedByDate = {};
   filteredJournal.forEach(entry => {
     // Parse Czech date format "31. 12. 2024 14:30:25" -> "31. 12. 2024"
-    const parts = entry.timestamp?.split(' ') || [];
-    const date = parts.length >= 3 ? `${parts[0]} ${parts[1]} ${parts[2]}` : (entry.timestamp || 'Neznámé datum');
+    const ts = typeof entry.timestamp === 'number' ? new Date(entry.timestamp).toLocaleString('cs-CZ') : entry.timestamp;
+    const parts = ts?.split(' ') || [];
+    const date = parts.length >= 3 ? `${parts[0]} ${parts[1]} ${parts[2]}` : (ts || 'Neznámé datum');
     if (!groupedByDate[date]) groupedByDate[date] = [];
     groupedByDate[date].push(entry);
   });
@@ -1046,6 +1048,34 @@ const JournalPanel = ({ onExport }) => {
         );
       }
 
+      case 'creature_lore': {
+        const d = entry.data;
+        const filledAspects = d?.lore ? Object.entries(d.lore).filter(([, v]) => v) : [];
+        const creature = worldCreatures?.find(c => c.id === d?.creatureId);
+        const name = creature?.name || d?.name || '???';
+        return (
+          <div
+            className="my-2 pl-3 border-l-2 border-amber-500 cursor-pointer hover:bg-amber-50 rounded-r transition-colors"
+            onClick={() => creature && setDetailModal({ type: 'creature_lore', data: creature })}
+            title={creature ? 'Klikni pro detail' : undefined}
+          >
+            <p className="text-sm font-bold text-amber-900">📖 {name}</p>
+            {filledAspects.slice(0, 3).map(([key, val]) => {
+              const aspect = LORE_ASPECTS_MAP[key];
+              return (
+                <p key={key} className="text-xs text-amber-800/80 truncate">
+                  {aspect?.icon || '·'} {val as string}
+                </p>
+              );
+            })}
+            {filledAspects.length > 3 && (
+              <p className="text-xs text-amber-500">+{filledAspects.length - 3} dalších aspektů</p>
+            )}
+            <EntryNote note={entry.note} entryId={entry.id} />
+          </div>
+        );
+      }
+
       default:
         // For any other type, show as mechanical note
         let content = entry.content || entry.data || entry;
@@ -1387,12 +1417,15 @@ const JournalPanel = ({ onExport }) => {
               return segments.map((segment, segIdx) => {
                 if (segment.type === 'loose') {
                   const entry = (segment as any).entry;
-                  const parts = entry.timestamp?.split(' ') || [];
-                  const entryDate = parts.length >= 3 ? `${parts[0]} ${parts[1]} ${parts[2]}` : (entry.timestamp || 'Neznámé datum');
+                  const tsE = typeof entry.timestamp === 'number' ? new Date(entry.timestamp).toLocaleString('cs-CZ') : entry.timestamp;
+                  const parts = tsE?.split(' ') || [];
+                  const entryDate = parts.length >= 3 ? `${parts[0]} ${parts[1]} ${parts[2]}` : (tsE || 'Neznámé datum');
                   const prevSeg = segments[segIdx - 1];
                   let prevDate = '';
                   if (prevSeg?.type === 'loose') {
-                    const pp = (prevSeg as any).entry.timestamp?.split(' ') || [];
+                    const prevTs = (prevSeg as any).entry.timestamp;
+                    const prevTsStr = typeof prevTs === 'number' ? new Date(prevTs).toLocaleString('cs-CZ') : prevTs;
+                    const pp = prevTsStr?.split(' ') || [];
                     prevDate = pp.length >= 3 ? `${pp[0]} ${pp[1]} ${pp[2]}` : '';
                   }
                   const showDateHeader = segIdx > 0 && entryDate !== prevDate;
