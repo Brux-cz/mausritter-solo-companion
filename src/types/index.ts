@@ -220,6 +220,11 @@ export interface WorldCreature {
   name: string;
   notes?: string;
   lore: Record<string, string>; // key → generated lore text (origin, motivation, etc.)
+  // Bojové statistiky (Mausritter)
+  hp?: number;      // životy (typicky 1–12)
+  armor?: number;   // ochrana 0–3
+  attack?: string;  // popis útoku, např. "d6 drápy"
+  morale?: number;  // morálka 2–12
   createdAt?: string;
 }
 
@@ -303,7 +308,8 @@ export interface BaseJournalEntry {
   authorId?: string | null;
   authorName?: string | null;
   edited?: boolean;
-  note?: string;
+  note?: string;    // legacy — migruje se do notes[]
+  notes?: string[]; // pole poznámek (více poznámek na záznam)
 }
 
 export interface NarrativeEntry extends BaseJournalEntry {
