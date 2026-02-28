@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { SAVE_VERSION, migrations, migrateSaveData } from './constants';
+import { SAVE_VERSION, migrations, migrateSaveData, LORE_ASPECTS } from './constants';
 
 describe('SAVE_VERSION', () => {
   it('je 6', () => {
@@ -157,6 +157,51 @@ describe('migrations', () => {
       expect(result.parties[0].sceneState.threads).toHaveLength(1);
       expect(result.parties[0].sceneState.sceneCount).toBe(3);
     });
+  });
+});
+
+describe('LORE_ASPECTS integrity', () => {
+  it('has exactly 12 aspects', () => {
+    expect(LORE_ASPECTS).toHaveLength(12);
+  });
+
+  it('each aspect has exactly 25 items', () => {
+    for (const aspect of LORE_ASPECTS) {
+      expect(aspect.table, `${aspect.key} má ${aspect.table.length} položek místo 25`).toHaveLength(25);
+    }
+  });
+
+  it('no empty strings in any table', () => {
+    for (const aspect of LORE_ASPECTS) {
+      for (const item of aspect.table) {
+        expect(item.trim(), `Prázdná položka v ${aspect.key}`).not.toBe('');
+      }
+    }
+  });
+
+  it('all aspect keys are unique', () => {
+    const keys = LORE_ASPECTS.map(a => a.key);
+    expect(new Set(keys).size).toBe(keys.length);
+  });
+
+  it('all required fields present on each aspect', () => {
+    for (const aspect of LORE_ASPECTS) {
+      expect(aspect.key, 'key chybí').toBeTruthy();
+      expect(aspect.label, `label chybí pro ${aspect.key}`).toBeTruthy();
+      expect(aspect.icon, `icon chybí pro ${aspect.key}`).toBeTruthy();
+      expect(aspect.borderColor, `borderColor chybí pro ${aspect.key}`).toBeTruthy();
+      expect(aspect.labelColor, `labelColor chybí pro ${aspect.key}`).toBeTruthy();
+      expect(Array.isArray(aspect.table), `table není pole pro ${aspect.key}`).toBe(true);
+    }
+  });
+
+  it('expected keys are present in correct order', () => {
+    const expectedKeys = [
+      'origin', 'motivation', 'social', 'lair', 'behavior',
+      'rumor', 'magic', 'likes', 'possessions', 'virtue', 'darkness', 'twist',
+    ];
+    const actualKeys = LORE_ASPECTS.map(a => a.key);
+    expect(actualKeys).toEqual(expectedKeys);
   });
 });
 
