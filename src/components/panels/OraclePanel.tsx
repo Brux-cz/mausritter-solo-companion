@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useGameStore } from '../../stores/gameStore';
-import { ORACLE_TABLE, ACTION_ORACLE, THEME_ORACLE, CARD_SUITS, CARD_VALUES, CARD_VALUE_MEANINGS, ENCOUNTER_CREATURES, ENCOUNTER_ACTIVITIES, ENCOUNTER_LOCATIONS, ENCOUNTER_MOODS, ENCOUNTER_DETAILS, ENCOUNTER_MOTIVATIONS, ENCOUNTER_COMPLICATIONS, CREATURE_TYPES, CREATURE_PERSONALITIES, CREATURE_APPEARANCES, CREATURE_GOALS, CREATURE_DOING, CREATURE_MOODS, CREATURE_SECRETS, CREATURE_QUIRKS, NARRATIVE_OPENINGS, NARRATIVE_SETTINGS, EVENT_FOCUS, EVENT_ACTIONS, EVENT_SUBJECTS, EVENT_COMPLICATIONS, SETTLEMENT_RUMORS, SETTLEMENT_HAPPENINGS, NATURE_EVENTS, WILDERNESS_THREATS, DISCOVERIES, LORE_ASPECTS } from '../../data/constants';
+import { ORACLE_TABLE, ACTION_ORACLE, THEME_ORACLE, CARD_SUITS, CARD_VALUES, CARD_VALUE_MEANINGS, ENCOUNTER_CREATURES, ENCOUNTER_ACTIVITIES, ENCOUNTER_LOCATIONS, ENCOUNTER_MOODS, ENCOUNTER_DETAILS, ENCOUNTER_MOTIVATIONS, ENCOUNTER_COMPLICATIONS, CREATURE_TYPES, CREATURE_PERSONALITIES, CREATURE_APPEARANCES, CREATURE_GOALS, CREATURE_DOING, CREATURE_MOODS, CREATURE_SECRETS, CREATURE_QUIRKS, NARRATIVE_OPENINGS, NARRATIVE_SETTINGS, EVENT_FOCUS, EVENT_ACTIONS, EVENT_SUBJECTS, EVENT_COMPLICATIONS, SETTLEMENT_RUMORS, SETTLEMENT_HAPPENINGS, NATURE_EVENTS, WILDERNESS_THREATS, DISCOVERIES, LORE_ASPECTS, CREATURE_CRITICAL_DAMAGE, CREATURE_SPECIAL_TRAITS } from '../../data/constants';
 import { rollDice, rollD6, roll2D6, randomFrom, formatTimestamp } from '../../utils/helpers';
 import { DiceDisplay, ResultBadge, SectionHeader, ResultCard, Button, HelpHeader, Input, TabNav } from '../ui/common';
 import SceneManager from './SceneManager';
@@ -230,6 +230,11 @@ const OraclePanel = () => {
     if (types.length === 0) types = CREATURE_TYPES; // fallback
 
     const type = randomFrom(types);
+    // Kategorie pro účely generování
+    const isPredator = type.category === 'predator';
+    const isSpirit = type.category === 'spirit' || type.category === 'fae';
+    const isConstruct = type.category === 'construct';
+
     const personality = randomFrom(CREATURE_PERSONALITIES);
     const appearance = randomFrom(CREATURE_APPEARANCES);
     const goal = randomFrom(CREATURE_GOALS);
@@ -237,15 +242,23 @@ const OraclePanel = () => {
     const mood = randomFrom(CREATURE_MOODS);
     const secret = creatureOptions.includeSecret ? randomFrom(CREATURE_SECRETS) : null;
     const quirk = creatureOptions.includeQuirk ? randomFrom(CREATURE_QUIRKS) : null;
+    // Kritické zranění a zvláštní vlastnosti — pro predátory vždy, pro ostatní 50%
+    const criticalDamage = (isPredator || rollD6() >= 4) ? randomFrom(CREATURE_CRITICAL_DAMAGE) : null;
+    const specialTrait = (isPredator || isSpirit || rollD6() >= 5) ? randomFrom(CREATURE_SPECIAL_TRAITS) : null;
 
     // Bojové statistiky
     const CREATURE_ATTACK_TYPES = ['d4 kousnutí', 'd6 drápy', 'd6 kousnutí', 'd8 silný útok', 'd4 žihadlo', 'd8 kousnutí', 'd10 tlama', 'd6 magický výboj', 'd4 osten', 'd6 uštknutí', 'd8 šlápnutí', 'd6 mlácení'];
-    const hpDie = type.category === 'predator' ? rollDice(2, 6).reduce((a, b) => a + b, 0) + 2
-                : type.category === 'construct' || type.category === 'spirit' ? rollD6() + 1
+    const rollStat = () => rollDice(2, 6).reduce((a, b) => a + b, 0);
+    const hpDie = isPredator ? rollDice(2, 6).reduce((a, b) => a + b, 0) + 2
+                : isConstruct || isSpirit ? rollD6() + 1
                 : rollD6();
     const armorRoll = rollD6();
     const armor = armorRoll <= 3 ? 0 : armorRoll <= 5 ? 1 : 2;
     const attack = randomFrom(CREATURE_ATTACK_TYPES);
+    // Atributy: predátoři silnější, duchové vyšší vůle, konstrukty vyšší síla
+    const str = isPredator || isConstruct ? Math.min(15, rollStat() + 2) : rollStat();
+    const dex = isPredator ? Math.min(15, rollStat() + 2) : isConstruct ? rollStat() - 2 : rollStat();
+    const wil = isSpirit ? Math.min(15, rollStat() + 3) : isPredator ? rollStat() : rollStat() - 2;
 
     // Generuj jméno (české myší jméno)
     const firstNames = ['Křemílek', 'Lístek', 'Proutek', 'Bělouš', 'Stínek', 'Chlupáč', 'Tichošlap', 'Bystrozrak',
@@ -282,8 +295,13 @@ const OraclePanel = () => {
       quirk,
       narrative,
       hp: hpDie,
+      str: Math.max(3, str),
+      dex: Math.max(3, dex),
+      wil: Math.max(3, wil),
       armor,
       attack,
+      criticalDamage,
+      specialTrait,
     };
 
     setCreatureResult(result);
@@ -920,10 +938,15 @@ const OraclePanel = () => {
 
               {/* Bojové statistiky */}
               {creatureResult.hp !== undefined && (
-                <div className="flex gap-3 text-sm font-mono bg-amber-100 rounded px-3 py-2 mb-3 justify-around">
-                  <span>❤️ <b>{creatureResult.hp}</b> HP</span>
-                  <span>🛡️ <b>{creatureResult.armor}</b> Armor</span>
-                  <span>⚔️ <b>{creatureResult.attack}</b></span>
+                <div className="mb-3 space-y-1">
+                  <div className="flex gap-2 text-sm font-mono bg-amber-100 rounded px-3 py-1.5 justify-around">
+                    <span title="Životy">❤️ <b>{creatureResult.hp}</b></span>
+                    <span title="Síla">💪 <b>{creatureResult.str}</b></span>
+                    <span title="Mrštnost">🏃 <b>{creatureResult.dex}</b></span>
+                    <span title="Vůle">🧠 <b>{creatureResult.wil}</b></span>
+                    <span title="Zbroj">🛡️ <b>{creatureResult.armor}</b></span>
+                  </div>
+                  <div className="text-xs text-center text-amber-700 font-mono bg-amber-50 rounded px-2 py-1">⚔️ {creatureResult.attack}</div>
                 </div>
               )}
 
@@ -951,6 +974,22 @@ const OraclePanel = () => {
                 <div className="mb-2 p-2 bg-white/50 rounded border-l-4 border-purple-400">
                   <span className="text-xs text-purple-600 font-medium block mb-1">✨ ZVLÁŠTNOST</span>
                   <p className="text-stone-700">{creatureResult.quirk.charAt(0).toUpperCase() + creatureResult.quirk.slice(1)}.</p>
+                </div>
+              )}
+
+              {/* Zvláštní vlastnost */}
+              {creatureResult.specialTrait && (
+                <div className="mb-2 p-2 bg-white/50 rounded border-l-4 border-teal-400">
+                  <span className="text-xs text-teal-600 font-medium block mb-1">⚡ ZVLÁŠTNÍ VLASTNOST</span>
+                  <p className="text-stone-700">{creatureResult.specialTrait}</p>
+                </div>
+              )}
+
+              {/* Kritické zranění */}
+              {creatureResult.criticalDamage && (
+                <div className="mb-2 p-2 bg-red-50 rounded border-l-4 border-red-400">
+                  <span className="text-xs text-red-600 font-medium block mb-1">💀 KRITICKÉ ZRANĚNÍ</span>
+                  <p className="text-stone-700">{creatureResult.criticalDamage}</p>
                 </div>
               )}
 

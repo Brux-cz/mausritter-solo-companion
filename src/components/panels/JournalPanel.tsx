@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { useUIStore } from '../../stores/uiStore';
 import { useMultiplayerStore } from '../../stores/multiplayerStore';
-import { NPC_BEHAVIOR_MOODS, NPC_BEHAVIOR_ACTIONS, NPC_BEHAVIOR_MOTIVATIONS, NPC_SECRETS, NPC_REACTIONS, SETTLEMENT_RUMORS, SETTLEMENT_HAPPENINGS, NATURE_EVENTS, WILDERNESS_THREATS, DISCOVERIES, ENCOUNTER_ACTIVITIES, ENCOUNTER_DETAILS, ENCOUNTER_MOODS, ENCOUNTER_MOTIVATIONS, LORE_ASPECTS } from '../../data/constants';
+import { NPC_BEHAVIOR_MOODS, NPC_BEHAVIOR_ACTIONS, NPC_BEHAVIOR_MOTIVATIONS, NPC_SECRETS, NPC_REACTIONS, SETTLEMENT_RUMORS, SETTLEMENT_HAPPENINGS, NATURE_EVENTS, WILDERNESS_THREATS, DISCOVERIES, ENCOUNTER_ACTIVITIES, ENCOUNTER_DETAILS, ENCOUNTER_MOODS, ENCOUNTER_MOTIVATIONS, LORE_ASPECTS, CREATURE_STATES, CREATURE_ACTIONS_ANIMAL, CREATURE_REACTIONS_ANIMAL, LORE_MOTIVATION, LORE_RUMOR, LORE_DARKNESS } from '../../data/constants';
 const LORE_ASPECTS_MAP = Object.fromEntries(LORE_ASPECTS.map(a => [a.key, a]));
 import { randomFrom, generateId, formatTimestamp } from '../../utils/helpers';
 import { parseMentions, Select } from '../ui/common';
@@ -12,7 +12,7 @@ const JournalPanel = ({ onExport }) => {
   const {
     journal, setJournal, parties, journalPartyFilter: partyFilter, setJournalPartyFilter: setPartyFilter,
     worldNPCs, worldCreatures, settlements, timedEvents, lexicon, setLexicon,
-    getActiveParty, deleteNPC, deleteSettlement, promoteToNPC, updateNPC, createCreature,
+    getActiveParty, deleteNPC, deleteSettlement, promoteToNPC, updateNPC, createCreature, updateCreature,
   } = useGameStore();
   const { setActivePanel, setPendingMentionOpen } = useUIStore();
   const { myUserId, roomPlayers, roomConnected } = useMultiplayerStore();
@@ -1855,6 +1855,20 @@ const JournalPanel = ({ onExport }) => {
                   <button onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }} className="text-amber-400 hover:text-amber-600 text-xl">✕</button>
                 </div>
 
+                {/* Bojové statistiky */}
+                {detailModal.data.hp !== undefined && (
+                  <div className="space-y-1">
+                    <div className="grid grid-cols-5 gap-1 text-center text-xs font-mono bg-amber-100 rounded px-2 py-2">
+                      <div><div className="text-amber-500 text-[10px]">BO</div><div className="font-bold text-amber-900">{detailModal.data.hp}</div></div>
+                      <div><div className="text-amber-500 text-[10px]">SÍL</div><div className="font-bold text-amber-900">{detailModal.data.str ?? '—'}</div></div>
+                      <div><div className="text-amber-500 text-[10px]">MRŠ</div><div className="font-bold text-amber-900">{detailModal.data.dex ?? '—'}</div></div>
+                      <div><div className="text-amber-500 text-[10px]">VŮL</div><div className="font-bold text-amber-900">{detailModal.data.wil ?? '—'}</div></div>
+                      <div><div className="text-amber-500 text-[10px]">ZBR</div><div className="font-bold text-amber-900">{detailModal.data.armor ?? 0}</div></div>
+                    </div>
+                    <div className="text-xs text-center text-amber-700 bg-amber-50 rounded px-2 py-1 font-mono">⚔️ {detailModal.data.attack}</div>
+                  </div>
+                )}
+
                 {/* Aktivita a nálada */}
                 <div className="p-3 bg-amber-100 rounded">
                   <p className="text-amber-900">
@@ -1883,6 +1897,22 @@ const JournalPanel = ({ onExport }) => {
                   <div className="p-3 bg-amber-50 rounded border-l-4 border-amber-400">
                     <span className="text-xs text-amber-700 font-medium block mb-1">✨ ZVLÁŠTNOST</span>
                     <p className="text-amber-900">{detailModal.data.quirk.charAt(0).toUpperCase() + detailModal.data.quirk.slice(1)}.</p>
+                  </div>
+                )}
+
+                {/* Zvláštní vlastnost */}
+                {detailModal.data.specialTrait && (
+                  <div className="p-3 bg-teal-50 rounded border-l-4 border-teal-400">
+                    <span className="text-xs text-teal-600 font-medium block mb-1">⚡ ZVLÁŠTNÍ VLASTNOST</span>
+                    <p className="text-amber-900">{detailModal.data.specialTrait}</p>
+                  </div>
+                )}
+
+                {/* Kritické zranění */}
+                {detailModal.data.criticalDamage && (
+                  <div className="p-3 bg-red-50 rounded border-l-4 border-red-400">
+                    <span className="text-xs text-red-600 font-medium block mb-1">💀 KRITICKÉ ZRANĚNÍ</span>
+                    <p className="text-amber-900">{detailModal.data.criticalDamage}</p>
                   </div>
                 )}
 
@@ -1915,52 +1945,162 @@ const JournalPanel = ({ onExport }) => {
                   </div>
                 )}
 
-                {/* Tlačítko pro povýšení na NPC */}
-                {onPromoteToNPC && (
-                  <div className="pt-3 border-t border-amber-200">
+                {/* Generátory setkání pro tvory */}
+                <div className="border-t border-amber-200 pt-3">
+                  <p className="text-xs text-amber-700 mb-2">🎲 Generátory setkání (nezapisuje se)</p>
+                  <div className="flex flex-wrap gap-1">
+                    <button onClick={() => setGeneratedBehavior(`🌡️ ${randomFrom(CREATURE_STATES)}`)} className="px-2 py-1 text-xs bg-amber-100 hover:bg-amber-200 rounded">Stav</button>
+                    <button onClick={() => setGeneratedBehavior(`🏃 ${randomFrom(CREATURE_ACTIONS_ANIMAL)}`)} className="px-2 py-1 text-xs bg-amber-100 hover:bg-amber-200 rounded">Akce</button>
+                    <button onClick={() => setGeneratedBehavior(`⚡ ${randomFrom(CREATURE_REACTIONS_ANIMAL)}`)} className="px-2 py-1 text-xs bg-amber-100 hover:bg-amber-200 rounded">Reakce</button>
+                    <button onClick={() => setGeneratedBehavior(`🎯 ${randomFrom(LORE_MOTIVATION)}`)} className="px-2 py-1 text-xs bg-amber-100 hover:bg-amber-200 rounded">Motivace</button>
+                    <button onClick={() => setGeneratedBehavior(`💬 ${randomFrom(LORE_RUMOR)}`)} className="px-2 py-1 text-xs bg-amber-100 hover:bg-amber-200 rounded">Zvěst</button>
+                    <button onClick={() => setGeneratedBehavior(`🌑 ${randomFrom(LORE_DARKNESS)}`)} className="px-2 py-1 text-xs bg-red-100 hover:bg-red-200 rounded">Temno</button>
+                  </div>
+                  {generatedBehavior && (
+                    <div className="mt-2 p-2 bg-amber-50 rounded border border-amber-200">
+                      <p className="font-medium text-amber-900">{generatedBehavior}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Tlačítka akcí */}
+                <div className="flex gap-2 pt-1">
+                  <button
+                    onClick={() => {
+                      const saved = createCreature(detailModal.data.name, {});
+                      updateCreature(saved.id, {
+                        hp: detailModal.data.hp,
+                        str: detailModal.data.str,
+                        dex: detailModal.data.dex,
+                        wil: detailModal.data.wil,
+                        armor: detailModal.data.armor,
+                        attack: detailModal.data.attack,
+                        notes: detailModal.data.narrative || '',
+                      });
+                      setDetailModal(null);
+                      setGeneratedBehavior(null);
+                      setActivePanel('worldhub');
+                    }}
+                    className="flex-1 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium transition-colors text-sm"
+                  >
+                    💾 Uložit do Bestiáře
+                  </button>
+                  {onPromoteToNPC && (
                     <button
                       onClick={() => {
                         const newNPC = onPromoteToNPC(detailModal.data);
                         if (newNPC) {
                           setDetailModal({ type: 'npc', data: newNPC });
+                          setGeneratedBehavior(null);
                         }
                       }}
-                      className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded font-medium transition-colors"
+                      className="flex-1 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-medium transition-colors text-sm"
                     >
                       ⭐ Povýšit na NPC
                     </button>
-                    <p className="text-xs text-amber-700 text-center mt-1">Vytvoří plnohodnotné NPC se statistikami</p>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             )}
 
             {/* Modal pro creature_lore — lore profil uloženého tvora */}
-            {detailModal.type === 'creature_lore' && detailModal.data && (
-              <div className="p-4 space-y-3">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-2xl font-bold text-amber-900">🐾 {detailModal.data.name}</h3>
-                    <p className="text-sm text-amber-600">Lore profil bytosti</p>
+            {detailModal.type === 'creature_lore' && detailModal.data && (() => {
+              const wc = worldCreatures?.find(c => c.id === detailModal.data.id);
+              const hp = wc?.hp ?? detailModal.data.hp;
+              const str = wc?.str ?? detailModal.data.str;
+              const dex = wc?.dex ?? detailModal.data.dex;
+              const wil = wc?.wil ?? detailModal.data.wil;
+              const armor = wc?.armor ?? detailModal.data.armor;
+              const attack = wc?.attack ?? detailModal.data.attack;
+              return (
+                <div className="p-4 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="text-2xl font-bold text-amber-900">🐾 {detailModal.data.name}</h3>
+                      <p className="text-sm text-amber-600">Lore profil bytosti</p>
+                    </div>
+                    <button onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }} className="text-amber-400 hover:text-amber-600 text-xl">✕</button>
                   </div>
-                  <button onClick={() => setDetailModal(null)} className="text-amber-400 hover:text-amber-600 text-xl">✕</button>
-                </div>
-                <div className="space-y-2 max-h-[60vh] overflow-y-auto pr-1">
-                  {LORE_ASPECTS.map(aspect => {
-                    const value = detailModal.data.lore?.[aspect.key];
-                    if (!value) return null;
-                    return (
-                      <div key={aspect.key} className="p-2.5 rounded-lg border-l-4" style={{ borderColor: aspect.borderColor, background: '#FFFCF7' }}>
-                        <span className="text-xs font-semibold uppercase tracking-wide block mb-0.5" style={{ color: aspect.labelColor }}>
-                          {aspect.icon} {aspect.label}
-                        </span>
-                        <p className="text-sm text-amber-900">{value}</p>
+
+                  {/* Bojové statistiky */}
+                  {hp !== undefined && (
+                    <div className="space-y-1">
+                      <div className="grid grid-cols-5 gap-1 text-center text-xs font-mono bg-amber-100 rounded px-2 py-2">
+                        <div><div className="text-amber-500 text-[10px]">BO</div><div className="font-bold text-amber-900">{hp}</div></div>
+                        <div><div className="text-amber-500 text-[10px]">SÍL</div><div className="font-bold text-amber-900">{str ?? '—'}</div></div>
+                        <div><div className="text-amber-500 text-[10px]">MRŠ</div><div className="font-bold text-amber-900">{dex ?? '—'}</div></div>
+                        <div><div className="text-amber-500 text-[10px]">VŮL</div><div className="font-bold text-amber-900">{wil ?? '—'}</div></div>
+                        <div><div className="text-amber-500 text-[10px]">ZBR</div><div className="font-bold text-amber-900">{armor ?? 0}</div></div>
                       </div>
-                    );
-                  })}
+                      {attack && <div className="text-xs text-center text-amber-700 bg-amber-50 rounded px-2 py-1 font-mono">⚔️ {attack}</div>}
+                    </div>
+                  )}
+
+                  {/* Lore aspekty */}
+                  <div className="space-y-2 max-h-[40vh] overflow-y-auto pr-1">
+                    {LORE_ASPECTS.map(aspect => {
+                      const value = detailModal.data.lore?.[aspect.key];
+                      if (!value) return null;
+                      return (
+                        <div key={aspect.key} className="p-2.5 rounded-lg border-l-4" style={{ borderColor: aspect.borderColor, background: '#FFFCF7' }}>
+                          <span className="text-xs font-semibold uppercase tracking-wide block mb-0.5" style={{ color: aspect.labelColor }}>
+                            {aspect.icon} {aspect.label}
+                          </span>
+                          <p className="text-sm text-amber-900">{value}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Generátory setkání */}
+                  <div className="border-t border-amber-200 pt-3">
+                    <p className="text-xs text-amber-700 mb-2">🎲 Generátory setkání (nezapisuje se)</p>
+                    <div className="flex flex-wrap gap-1">
+                      <button onClick={() => setGeneratedBehavior(`🌡️ ${randomFrom(CREATURE_STATES)}`)} className="px-2 py-1 text-xs bg-amber-100 hover:bg-amber-200 rounded">Stav</button>
+                      <button onClick={() => setGeneratedBehavior(`🏃 ${randomFrom(CREATURE_ACTIONS_ANIMAL)}`)} className="px-2 py-1 text-xs bg-amber-100 hover:bg-amber-200 rounded">Akce</button>
+                      <button onClick={() => setGeneratedBehavior(`⚡ ${randomFrom(CREATURE_REACTIONS_ANIMAL)}`)} className="px-2 py-1 text-xs bg-amber-100 hover:bg-amber-200 rounded">Reakce</button>
+                      <button onClick={() => setGeneratedBehavior(`🎯 ${randomFrom(LORE_MOTIVATION)}`)} className="px-2 py-1 text-xs bg-amber-100 hover:bg-amber-200 rounded">Motivace</button>
+                      <button onClick={() => setGeneratedBehavior(`💬 ${randomFrom(LORE_RUMOR)}`)} className="px-2 py-1 text-xs bg-amber-100 hover:bg-amber-200 rounded">Zvěst</button>
+                      <button onClick={() => setGeneratedBehavior(`🌑 ${randomFrom(LORE_DARKNESS)}`)} className="px-2 py-1 text-xs bg-red-100 hover:bg-red-200 rounded">Temno</button>
+                    </div>
+                    {generatedBehavior && (
+                      <div className="mt-2 p-2 bg-amber-50 rounded border border-amber-200">
+                        <p className="font-medium text-amber-900">{generatedBehavior}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Akční tlačítka */}
+                  <div className="flex gap-2 pt-1">
+                    {wc ? (
+                      <button
+                        onClick={() => {
+                          setDetailModal(null);
+                          setGeneratedBehavior(null);
+                          setActivePanel('worldhub');
+                        }}
+                        className="flex-1 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium text-sm"
+                      >
+                        ✏️ Upravit v Bestiáři
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          const saved = createCreature(detailModal.data.name, detailModal.data.lore || {});
+                          if (hp !== undefined) updateCreature(saved.id, { hp, str, dex, wil, armor, attack });
+                          setDetailModal(null);
+                          setGeneratedBehavior(null);
+                          setActivePanel('worldhub');
+                        }}
+                        className="flex-1 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium text-sm"
+                      >
+                        💾 Uložit do Bestiáře
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* Modal pro detail scény (frame_scene) */}
             {detailModal.type === 'frame_scene' && detailModal.data && (

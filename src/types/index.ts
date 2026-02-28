@@ -221,7 +221,10 @@ export interface WorldCreature {
   notes?: string;
   lore: Record<string, string>; // key → generated lore text (origin, motivation, etc.)
   // Bojové statistiky (Mausritter)
-  hp?: number;      // životy (typicky 1–12)
+  hp?: number;      // životy (typicky 1–15)
+  str?: number;     // síla
+  dex?: number;     // mrštnost
+  wil?: number;     // vůle
   armor?: number;   // ochrana 0–3
   attack?: string;  // popis útoku, např. "d6 drápy"
   morale?: number;  // morálka 2–12
