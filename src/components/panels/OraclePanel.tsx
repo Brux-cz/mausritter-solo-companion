@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useGameStore } from '../../stores/gameStore';
-import { ORACLE_TABLE, ACTION_ORACLE, THEME_ORACLE, CARD_SUITS, CARD_VALUES, CARD_VALUE_MEANINGS, ENCOUNTER_CREATURES, ENCOUNTER_ACTIVITIES, ENCOUNTER_LOCATIONS, ENCOUNTER_MOODS, ENCOUNTER_DETAILS, ENCOUNTER_MOTIVATIONS, ENCOUNTER_COMPLICATIONS, CREATURE_TYPES, CREATURE_PERSONALITIES, CREATURE_APPEARANCES, CREATURE_GOALS, CREATURE_DOING, CREATURE_MOODS, CREATURE_SECRETS, CREATURE_QUIRKS, NARRATIVE_OPENINGS, NARRATIVE_SETTINGS, EVENT_FOCUS, EVENT_ACTIONS, EVENT_SUBJECTS, EVENT_COMPLICATIONS, SETTLEMENT_RUMORS, SETTLEMENT_HAPPENINGS, NATURE_EVENTS, WILDERNESS_THREATS, DISCOVERIES } from '../../data/constants';
+import { ORACLE_TABLE, ACTION_ORACLE, THEME_ORACLE, CARD_SUITS, CARD_VALUES, CARD_VALUE_MEANINGS, ENCOUNTER_CREATURES, ENCOUNTER_ACTIVITIES, ENCOUNTER_LOCATIONS, ENCOUNTER_MOODS, ENCOUNTER_DETAILS, ENCOUNTER_MOTIVATIONS, ENCOUNTER_COMPLICATIONS, CREATURE_TYPES, CREATURE_PERSONALITIES, CREATURE_APPEARANCES, CREATURE_GOALS, CREATURE_DOING, CREATURE_MOODS, CREATURE_SECRETS, CREATURE_QUIRKS, NARRATIVE_OPENINGS, NARRATIVE_SETTINGS, EVENT_FOCUS, EVENT_ACTIONS, EVENT_SUBJECTS, EVENT_COMPLICATIONS, SETTLEMENT_RUMORS, SETTLEMENT_HAPPENINGS, NATURE_EVENTS, WILDERNESS_THREATS, DISCOVERIES, LORE_ASPECTS } from '../../data/constants';
 import { rollDice, rollD6, roll2D6, randomFrom, formatTimestamp } from '../../utils/helpers';
 import { DiceDisplay, ResultBadge, SectionHeader, ResultCard, Button, HelpHeader, Input, TabNav } from '../ui/common';
 import SceneManager from './SceneManager';
@@ -15,6 +15,7 @@ const OraclePanel = () => {
   const [customDiceResult, setCustomDiceResult] = useState(null);
   const [diceReason, setDiceReason] = useState('');
   const [silentMode, setSilentMode] = useState(false); // Tichý režim - nezapisuje do deníku
+  const [loreResult, setLoreResult] = useState<Record<string, string> | null>(null);
 
   // Helper pro logování (respektuje silentMode)
   const logEntry = (entry) => {
@@ -409,12 +410,37 @@ const OraclePanel = () => {
     logEntry(entry);
   };
 
+  const generateLore = (aspectKey: string | null = null) => {
+    let newResult: Record<string, string>;
+    if (aspectKey && loreResult) {
+      const aspect = LORE_ASPECTS.find(a => a.key === aspectKey);
+      newResult = { ...loreResult, [aspectKey]: randomFrom(aspect!.table) };
+    } else {
+      newResult = {};
+      for (const aspect of LORE_ASPECTS) {
+        newResult[aspect.key] = randomFrom(aspect.table);
+      }
+    }
+    setLoreResult(newResult);
+    const narrative = LORE_ASPECTS.map(a => `**${a.icon} ${a.label}:** ${newResult[a.key]}`).join('\n');
+    const entry = {
+      type: 'oracle',
+      subtype: 'monster_lore',
+      timestamp: formatTimestamp(),
+      result: narrative,
+      data: newResult
+    };
+    setLastResult(entry);
+    if (!silentMode) logEntry(entry);
+  };
+
   const oracleTabs = [
     { id: 'yesno', label: 'Ano/Ne', icon: '🎲' },
     { id: 'event', label: 'Události', icon: '⚡' },
     { id: 'narrative', label: 'Inspirace', icon: '💭' },
     { id: 'encounter', label: 'Setkání', icon: '👁️' },
     { id: 'creature', label: 'Tvor', icon: '🐭' },
+    { id: 'lore', label: 'Lore', icon: '📖' },
     { id: 'dice', label: 'Kostky', icon: '🎯' },
     { id: 'scene', label: 'Scéna', icon: '🎭' },
     { id: 'prompt', label: 'Prompt', icon: '💡' },
@@ -1100,6 +1126,97 @@ const OraclePanel = () => {
               💡 Generovat Prompt
             </Button>
           </div>
+        </ResultCard>
+      )}
+
+      {activeOracle === 'lore' && (
+        <ResultCard>
+          <HelpHeader
+            title="Generátor Lore Bytosti"
+            icon="📖"
+            tooltip={
+              <div>
+                <p className="font-bold mb-2">📖 Co je tohle?</p>
+                <p className="text-xs mb-2">Hloubkový profiler pro jakoukoliv bytost. Generuje 12 aspektů lore: původ, motivaci, společenství, doupě, chování, zvěsti, magii, záliby, vlastnictví, ctnosti, temné stránky a nečekané zvraty.</p>
+                <p className="font-bold mb-1">🎲 Jak to funguje:</p>
+                <ul className="text-xs space-y-1">
+                  <li>• <b>Hodit vše</b> — vygeneruje všech 12 aspektů najednou</li>
+                  <li>• <b>🔄</b> — přehodí jen jeden aspekt, zbytek zůstane</li>
+                  <li>• <b>Individuální tlačítka</b> — hodí jen jeden konkrétní aspekt</li>
+                </ul>
+                <p className="text-xs mt-2 text-stone-300">300 položek ve 12 tabulkách = ~59 biliard unikátních kombinací.</p>
+              </div>
+            }
+          />
+
+          <Button onClick={() => generateLore()} variant="primary" size="large" className="w-full mb-4">
+            📖 Generovat lore bytosti
+          </Button>
+
+          <div className="mb-4 grid grid-cols-3 sm:grid-cols-4 gap-2">
+            {LORE_ASPECTS.map(aspect => (
+              <button
+                key={aspect.key}
+                onClick={() => generateLore(aspect.key)}
+                className="px-2 py-1.5 bg-stone-100 hover:bg-stone-200 rounded text-xs text-stone-600 hover:text-stone-800 transition-colors border border-stone-200 flex items-center gap-1 justify-center"
+                title={`Hodit jen: ${aspect.label}`}
+              >
+                <span>{aspect.icon}</span>
+                <span className="truncate">{aspect.label}</span>
+              </button>
+            ))}
+          </div>
+
+          {loreResult && (
+            <div className="p-4 rounded-lg border-2 bg-amber-50 border-amber-300 space-y-2">
+              <h3 className="font-bold text-lg text-amber-900 mb-3">📖 Profil bytosti</h3>
+              {LORE_ASPECTS.map(aspect => {
+                const isTwist = aspect.key === 'twist';
+                const isDark = aspect.key === 'darkness';
+                const value = loreResult[aspect.key];
+                if (!value) return null;
+                return (
+                  <div
+                    key={aspect.key}
+                    className={`p-2 rounded border-l-4 flex items-start gap-2 ${
+                      isTwist ? `bg-stone-800 ${aspect.borderColor}` :
+                      isDark ? `bg-red-50 ${aspect.borderColor}` :
+                      `bg-white/50 ${aspect.borderColor}`
+                    }`}
+                  >
+                    <div className="flex-1">
+                      <span className={`text-xs font-medium block mb-1 ${isTwist ? 'text-stone-400' : aspect.labelColor}`}>
+                        {aspect.icon} {aspect.label.toUpperCase()}
+                      </span>
+                      <p className={`text-sm ${isTwist ? 'text-stone-300 italic' : isDark ? 'text-red-800' : 'text-stone-700'}`}>
+                        {value}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => generateLore(aspect.key)}
+                      className={`flex-shrink-0 w-7 h-7 rounded flex items-center justify-center transition-colors ${
+                        isTwist ? 'bg-stone-700 hover:bg-stone-600 text-stone-300' : 'bg-stone-100 hover:bg-stone-200 text-stone-500'
+                      }`}
+                      title={`Přehodit: ${aspect.label}`}
+                    >🔄</button>
+                  </div>
+                );
+              })}
+              <div className="mt-4 pt-3 border-t border-stone-200 flex flex-wrap items-center justify-between gap-2">
+                <span className="px-2 py-1 bg-stone-100 rounded text-xs text-stone-500">12 aspektů lore</span>
+                {silentMode && (
+                  <button
+                    onClick={() => {
+                      const narrative = LORE_ASPECTS.map(a => loreResult[a.key] ? `**${a.icon} ${a.label}:** ${loreResult[a.key]}` : null).filter(Boolean).join('\n');
+                      logEntry({ type: 'oracle', subtype: 'monster_lore', timestamp: formatTimestamp(), result: narrative, data: loreResult });
+                    }}
+                    className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded text-sm font-medium transition-colors"
+                  >📥 Uložit do deníku</button>
+                )}
+              </div>
+            </div>
+          )}
+          <p className="text-center text-xs text-stone-400 mt-4">300 položek ve 12 tabulkách = ~59,604,644,775,390,625 kombinací</p>
         </ResultCard>
       )}
 
