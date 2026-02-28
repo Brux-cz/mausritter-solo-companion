@@ -1295,21 +1295,18 @@ const WorldPanel = () => {
                                 <span className={`text-xs font-medium block mb-1 ${isTwist ? 'text-stone-400' : aspect.labelColor}`}>
                                   {aspect.icon} {aspect.label.toUpperCase()}
                                 </span>
-                                <select
+                                <input
+                                  type="text"
                                   value={value || ''}
                                   onChange={(e) => {
                                     const newLore = { ...(creature.lore || {}), [aspect.key]: e.target.value };
                                     updateCreature(creature.id, { lore: newLore });
                                   }}
-                                  className={`w-full text-sm rounded px-1 py-0.5 border-0 bg-transparent cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-400 ${
-                                    isTwist ? 'text-stone-300' : isDark ? 'text-red-800' : value ? 'text-stone-700' : 'text-stone-400 italic'
+                                  placeholder="—"
+                                  className={`w-full text-sm bg-transparent border-0 outline-none focus:ring-0 placeholder-stone-300 ${
+                                    isTwist ? 'text-stone-300' : isDark ? 'text-red-800' : 'text-stone-700'
                                   }`}
-                                >
-                                  {!value && <option value="">— vybrat —</option>}
-                                  {aspect.table.map((item, idx) => (
-                                    <option key={idx} value={item}>{item}</option>
-                                  ))}
-                                </select>
+                                />
                               </div>
                               <button
                                 onClick={() => {
