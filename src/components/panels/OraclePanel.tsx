@@ -1216,7 +1216,8 @@ const OraclePanel = () => {
                     <button
                       onClick={() => {
                         const narrative = LORE_ASPECTS.map(a => loreResult[a.key] ? `**${a.icon} ${a.label}:** ${loreResult[a.key]}` : null).filter(Boolean).join('\n');
-                        logEntry({ type: 'oracle', subtype: 'monster_lore', timestamp: formatTimestamp(), result: narrative, data: loreResult });
+                        // Voláme handleLogEntry přímo (ne logEntry), protože logEntry blokuje v silent mode
+                        if (handleLogEntry) handleLogEntry({ type: 'oracle', subtype: 'monster_lore', timestamp: formatTimestamp(), result: narrative, data: loreResult });
                       }}
                       className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded text-sm font-medium transition-colors"
                     >📥 Uložit do deníku</button>

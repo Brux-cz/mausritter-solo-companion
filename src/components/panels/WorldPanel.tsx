@@ -11,7 +11,7 @@ const WorldPanel = () => {
     settlements, setSettlements, worldNPCs, setWorldNPCs,
     worldCreatures, createCreature, updateCreature, deleteCreature,
     parties, activePartyId, getActiveParty, updateParty,
-    handleLogEntry, deleteNPC, deleteSettlement, propagateNameChange,
+    handleLogEntry, addJournalEntry, deleteNPC, deleteSettlement, propagateNameChange,
   } = useGameStore();
   const { pendingMentionOpen, setPendingMentionOpen } = useUIStore();
   const activeParty = getActiveParty();
@@ -1295,13 +1295,18 @@ const WorldPanel = () => {
                                 <span className={`text-xs font-medium block mb-1 ${isTwist ? 'text-stone-400' : aspect.labelColor}`}>
                                   {aspect.icon} {aspect.label.toUpperCase()}
                                 </span>
-                                {value ? (
-                                  <p className={`text-sm ${isTwist ? 'text-stone-300 italic' : isDark ? 'text-red-800' : 'text-stone-700'}`}>
-                                    {value}
-                                  </p>
-                                ) : (
-                                  <p className="text-sm text-stone-400 italic">—</p>
-                                )}
+                                <input
+                                  type="text"
+                                  value={value || ''}
+                                  onChange={(e) => {
+                                    const newLore = { ...(creature.lore || {}), [aspect.key]: e.target.value };
+                                    updateCreature(creature.id, { lore: newLore });
+                                  }}
+                                  placeholder="—"
+                                  className={`w-full text-sm bg-transparent border-0 outline-none focus:ring-0 placeholder-stone-300 ${
+                                    isTwist ? 'text-stone-300' : isDark ? 'text-red-800' : 'text-stone-700'
+                                  }`}
+                                />
                               </div>
                               <button
                                 onClick={() => {
@@ -1312,8 +1317,8 @@ const WorldPanel = () => {
                                   isTwist ? 'bg-stone-700 hover:bg-stone-600 text-stone-300' :
                                   'bg-stone-100 hover:bg-stone-200 text-stone-500'
                                 }`}
-                                title={`Přehodit: ${aspect.label}`}
-                              >🔄</button>
+                                title={`Náhodně: ${aspect.label}`}
+                              >🎲</button>
                             </div>
                           );
                         })}
@@ -1358,6 +1363,24 @@ const WorldPanel = () => {
                           className="w-full"
                         >
                           🎲 Přehodit vše
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            const filledAspects = LORE_ASPECTS.filter(a => creature.lore?.[a.key]);
+                            const loreLines = filledAspects.map(a => `${a.icon} **${a.label}:** ${creature.lore[a.key]}`).join('\n');
+                            addJournalEntry({
+                              id: `creature-lore-${creature.id}-${Date.now()}`,
+                              type: 'creature_lore',
+                              subtype: 'creature_lore',
+                              timestamp: formatTimestamp(),
+                              partyId: activePartyId,
+                              result: `📖 **${creature.name}**\n${loreLines}`,
+                              data: { creatureId: creature.id, name: creature.name, lore: creature.lore },
+                            } as any);
+                          }}
+                          className="w-full bg-amber-700 hover:bg-amber-800 text-white"
+                        >
+                          📖 Zapsat do deníku
                         </Button>
                       </div>
                     </div>

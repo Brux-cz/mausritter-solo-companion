@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { useUIStore } from '../../stores/uiStore';
 import { useMultiplayerStore } from '../../stores/multiplayerStore';
-import { NPC_BEHAVIOR_MOODS, NPC_BEHAVIOR_ACTIONS, NPC_BEHAVIOR_MOTIVATIONS, NPC_SECRETS, NPC_REACTIONS, SETTLEMENT_RUMORS, SETTLEMENT_HAPPENINGS, NATURE_EVENTS, WILDERNESS_THREATS, DISCOVERIES } from '../../data/constants';
+import { NPC_BEHAVIOR_MOODS, NPC_BEHAVIOR_ACTIONS, NPC_BEHAVIOR_MOTIVATIONS, NPC_SECRETS, NPC_REACTIONS, SETTLEMENT_RUMORS, SETTLEMENT_HAPPENINGS, NATURE_EVENTS, WILDERNESS_THREATS, DISCOVERIES, ENCOUNTER_ACTIVITIES, ENCOUNTER_DETAILS, ENCOUNTER_MOODS, ENCOUNTER_MOTIVATIONS, LORE_ASPECTS } from '../../data/constants';
+const LORE_ASPECTS_MAP = Object.fromEntries(LORE_ASPECTS.map(a => [a.key, a]));
 import { randomFrom, generateId, formatTimestamp } from '../../utils/helpers';
 import { parseMentions, Select } from '../ui/common';
 import { TiptapEditor } from '../ui/TiptapEditor';
@@ -10,8 +11,8 @@ import { TiptapEditor } from '../ui/TiptapEditor';
 const JournalPanel = ({ onExport }) => {
   const {
     journal, setJournal, parties, journalPartyFilter: partyFilter, setJournalPartyFilter: setPartyFilter,
-    worldNPCs, settlements, timedEvents, lexicon, setLexicon,
-    getActiveParty, deleteNPC, deleteSettlement, promoteToNPC, updateNPC,
+    worldNPCs, worldCreatures, settlements, timedEvents, lexicon, setLexicon,
+    getActiveParty, deleteNPC, deleteSettlement, promoteToNPC, updateNPC, createCreature,
   } = useGameStore();
   const { setActivePanel, setPendingMentionOpen } = useUIStore();
   const { myUserId, roomPlayers, roomConnected } = useMultiplayerStore();
@@ -420,8 +421,9 @@ const JournalPanel = ({ onExport }) => {
   const groupedByDate = {};
   filteredJournal.forEach(entry => {
     // Parse Czech date format "31. 12. 2024 14:30:25" -> "31. 12. 2024"
-    const parts = entry.timestamp?.split(' ') || [];
-    const date = parts.length >= 3 ? `${parts[0]} ${parts[1]} ${parts[2]}` : (entry.timestamp || 'Neznámé datum');
+    const ts = typeof entry.timestamp === 'number' ? new Date(entry.timestamp).toLocaleString('cs-CZ') : entry.timestamp;
+    const parts = ts?.split(' ') || [];
+    const date = parts.length >= 3 ? `${parts[0]} ${parts[1]} ${parts[2]}` : (ts || 'Neznámé datum');
     if (!groupedByDate[date]) groupedByDate[date] = [];
     groupedByDate[date].push(entry);
   });
@@ -565,16 +567,29 @@ const JournalPanel = ({ onExport }) => {
           );
         }
         // Handle encounter subtype - kratší zobrazení (+ fallback pro staré záznamy)
-        if ((entry.subtype === 'encounter' || (entry.data?.creature && entry.data?.activity)) && entry.data) {
+        if (entry.subtype === 'encounter' || (entry.data?.creature && entry.data?.activity)) {
           const e = entry.data;
+          if (e) {
+            const creatureName = e.creature?.name || e.creature || '???';
+            return (
+              <div className="my-2 pl-4 border-l-2 border-red-400 cursor-pointer hover:bg-red-50 rounded transition-colors overflow-hidden"
+                   onClick={() => setDetailModal({ type: 'encounter', data: e, entryId: entry.id, editName: creatureName, note: entry.note })}
+                   title="Klikni pro detail">
+                <p className="font-bold text-amber-900 truncate">
+                  {(e.danger || e.creature?.danger) ? '⚠️' : '👁️'} {creatureName}
+                </p>
+                <p className="text-amber-800/70 text-sm truncate">{e.activity}</p>
+                <EntryNote note={entry.note} entryId={entry.id} />
+              </div>
+            );
+          }
+          // Staré záznamy bez data — zobraz styled text bez surového markdownu
           return (
-            <div className="my-2 pl-4 border-l-2 border-red-400 cursor-pointer hover:bg-red-50 rounded transition-colors overflow-hidden"
-                 onClick={() => setDetailModal({ type: 'encounter', data: { creature: e.creature?.name || e.creature, activity: e.activity, danger: e.danger }, note: entry.note })}
-                 title="Klikni pro detail">
-              <p className="font-bold text-amber-900 truncate">
-                {e.danger ? '⚠️' : '👁️'} {e.creature?.name}
-              </p>
-              <p className="text-amber-800/70 text-sm truncate">{e.activity}</p>
+            <div className="my-2 pl-4 border-l-2 border-red-400 rounded overflow-hidden cursor-pointer hover:bg-red-50 transition-colors"
+                 onClick={() => startEdit(entry)}
+                 title="Klikni pro úpravu">
+              <p className="text-xs text-red-600 font-medium mb-1">👁️ Setkání</p>
+              <p className="text-sm text-amber-900/80 line-clamp-2">{entry.result?.replace(/\*\*/g, '').replace(/\*/g, '')}</p>
               <EntryNote note={entry.note} entryId={entry.id} />
             </div>
           );
@@ -1033,6 +1048,34 @@ const JournalPanel = ({ onExport }) => {
         );
       }
 
+      case 'creature_lore': {
+        const d = entry.data;
+        const filledAspects = d?.lore ? Object.entries(d.lore).filter(([, v]) => v) : [];
+        const creature = worldCreatures?.find(c => c.id === d?.creatureId);
+        const name = creature?.name || d?.name || '???';
+        return (
+          <div
+            className="my-2 pl-3 border-l-2 border-amber-500 cursor-pointer hover:bg-amber-50 rounded-r transition-colors"
+            onClick={() => creature && setDetailModal({ type: 'creature_lore', data: creature })}
+            title={creature ? 'Klikni pro detail' : undefined}
+          >
+            <p className="text-sm font-bold text-amber-900">📖 {name}</p>
+            {filledAspects.slice(0, 3).map(([key, val]) => {
+              const aspect = LORE_ASPECTS_MAP[key];
+              return (
+                <p key={key} className="text-xs text-amber-800/80 truncate">
+                  {aspect?.icon || '·'} {val as string}
+                </p>
+              );
+            })}
+            {filledAspects.length > 3 && (
+              <p className="text-xs text-amber-500">+{filledAspects.length - 3} dalších aspektů</p>
+            )}
+            <EntryNote note={entry.note} entryId={entry.id} />
+          </div>
+        );
+      }
+
       default:
         // For any other type, show as mechanical note
         let content = entry.content || entry.data || entry;
@@ -1374,12 +1417,15 @@ const JournalPanel = ({ onExport }) => {
               return segments.map((segment, segIdx) => {
                 if (segment.type === 'loose') {
                   const entry = (segment as any).entry;
-                  const parts = entry.timestamp?.split(' ') || [];
-                  const entryDate = parts.length >= 3 ? `${parts[0]} ${parts[1]} ${parts[2]}` : (entry.timestamp || 'Neznámé datum');
+                  const tsE = typeof entry.timestamp === 'number' ? new Date(entry.timestamp).toLocaleString('cs-CZ') : entry.timestamp;
+                  const parts = tsE?.split(' ') || [];
+                  const entryDate = parts.length >= 3 ? `${parts[0]} ${parts[1]} ${parts[2]}` : (tsE || 'Neznámé datum');
                   const prevSeg = segments[segIdx - 1];
                   let prevDate = '';
                   if (prevSeg?.type === 'loose') {
-                    const pp = (prevSeg as any).entry.timestamp?.split(' ') || [];
+                    const prevTs = (prevSeg as any).entry.timestamp;
+                    const prevTsStr = typeof prevTs === 'number' ? new Date(prevTs).toLocaleString('cs-CZ') : prevTs;
+                    const pp = prevTsStr?.split(' ') || [];
                     prevDate = pp.length >= 3 ? `${pp[0]} ${pp[1]} ${pp[2]}` : '';
                   }
                   const showDateHeader = segIdx > 0 && entryDate !== prevDate;
@@ -1917,37 +1963,145 @@ const JournalPanel = ({ onExport }) => {
             )}
 
             {/* Modal pro detail setkání (encounter) */}
-            {detailModal.type === 'encounter' && detailModal.data && (
-              <div className="p-4 space-y-3">
-                <div className="flex justify-between items-start">
-                  <div className="flex items-center gap-2">
-                    <span className="text-3xl">🎭</span>
-                    <h3 className="text-xl font-bold text-amber-900">Setkání</h3>
+            {detailModal.type === 'encounter' && detailModal.data && (() => {
+              const e = detailModal.data;
+              const danger = e.danger || e.creature?.danger;
+              return (
+                <div className="p-4 space-y-3">
+                  {/* Header - editable creature name */}
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1 mr-2">
+                      <input
+                        value={detailModal.editName ?? (e.creature?.name || e.creature || '')}
+                        onChange={(ev) => setDetailModal(prev => ({ ...prev, editName: ev.target.value }))}
+                        className="text-2xl font-bold text-amber-900 bg-transparent border-b-2 border-amber-300 focus:border-amber-500 outline-none w-full"
+                        placeholder="Jméno tvora"
+                      />
+                      {danger && <p className="text-sm text-red-600 font-medium mt-1">⚠️ Nebezpečné setkání</p>}
+                    </div>
+                    <button onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }} className="text-amber-400 hover:text-amber-600 text-xl flex-shrink-0">✕</button>
                   </div>
-                  <button onClick={() => { setDetailModal(null); setGeneratedBehavior(null); }} className="text-amber-400 hover:text-amber-600 text-xl">✕</button>
-                </div>
 
-                {/* Tvor */}
-                <div className="p-3 bg-amber-100 rounded border-l-4 border-amber-400">
-                  <span className="text-xs text-amber-700 font-medium block mb-1">🐭 TVOR</span>
-                  <p className="text-amber-900 font-medium">{detailModal.data.creature}</p>
-                </div>
-
-                {/* Aktivita */}
-                <div className="p-3 bg-amber-100 rounded border-l-4 border-amber-400">
-                  <span className="text-xs text-amber-700 font-medium block mb-1">🎬 AKTIVITA</span>
-                  <p className="text-amber-900">{detailModal.data.activity}</p>
-                </div>
-
-                {/* Poznámka */}
-                {detailModal.note && (
-                  <div className="p-3 bg-amber-100 rounded">
-                    <span className="text-sm text-amber-700">——</span>
-                    <p className="text-amber-900 italic">{detailModal.note}</p>
+                  {/* Aktivita */}
+                  <div className="p-3 bg-red-50 rounded border-l-4 border-red-400">
+                    <span className="text-xs text-red-700 font-medium block mb-1">🎬 AKTIVITA</span>
+                    <p className="text-amber-900">{e.activity}</p>
                   </div>
-                )}
-              </div>
-            )}
+
+                  {/* Detail */}
+                  {e.detail && (
+                    <div className="p-3 bg-amber-50 rounded border-l-4 border-amber-400">
+                      <span className="text-xs text-amber-700 font-medium block mb-1">👁️ DETAIL</span>
+                      <p className="text-amber-900">{e.detail}</p>
+                    </div>
+                  )}
+
+                  {/* Atmosféra/Nálada */}
+                  {e.mood && (
+                    <div className="p-3 bg-stone-50 rounded border-l-4 border-stone-300">
+                      <span className="text-xs text-stone-500 font-medium block mb-1">🌫️ ATMOSFÉRA</span>
+                      <p className="text-stone-700 italic">{e.mood}</p>
+                    </div>
+                  )}
+
+                  {/* Místo */}
+                  {e.location && (
+                    <div className="p-3 bg-green-50 rounded border-l-4 border-green-300">
+                      <span className="text-xs text-green-700 font-medium block mb-1">📍 MÍSTO</span>
+                      <p className="text-green-900">{e.location}</p>
+                    </div>
+                  )}
+
+                  {/* Motivace */}
+                  {e.motivation && (
+                    <div className="p-3 bg-blue-50 rounded border-l-4 border-blue-300">
+                      <span className="text-xs text-blue-700 font-medium block mb-1">💭 MOTIVACE</span>
+                      <p className="text-blue-900">{e.motivation}</p>
+                    </div>
+                  )}
+
+                  {/* Komplikace */}
+                  {e.complication && (
+                    <div className="p-3 bg-orange-50 rounded border-l-4 border-orange-400">
+                      <span className="text-xs text-orange-700 font-medium block mb-1">⚠️ KOMPLIKACE</span>
+                      <p className="text-orange-900 font-medium">{e.complication}</p>
+                    </div>
+                  )}
+
+                  {/* Poznámka */}
+                  {detailModal.note && (
+                    <div className="p-3 bg-amber-100 rounded">
+                      <span className="text-sm text-amber-700">——</span>
+                      <p className="text-amber-900 italic">{detailModal.note}</p>
+                    </div>
+                  )}
+
+                  {/* Generátory */}
+                  <div className="border-t border-amber-200 pt-3 space-y-3">
+                    <p className="text-sm font-medium text-stone-600">🎲 Generátory:</p>
+                    <div className="flex flex-wrap gap-2">
+                      <button onClick={() => setGeneratedBehavior(`🎬 ${randomFrom(ENCOUNTER_ACTIVITIES)}`)} className="px-3 py-2 text-sm bg-red-500 hover:bg-red-600 text-white rounded-lg shadow transition-colors font-medium">
+                        🎲 Aktivita
+                      </button>
+                      <button onClick={() => setGeneratedBehavior(`👁️ ${randomFrom(ENCOUNTER_DETAILS)}`)} className="px-3 py-2 text-sm bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow transition-colors font-medium">
+                        👁️ Detail
+                      </button>
+                      <button onClick={() => setGeneratedBehavior(`💭 ${randomFrom(ENCOUNTER_MOTIVATIONS)}`)} className="px-3 py-2 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow transition-colors font-medium">
+                        💭 Motivace
+                      </button>
+                      <button onClick={() => setGeneratedBehavior(`⚡ ${randomFrom(NPC_REACTIONS)}`)} className="px-3 py-2 text-sm bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg shadow transition-colors font-medium">
+                        ⚡ Reakce
+                      </button>
+                      <button onClick={() => setGeneratedBehavior(`🌫️ ${randomFrom(ENCOUNTER_MOODS)}`)} className="px-3 py-2 text-sm bg-stone-500 hover:bg-stone-600 text-white rounded-lg shadow transition-colors font-medium">
+                        🌫️ Nálada
+                      </button>
+                    </div>
+                    {generatedBehavior && (
+                      <div className="p-4 bg-gradient-to-r from-red-100 to-amber-100 rounded-lg border-2 border-red-300 shadow-inner">
+                        <p className="text-base font-bold text-red-900">{generatedBehavior}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Akce */}
+                  <div className="flex gap-2">
+                    {detailModal.entryId && (
+                      <button
+                        onClick={() => {
+                          const editedName = detailModal.editName ?? (e.creature?.name || e.creature || '');
+                          setJournal(journal.map(j => j.id === detailModal.entryId ? {
+                            ...j,
+                            data: j.data ? {
+                              ...j.data,
+                              creature: typeof j.data.creature === 'object'
+                                ? { ...(j.data.creature as any), name: editedName }
+                                : editedName
+                            } : j.data
+                          } : j));
+                          setDetailModal(null);
+                          setGeneratedBehavior(null);
+                        }}
+                        className="flex-1 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium transition-colors"
+                      >
+                        💾 Uložit
+                      </button>
+                    )}
+                    <button
+                      onClick={() => {
+                        const editedName = detailModal.editName ?? (e.creature?.name || e.creature || 'Nový tvor');
+                        createCreature(editedName, {});
+                        setActivePanel('worldhub');
+                        setDetailModal(null);
+                        setGeneratedBehavior(null);
+                      }}
+                      className="flex-1 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-medium transition-colors"
+                    >
+                      📌 Uložit jako Tvor
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
 
           </div>
         </div>
