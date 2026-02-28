@@ -1295,13 +1295,21 @@ const WorldPanel = () => {
                                 <span className={`text-xs font-medium block mb-1 ${isTwist ? 'text-stone-400' : aspect.labelColor}`}>
                                   {aspect.icon} {aspect.label.toUpperCase()}
                                 </span>
-                                {value ? (
-                                  <p className={`text-sm ${isTwist ? 'text-stone-300 italic' : isDark ? 'text-red-800' : 'text-stone-700'}`}>
-                                    {value}
-                                  </p>
-                                ) : (
-                                  <p className="text-sm text-stone-400 italic">—</p>
-                                )}
+                                <select
+                                  value={value || ''}
+                                  onChange={(e) => {
+                                    const newLore = { ...(creature.lore || {}), [aspect.key]: e.target.value };
+                                    updateCreature(creature.id, { lore: newLore });
+                                  }}
+                                  className={`w-full text-sm rounded px-1 py-0.5 border-0 bg-transparent cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-400 ${
+                                    isTwist ? 'text-stone-300' : isDark ? 'text-red-800' : value ? 'text-stone-700' : 'text-stone-400 italic'
+                                  }`}
+                                >
+                                  {!value && <option value="">— vybrat —</option>}
+                                  {aspect.table.map((item, idx) => (
+                                    <option key={idx} value={item}>{item}</option>
+                                  ))}
+                                </select>
                               </div>
                               <button
                                 onClick={() => {
@@ -1312,8 +1320,8 @@ const WorldPanel = () => {
                                   isTwist ? 'bg-stone-700 hover:bg-stone-600 text-stone-300' :
                                   'bg-stone-100 hover:bg-stone-200 text-stone-500'
                                 }`}
-                                title={`Přehodit: ${aspect.label}`}
-                              >🔄</button>
+                                title={`Náhodně: ${aspect.label}`}
+                              >🎲</button>
                             </div>
                           );
                         })}
