@@ -1967,15 +1967,22 @@ const JournalPanel = ({ onExport }) => {
                 <div className="flex gap-2 pt-1">
                   <button
                     onClick={() => {
-                      const saved = createCreature(detailModal.data.name, {});
+                      const d = detailModal.data;
+                      const lore: Record<string, string> = {};
+                      if (d.goal)          lore.motivation = d.goal;
+                      if (d.personality)   lore.behavior   = d.personality;
+                      if (d.appearance)    lore.lair       = d.appearance;
+                      if (d.quirk)         lore.likes      = d.quirk;
+                      if (d.secret)        lore.darkness   = d.secret;
+                      if (d.specialTrait)  lore.virtue     = d.specialTrait;
+                      if (d.criticalDamage) lore.social    = d.criticalDamage;
+                      if (d.doing)         lore.rumor      = d.doing;
+                      const notes = d.type ? `${d.type.icon || ''} ${d.type.name || ''}`.trim() : '';
+                      const saved = createCreature(d.name, lore);
                       updateCreature(saved.id, {
-                        hp: detailModal.data.hp,
-                        str: detailModal.data.str,
-                        dex: detailModal.data.dex,
-                        wil: detailModal.data.wil,
-                        armor: detailModal.data.armor,
-                        attack: detailModal.data.attack,
-                        notes: detailModal.data.narrative || '',
+                        hp: d.hp, str: d.str, dex: d.dex, wil: d.wil,
+                        armor: d.armor, attack: d.attack,
+                        notes,
                       });
                       setDetailModal(null);
                       setGeneratedBehavior(null);

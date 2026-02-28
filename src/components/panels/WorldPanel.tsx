@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { useUIStore } from '../../stores/uiStore';
-import { WEATHER_TABLE, CREATURE_CATEGORIES, BESTIARY, LANDMARKS, SETTLEMENT_FEATURES, SETTLEMENT_SIZES, SETTLEMENT_GOVERNANCE, SETTLEMENT_TRADES, SETTLEMENT_EVENTS, SETTLEMENT_NAME_STARTS, SETTLEMENT_NAME_ENDS, INN_NAME_FIRST, INN_NAME_SECOND, INN_SPECIALTIES, MALE_FIRST_NAMES, FEMALE_FIRST_NAMES, FAMILY_NAMES, BIRTHSIGNS, NPC_BEHAVIOR_MOODS, NPC_BEHAVIOR_ACTIONS, NPC_BEHAVIOR_MOTIVATIONS, NPC_SECRETS, NPC_REACTIONS, NPC_ROLES, EVENT_FOCUS, EVENT_ACTIONS, EVENT_SUBJECTS, EVENT_COMPLICATIONS, SETTLEMENT_RUMORS, SETTLEMENT_HAPPENINGS, PHYSICAL_DETAILS, NPC_QUIRKS, NPC_GOALS, DUNGEON_THEMES, DUNGEON_DENIZENS, LORE_ASPECTS } from '../../data/constants';
+import { WEATHER_TABLE, CREATURE_CATEGORIES, BESTIARY, LANDMARKS, SETTLEMENT_FEATURES, SETTLEMENT_SIZES, SETTLEMENT_GOVERNANCE, SETTLEMENT_TRADES, SETTLEMENT_EVENTS, SETTLEMENT_NAME_STARTS, SETTLEMENT_NAME_ENDS, INN_NAME_FIRST, INN_NAME_SECOND, INN_SPECIALTIES, MALE_FIRST_NAMES, FEMALE_FIRST_NAMES, FAMILY_NAMES, BIRTHSIGNS, NPC_BEHAVIOR_MOODS, NPC_BEHAVIOR_ACTIONS, NPC_BEHAVIOR_MOTIVATIONS, NPC_SECRETS, NPC_REACTIONS, NPC_ROLES, EVENT_FOCUS, EVENT_ACTIONS, EVENT_SUBJECTS, EVENT_COMPLICATIONS, SETTLEMENT_RUMORS, SETTLEMENT_HAPPENINGS, PHYSICAL_DETAILS, NPC_QUIRKS, NPC_GOALS, DUNGEON_THEMES, DUNGEON_DENIZENS, LORE_ASPECTS, CREATURE_TYPES, CREATURE_PERSONALITIES, CREATURE_APPEARANCES, CREATURE_GOALS, CREATURE_DOING, CREATURE_MOODS, CREATURE_SECRETS, CREATURE_QUIRKS, CREATURE_CRITICAL_DAMAGE, CREATURE_SPECIAL_TRAITS, CREATURE_STATES, CREATURE_ACTIONS_ANIMAL, CREATURE_REACTIONS_ANIMAL, LORE_MOTIVATION, LORE_RUMOR, LORE_DARKNESS } from '../../data/constants';
 import { rollDice, rollD6, roll2D6, randomFrom, generateId, formatTimestamp } from '../../utils/helpers';
 import { DiceDisplay, SectionHeader, ResultCard, Button, HelpHeader, Input, Select, TabNav } from '../ui/common';
 import { WEATHER_EFFECTS } from './TimePanel';
@@ -31,6 +31,7 @@ const WorldPanel = () => {
   const [npcSettlementFilter, setNpcSettlementFilter] = useState<string | null>(null); // null = všechny, 'homeless' = bez domova, string = settlementId
   const [showDeadNPCs, setShowDeadNPCs] = useState(false);
   const [editingCreature, setEditingCreature] = useState<string | null>(null);
+  const [creatureBehaviors, setCreatureBehaviors] = useState<Record<string, string>>({});
 
   const filteredNPCs = useMemo(() => {
     let result = worldNPCs;
@@ -264,6 +265,68 @@ const WorldPanel = () => {
         complication
       }
     });
+  };
+
+  // ========== CREATURE GENERATORS ==========
+  const genCreatureBehavior = (creatureId: string, type: string) => {
+    let result = '';
+    switch (type) {
+      case 'stav':     result = `🌡️ ${randomFrom(CREATURE_STATES)}`; break;
+      case 'akce':     result = `🏃 ${randomFrom(CREATURE_ACTIONS_ANIMAL)}`; break;
+      case 'reakce':   result = `⚡ ${randomFrom(CREATURE_REACTIONS_ANIMAL)}`; break;
+      case 'motivace': result = `🎯 ${randomFrom(LORE_MOTIVATION)}`; break;
+      case 'zvest':    result = `💬 ${randomFrom(LORE_RUMOR)}`; break;
+      case 'temno':    result = `🌑 ${randomFrom(LORE_DARKNESS)}`; break;
+    }
+    setCreatureBehaviors(prev => ({ ...prev, [creatureId]: result }));
+  };
+
+  const CREATURE_ATTACK_TYPES = ['d4 kousnutí', 'd6 drápy', 'd6 kousnutí', 'd8 silný útok', 'd4 žihadlo', 'd8 kousnutí', 'd10 tlama', 'd6 magický výboj', 'd4 osten', 'd6 uštknutí', 'd8 šlápnutí', 'd6 mlácení'];
+  const CREATURE_FIRST_NAMES = ['Křemílek', 'Lístek', 'Proutek', 'Bělouš', 'Stínek', 'Chlupáč', 'Tichošlap', 'Bystrozrak', 'Šedivka', 'Ořech', 'Zrnko', 'Kapka', 'Mech', 'Korál', 'Jiskra', 'Pírko', 'Hvězdička', 'Kvítek', 'Bobek', 'Kamínek', 'Vánek', 'Stéblo', 'Rosa', 'Luna', 'Šero', 'Úsvit', 'Mraka', 'Blesk', 'Rámus', 'Tichoun', 'Hbitec', 'Kulička', 'Pecka', 'Šiška', 'Vločka', 'Prach', 'Drobek'];
+
+  const generateFullCreature = () => {
+    const type = randomFrom(CREATURE_TYPES);
+    const isPredator = type.category === 'predator';
+    const isSpirit = type.category === 'spirit' || type.category === 'fae';
+    const isConstruct = type.category === 'construct';
+
+    const personality = randomFrom(CREATURE_PERSONALITIES);
+    const appearance = randomFrom(CREATURE_APPEARANCES);
+    const goal = randomFrom(CREATURE_GOALS);
+    const doing = randomFrom(CREATURE_DOING);
+    const quirk = randomFrom(CREATURE_QUIRKS);
+    const secret = randomFrom(CREATURE_SECRETS);
+    const criticalDamage = (isPredator || rollD6() >= 4) ? randomFrom(CREATURE_CRITICAL_DAMAGE) : null;
+    const specialTrait = (isPredator || isSpirit || rollD6() >= 5) ? randomFrom(CREATURE_SPECIAL_TRAITS) : null;
+
+    const rollStat = () => rollDice(2, 6).reduce((a, b) => a + b, 0);
+    const hp = isPredator ? rollDice(2, 6).reduce((a, b) => a + b, 0) + 2 : isConstruct || isSpirit ? rollD6() + 1 : rollD6();
+    const armorRoll = rollD6();
+    const armor = armorRoll <= 3 ? 0 : armorRoll <= 5 ? 1 : 2;
+    const attack = randomFrom(CREATURE_ATTACK_TYPES);
+    const str = Math.max(3, isPredator || isConstruct ? Math.min(15, rollStat() + 2) : rollStat());
+    const dex = Math.max(3, isPredator ? Math.min(15, rollStat() + 2) : isConstruct ? rollStat() - 2 : rollStat());
+    const wil = Math.max(3, isSpirit ? Math.min(15, rollStat() + 3) : isPredator ? rollStat() : rollStat() - 2);
+    const name = randomFrom(CREATURE_FIRST_NAMES);
+
+    // Mapuj na lore aspekty
+    const originTable = LORE_ASPECTS.find(a => a.key === 'origin')?.table || [];
+    const lore: Record<string, string> = {
+      origin:     randomFrom(originTable),
+      motivation: goal,
+      behavior:   personality,
+      lair:       appearance,
+      likes:      quirk,
+      darkness:   secret,
+      rumor:      doing,
+    };
+    if (specialTrait) lore.virtue = specialTrait;
+    if (criticalDamage) lore.social = `💀 Kritické: ${criticalDamage}`;
+
+    const morale = isPredator ? Math.min(12, rollD6() + 7) : isSpirit ? Math.min(12, rollD6() + 5) : rollD6() + 4;
+    const creature = createCreature(name, lore);
+    updateCreature(creature.id, { hp, str, dex, wil, armor, attack, morale, notes: `${type.icon} ${type.name}` });
+    setEditingCreature(creature.id);
   };
 
   // Generátor události pro konkrétní osadu
@@ -1228,6 +1291,9 @@ const WorldPanel = () => {
               }
             />
             <div className="flex gap-2 mt-3">
+              <Button onClick={generateFullCreature} size="large" className="flex-1">
+                🎲 Generovat setkání
+              </Button>
               <Button onClick={() => {
                 const lore: Record<string, string> = {};
                 for (const aspect of LORE_ASPECTS) {
@@ -1235,8 +1301,8 @@ const WorldPanel = () => {
                 }
                 const creature = createCreature('Nový tvor', lore);
                 setEditingCreature(creature.id);
-              }} size="large" className="flex-1">
-                📖 Generovat tvora
+              }} variant="secondary">
+                📖 Jen lore
               </Button>
               <Button onClick={() => {
                 const creature = createCreature('Nový tvor', {});
@@ -1275,8 +1341,47 @@ const WorldPanel = () => {
                         </div>
                       </div>
 
+                      {/* Bojové staty */}
+                      <div className="flex flex-wrap gap-2 text-sm font-mono bg-stone-100 rounded px-3 py-2 justify-center items-center">
+                        <span className="font-bold">BO:</span>
+                        <input type="text" inputMode="numeric" value={creature.hp ?? ''} onChange={(e) => updateCreature(creature.id, { hp: parseInt(e.target.value) || undefined })} className="w-12 h-8 text-center border rounded bg-white font-bold" placeholder="—" />
+                        <span className="ml-2 font-bold">SÍL:</span>
+                        <input type="text" inputMode="numeric" value={creature.str ?? ''} onChange={(e) => updateCreature(creature.id, { str: parseInt(e.target.value) || undefined })} className="w-12 h-8 text-center border rounded bg-white font-bold" placeholder="—" />
+                        <span className="ml-2 font-bold">MRŠ:</span>
+                        <input type="text" inputMode="numeric" value={creature.dex ?? ''} onChange={(e) => updateCreature(creature.id, { dex: parseInt(e.target.value) || undefined })} className="w-12 h-8 text-center border rounded bg-white font-bold" placeholder="—" />
+                        <span className="ml-2 font-bold">VŮL:</span>
+                        <input type="text" inputMode="numeric" value={creature.wil ?? ''} onChange={(e) => updateCreature(creature.id, { wil: parseInt(e.target.value) || undefined })} className="w-12 h-8 text-center border rounded bg-white font-bold" placeholder="—" />
+                        <span className="ml-2 font-bold">ZBR:</span>
+                        <input type="text" inputMode="numeric" value={creature.armor ?? ''} onChange={(e) => updateCreature(creature.id, { armor: parseInt(e.target.value) || undefined })} className="w-10 h-8 text-center border rounded bg-white font-bold" placeholder="0" />
+                        <span className="ml-2 font-bold">MOR:</span>
+                        <input type="text" inputMode="numeric" value={creature.morale ?? ''} onChange={(e) => updateCreature(creature.id, { morale: parseInt(e.target.value) || undefined })} className="w-10 h-8 text-center border rounded bg-white font-bold" placeholder="—" />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold text-stone-600">⚔️ Útok:</span>
+                        <input type="text" value={creature.attack || ''} onChange={(e) => updateCreature(creature.id, { attack: e.target.value })} className="flex-1 h-8 px-2 border rounded bg-white text-sm" placeholder="d6 kousnutí" />
+                      </div>
+
+                      {/* Generátory setkání */}
+                      <div className="border-t pt-3 space-y-2">
+                        <p className="text-sm font-medium text-stone-600">🎲 Generátory setkání:</p>
+                        <div className="flex flex-wrap gap-2">
+                          <button onClick={() => genCreatureBehavior(creature.id, 'stav')} className="px-3 py-2 text-sm bg-teal-500 hover:bg-teal-600 text-white rounded-lg shadow transition-colors font-medium">🌡️ Stav</button>
+                          <button onClick={() => genCreatureBehavior(creature.id, 'akce')} className="px-3 py-2 text-sm bg-green-500 hover:bg-green-600 text-white rounded-lg shadow transition-colors font-medium">🏃 Akce</button>
+                          <button onClick={() => genCreatureBehavior(creature.id, 'reakce')} className="px-3 py-2 text-sm bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg shadow transition-colors font-medium">⚡ Reakce</button>
+                          <button onClick={() => genCreatureBehavior(creature.id, 'motivace')} className="px-3 py-2 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow transition-colors font-medium">🎯 Motivace</button>
+                          <button onClick={() => genCreatureBehavior(creature.id, 'zvest')} className="px-3 py-2 text-sm bg-violet-500 hover:bg-violet-600 text-white rounded-lg shadow transition-colors font-medium">💬 Zvěst</button>
+                          <button onClick={() => genCreatureBehavior(creature.id, 'temno')} className="px-3 py-2 text-sm bg-rose-700 hover:bg-rose-800 text-white rounded-lg shadow transition-colors font-medium">🌑 Temno</button>
+                        </div>
+                        {creatureBehaviors[creature.id] && (
+                          <div className="p-4 bg-gradient-to-r from-teal-100 to-emerald-100 rounded-lg border-2 border-teal-300 shadow-inner">
+                            <p className="text-lg font-bold text-teal-900">{creatureBehaviors[creature.id]}</p>
+                          </div>
+                        )}
+                      </div>
+
                       {/* Lore aspekty */}
-                      <div className="space-y-2">
+                      <div className="border-t pt-3 space-y-2">
+                        <p className="text-sm font-medium text-stone-600">📖 Lore aspekty:</p>
                         {LORE_ASPECTS.map(aspect => {
                           const isTwist = aspect.key === 'twist';
                           const isDark = aspect.key === 'darkness';
@@ -1329,28 +1434,11 @@ const WorldPanel = () => {
                         value={creature.notes || ''}
                         onChange={(e) => updateCreature(creature.id, { notes: e.target.value })}
                         placeholder="Poznámky..."
-                        className="w-full h-20 px-3 py-2 border border-stone-300 rounded-lg resize-none text-sm"
+                        className="w-full h-16 px-3 py-2 border border-stone-300 rounded-lg resize-none text-sm"
                       />
 
-                      {/* Generátory dole */}
-                      <div className="border-t pt-3 space-y-3">
-                        <p className="text-sm font-medium text-stone-600">🎲 Generátory:</p>
-                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                          {LORE_ASPECTS.map(aspect => (
-                            <button
-                              key={aspect.key}
-                              onClick={() => {
-                                const newLore = { ...(creature.lore || {}), [aspect.key]: randomFrom(aspect.table) };
-                                updateCreature(creature.id, { lore: newLore });
-                              }}
-                              className="px-2 py-1.5 bg-stone-100 hover:bg-stone-200 rounded text-xs text-stone-600 hover:text-stone-800 transition-colors border border-stone-200 flex items-center gap-1 justify-center"
-                              title={`Hodit: ${aspect.label}`}
-                            >
-                              <span>{aspect.icon}</span>
-                              <span className="truncate">{aspect.label}</span>
-                            </button>
-                          ))}
-                        </div>
+                      {/* Akční tlačítka */}
+                      <div className="flex gap-2 pt-2 border-t">
                         <Button
                           onClick={() => {
                             const lore: Record<string, string> = {};
@@ -1360,9 +1448,9 @@ const WorldPanel = () => {
                             updateCreature(creature.id, { lore });
                           }}
                           variant="secondary"
-                          className="w-full"
+                          className="flex-1"
                         >
-                          🎲 Přehodit vše
+                          🎲 Přehodit lore
                         </Button>
                         <Button
                           onClick={() => {
@@ -1378,9 +1466,9 @@ const WorldPanel = () => {
                               data: { creatureId: creature.id, name: creature.name, lore: creature.lore },
                             } as any);
                           }}
-                          className="w-full bg-amber-700 hover:bg-amber-800 text-white"
+                          className="flex-1 bg-amber-700 hover:bg-amber-800 text-white"
                         >
-                          📖 Zapsat do deníku
+                          📖 Do deníku
                         </Button>
                       </div>
                     </div>
@@ -1406,7 +1494,22 @@ const WorldPanel = () => {
                               )}
                             </div>
                           )}
-                          {creature.notes && <p className="mt-2 text-sm italic text-stone-500 line-clamp-2">{creature.notes}</p>}
+                          {/* Bojové staty */}
+                          {(creature.hp !== undefined || creature.str !== undefined || creature.attack) && (
+                            <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs font-mono bg-stone-100 rounded px-2 py-1">
+                              {creature.hp !== undefined && <span>❤️ <b>{creature.hp}</b></span>}
+                              {creature.str !== undefined && <span>💪 <b>{creature.str}</b></span>}
+                              {creature.dex !== undefined && <span>🐾 <b>{creature.dex}</b></span>}
+                              {creature.wil !== undefined && <span>🧠 <b>{creature.wil}</b></span>}
+                              {creature.armor !== undefined && creature.armor > 0 && <span>🛡️ <b>{creature.armor}</b></span>}
+                              {creature.morale !== undefined && <span>⚖️ <b>{creature.morale}</b></span>}
+                              {creature.attack && <span>⚔️ {creature.attack}</span>}
+                            </div>
+                          )}
+                          {/* Notes — jen krátké, ne celý markdown dump */}
+                          {creature.notes && creature.notes.length < 120 && (
+                            <p className="mt-1 text-xs italic text-stone-500 truncate">{creature.notes}</p>
+                          )}
                         </div>
                         <div className="flex flex-col gap-1 flex-shrink-0">
                           <button
